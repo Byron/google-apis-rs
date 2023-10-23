@@ -111,7 +111,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -355,7 +355,7 @@ pub struct DeployJobRun {
     /// Output only. The reason the deploy failed. This will always be unspecified while the deploy is in progress or if it succeeded.
     #[serde(rename="failureCause")]
     
-    pub failure_cause: Option<String>,
+    pub failure_cause: Option<DeployJobRunFailureCauseEnum>,
     /// Output only. Additional information about the deploy failure, if available.
     #[serde(rename="failureMessage")]
     
@@ -450,7 +450,7 @@ pub struct ExecutionConfig {
     pub service_account: Option<String>,
     /// Required. Usages when this configuration should be applied.
     
-    pub usages: Option<Vec<String>>,
+    pub usages: Option<Vec<ExecutionConfigUsagesEnum>>,
     /// Optional. The resource name of the `WorkerPool`, with the format `projects/{project}/locations/{location}/workerPools/{worker_pool}`. If this optional field is unspecified, the default Cloud Build pool will be used.
     #[serde(rename="workerPool")]
     
@@ -523,7 +523,7 @@ pub struct Job {
     pub job_run: Option<String>,
     /// Output only. The current state of the Job.
     
-    pub state: Option<String>,
+    pub state: Option<JobStateEnum>,
     /// Output only. A verify Job.
     #[serde(rename="verifyJob")]
     
@@ -576,7 +576,7 @@ pub struct JobRun {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of the `JobRun`.
     
-    pub state: Option<String>,
+    pub state: Option<JobRunStateEnum>,
     /// Output only. Unique identifier of the `JobRun`.
     
     pub uid: Option<String>,
@@ -871,7 +871,7 @@ pub struct Phase {
     pub id: Option<String>,
     /// Output only. Current state of the Phase.
     
-    pub state: Option<String>,
+    pub state: Option<PhaseStateEnum>,
 }
 
 impl client::Part for Phase {}
@@ -1030,7 +1030,7 @@ pub struct Release {
     /// Output only. Current state of the render operation.
     #[serde(rename="renderState")]
     
-    pub render_state: Option<String>,
+    pub render_state: Option<ReleaseRenderStateEnum>,
     /// Filepath of the Skaffold config inside of the config URI.
     #[serde(rename="skaffoldConfigPath")]
     
@@ -1121,7 +1121,7 @@ pub struct Rollout {
     /// Output only. Approval state of the `Rollout`.
     #[serde(rename="approvalState")]
     
-    pub approval_state: Option<String>,
+    pub approval_state: Option<RolloutApprovalStateEnum>,
     /// Output only. Time at which the `Rollout` was approved.
     #[serde(rename="approveTime")]
     
@@ -1137,7 +1137,7 @@ pub struct Rollout {
     /// Output only. The reason this rollout failed. This will always be unspecified while the rollout is in progress.
     #[serde(rename="deployFailureCause")]
     
-    pub deploy_failure_cause: Option<String>,
+    pub deploy_failure_cause: Option<RolloutDeployFailureCauseEnum>,
     /// Output only. Time at which the `Rollout` started deploying.
     #[serde(rename="deployStartTime")]
     
@@ -1174,7 +1174,7 @@ pub struct Rollout {
     pub phases: Option<Vec<Phase>>,
     /// Output only. Current state of the `Rollout`.
     
-    pub state: Option<String>,
+    pub state: Option<RolloutStateEnum>,
     /// Required. The ID of Target to which this `Rollout` is deploying.
     #[serde(rename="targetId")]
     
@@ -1420,7 +1420,7 @@ pub struct TargetRender {
     /// Output only. Reason this render failed. This will always be unspecified while the render in progress.
     #[serde(rename="failureCause")]
     
-    pub failure_cause: Option<String>,
+    pub failure_cause: Option<TargetRenderFailureCauseEnum>,
     /// Output only. Additional information about the render failure, if available.
     #[serde(rename="failureMessage")]
     
@@ -1432,7 +1432,7 @@ pub struct TargetRender {
     /// Output only. Current state of the render operation for this Target.
     #[serde(rename="renderingState")]
     
-    pub rendering_state: Option<String>,
+    pub rendering_state: Option<TargetRenderRenderingStateEnum>,
 }
 
 impl client::Part for TargetRender {}
@@ -1552,7 +1552,7 @@ pub struct VerifyJobRun {
     /// Output only. The reason the verify failed. This will always be unspecified while the verify is in progress or if it succeeded.
     #[serde(rename="failureCause")]
     
-    pub failure_cause: Option<String>,
+    pub failure_cause: Option<VerifyJobRunFailureCauseEnum>,
     /// Output only. Additional information about the verify failure, if available.
     #[serde(rename="failureMessage")]
     

@@ -204,7 +204,7 @@ pub struct SasPortalDevice {
     pub serial_number: Option<String>,
     /// Output only. Device state.
     
-    pub state: Option<String>,
+    pub state: Option<SasPortalDeviceStateEnum>,
 }
 
 impl client::RequestValue for SasPortalDevice {}
@@ -221,7 +221,7 @@ pub struct SasPortalDeviceAirInterface {
     /// Conditional. This field specifies the radio access technology that is used for the CBSD.
     #[serde(rename="radioTechnology")]
     
-    pub radio_technology: Option<String>,
+    pub radio_technology: Option<SasPortalDeviceAirInterfaceRadioTechnologyEnum>,
     /// Optional. This field is related to the `radioTechnology` and provides the air interface specification that the CBSD is compliant with at the time of registration.
     #[serde(rename="supportedSpec")]
     
@@ -248,7 +248,7 @@ pub struct SasPortalDeviceConfig {
     pub call_sign: Option<String>,
     /// FCC category of the device.
     
-    pub category: Option<String>,
+    pub category: Option<SasPortalDeviceConfigCategoryEnum>,
     /// Installation parameters for the device.
     #[serde(rename="installationParams")]
     
@@ -260,13 +260,13 @@ pub struct SasPortalDeviceConfig {
     /// Measurement reporting capabilities of the device.
     #[serde(rename="measurementCapabilities")]
     
-    pub measurement_capabilities: Option<Vec<String>>,
+    pub measurement_capabilities: Option<Vec<SasPortalDeviceConfigMeasurementCapabilitiesEnum>>,
     /// Information about this device model.
     
     pub model: Option<SasPortalDeviceModel>,
     /// State of the configuration.
     
-    pub state: Option<String>,
+    pub state: Option<SasPortalDeviceConfigStateEnum>,
     /// Output only. The last time the device configuration was edited.
     #[serde(rename="updateTime")]
     
@@ -290,7 +290,7 @@ pub struct SasPortalDeviceGrant {
     /// Type of channel used.
     #[serde(rename="channelType")]
     
-    pub channel_type: Option<String>,
+    pub channel_type: Option<SasPortalDeviceGrantChannelTypeEnum>,
     /// The expiration time of the grant.
     #[serde(rename="expireTime")]
     
@@ -317,7 +317,7 @@ pub struct SasPortalDeviceGrant {
     pub move_list: Option<Vec<SasPortalDpaMoveList>>,
     /// State of the grant.
     
-    pub state: Option<String>,
+    pub state: Option<SasPortalDeviceGrantStateEnum>,
     /// If the grant is suspended, the reason(s) for suspension.
     #[serde(rename="suspensionReason")]
     
@@ -555,7 +555,7 @@ pub struct SasPortalInstallationParams {
     /// Specifies how the height is measured.
     #[serde(rename="heightType")]
     
-    pub height_type: Option<String>,
+    pub height_type: Option<SasPortalInstallationParamHeightTypeEnum>,
     /// A positive number in meters to indicate accuracy of the device antenna horizontal location. This optional parameter should only be present if its value is less than the FCC requirement of 50 meters.
     #[serde(rename="horizontalAccuracy")]
     
@@ -802,7 +802,7 @@ pub struct SasPortalNrqzValidation {
     pub longitude: Option<f64>,
     /// State of the NRQZ validation info.
     
-    pub state: Option<String>,
+    pub state: Option<SasPortalNrqzValidationStateEnum>,
 }
 
 impl client::Part for SasPortalNrqzValidation {}

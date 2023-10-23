@@ -31,11 +31,11 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().files_list(-55, -62)
-///              .sort_order("Lorem")
-///              .sort_field("gubergren")
-///              .page_token("eos")
-///              .max_results(-4)
+/// let result = hub.reports().files_list(-2, -59)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .page_token("amet.")
+///              .max_results(-20)
 ///              .doit().await;
 /// 
 /// match result {

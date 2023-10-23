@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("traceId", self._trace_id);
+        params.push("projectId", &self._project_id);
+        params.push("traceId", &self._trace_id);
 
         params.extend(self._additional_params.iter());
 
@@ -300,12 +300,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().traces_list("projectId")
-///              .view("takimata")
+///              .view(&Default::default())
 ///              .start_time(chrono::Utc::now())
-///              .page_token("amet.")
-///              .page_size(-20)
-///              .order_by("ipsum")
-///              .filter("gubergren")
+///              .page_token("takimata")
+///              .page_size(-52)
+///              .order_by("duo")
+///              .filter("ipsum")
 ///              .end_time(chrono::Utc::now())
 ///              .doit().await;
 /// # }
@@ -315,7 +315,7 @@ pub struct ProjectTraceListCall<'a, S>
 
    pub(super) hub: &'a CloudTrace<S>,
    pub(super) _project_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -358,7 +358,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -497,8 +497,8 @@ where
     /// Optional. Type of data returned for traces in the list. Default is `MINIMAL`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectTraceListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Start of the time interval (inclusive) during which the trace data was collected from the application.
@@ -697,7 +697,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
 
         params.extend(self._additional_params.iter());
 

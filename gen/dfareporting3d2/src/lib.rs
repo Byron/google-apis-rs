@@ -233,11 +233,11 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.reports().files_list(-8, -80)
-//!              .sort_order("amet.")
-//!              .sort_field("takimata")
-//!              .page_token("amet.")
-//!              .max_results(-20)
+//! let result = hub.reports().files_list(-28, -27)
+//!              .sort_order(&Default::default())
+//!              .sort_field(&Default::default())
+//!              .page_token("sanctus")
+//!              .max_results(-80)
 //!              .doit().await;
 //! 
 //! match result {

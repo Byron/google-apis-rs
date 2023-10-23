@@ -81,7 +81,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -388,7 +388,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", value);
         }
@@ -660,7 +660,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -924,7 +924,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -1204,7 +1204,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1517,7 +1517,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -1829,7 +1829,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -2121,7 +2121,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -2362,7 +2362,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_scans_jobs_get("name")
-///              .view("gubergren")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2371,7 +2371,7 @@ pub struct ProjectLocationDataScanJobGetCall<'a, S>
 
    pub(super) hub: &'a CloudDataplex<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2408,7 +2408,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -2529,8 +2529,8 @@ where
     /// Optional. Select the DataScanJob view to return. Defaults to BASIC.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDataScanJobGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationDataScanJobGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2636,8 +2636,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_scans_jobs_list("parent")
-///              .page_token("dolor")
-///              .page_size(-56)
+///              .page_token("ea")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2684,7 +2684,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2928,7 +2928,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_scans_create(req, "parent")
-///              .data_scan_id("labore")
+///              .data_scan_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2975,7 +2975,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._data_scan_id.as_ref() {
             params.push("dataScanId", value);
         }
@@ -3270,7 +3270,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3488,7 +3488,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_scans_get("name")
-///              .view("sed")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3497,7 +3497,7 @@ pub struct ProjectLocationDataScanGetCall<'a, S>
 
    pub(super) hub: &'a CloudDataplex<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3534,7 +3534,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3655,8 +3655,8 @@ where
     /// Optional. Select the DataScan view to return. Defaults to BASIC.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDataScanGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationDataScanGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3762,7 +3762,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_scans_get_iam_policy("resource")
-///              .options_requested_policy_version(-15)
+///              .options_requested_policy_version(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3808,7 +3808,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -4036,10 +4036,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_scans_list("parent")
-///              .page_token("et")
-///              .page_size(-43)
+///              .page_token("Stet")
+///              .page_size(-13)
 ///              .order_by("et")
-///              .filter("et")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4088,7 +4088,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4399,7 +4399,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4701,7 +4701,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4993,7 +4993,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -5285,7 +5285,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -5581,7 +5581,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -5888,7 +5888,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", value);
         }
@@ -6160,7 +6160,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6424,7 +6424,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -6704,7 +6704,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7017,7 +7017,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -7329,7 +7329,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -7621,7 +7621,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -7917,7 +7917,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -8224,7 +8224,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", value);
         }
@@ -8496,7 +8496,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8760,7 +8760,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -9040,7 +9040,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9353,7 +9353,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -9665,7 +9665,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -9957,7 +9957,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -10246,7 +10246,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10537,7 +10537,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -10832,7 +10832,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11050,7 +11050,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_content_get("name")
-///              .view("sadipscing")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -11059,7 +11059,7 @@ pub struct ProjectLocationLakeContentGetCall<'a, S>
 
    pub(super) hub: &'a CloudDataplex<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -11096,7 +11096,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -11217,8 +11217,8 @@ where
     /// Optional. Specify content view to make a partial request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationLakeContentGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationLakeContentGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11324,7 +11324,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_content_get_iam_policy("resource")
-///              .options_requested_policy_version(-38)
+///              .options_requested_policy_version(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11370,7 +11370,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -11598,9 +11598,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_content_list("parent")
-///              .page_token("est")
-///              .page_size(-27)
-///              .filter("sed")
+///              .page_token("no")
+///              .page_size(-7)
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11648,7 +11648,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11902,7 +11902,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_content_patch(req, "name")
-///              .validate_only(true)
+///              .validate_only(false)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -11951,7 +11951,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -12263,7 +12263,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -12555,7 +12555,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -12849,7 +12849,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -13144,7 +13144,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13362,7 +13362,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_contentitems_get("name")
-///              .view("diam")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -13371,7 +13371,7 @@ pub struct ProjectLocationLakeContentitemGetCall<'a, S>
 
    pub(super) hub: &'a CloudDataplex<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -13408,7 +13408,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -13529,8 +13529,8 @@ where
     /// Optional. Specify content view to make a partial request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationLakeContentitemGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationLakeContentitemGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13636,7 +13636,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_contentitems_get_iam_policy("resource")
-///              .options_requested_policy_version(-69)
+///              .options_requested_policy_version(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13682,7 +13682,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -13910,9 +13910,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_contentitems_list("parent")
-///              .page_token("sed")
-///              .page_size(-11)
-///              .filter("et")
+///              .page_token("et")
+///              .page_size(-93)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13960,7 +13960,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -14263,7 +14263,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -14575,7 +14575,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -14867,7 +14867,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -15108,9 +15108,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_environments_sessions_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-32)
-///              .filter("dolores")
+///              .page_token("At")
+///              .page_size(-45)
+///              .filter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15158,7 +15158,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15413,7 +15413,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_environments_create(req, "parent")
 ///              .validate_only(false)
-///              .environment_id("amet")
+///              .environment_id("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15461,7 +15461,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -15766,7 +15766,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -16028,7 +16028,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -16246,7 +16246,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_environments_get_iam_policy("resource")
-///              .options_requested_policy_version(-96)
+///              .options_requested_policy_version(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16292,7 +16292,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -16520,10 +16520,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_environments_list("parent")
-///              .page_token("Stet")
-///              .page_size(-7)
-///              .order_by("aliquyam")
-///              .filter("elitr")
+///              .page_token("consetetur")
+///              .page_size(-46)
+///              .order_by("Stet")
+///              .filter("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16572,7 +16572,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -16836,7 +16836,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_environments_patch(req, "name")
-///              .validate_only(true)
+///              .validate_only(false)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -16885,7 +16885,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -17197,7 +17197,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -17489,7 +17489,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -17781,7 +17781,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -18066,7 +18066,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -18284,8 +18284,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_tasks_jobs_list("parent")
-///              .page_token("ea")
-///              .page_size(-15)
+///              .page_token("eos")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18332,7 +18332,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -18625,7 +18625,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -18930,7 +18930,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -19192,7 +19192,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -19456,7 +19456,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -19736,7 +19736,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -20049,7 +20049,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -20361,7 +20361,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -20653,7 +20653,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -20945,7 +20945,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -21234,7 +21234,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21520,7 +21520,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21813,7 +21813,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -22118,7 +22118,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -22380,7 +22380,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -22644,7 +22644,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -22924,7 +22924,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -23237,7 +23237,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -23549,7 +23549,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -23841,7 +23841,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -24135,7 +24135,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -24432,7 +24432,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", value);
         }
@@ -24704,7 +24704,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -24972,7 +24972,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -25273,7 +25273,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -25570,7 +25570,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", value);
         }
@@ -25798,7 +25798,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_zones_entities_get("name")
-///              .view("Lorem")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -25807,7 +25807,7 @@ pub struct ProjectLocationLakeZoneEntityGetCall<'a, S>
 
    pub(super) hub: &'a CloudDataplex<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -25844,7 +25844,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -25965,8 +25965,8 @@ where
     /// Optional. Used to select the subset of entity information to return. Defaults to BASIC.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationLakeZoneEntityGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationLakeZoneEntityGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -26072,10 +26072,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_zones_entities_list("parent")
-///              .view("amet.")
-///              .page_token("no")
-///              .page_size(-91)
-///              .filter("sed")
+///              .view(&Default::default())
+///              .page_token("justo")
+///              .page_size(-52)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26084,7 +26084,7 @@ pub struct ProjectLocationLakeZoneEntityListCall<'a, S>
 
    pub(super) hub: &'a CloudDataplex<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _filter: Option<String>,
@@ -26124,7 +26124,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -26254,8 +26254,8 @@ where
     /// Required. Specify the entity view to make a partial list request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationLakeZoneEntityListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationLakeZoneEntityListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Optional. Page token received from a previous ListEntities call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to ListEntities must match the call that provided the page token.
@@ -26388,7 +26388,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_zones_entities_update(req, "name")
-///              .validate_only(false)
+///              .validate_only(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26435,7 +26435,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -26692,7 +26692,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_zones_create(req, "parent")
-///              .zone_id("nonumy")
+///              .zone_id("Lorem")
 ///              .validate_only(true)
 ///              .doit().await;
 /// # }
@@ -26741,7 +26741,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._zone_id.as_ref() {
             params.push("zoneId", value);
         }
@@ -27046,7 +27046,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -27308,7 +27308,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -27526,7 +27526,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_zones_get_iam_policy("resource")
-///              .options_requested_policy_version(-52)
+///              .options_requested_policy_version(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27572,7 +27572,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -27800,10 +27800,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_zones_list("parent")
-///              .page_token("amet")
-///              .page_size(-37)
-///              .order_by("At")
-///              .filter("sit")
+///              .page_token("amet.")
+///              .page_size(-84)
+///              .order_by("amet")
+///              .filter("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27852,7 +27852,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -28165,7 +28165,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -28477,7 +28477,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -28769,7 +28769,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -29016,8 +29016,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_create(req, "parent")
-///              .validate_only(true)
-///              .lake_id("sadipscing")
+///              .validate_only(false)
+///              .lake_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29065,7 +29065,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -29370,7 +29370,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -29632,7 +29632,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -29850,7 +29850,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_get_iam_policy("resource")
-///              .options_requested_policy_version(-56)
+///              .options_requested_policy_version(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29896,7 +29896,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -30124,10 +30124,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lakes_list("parent")
-///              .page_token("takimata")
-///              .page_size(-66)
-///              .order_by("At")
-///              .filter("invidunt")
+///              .page_token("et")
+///              .page_size(-56)
+///              .order_by("magna")
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30176,7 +30176,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -30489,7 +30489,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -30801,7 +30801,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -31093,7 +31093,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -31385,7 +31385,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -31670,7 +31670,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -31932,7 +31932,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -32150,9 +32150,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("dolores")
-///              .page_size(-30)
-///              .filter("invidunt")
+///              .page_token("rebum.")
+///              .page_size(-19)
+///              .filter("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32200,7 +32200,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -32492,7 +32492,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -32710,9 +32710,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("aliquyam")
-///              .page_size(-83)
-///              .filter("diam")
+///              .page_token("invidunt")
+///              .page_size(-64)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32760,7 +32760,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

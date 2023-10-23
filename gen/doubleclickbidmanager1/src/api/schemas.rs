@@ -13,7 +13,7 @@ pub struct DownloadLineItemsRequest {
     /// File specification (column names, types, order) in which the line items will be returned. Default to EWF.
     #[serde(rename="fileSpec")]
     
-    pub file_spec: Option<String>,
+    pub file_spec: Option<DownloadLineItemsRequestFileSpecEnum>,
     /// Ids of the specified filter type used to filter line items to fetch. If omitted, all the line items will be returned.
     #[serde(rename="filterIds")]
     
@@ -22,10 +22,10 @@ pub struct DownloadLineItemsRequest {
     /// Filter type used to filter line items to fetch.
     #[serde(rename="filterType")]
     
-    pub filter_type: Option<String>,
+    pub filter_type: Option<DownloadLineItemsRequestFilterTypeEnum>,
     /// Format in which the line items will be returned. Default to CSV.
     
-    pub format: Option<String>,
+    pub format: Option<DownloadLineItemsRequestFormatEnum>,
 }
 
 impl client::RequestValue for DownloadLineItemsRequest {}
@@ -65,7 +65,7 @@ pub struct DownloadRequest {
     /// File types that will be returned. If INVENTORY_SOURCE is requested, no other file types may be requested. Acceptable values are: - "AD" - "AD_GROUP" - "CAMPAIGN" - "INSERTION_ORDER" - "INVENTORY_SOURCE" - "LINE_ITEM" 
     #[serde(rename="fileTypes")]
     
-    pub file_types: Option<Vec<String>>,
+    pub file_types: Option<Vec<DownloadRequestFileTypesEnum>>,
     /// The IDs of the specified filter type. This is used to filter entities to fetch. At least one ID must be specified.
     #[serde(rename="filterIds")]
     
@@ -74,7 +74,7 @@ pub struct DownloadRequest {
     /// Filter type used to filter entities to fetch. PARTNER_ID and INVENTORY_SOURCE_ID may only be used when downloading inventory sources.
     #[serde(rename="filterType")]
     
-    pub filter_type: Option<String>,
+    pub filter_type: Option<DownloadRequestFilterTypeEnum>,
     /// SDF Version (column names, types, order) in which the entities will be returned. Default to 5.
     
     pub version: Option<String>,
@@ -131,7 +131,7 @@ pub struct FilterPair {
     /// Filter type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FilterPairTypeEnum>,
     /// Filter value.
     
     pub value: Option<String>,
@@ -197,18 +197,18 @@ pub struct Parameters {
     /// Data is grouped by the filters listed in this field.
     #[serde(rename="groupBys")]
     
-    pub group_bys: Option<Vec<String>>,
+    pub group_bys: Option<Vec<ParameterGroupBysEnum>>,
     /// Deprecated. This field is no longer in use.
     #[serde(rename="includeInviteData")]
     
     pub include_invite_data: Option<bool>,
     /// Metrics to include as columns in your report.
     
-    pub metrics: Option<Vec<String>>,
+    pub metrics: Option<Vec<ParameterMetricsEnum>>,
     /// Report type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ParameterTypeEnum>,
 }
 
 impl client::Part for Parameters {}
@@ -273,10 +273,10 @@ pub struct QueryMetadata {
     /// Range of report data.
     #[serde(rename="dataRange")]
     
-    pub data_range: Option<String>,
+    pub data_range: Option<QueryMetadataDataRangeEnum>,
     /// Format of the generated report.
     
-    pub format: Option<String>,
+    pub format: Option<QueryMetadataFormatEnum>,
     /// The path to the location in Google Cloud Storage where the latest report is stored.
     #[serde(rename="googleCloudStoragePathForLatestReport")]
     
@@ -330,7 +330,7 @@ pub struct QuerySchedule {
     pub end_time_ms: Option<i64>,
     /// How often the query is run.
     
-    pub frequency: Option<String>,
+    pub frequency: Option<QueryScheduleFrequencyEnum>,
     /// Time of day at which a new report will be generated, represented as minutes past midnight. Range is 0 to 1439. Only applies to scheduled reports.
     #[serde(rename="nextRunMinuteOfDay")]
     
@@ -379,7 +379,7 @@ pub struct ReportFailure {
     /// Error code that shows why the report was not created.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<ReportFailureErrorCodeEnum>,
 }
 
 impl client::Part for ReportFailure {}
@@ -453,10 +453,10 @@ pub struct ReportStatus {
     pub finish_time_ms: Option<i64>,
     /// The file type of the report.
     
-    pub format: Option<String>,
+    pub format: Option<ReportStatuFormatEnum>,
     /// The state of the report.
     
-    pub state: Option<String>,
+    pub state: Option<ReportStatuStateEnum>,
 }
 
 impl client::Part for ReportStatus {}
@@ -510,7 +510,7 @@ pub struct RunQueryRequest {
     /// Report data range used to generate the report.
     #[serde(rename="dataRange")]
     
-    pub data_range: Option<String>,
+    pub data_range: Option<RunQueryRequestDataRangeEnum>,
     /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.
     #[serde(rename="reportDataEndTimeMs")]
     
@@ -547,7 +547,7 @@ pub struct UploadLineItemsRequest {
     pub dry_run: Option<bool>,
     /// Format the line items are in. Default to CSV.
     
-    pub format: Option<String>,
+    pub format: Option<UploadLineItemsRequestFormatEnum>,
     /// Line items in CSV to upload. Refer to Entity Write File Format for more information on file format.
     #[serde(rename="lineItems")]
     

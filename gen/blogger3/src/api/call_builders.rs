@@ -26,7 +26,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.blog_user_infos().get("userId", "blogId")
-///              .max_posts(31)
+///              .max_posts(84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -73,8 +73,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("blogId", self._blog_id);
+        params.push("userId", &self._user_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._max_posts.as_ref() {
             params.push("maxPosts", value.to_string());
         }
@@ -309,8 +309,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.blogs().get("blogId")
-///              .view("no")
-///              .max_posts(86)
+///              .view(&Default::default())
+///              .max_posts(45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -319,7 +319,7 @@ pub struct BlogGetCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<BlogViewEnum>,
    pub(super) _max_posts: Option<u32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -357,7 +357,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -479,8 +479,8 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &BlogViewEnum) -> BlogGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
@@ -592,7 +592,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.blogs().get_by_url("url")
-///              .view("et")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -601,7 +601,7 @@ pub struct BlogGetByUrlCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _url: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<BlogViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -638,7 +638,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("url", self._url);
+        params.push("url", &self._url);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -750,8 +750,8 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &BlogViewEnum) -> BlogGetByUrlCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -857,10 +857,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.blogs().list_by_user("userId")
-///              .view("et")
-///              .add_status("et")
-///              .add_role("vero")
-///              .fetch_user_info(false)
+///              .view(&Default::default())
+///              .add_status(&Default::default())
+///              .add_role(&Default::default())
+///              .fetch_user_info(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -869,9 +869,9 @@ pub struct BlogListByUserCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _user_id: String,
-   pub(super) _view: Option<String>,
-   pub(super) _status: Vec<String>,
-   pub(super) _role: Vec<String>,
+   pub(super) _view: Option<BlogViewEnum>,
+   pub(super) _status: Option<BlogStatusEnum>,
+   pub(super) _role: Option<BlogRoleEnum>,
    pub(super) _fetch_user_info: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -909,7 +909,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1041,23 +1041,23 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &BlogViewEnum) -> BlogListByUserCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Default value of status is LIVE.
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
-        self._status.push(new_value.to_string());
+    pub fn add_status(mut self, new_value: &BlogStatusEnum) -> BlogListByUserCall<'a, S> {
+        self._status.push(new_value.clone());
         self
     }
     ///
     /// Append the given value to the *role* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
-        self._role.push(new_value.to_string());
+    pub fn add_role(mut self, new_value: &BlogRoleEnum) -> BlogListByUserCall<'a, S> {
+        self._role.push(new_value.clone());
         self
     }
     ///
@@ -1215,9 +1215,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
-        params.push("commentId", self._comment_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1498,9 +1498,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
-        params.push("commentId", self._comment_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1724,7 +1724,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().get("blogId", "postId", "commentId")
-///              .view("et")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1735,7 +1735,7 @@ pub struct CommentGetCall<'a, S>
    pub(super) _blog_id: String,
    pub(super) _post_id: String,
    pub(super) _comment_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<CommentViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1772,9 +1772,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
-        params.push("commentId", self._comment_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
+        params.push("commentId", &self._comment_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1911,8 +1911,8 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &CommentViewEnum) -> CommentGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2018,13 +2018,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("blogId", "postId")
-///              .view("dolor")
-///              .status("duo")
-///              .start_date("vero")
-///              .page_token("vero")
-///              .max_results(13)
-///              .fetch_bodies(true)
-///              .end_date("vero")
+///              .view(&Default::default())
+///              .status(&Default::default())
+///              .start_date("sed")
+///              .page_token("duo")
+///              .max_results(67)
+///              .fetch_bodies(false)
+///              .end_date("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2034,8 +2034,8 @@ pub struct CommentListCall<'a, S>
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
    pub(super) _post_id: String,
-   pub(super) _view: Option<String>,
-   pub(super) _status: Option<String>,
+   pub(super) _view: Option<CommentViewEnum>,
+   pub(super) _status: Option<CommentStatusEnum>,
    pub(super) _start_date: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
@@ -2077,8 +2077,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -2224,14 +2224,14 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CommentListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &CommentViewEnum) -> CommentListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> CommentListCall<'a, S> {
-        self._status = Some(new_value.to_string());
+    pub fn status(mut self, new_value: &CommentStatusEnum) -> CommentListCall<'a, S> {
+        self._status = Some(new_value.clone());
         self
     }
     ///
@@ -2367,12 +2367,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list_by_blog("blogId")
-///              .add_status("Lorem")
-///              .start_date("diam")
-///              .page_token("no")
-///              .max_results(1)
-///              .fetch_bodies(true)
-///              .end_date("consetetur")
+///              .add_status(&Default::default())
+///              .start_date("et")
+///              .page_token("et")
+///              .max_results(6)
+///              .fetch_bodies(false)
+///              .end_date("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2381,7 +2381,7 @@ pub struct CommentListByBlogCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
-   pub(super) _status: Vec<String>,
+   pub(super) _status: Option<CommentStatusEnum>,
    pub(super) _start_date: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
@@ -2423,7 +2423,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if self._status.len() > 0 {
             for f in self._status.iter() {
                 params.push("status", f);
@@ -2560,8 +2560,8 @@ where
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> CommentListByBlogCall<'a, S> {
-        self._status.push(new_value.to_string());
+    pub fn add_status(mut self, new_value: &CommentStatusEnum) -> CommentListByBlogCall<'a, S> {
+        self._status.push(new_value.clone());
         self
     }
     ///
@@ -2743,9 +2743,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
-        params.push("commentId", self._comment_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3026,9 +3026,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
-        params.push("commentId", self._comment_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3263,7 +3263,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.page_views().get("blogId")
-///              .add_range("dolores")
+///              .add_range(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3272,7 +3272,7 @@ pub struct PageViewGetCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
-   pub(super) _range: Vec<String>,
+   pub(super) _range: Option<PageViewRangeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3309,7 +3309,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if self._range.len() > 0 {
             for f in self._range.iter() {
                 params.push("range", f);
@@ -3431,8 +3431,8 @@ where
     ///
     /// Append the given value to the *range* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_range(mut self, new_value: &str) -> PageViewGetCall<'a, S> {
-        self._range.push(new_value.to_string());
+    pub fn add_range(mut self, new_value: &PageViewRangeEnum) -> PageViewGetCall<'a, S> {
+        self._range.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3585,8 +3585,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("pageId", self._page_id);
+        params.push("blogId", &self._blog_id);
+        params.push("pageId", &self._page_id);
         if let Some(value) = self._use_trash.as_ref() {
             params.push("useTrash", value.to_string());
         }
@@ -3811,7 +3811,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pages().get("blogId", "pageId")
-///              .view("dolore")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3821,7 +3821,7 @@ pub struct PageGetCall<'a, S>
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
    pub(super) _page_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<PageViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3858,8 +3858,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("pageId", self._page_id);
+        params.push("blogId", &self._blog_id);
+        params.push("pageId", &self._page_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3987,8 +3987,8 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PageGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &PageViewEnum) -> PageGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4147,7 +4147,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._is_draft.as_ref() {
             params.push("isDraft", value.to_string());
         }
@@ -4396,10 +4396,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pages().list("blogId")
-///              .view("invidunt")
-///              .add_status("no")
-///              .page_token("est")
-///              .max_results(74)
+///              .view(&Default::default())
+///              .add_status(&Default::default())
+///              .page_token("consetetur")
+///              .max_results(99)
 ///              .fetch_bodies(true)
 ///              .doit().await;
 /// # }
@@ -4409,8 +4409,8 @@ pub struct PageListCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
-   pub(super) _view: Option<String>,
-   pub(super) _status: Vec<String>,
+   pub(super) _view: Option<PageViewEnum>,
+   pub(super) _status: Option<PageStatusEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _fetch_bodies: Option<bool>,
@@ -4450,7 +4450,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -4583,15 +4583,15 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PageListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &PageViewEnum) -> PageListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> PageListCall<'a, S> {
-        self._status.push(new_value.to_string());
+    pub fn add_status(mut self, new_value: &PageStatusEnum) -> PageListCall<'a, S> {
+        self._status.push(new_value.clone());
         self
     }
     ///
@@ -4721,8 +4721,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pages().patch(req, "blogId", "pageId")
-///              .revert(true)
-///              .publish(true)
+///              .revert(false)
+///              .publish(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4771,8 +4771,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("pageId", self._page_id);
+        params.push("blogId", &self._blog_id);
+        params.push("pageId", &self._page_id);
         if let Some(value) = self._revert.as_ref() {
             params.push("revert", value.to_string());
         }
@@ -5084,8 +5084,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("pageId", self._page_id);
+        params.push("blogId", &self._blog_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5356,8 +5356,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("pageId", self._page_id);
+        params.push("blogId", &self._blog_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5589,7 +5589,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pages().update(req, "blogId", "pageId")
-///              .revert(false)
+///              .revert(true)
 ///              .publish(false)
 ///              .doit().await;
 /// # }
@@ -5639,8 +5639,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("pageId", self._page_id);
+        params.push("blogId", &self._blog_id);
+        params.push("pageId", &self._page_id);
         if let Some(value) = self._revert.as_ref() {
             params.push("revert", value.to_string());
         }
@@ -5907,7 +5907,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.post_user_infos().get("userId", "blogId", "postId")
-///              .max_comments(10)
+///              .max_comments(96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5955,9 +5955,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("userId", &self._user_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._max_comments.as_ref() {
             params.push("maxComments", value.to_string());
         }
@@ -6201,15 +6201,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.post_user_infos().list("userId", "blogId")
-///              .view("aliquyam")
-///              .add_status("dolores")
-///              .start_date("sadipscing")
-///              .page_token("erat")
-///              .order_by("aliquyam")
-///              .max_results(54)
-///              .labels("est")
-///              .fetch_bodies(false)
-///              .end_date("consetetur")
+///              .view(&Default::default())
+///              .add_status(&Default::default())
+///              .start_date("Lorem")
+///              .page_token("est")
+///              .order_by(&Default::default())
+///              .max_results(71)
+///              .labels("diam")
+///              .fetch_bodies(true)
+///              .end_date("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6219,11 +6219,11 @@ pub struct PostUserInfoListCall<'a, S>
    pub(super) hub: &'a Blogger<S>,
    pub(super) _user_id: String,
    pub(super) _blog_id: String,
-   pub(super) _view: Option<String>,
-   pub(super) _status: Vec<String>,
+   pub(super) _view: Option<PostUserInfoViewEnum>,
+   pub(super) _status: Option<PostUserInfoStatusEnum>,
    pub(super) _start_date: Option<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<PostUserInfoOrderByEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _labels: Option<String>,
    pub(super) _fetch_bodies: Option<bool>,
@@ -6264,8 +6264,8 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("blogId", self._blog_id);
+        params.push("userId", &self._user_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -6419,15 +6419,15 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &PostUserInfoViewEnum) -> PostUserInfoListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
-        self._status.push(new_value.to_string());
+    pub fn add_status(mut self, new_value: &PostUserInfoStatusEnum) -> PostUserInfoListCall<'a, S> {
+        self._status.push(new_value.clone());
         self
     }
     ///
@@ -6444,8 +6444,8 @@ where
     }
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &PostUserInfoOrderByEnum) -> PostUserInfoListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     ///
@@ -6622,8 +6622,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._use_trash.as_ref() {
             params.push("useTrash", value.to_string());
         }
@@ -6848,9 +6848,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().get("blogId", "postId")
-///              .view("diam")
-///              .max_comments(44)
-///              .fetch_images(true)
+///              .view(&Default::default())
+///              .max_comments(40)
+///              .fetch_images(false)
 ///              .fetch_body(false)
 ///              .doit().await;
 /// # }
@@ -6861,7 +6861,7 @@ pub struct PostGetCall<'a, S>
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
    pub(super) _post_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<PostViewEnum>,
    pub(super) _max_comments: Option<u32>,
    pub(super) _fetch_images: Option<bool>,
    pub(super) _fetch_body: Option<bool>,
@@ -6901,8 +6901,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -7039,8 +7039,8 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &PostViewEnum) -> PostGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
@@ -7164,8 +7164,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().get_by_path("blogId", "path")
-///              .view("ea")
-///              .max_comments(86)
+///              .view(&Default::default())
+///              .max_comments(32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7175,7 +7175,7 @@ pub struct PostGetByPathCall<'a, S>
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
    pub(super) _path: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<PostViewEnum>,
    pub(super) _max_comments: Option<u32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -7213,8 +7213,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("path", self._path);
+        params.push("blogId", &self._blog_id);
+        params.push("path", &self._path);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -7345,8 +7345,8 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &PostViewEnum) -> PostGetByPathCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
@@ -7464,9 +7464,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().insert(req, "blogId")
-///              .is_draft(true)
-///              .fetch_images(false)
-///              .fetch_body(false)
+///              .is_draft(false)
+///              .fetch_images(true)
+///              .fetch_body(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7515,7 +7515,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._is_draft.as_ref() {
             params.push("isDraft", value.to_string());
         }
@@ -7782,17 +7782,17 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().list("blogId")
-///              .view("eirmod")
-///              .add_status("Lorem")
-///              .start_date("accusam")
-///              .sort_option("amet")
-///              .page_token("erat")
-///              .order_by("dolores")
-///              .max_results(20)
-///              .labels("accusam")
-///              .fetch_images(true)
-///              .fetch_bodies(true)
-///              .end_date("et")
+///              .view(&Default::default())
+///              .add_status(&Default::default())
+///              .start_date("sea")
+///              .sort_option(&Default::default())
+///              .page_token("consetetur")
+///              .order_by(&Default::default())
+///              .max_results(55)
+///              .labels("Stet")
+///              .fetch_images(false)
+///              .fetch_bodies(false)
+///              .end_date("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7801,12 +7801,12 @@ pub struct PostListCall<'a, S>
 
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
-   pub(super) _view: Option<String>,
-   pub(super) _status: Vec<String>,
+   pub(super) _view: Option<PostViewEnum>,
+   pub(super) _status: Option<PostStatusEnum>,
    pub(super) _start_date: Option<String>,
-   pub(super) _sort_option: Option<String>,
+   pub(super) _sort_option: Option<PostSortOptionEnum>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<PostOrderByEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _labels: Option<String>,
    pub(super) _fetch_images: Option<bool>,
@@ -7848,7 +7848,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
+        params.push("blogId", &self._blog_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -7999,15 +7999,15 @@ where
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &PostViewEnum) -> PostListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> PostListCall<'a, S> {
-        self._status.push(new_value.to_string());
+    pub fn add_status(mut self, new_value: &PostStatusEnum) -> PostListCall<'a, S> {
+        self._status.push(new_value.clone());
         self
     }
     ///
@@ -8019,8 +8019,8 @@ where
     /// Sort direction applied to post list.
     ///
     /// Sets the *sort option* query property to the given value.
-    pub fn sort_option(mut self, new_value: &str) -> PostListCall<'a, S> {
-        self._sort_option = Some(new_value.to_string());
+    pub fn sort_option(mut self, new_value: &PostSortOptionEnum) -> PostListCall<'a, S> {
+        self._sort_option = Some(new_value.clone());
         self
     }
     ///
@@ -8031,8 +8031,8 @@ where
     }
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &PostOrderByEnum) -> PostListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     ///
@@ -8176,7 +8176,7 @@ where
 /// let result = hub.posts().patch(req, "blogId", "postId")
 ///              .revert(true)
 ///              .publish(false)
-///              .max_comments(91)
+///              .max_comments(26)
 ///              .fetch_images(true)
 ///              .fetch_body(true)
 ///              .doit().await;
@@ -8230,8 +8230,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._revert.as_ref() {
             params.push("revert", value.to_string());
         }
@@ -8525,7 +8525,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().publish("blogId", "postId")
-///              .publish_date("aliquyam")
+///              .publish_date("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8572,8 +8572,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._publish_date.as_ref() {
             params.push("publishDate", value);
         }
@@ -8853,8 +8853,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9080,7 +9080,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().search("blogId", "q")
-///              .order_by("gubergren")
+///              .order_by(&Default::default())
 ///              .fetch_bodies(true)
 ///              .doit().await;
 /// # }
@@ -9091,7 +9091,7 @@ pub struct PostSearchCall<'a, S>
    pub(super) hub: &'a Blogger<S>,
    pub(super) _blog_id: String,
    pub(super) _q: String,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<PostOrderByEnum>,
    pub(super) _fetch_bodies: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -9129,8 +9129,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("q", self._q);
+        params.push("blogId", &self._blog_id);
+        params.push("q", &self._q);
         if let Some(value) = self._order_by.as_ref() {
             params.push("orderBy", value);
         }
@@ -9261,8 +9261,8 @@ where
     }
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &PostOrderByEnum) -> PostSearchCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     ///
@@ -9380,9 +9380,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.posts().update(req, "blogId", "postId")
-///              .revert(true)
+///              .revert(false)
 ///              .publish(false)
-///              .max_comments(39)
+///              .max_comments(91)
 ///              .fetch_images(true)
 ///              .fetch_body(true)
 ///              .doit().await;
@@ -9436,8 +9436,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("blogId", self._blog_id);
-        params.push("postId", self._post_id);
+        params.push("blogId", &self._blog_id);
+        params.push("postId", &self._post_id);
         if let Some(value) = self._revert.as_ref() {
             params.push("revert", value.to_string());
         }
@@ -9775,7 +9775,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 

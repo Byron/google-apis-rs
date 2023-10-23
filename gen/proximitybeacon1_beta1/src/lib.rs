@@ -115,10 +115,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.beacons().diagnostics_list("beaconName")
-//!              .project_id("sanctus")
-//!              .page_token("sed")
-//!              .page_size(-2)
-//!              .alert_filter("takimata")
+//!              .project_id("At")
+//!              .page_token("sanctus")
+//!              .page_size(-80)
+//!              .alert_filter(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

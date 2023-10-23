@@ -93,7 +93,7 @@ pub struct GoogleCloudBillingBudgetsV1Filter {
     /// Optional. Specifies to track usage for recurring calendar period. For example, assume that CalendarPeriod.QUARTER is set. The budget tracks usage from April 1 to June 30, when the current calendar month is April, May, June. After that, it tracks usage from July 1 to September 30 when the current calendar month is July, August, September, so on.
     #[serde(rename="calendarPeriod")]
     
-    pub calendar_period: Option<String>,
+    pub calendar_period: Option<GoogleCloudBillingBudgetsV1FilterCalendarPeriodEnum>,
     /// Optional. If Filter.credit_types_treatment is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be subtracted from gross cost to determine the spend for threshold calculations. See [a list of acceptable credit type values](https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type). If Filter.credit_types_treatment is **not** INCLUDE_SPECIFIED_CREDITS, this field must be empty.
     #[serde(rename="creditTypes")]
     
@@ -101,7 +101,7 @@ pub struct GoogleCloudBillingBudgetsV1Filter {
     /// Optional. If not set, default behavior is `INCLUDE_ALL_CREDITS`.
     #[serde(rename="creditTypesTreatment")]
     
-    pub credit_types_treatment: Option<String>,
+    pub credit_types_treatment: Option<GoogleCloudBillingBudgetsV1FilterCreditTypesTreatmentEnum>,
     /// Optional. Specifies to track usage from any start date (required) to any end date (optional). This time period is static, it does not recur.
     #[serde(rename="customPeriod")]
     
@@ -194,7 +194,7 @@ pub struct GoogleCloudBillingBudgetsV1ThresholdRule {
     /// Optional. The type of basis used to determine if spend has passed the threshold. Behavior defaults to CURRENT_SPEND if not set.
     #[serde(rename="spendBasis")]
     
-    pub spend_basis: Option<String>,
+    pub spend_basis: Option<GoogleCloudBillingBudgetsV1ThresholdRuleSpendBasisEnum>,
     /// Required. Send an alert when this threshold is exceeded. This is a 1.0-based percentage, so 0.5 = 50%. Validation: non-negative number.
     #[serde(rename="thresholdPercent")]
     

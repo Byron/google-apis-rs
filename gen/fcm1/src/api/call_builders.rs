@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 

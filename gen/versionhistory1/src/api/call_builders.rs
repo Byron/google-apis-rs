@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -342,7 +342,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -603,7 +603,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -844,7 +844,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

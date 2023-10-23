@@ -78,9 +78,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userToken", self._user_token);
-        params.push("accountType", self._account_type);
-        params.push("accountName", self._account_name);
+        params.push("userToken", &self._user_token);
+        params.push("accountType", &self._account_type);
+        params.push("accountName", &self._account_name);
 
         params.extend(self._additional_params.iter());
 
@@ -337,7 +337,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -584,7 +584,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1357,7 +1357,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1645,7 +1645,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1926,7 +1926,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -2423,7 +2423,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -2683,7 +2683,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -3445,7 +3445,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -3727,8 +3727,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("itemId", self._item_id);
-        params.push("attachmentId", self._attachment_id);
+        params.push("itemId", &self._item_id);
+        params.push("attachmentId", &self._attachment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3991,8 +3991,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("itemId", self._item_id);
-        params.push("attachmentId", self._attachment_id);
+        params.push("itemId", &self._item_id);
+        params.push("attachmentId", &self._attachment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4271,7 +4271,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("itemId", self._item_id);
+        params.push("itemId", &self._item_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4637,7 +4637,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("itemId", self._item_id);
+        params.push("itemId", &self._item_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4895,7 +4895,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -5142,7 +5142,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -5742,8 +5742,8 @@ where
 ///              .source_item_id("duo")
 ///              .pinned_only(true)
 ///              .page_token("sed")
-///              .order_by("ut")
-///              .max_results(89)
+///              .order_by(&Default::default())
+///              .max_results(64)
 ///              .include_deleted(true)
 ///              .bundle_id("ipsum")
 ///              .doit().await;
@@ -5756,7 +5756,7 @@ pub struct TimelineListCall<'a, S>
    pub(super) _source_item_id: Option<String>,
    pub(super) _pinned_only: Option<bool>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<TimelineOrderByEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _include_deleted: Option<bool>,
    pub(super) _bundle_id: Option<String>,
@@ -5938,8 +5938,8 @@ where
     /// Controls the order in which timeline items are returned.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> TimelineListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &TimelineOrderByEnum) -> TimelineListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// The maximum number of items to include in the response, used for paging.
@@ -6113,7 +6113,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -6403,7 +6403,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 

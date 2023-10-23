@@ -30,8 +30,8 @@ use super::*;
 ///              .read_time(chrono::Utc::now())
 ///              .page_token("At")
 ///              .page_size(-8)
-///              .content_type("sed")
-///              .add_asset_types("amet.")
+///              .content_type(&Default::default())
+///              .add_asset_types("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -44,7 +44,7 @@ pub struct AssetListCall<'a, S>
    pub(super) _read_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _content_type: Option<String>,
+   pub(super) _content_type: Option<AssetContentTypeEnum>,
    pub(super) _asset_types: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -82,7 +82,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if self._relationship_types.len() > 0 {
             for f in self._relationship_types.iter() {
                 params.push("relationshipTypes", f);
@@ -251,8 +251,8 @@ where
     /// Asset content type. If not specified, no content but the asset name will be returned.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> AssetListCall<'a, S> {
-        self._content_type = Some(new_value.to_string());
+    pub fn content_type(mut self, new_value: &AssetContentTypeEnum) -> AssetListCall<'a, S> {
+        self._content_type = Some(new_value.clone());
         self
     }
     /// A list of asset types to take a snapshot for. For example: "compute.googleapis.com/Disk". Regular expression is also supported. For example: * "compute.googleapis.com.*" snapshots resources whose asset type starts with "compute.googleapis.com". * ".*Instance" snapshots resources whose asset type ends with "Instance". * ".*Instance.*" snapshots resources whose asset type contains "Instance". See [RE2](https://github.com/google/re2/wiki/Syntax) for all supported regular expression syntax. If the regular expression does not match any supported asset type, an INVALID_ARGUMENT error will be returned. If specified, only matching assets will be returned, otherwise, it will snapshot all asset types. See [Introduction to Cloud Asset Inventory](https://cloud.google.com/asset-inventory/docs/overview) for all supported asset types.
@@ -366,7 +366,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.effective_iam_policies().batch_get("scope")
-///              .add_names("amet.")
+///              .add_names("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -412,7 +412,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if self._names.len() > 0 {
             for f in self._names.iter() {
                 params.push("names", f);
@@ -694,7 +694,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -979,7 +979,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1241,7 +1241,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1503,7 +1503,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1772,7 +1772,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2057,7 +2057,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2281,7 +2281,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.saved_queries().create(req, "parent")
-///              .saved_query_id("ea")
+///              .saved_query_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2328,7 +2328,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._saved_query_id.as_ref() {
             params.push("savedQueryId", value);
         }
@@ -2623,7 +2623,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2885,7 +2885,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3103,9 +3103,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.saved_queries().list("parent")
-///              .page_token("duo")
-///              .page_size(-50)
-///              .filter("sed")
+///              .page_token("amet")
+///              .page_size(-20)
+///              .filter("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3153,7 +3153,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3454,7 +3454,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3705,7 +3705,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().analyze_iam_policy("scope")
-///              .saved_analysis_query("rebum.")
+///              .saved_analysis_query("gubergren")
 ///              .execution_timeout(chrono::Duration::seconds(5840181))
 ///              .analysis_query_resource_selector_full_resource_name("ipsum")
 ///              .analysis_query_options_output_resource_edges(true)
@@ -3775,7 +3775,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if let Some(value) = self._saved_analysis_query.as_ref() {
             params.push("savedAnalysisQuery", value);
         }
@@ -4180,7 +4180,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
 
         params.extend(self._additional_params.iter());
 
@@ -4421,8 +4421,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().analyze_move("resource")
-///              .view("et")
-///              .destination_parent("sed")
+///              .view(&Default::default())
+///              .destination_parent("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4431,7 +4431,7 @@ pub struct MethodAnalyzeMoveCall<'a, S>
 
    pub(super) hub: &'a CloudAsset<S>,
    pub(super) _resource: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<MethodViewEnum>,
    pub(super) _destination_parent: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -4469,7 +4469,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -4593,8 +4593,8 @@ where
     /// Analysis view indicating what information should be included in the analysis response. If unspecified, the default view is FULL.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MethodAnalyzeMoveCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &MethodViewEnum) -> MethodAnalyzeMoveCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Required. Name of the Google Cloud folder or organization to reparent the target resource. The analysis will be performed against hypothetically moving the resource to this specified desitination parent. This can only be a folder number (such as "folders/123") or an organization number (such as "organizations/123").
@@ -4708,9 +4708,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().analyze_org_policies("scope")
 ///              .page_token("et")
-///              .page_size(-76)
-///              .filter("erat")
-///              .constraint("sed")
+///              .page_size(-68)
+///              .filter("vero")
+///              .constraint("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4759,7 +4759,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5017,10 +5017,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().analyze_org_policy_governed_assets("scope")
-///              .page_token("dolore")
-///              .page_size(-22)
-///              .filter("voluptua.")
-///              .constraint("amet.")
+///              .page_token("duo")
+///              .page_size(-34)
+///              .filter("et")
+///              .constraint("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5069,7 +5069,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5327,9 +5327,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().analyze_org_policy_governed_containers("scope")
-///              .page_token("diam")
-///              .page_size(-49)
-///              .filter("et")
+///              .page_token("consetetur")
+///              .page_size(-92)
+///              .filter("dolor")
 ///              .constraint("et")
 ///              .doit().await;
 /// # }
@@ -5379,7 +5379,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5637,11 +5637,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().batch_get_assets_history("parent")
-///              .add_relationship_types("Stet")
+///              .add_relationship_types("sadipscing")
 ///              .read_time_window_start_time(chrono::Utc::now())
 ///              .read_time_window_end_time(chrono::Utc::now())
-///              .content_type("dolor")
-///              .add_asset_names("duo")
+///              .content_type(&Default::default())
+///              .add_asset_names("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5653,7 +5653,7 @@ pub struct MethodBatchGetAssetsHistoryCall<'a, S>
    pub(super) _relationship_types: Vec<String>,
    pub(super) _read_time_window_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _read_time_window_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-   pub(super) _content_type: Option<String>,
+   pub(super) _content_type: Option<MethodContentTypeEnum>,
    pub(super) _asset_names: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -5691,7 +5691,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if self._relationship_types.len() > 0 {
             for f in self._relationship_types.iter() {
                 params.push("relationshipTypes", f);
@@ -5850,8 +5850,8 @@ where
     /// Optional. The content type.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a, S> {
-        self._content_type = Some(new_value.to_string());
+    pub fn content_type(mut self, new_value: &MethodContentTypeEnum) -> MethodBatchGetAssetsHistoryCall<'a, S> {
+        self._content_type = Some(new_value.clone());
         self
     }
     /// A list of the full names of the assets. See: https://cloud.google.com/asset-inventory/docs/resource-name-format Example: `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`. The request becomes a no-op if the asset name list is empty, and the max size of the asset name list is 100 in one request.
@@ -6016,7 +6016,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6308,7 +6308,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6549,11 +6549,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().search_all_iam_policies("scope")
-///              .query("Stet")
-///              .page_token("vero")
-///              .page_size(-44)
-///              .order_by("Lorem")
-///              .add_asset_types("diam")
+///              .query("vero")
+///              .page_token("invidunt")
+///              .page_size(-65)
+///              .order_by("vero")
+///              .add_asset_types("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6603,7 +6603,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -6875,11 +6875,11 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().search_all_resources("scope")
 ///              .read_mask(&Default::default())
-///              .query("ipsum")
-///              .page_token("accusam")
-///              .page_size(-59)
-///              .order_by("consetetur")
-///              .add_asset_types("voluptua.")
+///              .query("diam")
+///              .page_token("no")
+///              .page_size(-100)
+///              .order_by("accusam")
+///              .add_asset_types("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6930,7 +6930,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("scope", self._scope);
+        params.push("scope", &self._scope);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }

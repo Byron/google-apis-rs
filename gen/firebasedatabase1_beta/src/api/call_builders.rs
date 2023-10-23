@@ -81,7 +81,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -386,7 +386,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -655,7 +655,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -940,7 +940,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1208,7 +1208,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._show_deleted.as_ref() {
             params.push("showDeleted", value.to_string());
         }
@@ -1507,7 +1507,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1799,7 +1799,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

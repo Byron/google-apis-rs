@@ -28,7 +28,7 @@ use super::*;
 /// let result = hub.folders().contacts_compute("parent")
 ///              .page_token("voluptua.")
 ///              .page_size(-27)
-///              .add_notification_categories("sanctus")
+///              .add_notification_categories(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -39,7 +39,7 @@ pub struct FolderContactComputeCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _notification_categories: Vec<String>,
+   pub(super) _notification_categories: Option<FolderNotificationCategoriesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -76,7 +76,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -220,8 +220,8 @@ where
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
-        self._notification_categories.push(new_value.to_string());
+    pub fn add_notification_categories(mut self, new_value: &FolderNotificationCategoriesEnum) -> FolderContactComputeCall<'a, S> {
+        self._notification_categories.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -378,7 +378,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -663,7 +663,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -925,7 +925,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1143,8 +1143,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().contacts_list("parent")
-///              .page_token("duo")
-///              .page_size(-55)
+///              .page_token("amet.")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1191,7 +1191,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1482,7 +1482,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1784,7 +1784,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -2025,9 +2025,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().contacts_compute("parent")
-///              .page_token("eos")
-///              .page_size(-4)
-///              .add_notification_categories("ea")
+///              .page_token("gubergren")
+///              .page_size(-75)
+///              .add_notification_categories(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2038,7 +2038,7 @@ pub struct OrganizationContactComputeCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _notification_categories: Vec<String>,
+   pub(super) _notification_categories: Option<OrganizationNotificationCategoriesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2075,7 +2075,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2219,8 +2219,8 @@ where
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
-        self._notification_categories.push(new_value.to_string());
+    pub fn add_notification_categories(mut self, new_value: &OrganizationNotificationCategoriesEnum) -> OrganizationContactComputeCall<'a, S> {
+        self._notification_categories.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2377,7 +2377,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2662,7 +2662,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2924,7 +2924,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3142,8 +3142,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().contacts_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-93)
+///              .page_token("amet")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3190,7 +3190,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3481,7 +3481,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3783,7 +3783,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4024,9 +4024,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().contacts_compute("parent")
-///              .page_token("est")
-///              .page_size(-50)
-///              .add_notification_categories("ipsum")
+///              .page_token("gubergren")
+///              .page_size(-16)
+///              .add_notification_categories(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -4037,7 +4037,7 @@ pub struct ProjectContactComputeCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _notification_categories: Vec<String>,
+   pub(super) _notification_categories: Option<ProjectNotificationCategoriesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -4074,7 +4074,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4218,8 +4218,8 @@ where
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
-        self._notification_categories.push(new_value.to_string());
+    pub fn add_notification_categories(mut self, new_value: &ProjectNotificationCategoriesEnum) -> ProjectContactComputeCall<'a, S> {
+        self._notification_categories.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4376,7 +4376,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4661,7 +4661,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4923,7 +4923,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5141,8 +5141,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().contacts_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-25)
+///              .page_token("gubergren")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5189,7 +5189,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5480,7 +5480,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -5782,7 +5782,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 

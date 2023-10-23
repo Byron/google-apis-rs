@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -115,7 +115,7 @@ pub struct Folder {
     /// Output only. The lifecycle state of the folder. Updates to the lifecycle_state must be performed via DeleteFolder and UndeleteFolder.
     #[serde(rename="lifecycleState")]
     
-    pub lifecycle_state: Option<String>,
+    pub lifecycle_state: Option<FolderLifecycleStateEnum>,
     /// Output only. The resource name of the Folder. Its format is `folders/{folder_id}`, for example: "folders/1234".
     
     pub name: Option<String>,

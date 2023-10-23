@@ -34,7 +34,7 @@ pub struct Change {
     pub start_time: Option<String>,
     /// Status of the operation (output only). A status of "done" means that the request to update the authoritative servers has been sent, but the servers might not be updated yet.
     
-    pub status: Option<String>,
+    pub status: Option<ChangeStatusEnum>,
 }
 
 impl client::RequestValue for Change {}
@@ -85,7 +85,7 @@ impl client::ResponseResult for ChangesListResponse {}
 pub struct DnsKey {
     /// String mnemonic specifying the DNSSEC algorithm of this key. Immutable after creation time.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<DnsKeyAlgorithmEnum>,
     /// The time that this resource was created in the control plane. This is in RFC3339 text format. Output only.
     #[serde(rename="creationTime")]
     
@@ -121,7 +121,7 @@ pub struct DnsKey {
     /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, are used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag is cleared, and this key is used to sign only resource record sets of other types. Immutable after creation time.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DnsKeyTypeEnum>,
 }
 
 impl client::Resource for DnsKey {}
@@ -141,7 +141,7 @@ pub struct DnsKeyDigest {
     /// Specifies the algorithm used to calculate this digest.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DnsKeyDigestTypeEnum>,
 }
 
 impl client::Part for DnsKeyDigest {}
@@ -156,7 +156,7 @@ impl client::Part for DnsKeyDigest {}
 pub struct DnsKeySpec {
     /// String mnemonic specifying the DNSSEC algorithm of this key.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<DnsKeySpecAlgorithmEnum>,
     /// Length of the keys in bits.
     #[serde(rename="keyLength")]
     
@@ -164,7 +164,7 @@ pub struct DnsKeySpec {
     /// Specifies whether this is a key signing key (KSK) or a zone signing key (ZSK). Key signing keys have the Secure Entry Point flag set and, when active, are only used to sign resource record sets of type DNSKEY. Zone signing keys do not have the Secure Entry Point flag set and are used to sign all other types of resource record sets.
     #[serde(rename="keyType")]
     
-    pub key_type: Option<String>,
+    pub key_type: Option<DnsKeySpecKeyTypeEnum>,
     /// no description provided
     
     pub kind: Option<String>,
@@ -260,7 +260,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}
@@ -495,7 +495,7 @@ pub struct ManagedZone {
     pub service_directory_config: Option<ManagedZoneServiceDirectoryConfig>,
     /// The zone's visibility: public zones are exposed to the Internet, while private zones are visible only to Virtual Private Cloud resources.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<ManagedZoneVisibilityEnum>,
 }
 
 impl client::RequestValue for ManagedZone {}
@@ -539,10 +539,10 @@ pub struct ManagedZoneDnsSecConfig {
     /// Specifies the mechanism for authenticated denial-of-existence responses. Can only be changed while the state is OFF.
     #[serde(rename="nonExistence")]
     
-    pub non_existence: Option<String>,
+    pub non_existence: Option<ManagedZoneDnsSecConfigNonExistenceEnum>,
     /// Specifies whether DNSSEC is enabled, and what mode it is in.
     
-    pub state: Option<String>,
+    pub state: Option<ManagedZoneDnsSecConfigStateEnum>,
 }
 
 impl client::Part for ManagedZoneDnsSecConfig {}
@@ -577,7 +577,7 @@ pub struct ManagedZoneForwardingConfigNameServerTarget {
     /// Forwarding path for this NameServerTarget. If unset or set to DEFAULT, Cloud DNS makes forwarding decisions based on IP address ranges; that is, RFC1918 addresses go to the VPC network, non-RFC1918 addresses go to the internet. When set to PRIVATE, Cloud DNS always sends queries through the VPC network for this target.
     #[serde(rename="forwardingPath")]
     
-    pub forwarding_path: Option<String>,
+    pub forwarding_path: Option<ManagedZoneForwardingConfigNameServerTargetForwardingPathEnum>,
     /// IPv4 address of a target name server.
     #[serde(rename="ipv4Address")]
     
@@ -840,7 +840,7 @@ pub struct Operation {
     pub start_time: Option<String>,
     /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only). A status of "DONE" means that the request to update the authoritative servers has been sent, but the servers might not be updated yet.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// Type of the operation. Operations include insert, update, and delete (output only).
     #[serde(rename="type")]
     
@@ -1047,7 +1047,7 @@ pub struct PolicyAlternativeNameServerConfigTargetNameServer {
     /// Forwarding path for this TargetNameServer. If unset or set to DEFAULT, Cloud DNS makes forwarding decisions based on address ranges; that is, RFC1918 addresses go to the VPC network, non-RFC1918 addresses go to the internet. When set to PRIVATE, Cloud DNS always sends queries through the VPC network for this target.
     #[serde(rename="forwardingPath")]
     
-    pub forwarding_path: Option<String>,
+    pub forwarding_path: Option<PolicyAlternativeNameServerConfigTargetNameServerForwardingPathEnum>,
     /// IPv4 address to forward queries to.
     #[serde(rename="ipv4Address")]
     
@@ -1325,14 +1325,14 @@ pub struct RRSetRoutingPolicyLoadBalancerTarget {
     /// no description provided
     #[serde(rename="ipProtocol")]
     
-    pub ip_protocol: Option<String>,
+    pub ip_protocol: Option<RRSetRoutingPolicyLoadBalancerTargetIpProtocolEnum>,
     /// no description provided
     
     pub kind: Option<String>,
     /// no description provided
     #[serde(rename="loadBalancerType")]
     
-    pub load_balancer_type: Option<String>,
+    pub load_balancer_type: Option<RRSetRoutingPolicyLoadBalancerTargetLoadBalancerTypeEnum>,
     /// The fully qualified url of the network on which the ILB is
     #[serde(rename="networkUrl")]
     
@@ -1689,7 +1689,7 @@ impl client::Part for ResponsePolicyNetwork {}
 pub struct ResponsePolicyRule {
     /// Answer this query with a behavior rather than DNS data.
     
-    pub behavior: Option<String>,
+    pub behavior: Option<ResponsePolicyRuleBehaviorEnum>,
     /// The DNS name (wildcard or exact) to apply this rule to. Must be unique within the Response Policy Rule.
     #[serde(rename="dnsName")]
     

@@ -119,7 +119,7 @@ pub struct Device {
     /// **Beta Feature** The logging verbosity for device activity. If unspecified, DeviceRegistry.log_level will be used.
     #[serde(rename="logLevel")]
     
-    pub log_level: Option<String>,
+    pub log_level: Option<DeviceLogLevelEnum>,
     /// The metadata key-value pairs assigned to the device. This metadata is not interpreted or indexed by Cloud IoT Core. It can be used to add contextual information for the device. Keys must conform to the regular expression a-zA-Z+ and be less than 128 bytes in length. Values are free-form strings. Each value must be less than or equal to 32 KB in size. The total size of all keys and values must be less than 256 KB, and the maximum number of key-value pairs is 500.
     
     pub metadata: Option<HashMap<String, String>>,
@@ -223,7 +223,7 @@ pub struct DeviceRegistry {
     /// **Beta Feature** The default logging verbosity for activity from devices in this registry. The verbosity level can be overridden by Device.log_level.
     #[serde(rename="logLevel")]
     
-    pub log_level: Option<String>,
+    pub log_level: Option<DeviceRegistryLogLevelEnum>,
     /// The MQTT configuration for this device registry.
     #[serde(rename="mqttConfig")]
     
@@ -332,11 +332,11 @@ pub struct GatewayConfig {
     /// Indicates how to authorize and/or authenticate devices to access the gateway.
     #[serde(rename="gatewayAuthMethod")]
     
-    pub gateway_auth_method: Option<String>,
+    pub gateway_auth_method: Option<GatewayConfigGatewayAuthMethodEnum>,
     /// Indicates whether the device is a gateway.
     #[serde(rename="gatewayType")]
     
-    pub gateway_type: Option<String>,
+    pub gateway_type: Option<GatewayConfigGatewayTypeEnum>,
     /// [Output only] The ID of the gateway the device accessed most recently.
     #[serde(rename="lastAccessedGatewayId")]
     
@@ -396,7 +396,7 @@ pub struct HttpConfig {
     /// If enabled, allows devices to use DeviceService via the HTTP protocol. Otherwise, any requests to DeviceService will fail for this registry.
     #[serde(rename="httpEnabledState")]
     
-    pub http_enabled_state: Option<String>,
+    pub http_enabled_state: Option<HttpConfigHttpEnabledStateEnum>,
 }
 
 impl client::Part for HttpConfig {}
@@ -526,7 +526,7 @@ pub struct MqttConfig {
     /// If enabled, allows connections using the MQTT protocol. Otherwise, MQTT connections to this registry will fail.
     #[serde(rename="mqttEnabledState")]
     
-    pub mqtt_enabled_state: Option<String>,
+    pub mqtt_enabled_state: Option<MqttConfigMqttEnabledStateEnum>,
 }
 
 impl client::Part for MqttConfig {}
@@ -573,7 +573,7 @@ pub struct PublicKeyCertificate {
     pub certificate: Option<String>,
     /// The certificate format.
     
-    pub format: Option<String>,
+    pub format: Option<PublicKeyCertificateFormatEnum>,
     /// [Output only] The certificate details. Used only for X.509 certificates.
     #[serde(rename="x509Details")]
     
@@ -592,7 +592,7 @@ impl client::Part for PublicKeyCertificate {}
 pub struct PublicKeyCredential {
     /// The format of the key.
     
-    pub format: Option<String>,
+    pub format: Option<PublicKeyCredentialFormatEnum>,
     /// The key data.
     
     pub key: Option<String>,

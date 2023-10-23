@@ -13,7 +13,7 @@ use super::*;
 pub struct AutoForwarding {
     /// The state that a message should be left in after it has been forwarded.
     
-    pub disposition: Option<String>,
+    pub disposition: Option<AutoForwardingDispositionEnum>,
     /// Email address to which all incoming messages are forwarded. This email address must be a verified member of the forwarding addresses.
     #[serde(rename="emailAddress")]
     
@@ -121,7 +121,7 @@ pub struct CseKeyPair {
     /// Output only. The current state of the key pair.
     #[serde(rename="enablementState")]
     
-    pub enablement_state: Option<String>,
+    pub enablement_state: Option<CseKeyPairEnablementStateEnum>,
     /// Output only. The immutable ID for the client-side encryption S/MIME key pair.
     #[serde(rename="keyPairId")]
     
@@ -185,7 +185,7 @@ pub struct Delegate {
     /// Indicates whether this address has been verified and can act as a delegate for the account. Read-only.
     #[serde(rename="verificationStatus")]
     
-    pub verification_status: Option<String>,
+    pub verification_status: Option<DelegateVerificationStatusEnum>,
 }
 
 impl client::RequestValue for Delegate {}
@@ -329,7 +329,7 @@ pub struct FilterCriteria {
     /// How the message size in bytes should be in relation to the size field.
     #[serde(rename="sizeComparison")]
     
-    pub size_comparison: Option<String>,
+    pub size_comparison: Option<FilterCriterionSizeComparisonEnum>,
     /// Case-insensitive phrase found in the message's subject. Trailing and leading whitespace are be trimmed and adjacent spaces are collapsed.
     
     pub subject: Option<String>,
@@ -360,7 +360,7 @@ pub struct ForwardingAddress {
     /// Indicates whether this address has been verified and is usable for forwarding. Read-only.
     #[serde(rename="verificationStatus")]
     
-    pub verification_status: Option<String>,
+    pub verification_status: Option<ForwardingAddresVerificationStatusEnum>,
 }
 
 impl client::RequestValue for ForwardingAddress {}
@@ -492,7 +492,7 @@ pub struct ImapSettings {
     /// The action that will be executed on a message when it is marked as deleted and expunged from the last visible IMAP folder.
     #[serde(rename="expungeBehavior")]
     
-    pub expunge_behavior: Option<String>,
+    pub expunge_behavior: Option<ImapSettingExpungeBehaviorEnum>,
     /// An optional limit on the number of messages that an IMAP folder may contain. Legal values are 0, 1000, 2000, 5000 or 10000. A value of zero is interpreted to mean that there is no limit.
     #[serde(rename="maxFolderSize")]
     
@@ -546,11 +546,11 @@ pub struct Label {
     /// The visibility of the label in the label list in the Gmail web interface.
     #[serde(rename="labelListVisibility")]
     
-    pub label_list_visibility: Option<String>,
+    pub label_list_visibility: Option<LabelLabelListVisibilityEnum>,
     /// The visibility of messages with this label in the message list in the Gmail web interface.
     #[serde(rename="messageListVisibility")]
     
-    pub message_list_visibility: Option<String>,
+    pub message_list_visibility: Option<LabelMessageListVisibilityEnum>,
     /// The total number of messages with the label.
     #[serde(rename="messagesTotal")]
     
@@ -573,7 +573,7 @@ pub struct Label {
     /// The owner type for the label. User labels are created by the user and can be modified and deleted by the user and can be applied to any message or thread. System labels are internally created and cannot be added, modified, or deleted. System labels may be able to be applied to or removed from messages and threads under some circumstances but this is not guaranteed. For example, users can apply and remove the `INBOX` and `UNREAD` labels from messages and threads, but cannot apply or remove the `DRAFTS` or `SENT` labels from messages or threads.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LabelTypeEnum>,
 }
 
 impl client::RequestValue for Label {}
@@ -1110,10 +1110,10 @@ pub struct PopSettings {
     /// The range of messages which are accessible via POP.
     #[serde(rename="accessWindow")]
     
-    pub access_window: Option<String>,
+    pub access_window: Option<PopSettingAccessWindowEnum>,
     /// The action that will be executed on a message after it has been fetched via POP.
     
-    pub disposition: Option<String>,
+    pub disposition: Option<PopSettingDispositionEnum>,
 }
 
 impl client::RequestValue for PopSettings {}
@@ -1201,7 +1201,7 @@ pub struct SendAs {
     /// Indicates whether this address has been verified for use as a send-as alias. Read-only. This setting only applies to custom "from" aliases.
     #[serde(rename="verificationStatus")]
     
-    pub verification_status: Option<String>,
+    pub verification_status: Option<SendAVerificationStatusEnum>,
 }
 
 impl client::RequestValue for SendAs {}
@@ -1271,7 +1271,7 @@ pub struct SmtpMsa {
     /// The protocol that will be used to secure communication with the SMTP service. Required.
     #[serde(rename="securityMode")]
     
-    pub security_mode: Option<String>,
+    pub security_mode: Option<SmtpMsaSecurityModeEnum>,
     /// The username that will be used for authentication with the SMTP service. This is a write-only field that can be specified in requests to create or update SendAs settings; it is never populated in responses.
     
     pub username: Option<String>,
@@ -1379,7 +1379,7 @@ pub struct WatchRequest {
     /// Filtering behavior of labelIds list specified.
     #[serde(rename="labelFilterAction")]
     
-    pub label_filter_action: Option<String>,
+    pub label_filter_action: Option<WatchRequestLabelFilterActionEnum>,
     /// List of label_ids to restrict notifications about. By default, if unspecified, all changes are pushed out. If specified then dictates which labels are required for a push notification to be generated.
     #[serde(rename="labelIds")]
     

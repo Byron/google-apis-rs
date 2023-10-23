@@ -36,7 +36,7 @@ pub struct AppEngineHttpRequest {
     /// The HTTP method to use for the request. The default is POST. The app's request handler for the task's target URL must be able to handle HTTP requests with this http_method, otherwise the task attempt fails with error code 405 (Method Not Allowed). See [Writing a push task request handler](https://cloud.google.com/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler) and the App Engine documentation for your runtime on [How Requests are Handled](https://cloud.google.com/appengine/docs/standard/python3/how-requests-are-handled).
     #[serde(rename="httpMethod")]
     
-    pub http_method: Option<String>,
+    pub http_method: Option<AppEngineHttpRequestHttpMethodEnum>,
     /// The relative URI. The relative URI must begin with "/" and must be a valid HTTP relative URI. It can contain a path and query string arguments. If the relative URI is empty, then the root path "/" will be used. No spaces are allowed, and the maximum length allowed is 2083 characters.
     #[serde(rename="relativeUri")]
     
@@ -171,7 +171,7 @@ pub struct CreateTaskRequest {
     /// The response_view specifies which subset of the Task will be returned. By default response_view is BASIC; not all information is retrieved by default because some data, such as payloads, might be desirable to return only when needed because of its large size or because of the sensitivity of data that it contains. Authorization for FULL requires `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/) permission on the Task resource.
     #[serde(rename="responseView")]
     
-    pub response_view: Option<String>,
+    pub response_view: Option<CreateTaskRequestResponseViewEnum>,
     /// Required. The task to add. Task names have the following format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`. The user can optionally specify a task name. If a name is not specified then the system will generate a random unique task id, which will be set in the task returned in the response. If schedule_time is not set or is in the past then Cloud Tasks will set it to the current time. Task De-duplication: Explicitly specifying a task ID enables task de-duplication. If a task's ID is identical to that of an existing task or a task that was deleted or executed recently then the call will fail with ALREADY_EXISTS. If the task's queue was created using Cloud Tasks, then another task with the same name can't be created for ~1hour after the original task was deleted or executed. If the task's queue was created using queue.yaml or queue.xml, then another task with the same name can't be created for ~9days after the original task was deleted or executed. Because there is an extra lookup cost to identify duplicate task names, these CreateTask calls have significantly increased latency. Using hashed strings for the task id or for the prefix of the task id is recommended. Choosing task ids that are sequential or have sequential prefixes, for example using a timestamp, causes an increase in latency and error rates in all task commands. The infrastructure relies on an approximately uniform distribution of task ids to store and serve tasks efficiently.
     
     pub task: Option<Task>,
@@ -328,7 +328,7 @@ pub struct HttpRequest {
     /// The HTTP method to use for the request. The default is POST.
     #[serde(rename="httpMethod")]
     
-    pub http_method: Option<String>,
+    pub http_method: Option<HttpRequestHttpMethodEnum>,
     /// If specified, an [OAuth token](https://developers.google.com/identity/protocols/OAuth2) will be generated and attached as an `Authorization` header in the HTTP request. This type of authorization should generally only be used when calling Google APIs hosted on *.googleapis.com.
     #[serde(rename="oauthToken")]
     
@@ -359,7 +359,7 @@ pub struct HttpTarget {
     /// The HTTP method to use for the request. When specified, it will override HttpRequest for the task. Note that if the value is set to HttpMethod the HttpRequest of the task will be ignored at execution time.
     #[serde(rename="httpMethod")]
     
-    pub http_method: Option<String>,
+    pub http_method: Option<HttpTargetHttpMethodEnum>,
     /// URI override. When specified, modifies the execution URI for all the tasks in the queue.
     #[serde(rename="uriOverride")]
     
@@ -661,7 +661,7 @@ pub struct Queue {
     pub stackdriver_logging_config: Option<StackdriverLoggingConfig>,
     /// Output only. The state of the queue. `state` can only be changed by called PauseQueue, ResumeQueue, or uploading [queue.yaml/xml](https://cloud.google.com/appengine/docs/python/config/queueref). UpdateQueue cannot be used to change `state`.
     
-    pub state: Option<String>,
+    pub state: Option<QueueStateEnum>,
     /// Output only. The realtime, informational statistics for a queue. In order to receive the statistics the caller should include this field in the FieldMask.
     
     pub stats: Option<QueueStats>,
@@ -678,7 +678,7 @@ pub struct Queue {
     /// Immutable. The type of a queue (push or pull). `Queue.type` is an immutable property of the queue that is set at the queue creation time. When left unspecified, the default value of `PUSH` is selected.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<QueueTypeEnum>,
 }
 
 impl client::RequestValue for Queue {}
@@ -808,7 +808,7 @@ pub struct RunTaskRequest {
     /// The response_view specifies which subset of the Task will be returned. By default response_view is BASIC; not all information is retrieved by default because some data, such as payloads, might be desirable to return only when needed because of its large size or because of the sensitivity of data that it contains. Authorization for FULL requires `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/) permission on the Task resource.
     #[serde(rename="responseView")]
     
-    pub response_view: Option<String>,
+    pub response_view: Option<RunTaskRequestResponseViewEnum>,
 }
 
 impl client::RequestValue for RunTaskRequest {}
@@ -929,7 +929,7 @@ pub struct Task {
     pub schedule_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The view specifies which subset of the Task has been returned.
     
-    pub view: Option<String>,
+    pub view: Option<TaskViewEnum>,
 }
 
 impl client::ResponseResult for Task {}
@@ -997,11 +997,11 @@ pub struct UriOverride {
     pub query_override: Option<QueryOverride>,
     /// Scheme override. When specified, the task URI scheme is replaced by the provided value (HTTP or HTTPS).
     
-    pub scheme: Option<String>,
+    pub scheme: Option<UriOverrideSchemeEnum>,
     /// URI Override Enforce Mode When specified, determines the Target UriOverride mode. If not specified, it defaults to ALWAYS.
     #[serde(rename="uriOverrideEnforceMode")]
     
-    pub uri_override_enforce_mode: Option<String>,
+    pub uri_override_enforce_mode: Option<UriOverrideUriOverrideEnforceModeEnum>,
 }
 
 impl client::Part for UriOverride {}

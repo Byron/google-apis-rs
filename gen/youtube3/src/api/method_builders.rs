@@ -759,11 +759,11 @@ impl<'a, S> CommentMethods<'a, S> {
     ///
     /// * `id` - Modifies the moderation status of the comments with the given IDs
     /// * `moderationStatus` - Specifies the requested moderation status. Note, comments can be in statuses, which are not available through this call. For example, this call does not allow to mark a comment as 'likely spam'. Valid values: MODERATION_STATUS_PUBLISHED, MODERATION_STATUS_HELD_FOR_REVIEW, MODERATION_STATUS_REJECTED.
-    pub fn set_moderation_status(&self, id: &Vec<String>, moderation_status: &str) -> CommentSetModerationStatuCall<'a, S> {
+    pub fn set_moderation_status(&self, id: &Vec<String>, moderation_status: &CommentModerationStatusEnum) -> CommentSetModerationStatuCall<'a, S> {
         CommentSetModerationStatuCall {
             hub: self.hub,
             _id: id.clone(),
-            _moderation_status: moderation_status.to_string(),
+            _moderation_status: moderation_status.clone(),
             _ban_author: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -1068,10 +1068,10 @@ impl<'a, S> LiveBroadcastMethods<'a, S> {
     /// * `broadcastStatus` - The status to which the broadcast is going to transition.
     /// * `id` - Broadcast to transition.
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn transition(&self, broadcast_status: &str, id: &str, part: &Vec<String>) -> LiveBroadcastTransitionCall<'a, S> {
+    pub fn transition(&self, broadcast_status: &LiveBroadcastBroadcastStatusEnum, id: &str, part: &Vec<String>) -> LiveBroadcastTransitionCall<'a, S> {
         LiveBroadcastTransitionCall {
             hub: self.hub,
-            _broadcast_status: broadcast_status.to_string(),
+            _broadcast_status: broadcast_status.clone(),
             _id: id.to_string(),
             _part: part.clone(),
             _on_behalf_of_content_owner_channel: Default::default(),
@@ -2247,11 +2247,11 @@ impl<'a, S> ThirdPartyLinkMethods<'a, S> {
     ///
     /// * `linkingToken` - Delete the partner links with the given linking token.
     /// * `type` - Type of the link to be deleted.
-    pub fn delete(&self, linking_token: &str, type_: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
+    pub fn delete(&self, linking_token: &str, type_: &ThirdPartyLinkTypeEnum) -> ThirdPartyLinkDeleteCall<'a, S> {
         ThirdPartyLinkDeleteCall {
             hub: self.hub,
             _linking_token: linking_token.to_string(),
-            _type_: type_.to_string(),
+            _type_: type_.clone(),
             _part: Default::default(),
             _external_channel_id: Default::default(),
             _delegate: Default::default(),
@@ -2636,11 +2636,11 @@ impl<'a, S> VideoMethods<'a, S> {
     ///
     /// * `id` - No description provided.
     /// * `rating` - No description provided.
-    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a, S> {
+    pub fn rate(&self, id: &str, rating: &VideoRatingEnum) -> VideoRateCall<'a, S> {
         VideoRateCall {
             hub: self.hub,
             _id: id.to_string(),
-            _rating: rating.to_string(),
+            _rating: rating.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),

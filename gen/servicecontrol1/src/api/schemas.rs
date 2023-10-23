@@ -129,7 +129,7 @@ impl client::Part for Attributes {}
 pub struct CheckError {
     /// The error code.
     
-    pub code: Option<String>,
+    pub code: Option<CheckErrorCodeEnum>,
     /// Free-form text providing details on the error cause of the error.
     
     pub detail: Option<String>,
@@ -255,7 +255,7 @@ pub struct ConsumerInfo {
     /// The type of the consumer which should have been defined in [Google Resource Manager](https://cloud.google.com/resource-manager/).
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ConsumerInfoTypeEnum>,
 }
 
 impl client::Part for ConsumerInfo {}
@@ -493,7 +493,7 @@ pub struct LogEntry {
     pub proto_payload: Option<HashMap<String, json::Value>>,
     /// The severity of the log entry. The default value is `LogSeverity.DEFAULT`.
     
-    pub severity: Option<String>,
+    pub severity: Option<LogEntrySeverityEnum>,
     /// Optional. Source code location information associated with the log entry, if any.
     #[serde(rename="sourceLocation")]
     
@@ -671,7 +671,7 @@ pub struct Operation {
     pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// DO NOT USE. This is an experimental field.
     
-    pub importance: Option<String>,
+    pub importance: Option<OperationImportanceEnum>,
     /// Labels describing the operation. Only the following labels are allowed: - Labels describing monitored resources as defined in the service configuration. - Default labels of metric values. When specified, labels defined in the metric value override these default. - The following labels defined by Google Cloud Platform: - `cloud.googleapis.com/location` describing the location where the operation happened, - `servicecontrol.googleapis.com/user_agent` describing the user agent of the API request, - `servicecontrol.googleapis.com/service_agent` describing the service used to handle the API request (e.g. ESP), - `servicecontrol.googleapis.com/platform` describing the platform where the API is served, such as App Engine, Compute Engine, or Kubernetes Engine.
     
     pub labels: Option<HashMap<String, String>>,
@@ -724,7 +724,7 @@ impl client::Part for Operation {}
 pub struct QuotaError {
     /// Error code.
     
-    pub code: Option<String>,
+    pub code: Option<QuotaErrorCodeEnum>,
     /// Free-form text that provides details on the cause of the error.
     
     pub description: Option<String>,
@@ -792,7 +792,7 @@ pub struct QuotaOperation {
     /// Quota mode for this operation.
     #[serde(rename="quotaMode")]
     
-    pub quota_mode: Option<String>,
+    pub quota_mode: Option<QuotaOperationQuotaModeEnum>,
 }
 
 impl client::Part for QuotaOperation {}
@@ -808,7 +808,7 @@ pub struct QuotaProperties {
     /// Quota mode for this operation.
     #[serde(rename="quotaMode")]
     
-    pub quota_mode: Option<String>,
+    pub quota_mode: Option<QuotaPropertyQuotaModeEnum>,
 }
 
 impl client::Part for QuotaProperties {}
@@ -972,7 +972,7 @@ pub struct TraceSpan {
     /// Distinguishes between spans generated in a particular context. For example, two spans with the same name may be distinguished using `CLIENT` (caller) and `SERVER` (callee) to identify an RPC call.
     #[serde(rename="spanKind")]
     
-    pub span_kind: Option<String>,
+    pub span_kind: Option<TraceSpanSpanKindEnum>,
     /// The start time of the span. On the client side, this is the time kept by the local machine where the span execution starts. On the server side, this is the time when the server's application handler starts running.
     #[serde(rename="startTime")]
     

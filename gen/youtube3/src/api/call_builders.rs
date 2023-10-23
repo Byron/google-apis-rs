@@ -321,15 +321,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().list(&vec!["duo".into()])
-///              .region_code("sed")
+/// let result = hub.activities().list(&vec!["ea".into()])
+///              .region_code("dolor")
 ///              .published_before(chrono::Utc::now())
 ///              .published_after(chrono::Utc::now())
-///              .page_token("no")
-///              .mine(true)
-///              .max_results(77)
-///              .home(true)
-///              .channel_id("vero")
+///              .page_token("Lorem")
+///              .mine(false)
+///              .max_results(58)
+///              .home(false)
+///              .channel_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -672,8 +672,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().delete("id")
-///              .on_behalf_of_content_owner("sed")
-///              .on_behalf_of("duo")
+///              .on_behalf_of_content_owner("Stet")
+///              .on_behalf_of("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -720,7 +720,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -942,10 +942,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().download("id")
-///              .tlang("et")
-///              .tfmt("voluptua.")
-///              .on_behalf_of_content_owner("amet.")
-///              .on_behalf_of("consetetur")
+///              .tlang("sed")
+///              .tfmt("et")
+///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -994,7 +994,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._tlang.as_ref() {
             params.push("tlang", value);
         }
@@ -1249,8 +1249,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().insert(req)
 ///              .sync(false)
-///              .on_behalf_of_content_owner("dolor")
-///              .on_behalf_of("et")
+///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of("dolore")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -1701,9 +1701,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().list(&vec!["et".into()], "videoId")
-///              .on_behalf_of_content_owner("Stet")
-///              .on_behalf_of("dolor")
-///              .add_id("duo")
+///              .on_behalf_of_content_owner("amet.")
+///              .on_behalf_of("consetetur")
+///              .add_id("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1757,7 +1757,7 @@ where
                 params.push("part", f);
             }
         }
-        params.push("videoId", self._video_id);
+        params.push("videoId", &self._video_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -2033,7 +2033,7 @@ where
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Caption::default();
-/// req.id = Some("vero".to_string());
+/// req.id = Some("dolor".to_string());
 /// req.snippet = Default::default(); // is CaptionSnippet
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -2041,8 +2041,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().update(req)
 ///              .sync(false)
-///              .on_behalf_of_content_owner("invidunt")
-///              .on_behalf_of("Stet")
+///              .on_behalf_of_content_owner("Stet")
+///              .on_behalf_of("dolor")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -2496,9 +2496,9 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(req)
-///              .on_behalf_of_content_owner_channel("vero")
-///              .on_behalf_of_content_owner("elitr")
-///              .channel_id("Lorem")
+///              .on_behalf_of_content_owner_channel("duo")
+///              .on_behalf_of_content_owner("vero")
+///              .channel_id("vero")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -2912,7 +2912,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///              .on_behalf_of_content_owner("no")
+///              .on_behalf_of_content_owner("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2958,7 +2958,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -3190,8 +3190,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().insert(req)
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of_content_owner_channel("vero")
+///              .on_behalf_of_content_owner("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3530,12 +3530,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channel_sections().list(&vec!["takimata".into()])
-///              .on_behalf_of_content_owner("consetetur")
-///              .mine(false)
-///              .add_id("erat")
-///              .hl("consetetur")
-///              .channel_id("amet.")
+/// let result = hub.channel_sections().list(&vec!["Lorem".into()])
+///              .on_behalf_of_content_owner("diam")
+///              .mine(true)
+///              .add_id("ipsum")
+///              .hl("accusam")
+///              .channel_id("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3883,7 +3883,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().update(req)
-///              .on_behalf_of_content_owner("sed")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4194,17 +4194,17 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channels().list(&vec!["takimata".into()])
-///              .page_token("dolores")
-///              .on_behalf_of_content_owner("gubergren")
+/// let result = hub.channels().list(&vec!["voluptua.".into()])
+///              .page_token("et")
+///              .on_behalf_of_content_owner("erat")
 ///              .my_subscribers(false)
-///              .mine(false)
-///              .max_results(67)
+///              .mine(true)
+///              .max_results(27)
 ///              .managed_by_me(false)
-///              .add_id("amet.")
-///              .hl("ea")
-///              .for_username("sadipscing")
-///              .category_id("Lorem")
+///              .add_id("dolore")
+///              .hl("dolore")
+///              .for_username("dolore")
+///              .category_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4584,7 +4584,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(req)
-///              .on_behalf_of_content_owner("invidunt")
+///              .on_behalf_of_content_owner("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5181,17 +5181,17 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.comment_threads().list(&vec!["no".into()])
-///              .video_id("est")
-///              .text_format("At")
-///              .search_terms("sed")
-///              .page_token("sit")
-///              .order("et")
-///              .moderation_status("tempor")
-///              .max_results(69)
-///              .add_id("ipsum")
-///              .channel_id("et")
-///              .all_threads_related_to_channel_id("sanctus")
+/// let result = hub.comment_threads().list(&vec!["ea".into()])
+///              .video_id("sadipscing")
+///              .text_format(&Default::default())
+///              .search_terms("Lorem")
+///              .page_token("invidunt")
+///              .order(&Default::default())
+///              .moderation_status(&Default::default())
+///              .max_results(90)
+///              .add_id("est")
+///              .channel_id("At")
+///              .all_threads_related_to_channel_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5201,11 +5201,11 @@ pub struct CommentThreadListCall<'a, S>
    pub(super) hub: &'a YouTube<S>,
    pub(super) _part: Vec<String>,
    pub(super) _video_id: Option<String>,
-   pub(super) _text_format: Option<String>,
+   pub(super) _text_format: Option<CommentThreadTextFormatEnum>,
    pub(super) _search_terms: Option<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order: Option<String>,
-   pub(super) _moderation_status: Option<String>,
+   pub(super) _order: Option<CommentThreadOrderEnum>,
+   pub(super) _moderation_status: Option<CommentThreadModerationStatusEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _id: Vec<String>,
    pub(super) _channel_id: Option<String>,
@@ -5401,8 +5401,8 @@ where
     /// The requested text format for the returned comments.
     ///
     /// Sets the *text format* query property to the given value.
-    pub fn text_format(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
-        self._text_format = Some(new_value.to_string());
+    pub fn text_format(mut self, new_value: &CommentThreadTextFormatEnum) -> CommentThreadListCall<'a, S> {
+        self._text_format = Some(new_value.clone());
         self
     }
     /// Limits the returned comment threads to those matching the specified key words. Not compatible with the 'id' filter.
@@ -5421,15 +5421,15 @@ where
     }
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
-        self._order = Some(new_value.to_string());
+    pub fn order(mut self, new_value: &CommentThreadOrderEnum) -> CommentThreadListCall<'a, S> {
+        self._order = Some(new_value.clone());
         self
     }
     /// Limits the returned comment threads to those with the specified moderation status. Not compatible with the 'id' filter. Valid values: published, heldForReview, likelySpam.
     ///
     /// Sets the *moderation status* query property to the given value.
-    pub fn moderation_status(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
-        self._moderation_status = Some(new_value.to_string());
+    pub fn moderation_status(mut self, new_value: &CommentThreadModerationStatusEnum) -> CommentThreadListCall<'a, S> {
+        self._moderation_status = Some(new_value.clone());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
@@ -5608,7 +5608,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -6102,11 +6102,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.comments().list(&vec!["est".into()])
-///              .text_format("sed")
-///              .parent_id("diam")
-///              .page_token("dolores")
-///              .max_results(32)
+/// let result = hub.comments().list(&vec!["et".into()])
+///              .text_format(&Default::default())
+///              .parent_id("tempor")
+///              .page_token("aliquyam")
+///              .max_results(96)
 ///              .add_id("et")
 ///              .doit().await;
 /// # }
@@ -6116,7 +6116,7 @@ pub struct CommentListCall<'a, S>
 
    pub(super) hub: &'a YouTube<S>,
    pub(super) _part: Vec<String>,
-   pub(super) _text_format: Option<String>,
+   pub(super) _text_format: Option<CommentTextFormatEnum>,
    pub(super) _parent_id: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
@@ -6290,8 +6290,8 @@ where
     /// The requested text format for the returned comments.
     ///
     /// Sets the *text format* query property to the given value.
-    pub fn text_format(mut self, new_value: &str) -> CommentListCall<'a, S> {
-        self._text_format = Some(new_value.to_string());
+    pub fn text_format(mut self, new_value: &CommentTextFormatEnum) -> CommentListCall<'a, S> {
+        self._text_format = Some(new_value.clone());
         self
     }
     /// Returns replies to the specified comment. Note, currently YouTube features only one level of replies (ie replies to top level comments). However replies to replies may be supported in the future.
@@ -6425,7 +6425,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.comments().mark_as_spam(&vec!["sed".into()])
+/// let result = hub.comments().mark_as_spam(&vec!["sanctus".into()])
 ///              .doit().await;
 /// # }
 /// ```
@@ -6674,8 +6674,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.comments().set_moderation_status(&vec!["no".into()], "moderationStatus")
-///              .ban_author(false)
+/// let result = hub.comments().set_moderation_status(&vec!["Lorem".into()], &Default::default())
+///              .ban_author(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6684,7 +6684,7 @@ pub struct CommentSetModerationStatuCall<'a, S>
 
    pub(super) hub: &'a YouTube<S>,
    pub(super) _id: Vec<String>,
-   pub(super) _moderation_status: String,
+   pub(super) _moderation_status: CommentModerationStatusEnum,
    pub(super) _ban_author: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -6727,7 +6727,7 @@ where
                 params.push("id", f);
             }
         }
-        params.push("moderationStatus", self._moderation_status);
+        params.push("moderationStatus", &self._moderation_status);
         if let Some(value) = self._ban_author.as_ref() {
             params.push("banAuthor", value.to_string());
         }
@@ -6834,8 +6834,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn moderation_status(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, S> {
-        self._moderation_status = new_value.to_string();
+    pub fn moderation_status(mut self, new_value: &CommentModerationStatusEnum) -> CommentSetModerationStatuCall<'a, S> {
+        self._moderation_status = new_value.clone();
         self
     }
     /// If set to true the author of the comment gets added to the ban list. This means all future comments of the author will autmomatically be rejected. Only valid in combination with STATUS_REJECTED.
@@ -7243,8 +7243,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.i18n_languages().list(&vec!["sed".into()])
-///              .hl("no")
+/// let result = hub.i18n_languages().list(&vec!["et".into()])
+///              .hl("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7514,8 +7514,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.i18n_regions().list(&vec!["nonumy".into()])
-///              .hl("At")
+/// let result = hub.i18n_regions().list(&vec!["no".into()])
+///              .hl("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7801,10 +7801,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().bind("id", &vec!["aliquyam".into()])
-///              .stream_id("dolores")
-///              .on_behalf_of_content_owner_channel("sadipscing")
-///              .on_behalf_of_content_owner("erat")
+/// let result = hub.live_broadcasts().bind("id", &vec!["sed".into()])
+///              .stream_id("no")
+///              .on_behalf_of_content_owner_channel("nonumy")
+///              .on_behalf_of_content_owner("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7853,7 +7853,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if self._part.len() > 0 {
             for f in self._part.iter() {
                 params.push("part", f);
@@ -8117,8 +8117,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("amet")
-///              .on_behalf_of_content_owner("est")
+///              .on_behalf_of_content_owner_channel("aliquyam")
+///              .on_behalf_of_content_owner("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8165,7 +8165,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner_channel.as_ref() {
             params.push("onBehalfOfContentOwnerChannel", value);
         }
@@ -8403,7 +8403,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveBroadcast::default();
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("et".to_string());
+/// req.id = Some("sadipscing".to_string());
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// 
@@ -8411,8 +8411,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(req)
-///              .on_behalf_of_content_owner_channel("sea")
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner_channel("erat")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8757,16 +8757,16 @@ where
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Cuepoint::default();
-/// req.id = Some("consetetur".to_string());
+/// req.id = Some("amet".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert_cuepoint(req)
-///              .add_part("Stet")
-///              .on_behalf_of_content_owner_channel("est")
-///              .on_behalf_of_content_owner("aliquyam")
-///              .id("elitr")
+///              .add_part("est")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("sea")
+///              .id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9121,15 +9121,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().list(&vec!["duo".into()])
-///              .page_token("diam")
+/// let result = hub.live_broadcasts().list(&vec!["consetetur".into()])
+///              .page_token("Stet")
 ///              .on_behalf_of_content_owner_channel("est")
-///              .on_behalf_of_content_owner("sit")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .mine(false)
-///              .max_results(26)
-///              .add_id("Lorem")
-///              .broadcast_type("ea")
-///              .broadcast_status("Stet")
+///              .max_results(81)
+///              .add_id("diam")
+///              .broadcast_type(&Default::default())
+///              .broadcast_status(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -9144,8 +9144,8 @@ pub struct LiveBroadcastListCall<'a, S>
    pub(super) _mine: Option<bool>,
    pub(super) _max_results: Option<u32>,
    pub(super) _id: Vec<String>,
-   pub(super) _broadcast_type: Option<String>,
-   pub(super) _broadcast_status: Option<String>,
+   pub(super) _broadcast_type: Option<LiveBroadcastBroadcastTypeEnum>,
+   pub(super) _broadcast_status: Option<LiveBroadcastBroadcastStatusEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -9374,15 +9374,15 @@ where
     /// Return only broadcasts with the selected type.
     ///
     /// Sets the *broadcast type* query property to the given value.
-    pub fn broadcast_type(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
-        self._broadcast_type = Some(new_value.to_string());
+    pub fn broadcast_type(mut self, new_value: &LiveBroadcastBroadcastTypeEnum) -> LiveBroadcastListCall<'a, S> {
+        self._broadcast_type = Some(new_value.clone());
         self
     }
     /// Return broadcasts with a certain status, e.g. active broadcasts.
     ///
     /// Sets the *broadcast status* query property to the given value.
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
-        self._broadcast_status = Some(new_value.to_string());
+    pub fn broadcast_status(mut self, new_value: &LiveBroadcastBroadcastStatusEnum) -> LiveBroadcastListCall<'a, S> {
+        self._broadcast_status = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9503,9 +9503,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().transition("broadcastStatus", "id", &vec!["et".into()])
-///              .on_behalf_of_content_owner_channel("sea")
-///              .on_behalf_of_content_owner("et")
+/// let result = hub.live_broadcasts().transition(&Default::default(), "id", &vec!["sit".into()])
+///              .on_behalf_of_content_owner_channel("sed")
+///              .on_behalf_of_content_owner("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9513,7 +9513,7 @@ pub struct LiveBroadcastTransitionCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a YouTube<S>,
-   pub(super) _broadcast_status: String,
+   pub(super) _broadcast_status: LiveBroadcastBroadcastStatusEnum,
    pub(super) _id: String,
    pub(super) _part: Vec<String>,
    pub(super) _on_behalf_of_content_owner_channel: Option<String>,
@@ -9554,8 +9554,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("broadcastStatus", self._broadcast_status);
-        params.push("id", self._id);
+        params.push("broadcastStatus", &self._broadcast_status);
+        params.push("id", &self._id);
         if self._part.len() > 0 {
             for f in self._part.iter() {
                 params.push("part", f);
@@ -9670,8 +9670,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, S> {
-        self._broadcast_status = new_value.to_string();
+    pub fn broadcast_status(mut self, new_value: &LiveBroadcastBroadcastStatusEnum) -> LiveBroadcastTransitionCall<'a, S> {
+        self._broadcast_status = new_value.clone();
         self
     }
     /// Broadcast to transition.
@@ -9837,7 +9837,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveBroadcast::default();
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("At".to_string());
+/// req.id = Some("Lorem".to_string());
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// 
@@ -9845,8 +9845,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(req)
-///              .on_behalf_of_content_owner_channel("dolore")
-///              .on_behalf_of_content_owner("eirmod")
+///              .on_behalf_of_content_owner_channel("ea")
+///              .on_behalf_of_content_owner("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10217,7 +10217,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -10756,7 +10756,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -11265,11 +11265,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_chat_messages().list("liveChatId", &vec!["erat".into()])
-///              .profile_image_size(32)
-///              .page_token("erat")
-///              .max_results(28)
-///              .hl("sea")
+/// let result = hub.live_chat_messages().list("liveChatId", &vec!["sea".into()])
+///              .profile_image_size(27)
+///              .page_token("At")
+///              .max_results(17)
+///              .hl("eirmod")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11319,7 +11319,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("liveChatId", self._live_chat_id);
+        params.push("liveChatId", &self._live_chat_id);
         if self._part.len() > 0 {
             for f in self._part.iter() {
                 params.push("part", f);
@@ -11635,7 +11635,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -12144,9 +12144,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_chat_moderators().list("liveChatId", &vec!["et".into()])
-///              .page_token("At")
-///              .max_results(97)
+/// let result = hub.live_chat_moderators().list("liveChatId", &vec!["amet".into()])
+///              .page_token("erat")
+///              .max_results(32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12194,7 +12194,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("liveChatId", self._live_chat_id);
+        params.push("liveChatId", &self._live_chat_id);
         if self._part.len() > 0 {
             for f in self._part.iter() {
                 params.push("part", f);
@@ -12446,8 +12446,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("sit")
-///              .on_behalf_of_content_owner("erat")
+///              .on_behalf_of_content_owner_channel("accusam")
+///              .on_behalf_of_content_owner("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12494,7 +12494,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner_channel.as_ref() {
             params.push("onBehalfOfContentOwnerChannel", value);
         }
@@ -12732,7 +12732,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveStream::default();
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("sea".to_string());
+/// req.id = Some("takimata".to_string());
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.status = Default::default(); // is LiveStreamStatus
 /// 
@@ -12740,7 +12740,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(req)
-///              .on_behalf_of_content_owner_channel("nonumy")
+///              .on_behalf_of_content_owner_channel("Lorem")
 ///              .on_behalf_of_content_owner("et")
 ///              .doit().await;
 /// # }
@@ -13086,13 +13086,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_streams().list(&vec!["gubergren".into()])
-///              .page_token("justo")
-///              .on_behalf_of_content_owner_channel("sea")
-///              .on_behalf_of_content_owner("consetetur")
+/// let result = hub.live_streams().list(&vec!["At".into()])
+///              .page_token("dolor")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("sit")
 ///              .mine(false)
-///              .max_results(69)
-///              .add_id("eos")
+///              .max_results(91)
+///              .add_id("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13446,7 +13446,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let mut req = LiveStream::default();
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("At".to_string());
+/// req.id = Some("et".to_string());
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.status = Default::default(); // is LiveStreamStatus
 /// 
@@ -13454,8 +13454,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(req)
-///              .on_behalf_of_content_owner_channel("dolores")
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner_channel("gubergren")
+///              .on_behalf_of_content_owner("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13781,12 +13781,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.members().list(&vec!["gubergren".into()])
-///              .page_token("dolor")
-///              .mode("aliquyam")
-///              .max_results(40)
-///              .has_access_to_level("amet.")
-///              .filter_by_member_channel_id("ipsum")
+/// let result = hub.members().list(&vec!["sea".into()])
+///              .page_token("consetetur")
+///              .mode(&Default::default())
+///              .max_results(3)
+///              .has_access_to_level("aliquyam")
+///              .filter_by_member_channel_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13796,7 +13796,7 @@ pub struct MemberListCall<'a, S>
    pub(super) hub: &'a YouTube<S>,
    pub(super) _part: Vec<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _mode: Option<String>,
+   pub(super) _mode: Option<MemberModeEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _has_access_to_level: Option<String>,
    pub(super) _filter_by_member_channel_id: Option<String>,
@@ -13974,8 +13974,8 @@ where
     /// Parameter that specifies which channel members to return.
     ///
     /// Sets the *mode* query property to the given value.
-    pub fn mode(mut self, new_value: &str) -> MemberListCall<'a, S> {
-        self._mode = Some(new_value.to_string());
+    pub fn mode(mut self, new_value: &MemberModeEnum) -> MemberListCall<'a, S> {
+        self._mode = Some(new_value.clone());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
@@ -14112,7 +14112,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.memberships_levels().list(&vec!["Lorem".into()])
+/// let result = hub.memberships_levels().list(&vec!["At".into()])
 ///              .doit().await;
 /// # }
 /// ```
@@ -14378,7 +14378,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().delete("id")
-///              .on_behalf_of_content_owner("gubergren")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14424,7 +14424,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -14639,7 +14639,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(req)
-///              .on_behalf_of_content_owner("sadipscing")
+///              .on_behalf_of_content_owner("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14940,13 +14940,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlist_items().list(&vec!["At".into()])
-///              .video_id("sit")
-///              .playlist_id("duo")
-///              .page_token("sit")
-///              .on_behalf_of_content_owner("magna")
-///              .max_results(79)
-///              .add_id("rebum.")
+/// let result = hub.playlist_items().list(&vec!["dolor".into()])
+///              .video_id("aliquyam")
+///              .playlist_id("no")
+///              .page_token("amet.")
+///              .on_behalf_of_content_owner("ipsum")
+///              .max_results(45)
+///              .add_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15281,7 +15281,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().update(req)
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15583,7 +15583,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15629,7 +15629,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -15844,8 +15844,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(req)
-///              .on_behalf_of_content_owner_channel("amet.")
-///              .on_behalf_of_content_owner("no")
+///              .on_behalf_of_content_owner_channel("sit")
+///              .on_behalf_of_content_owner("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16157,15 +16157,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlists().list(&vec!["nonumy".into()])
-///              .page_token("sed")
-///              .on_behalf_of_content_owner_channel("kasd")
-///              .on_behalf_of_content_owner("Lorem")
-///              .mine(true)
-///              .max_results(10)
-///              .add_id("rebum.")
-///              .hl("tempor")
-///              .channel_id("dolore")
+/// let result = hub.playlists().list(&vec!["sit".into()])
+///              .page_token("magna")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("rebum.")
+///              .mine(false)
+///              .max_results(49)
+///              .add_id("no")
+///              .hl("nonumy")
+///              .channel_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16523,7 +16523,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(req)
-///              .on_behalf_of_content_owner("eos")
+///              .on_behalf_of_content_owner("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16824,37 +16824,37 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.search().list(&vec!["amet.".into()])
-///              .video_type("dolore")
-///              .video_syndicated("amet")
-///              .video_license("ut")
-///              .video_embeddable("At")
-///              .video_duration("sit")
-///              .video_dimension("vero")
-///              .video_definition("duo")
-///              .video_category_id("sadipscing")
-///              .video_caption("ut")
-///              .add_type("rebum.")
-///              .topic_id("duo")
-///              .safe_search("kasd")
-///              .relevance_language("sadipscing")
-///              .related_to_video_id("tempor")
-///              .region_code("sea")
-///              .q("et")
+/// let result = hub.search().list(&vec!["Lorem".into()])
+///              .video_type(&Default::default())
+///              .video_syndicated(&Default::default())
+///              .video_license(&Default::default())
+///              .video_embeddable(&Default::default())
+///              .video_duration(&Default::default())
+///              .video_dimension(&Default::default())
+///              .video_definition(&Default::default())
+///              .video_category_id("sanctus")
+///              .video_caption(&Default::default())
+///              .add_type("nonumy")
+///              .topic_id("rebum.")
+///              .safe_search(&Default::default())
+///              .relevance_language("tempor")
+///              .related_to_video_id("dolore")
+///              .region_code("eos")
+///              .q("amet.")
 ///              .published_before(chrono::Utc::now())
 ///              .published_after(chrono::Utc::now())
-///              .page_token("Lorem")
-///              .order("magna")
-///              .on_behalf_of_content_owner("takimata")
-///              .max_results(35)
+///              .page_token("dolore")
+///              .order(&Default::default())
+///              .on_behalf_of_content_owner("amet")
+///              .max_results(64)
 ///              .location_radius("At")
-///              .location("invidunt")
+///              .location("sit")
 ///              .for_mine(false)
-///              .for_developer(false)
-///              .for_content_owner(true)
-///              .event_type("clita")
-///              .channel_type("dolor")
-///              .channel_id("aliquyam")
+///              .for_developer(true)
+///              .for_content_owner(false)
+///              .event_type(&Default::default())
+///              .channel_type(&Default::default())
+///              .channel_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16863,18 +16863,18 @@ pub struct SearchListCall<'a, S>
 
    pub(super) hub: &'a YouTube<S>,
    pub(super) _part: Vec<String>,
-   pub(super) _video_type: Option<String>,
-   pub(super) _video_syndicated: Option<String>,
-   pub(super) _video_license: Option<String>,
-   pub(super) _video_embeddable: Option<String>,
-   pub(super) _video_duration: Option<String>,
-   pub(super) _video_dimension: Option<String>,
-   pub(super) _video_definition: Option<String>,
+   pub(super) _video_type: Option<SearchVideoTypeEnum>,
+   pub(super) _video_syndicated: Option<SearchVideoSyndicatedEnum>,
+   pub(super) _video_license: Option<SearchVideoLicenseEnum>,
+   pub(super) _video_embeddable: Option<SearchVideoEmbeddableEnum>,
+   pub(super) _video_duration: Option<SearchVideoDurationEnum>,
+   pub(super) _video_dimension: Option<SearchVideoDimensionEnum>,
+   pub(super) _video_definition: Option<SearchVideoDefinitionEnum>,
    pub(super) _video_category_id: Option<String>,
-   pub(super) _video_caption: Option<String>,
+   pub(super) _video_caption: Option<SearchVideoCaptionEnum>,
    pub(super) _type_: Vec<String>,
    pub(super) _topic_id: Option<String>,
-   pub(super) _safe_search: Option<String>,
+   pub(super) _safe_search: Option<SearchSafeSearchEnum>,
    pub(super) _relevance_language: Option<String>,
    pub(super) _related_to_video_id: Option<String>,
    pub(super) _region_code: Option<String>,
@@ -16882,7 +16882,7 @@ pub struct SearchListCall<'a, S>
    pub(super) _published_before: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _published_after: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order: Option<String>,
+   pub(super) _order: Option<SearchOrderEnum>,
    pub(super) _on_behalf_of_content_owner: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _location_radius: Option<String>,
@@ -16890,8 +16890,8 @@ pub struct SearchListCall<'a, S>
    pub(super) _for_mine: Option<bool>,
    pub(super) _for_developer: Option<bool>,
    pub(super) _for_content_owner: Option<bool>,
-   pub(super) _event_type: Option<String>,
-   pub(super) _channel_type: Option<String>,
+   pub(super) _event_type: Option<SearchEventTypeEnum>,
+   pub(super) _channel_type: Option<SearchChannelTypeEnum>,
    pub(super) _channel_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -17137,50 +17137,50 @@ where
     /// Filter on videos of a specific type.
     ///
     /// Sets the *video type* query property to the given value.
-    pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_type = Some(new_value.to_string());
+    pub fn video_type(mut self, new_value: &SearchVideoTypeEnum) -> SearchListCall<'a, S> {
+        self._video_type = Some(new_value.clone());
         self
     }
     /// Filter on syndicated videos.
     ///
     /// Sets the *video syndicated* query property to the given value.
-    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_syndicated = Some(new_value.to_string());
+    pub fn video_syndicated(mut self, new_value: &SearchVideoSyndicatedEnum) -> SearchListCall<'a, S> {
+        self._video_syndicated = Some(new_value.clone());
         self
     }
     /// Filter on the license of the videos.
     ///
     /// Sets the *video license* query property to the given value.
-    pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_license = Some(new_value.to_string());
+    pub fn video_license(mut self, new_value: &SearchVideoLicenseEnum) -> SearchListCall<'a, S> {
+        self._video_license = Some(new_value.clone());
         self
     }
     /// Filter on embeddable videos.
     ///
     /// Sets the *video embeddable* query property to the given value.
-    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_embeddable = Some(new_value.to_string());
+    pub fn video_embeddable(mut self, new_value: &SearchVideoEmbeddableEnum) -> SearchListCall<'a, S> {
+        self._video_embeddable = Some(new_value.clone());
         self
     }
     /// Filter on the duration of the videos.
     ///
     /// Sets the *video duration* query property to the given value.
-    pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_duration = Some(new_value.to_string());
+    pub fn video_duration(mut self, new_value: &SearchVideoDurationEnum) -> SearchListCall<'a, S> {
+        self._video_duration = Some(new_value.clone());
         self
     }
     /// Filter on 3d videos.
     ///
     /// Sets the *video dimension* query property to the given value.
-    pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_dimension = Some(new_value.to_string());
+    pub fn video_dimension(mut self, new_value: &SearchVideoDimensionEnum) -> SearchListCall<'a, S> {
+        self._video_dimension = Some(new_value.clone());
         self
     }
     /// Filter on the definition of the videos.
     ///
     /// Sets the *video definition* query property to the given value.
-    pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_definition = Some(new_value.to_string());
+    pub fn video_definition(mut self, new_value: &SearchVideoDefinitionEnum) -> SearchListCall<'a, S> {
+        self._video_definition = Some(new_value.clone());
         self
     }
     /// Filter on videos in a specific category.
@@ -17193,8 +17193,8 @@ where
     /// Filter on the presence of captions on the videos.
     ///
     /// Sets the *video caption* query property to the given value.
-    pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._video_caption = Some(new_value.to_string());
+    pub fn video_caption(mut self, new_value: &SearchVideoCaptionEnum) -> SearchListCall<'a, S> {
+        self._video_caption = Some(new_value.clone());
         self
     }
     /// Restrict results to a particular set of resource types from One Platform.
@@ -17215,8 +17215,8 @@ where
     /// Indicates whether the search results should include restricted content as well as standard content.
     ///
     /// Sets the *safe search* query property to the given value.
-    pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._safe_search = Some(new_value.to_string());
+    pub fn safe_search(mut self, new_value: &SearchSafeSearchEnum) -> SearchListCall<'a, S> {
+        self._safe_search = Some(new_value.clone());
         self
     }
     /// Return results relevant to this language.
@@ -17271,8 +17271,8 @@ where
     /// Sort order of the results.
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._order = Some(new_value.to_string());
+    pub fn order(mut self, new_value: &SearchOrderEnum) -> SearchListCall<'a, S> {
+        self._order = Some(new_value.clone());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
@@ -17327,15 +17327,15 @@ where
     /// Filter on the livestream status of the videos.
     ///
     /// Sets the *event type* query property to the given value.
-    pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._event_type = Some(new_value.to_string());
+    pub fn event_type(mut self, new_value: &SearchEventTypeEnum) -> SearchListCall<'a, S> {
+        self._event_type = Some(new_value.clone());
         self
     }
     /// Add a filter on the channel search.
     ///
     /// Sets the *channel type* query property to the given value.
-    pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
-        self._channel_type = Some(new_value.to_string());
+    pub fn channel_type(mut self, new_value: &SearchChannelTypeEnum) -> SearchListCall<'a, S> {
+        self._channel_type = Some(new_value.clone());
         self
     }
     /// Filter on resources belonging to this channelId.
@@ -17492,7 +17492,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -17986,18 +17986,18 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subscriptions().list(&vec!["diam".into()])
-///              .page_token("nonumy")
-///              .order("et")
-///              .on_behalf_of_content_owner_channel("sanctus")
-///              .on_behalf_of_content_owner("accusam")
-///              .my_subscribers(true)
+/// let result = hub.subscriptions().list(&vec!["kasd".into()])
+///              .page_token("sadipscing")
+///              .order(&Default::default())
+///              .on_behalf_of_content_owner_channel("tempor")
+///              .on_behalf_of_content_owner("sea")
+///              .my_subscribers(false)
 ///              .my_recent_subscribers(true)
-///              .mine(false)
-///              .max_results(22)
+///              .mine(true)
+///              .max_results(35)
 ///              .add_id("At")
-///              .for_channel_id("erat")
-///              .channel_id("justo")
+///              .for_channel_id("invidunt")
+///              .channel_id("clita")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18007,7 +18007,7 @@ pub struct SubscriptionListCall<'a, S>
    pub(super) hub: &'a YouTube<S>,
    pub(super) _part: Vec<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order: Option<String>,
+   pub(super) _order: Option<SubscriptionOrderEnum>,
    pub(super) _on_behalf_of_content_owner_channel: Option<String>,
    pub(super) _on_behalf_of_content_owner: Option<String>,
    pub(super) _my_subscribers: Option<bool>,
@@ -18211,8 +18211,8 @@ where
     /// The order of the returned subscriptions
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
-        self._order = Some(new_value.to_string());
+    pub fn order(mut self, new_value: &SubscriptionOrderEnum) -> SubscriptionListCall<'a, S> {
+        self._order = Some(new_value.clone());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
@@ -18380,10 +18380,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.super_chat_events().list(&vec!["ipsum".into()])
-///              .page_token("accusam")
-///              .max_results(82)
-///              .hl("consetetur")
+/// let result = hub.super_chat_events().list(&vec!["Stet".into()])
+///              .page_token("aliquyam")
+///              .max_results(64)
+///              .hl("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18683,7 +18683,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tests().insert(req)
-///              .external_channel_id("no")
+///              .external_channel_id("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18982,9 +18982,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.third_party_links().delete("linkingToken", "type")
-///              .add_part("diam")
-///              .external_channel_id("sea")
+/// let result = hub.third_party_links().delete("linkingToken", &Default::default())
+///              .add_part("dolores")
+///              .external_channel_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18993,7 +18993,7 @@ pub struct ThirdPartyLinkDeleteCall<'a, S>
 
    pub(super) hub: &'a YouTube<S>,
    pub(super) _linking_token: String,
-   pub(super) _type_: String,
+   pub(super) _type_: ThirdPartyLinkTypeEnum,
    pub(super) _part: Vec<String>,
    pub(super) _external_channel_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19031,8 +19031,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("linkingToken", self._linking_token);
-        params.push("type", self._type_);
+        params.push("linkingToken", &self._linking_token);
+        params.push("type", &self._type_);
         if self._part.len() > 0 {
             for f in self._part.iter() {
                 params.push("part", f);
@@ -19133,8 +19133,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
-        self._type_ = new_value.to_string();
+    pub fn type_(mut self, new_value: &ThirdPartyLinkTypeEnum) -> ThirdPartyLinkDeleteCall<'a, S> {
+        self._type_ = new_value.clone();
         self
     }
     /// Do not use. Required for compatibility.
@@ -19229,7 +19229,7 @@ where
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = ThirdPartyLink::default();
-/// req.linking_token = Some("ipsum".to_string());
+/// req.linking_token = Some("dolores".to_string());
 /// req.snippet = Default::default(); // is ThirdPartyLinkSnippet
 /// req.status = Default::default(); // is ThirdPartyLinkStatus
 /// 
@@ -19237,7 +19237,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.third_party_links().insert(req)
-///              .external_channel_id("Stet")
+///              .external_channel_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19512,10 +19512,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.third_party_links().list(&vec!["gubergren".into()])
-///              .type_("ipsum")
-///              .linking_token("no")
-///              .external_channel_id("sit")
+/// let result = hub.third_party_links().list(&vec!["invidunt".into()])
+///              .type_(&Default::default())
+///              .linking_token("clita")
+///              .external_channel_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19524,7 +19524,7 @@ pub struct ThirdPartyLinkListCall<'a, S>
 
    pub(super) hub: &'a YouTube<S>,
    pub(super) _part: Vec<String>,
-   pub(super) _type_: Option<String>,
+   pub(super) _type_: Option<ThirdPartyLinkTypeEnum>,
    pub(super) _linking_token: Option<String>,
    pub(super) _external_channel_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19683,8 +19683,8 @@ where
     /// Get a third party link of the given type.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &ThirdPartyLinkTypeEnum) -> ThirdPartyLinkListCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// Get a third party link with the given linking token.
@@ -19778,7 +19778,7 @@ where
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = ThirdPartyLink::default();
-/// req.linking_token = Some("kasd".to_string());
+/// req.linking_token = Some("aliquyam".to_string());
 /// req.snippet = Default::default(); // is ThirdPartyLinkSnippet
 /// req.status = Default::default(); // is ThirdPartyLinkStatus
 /// 
@@ -19786,7 +19786,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.third_party_links().update(req)
-///              .external_channel_id("amet")
+///              .external_channel_id("magna")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20056,7 +20056,7 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner("nonumy")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -20103,7 +20103,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("videoId", self._video_id);
+        params.push("videoId", &self._video_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -20446,8 +20446,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.video_abuse_report_reasons().list(&vec!["invidunt".into()])
-///              .hl("sed")
+/// let result = hub.video_abuse_report_reasons().list(&vec!["et".into()])
+///              .hl("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20722,10 +20722,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.video_categories().list(&vec!["nonumy".into()])
-///              .region_code("sea")
-///              .add_id("ipsum")
-///              .hl("kasd")
+/// let result = hub.video_categories().list(&vec!["accusam".into()])
+///              .region_code("tempor")
+///              .add_id("sed")
+///              .hl("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21020,7 +21020,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///              .on_behalf_of_content_owner("ea")
+///              .on_behalf_of_content_owner("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21066,7 +21066,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -21274,8 +21274,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().get_rating(&vec!["At".into()])
-///              .on_behalf_of_content_owner("erat")
+/// let result = hub.videos().get_rating(&vec!["diam".into()])
+///              .on_behalf_of_content_owner("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21554,10 +21554,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(req)
 ///              .stabilize(false)
-///              .on_behalf_of_content_owner_channel("invidunt")
-///              .on_behalf_of_content_owner("nonumy")
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("ipsum")
 ///              .notify_subscribers(false)
-///              .auto_levels(true)
+///              .auto_levels(false)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -22015,19 +22015,19 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().list(&vec!["voluptua.".into()])
-///              .video_category_id("eos")
-///              .region_code("duo")
-///              .page_token("elitr")
-///              .on_behalf_of_content_owner("consetetur")
-///              .my_rating("et")
-///              .max_width(-14)
-///              .max_results(100)
-///              .max_height(-48)
-///              .locale("takimata")
-///              .add_id("erat")
-///              .hl("diam")
-///              .chart("nonumy")
+/// let result = hub.videos().list(&vec!["no".into()])
+///              .video_category_id("justo")
+///              .region_code("sadipscing")
+///              .page_token("diam")
+///              .on_behalf_of_content_owner("sea")
+///              .my_rating(&Default::default())
+///              .max_width(-50)
+///              .max_results(86)
+///              .max_height(-62)
+///              .locale("ipsum")
+///              .add_id("no")
+///              .hl("sit")
+///              .chart(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -22040,14 +22040,14 @@ pub struct VideoListCall<'a, S>
    pub(super) _region_code: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _on_behalf_of_content_owner: Option<String>,
-   pub(super) _my_rating: Option<String>,
+   pub(super) _my_rating: Option<VideoMyRatingEnum>,
    pub(super) _max_width: Option<i32>,
    pub(super) _max_results: Option<u32>,
    pub(super) _max_height: Option<i32>,
    pub(super) _locale: Option<String>,
    pub(super) _id: Vec<String>,
    pub(super) _hl: Option<String>,
-   pub(super) _chart: Option<String>,
+   pub(super) _chart: Option<VideoChartEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -22266,8 +22266,8 @@ where
     /// Return videos liked/disliked by the authenticated user. Does not support RateType.RATED_TYPE_NONE.
     ///
     /// Sets the *my rating* query property to the given value.
-    pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a, S> {
-        self._my_rating = Some(new_value.to_string());
+    pub fn my_rating(mut self, new_value: &VideoMyRatingEnum) -> VideoListCall<'a, S> {
+        self._my_rating = Some(new_value.clone());
         self
     }
     /// Return the player with maximum height specified in
@@ -22314,8 +22314,8 @@ where
     /// Return the videos that are in the specified chart.
     ///
     /// Sets the *chart* query property to the given value.
-    pub fn chart(mut self, new_value: &str) -> VideoListCall<'a, S> {
-        self._chart = Some(new_value.to_string());
+    pub fn chart(mut self, new_value: &VideoChartEnum) -> VideoListCall<'a, S> {
+        self._chart = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -22420,7 +22420,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().rate("id", "rating")
+/// let result = hub.videos().rate("id", &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -22429,7 +22429,7 @@ pub struct VideoRateCall<'a, S>
 
    pub(super) hub: &'a YouTube<S>,
    pub(super) _id: String,
-   pub(super) _rating: String,
+   pub(super) _rating: VideoRatingEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -22466,8 +22466,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
-        params.push("rating", self._rating);
+        params.push("id", &self._id);
+        params.push("rating", &self._rating);
 
         params.extend(self._additional_params.iter());
 
@@ -22568,8 +22568,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a, S> {
-        self._rating = new_value.to_string();
+    pub fn rating(mut self, new_value: &VideoRatingEnum) -> VideoRateCall<'a, S> {
+        self._rating = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -22681,7 +22681,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().report_abuse(req)
-///              .on_behalf_of_content_owner("diam")
+///              .on_behalf_of_content_owner("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22955,7 +22955,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(req)
-///              .on_behalf_of_content_owner("diam")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23264,7 +23264,7 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(req, "channelId")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("invidunt")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -23312,7 +23312,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("channelId", self._channel_id);
+        params.push("channelId", &self._channel_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -23656,7 +23656,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of_content_owner("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23702,7 +23702,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("channelId", self._channel_id);
+        params.push("channelId", &self._channel_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -23917,7 +23917,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.youtube().v3_update_comment_threads(req)
-///              .add_part("ipsum")
+///              .add_part("sea")
 ///              .doit().await;
 /// # }
 /// ```

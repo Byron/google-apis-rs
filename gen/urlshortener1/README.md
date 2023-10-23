@@ -96,7 +96,7 @@ let mut hub = Urlshortener::new(hyper::Client::builder().build(hyper_rustls::Htt
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.url().get("shortUrl")
-             .projection("magna")
+             .projection(&Default::default())
              .doit().await;
 
 match result {

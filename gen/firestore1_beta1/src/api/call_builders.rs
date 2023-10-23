@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -661,7 +661,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -953,7 +953,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -1250,8 +1250,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("collectionId", self._collection_id);
+        params.push("parent", &self._parent);
+        params.push("collectionId", &self._collection_id);
         if self._mask_field_paths.len() > 0 {
             for f in self._mask_field_paths.iter() {
                 params.push("mask.fieldPaths", f);
@@ -1573,7 +1573,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._current_document_update_time.as_ref() {
             params.push("currentDocument.updateTime", ::client::serde::datetime_to_string(&value));
         }
@@ -1861,7 +1861,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._transaction.as_ref() {
             params.push("transaction", ::client::serde::urlsafe_base64::to_string(&value));
         }
@@ -2171,8 +2171,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("collectionId", self._collection_id);
+        params.push("parent", &self._parent);
+        params.push("collectionId", &self._collection_id);
         if let Some(value) = self._transaction.as_ref() {
             params.push("transaction", ::client::serde::urlsafe_base64::to_string(&value));
         }
@@ -2524,7 +2524,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2824,8 +2824,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("collectionId", self._collection_id);
+        params.push("parent", &self._parent);
+        params.push("collectionId", &self._collection_id);
         if let Some(value) = self._transaction.as_ref() {
             params.push("transaction", ::client::serde::urlsafe_base64::to_string(&value));
         }
@@ -3177,7 +3177,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -3469,7 +3469,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3769,7 +3769,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if self._update_mask_field_paths.len() > 0 {
             for f in self._update_mask_field_paths.iter() {
                 params.push("updateMask.fieldPaths", f);
@@ -4107,7 +4107,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -4399,7 +4399,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4691,7 +4691,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4983,7 +4983,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("database", self._database);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -5275,7 +5275,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -5560,7 +5560,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5822,7 +5822,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6090,7 +6090,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6388,7 +6388,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6680,7 +6680,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

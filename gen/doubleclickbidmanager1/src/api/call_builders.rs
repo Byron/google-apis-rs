@@ -889,7 +889,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1140,7 +1140,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1652,7 +1652,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1926,7 +1926,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("queryId", self._query_id.to_string());
+        params.push("queryId", &self._query_id.to_string());
 
         params.extend(self._additional_params.iter());
 

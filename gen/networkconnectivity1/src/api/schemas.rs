@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -230,7 +230,7 @@ pub struct Hub {
     pub routing_vpcs: Option<Vec<RoutingVPC>>,
     /// Output only. The current lifecycle state of this hub.
     
-    pub state: Option<String>,
+    pub state: Option<HubStateEnum>,
     /// Output only. The Google-generated UUID for the hub. This value is unique across all hub resources. If a hub is deleted and another with the same name is created, the new hub is assigned a different unique_id.
     #[serde(rename="uniqueId")]
     
@@ -280,10 +280,10 @@ pub struct InternalRange {
     pub network: Option<String>,
     /// Optional. Types of resources that are allowed to overlap with the current internal range.
     
-    pub overlaps: Option<Vec<String>>,
+    pub overlaps: Option<Vec<InternalRangeOverlapsEnum>>,
     /// The type of peering set for this internal range.
     
-    pub peering: Option<String>,
+    pub peering: Option<InternalRangePeeringEnum>,
     /// An alternate to ip_cidr_range. Can be set when trying to create a reservation that automatically finds a free range of the given size. If both ip_cidr_range and prefix_length are set, there is an error if the range sizes do not match. Can also be used during updates to change the range size.
     #[serde(rename="prefixLength")]
     
@@ -298,7 +298,7 @@ pub struct InternalRange {
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The type of usage set for this InternalRange.
     
-    pub usage: Option<String>,
+    pub usage: Option<InternalRangeUsageEnum>,
     /// Output only. The list of resources that refer to this internal range. Resources that use the internal range for their range allocation are referred to as users of the range. Other resources mark themselves as users while doing so by creating a reference to this internal range. Having a user, based on this reference, prevents deletion of the internal range referred to. Can be empty.
     
     pub users: Option<Vec<String>>,
@@ -663,7 +663,7 @@ pub struct Spoke {
     pub name: Option<String>,
     /// Output only. The current lifecycle state of this spoke.
     
-    pub state: Option<String>,
+    pub state: Option<SpokeStateEnum>,
     /// Output only. The Google-generated UUID for the spoke. This value is unique across all spoke resources. If a spoke is deleted and another with the same name is created, the new spoke is assigned a different unique_id.
     #[serde(rename="uniqueId")]
     

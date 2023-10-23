@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -610,7 +610,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflows_executions_get("name")
-///              .view("sanctus")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -619,7 +619,7 @@ pub struct ProjectLocationWorkflowExecutionGetCall<'a, S>
 
    pub(super) hub: &'a WorkflowExecutions<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -656,7 +656,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -777,8 +777,8 @@ where
     /// Optional. A view defining which fields should be filled in the returned execution. The API will default to the FULL view.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationWorkflowExecutionGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -884,9 +884,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflows_executions_list("parent")
-///              .view("amet.")
-///              .page_token("takimata")
-///              .page_size(-52)
+///              .view(&Default::default())
+///              .page_token("sed")
+///              .page_size(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -895,7 +895,7 @@ pub struct ProjectLocationWorkflowExecutionListCall<'a, S>
 
    pub(super) hub: &'a WorkflowExecutions<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -934,7 +934,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1061,8 +1061,8 @@ where
     /// Optional. A view defining which fields should be filled in the returned executions. The API will default to the BASIC view.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// A page token, received from a previous `ListExecutions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListExecutions` must match the call that provided the page token.
@@ -1233,7 +1233,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("workflow", self._workflow);
+        params.push("workflow", &self._workflow);
 
         params.extend(self._additional_params.iter());
 

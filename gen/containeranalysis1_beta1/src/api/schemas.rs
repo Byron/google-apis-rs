@@ -8,7 +8,7 @@ use super::*;
 pub struct AliasContext {
     /// The alias kind.
     
-    pub kind: Option<String>,
+    pub kind: Option<AliasContextKindEnum>,
     /// The alias name.
     
     pub name: Option<String>,
@@ -330,7 +330,7 @@ pub struct BuildSignature {
     /// The type of the key, either stored in `public_key` or referenced in `key_id`.
     #[serde(rename="keyType")]
     
-    pub key_type: Option<String>,
+    pub key_type: Option<BuildSignatureKeyTypeEnum>,
     /// Public key of the builder which can be used to verify that the related findings are valid and unchanged. If `key_type` is empty, this defaults to PEM encoded public keys. This field may be empty if `key_id` references an external key. For Cloud Build based signatures, this is a PEM encoded public key. To verify the Cloud Build signature, place the contents of this field into a file (public.pem). The signature field is base64-decoded into its binary representation in signature.bin, and the provenance bytes from `BuildDetails` are base64-decoded into a binary representation in signed.bin. OpenSSL can then verify the signature: `openssl sha256 -verify public.pem -signature signature.bin signed.bin`
     #[serde(rename="publicKey")]
     
@@ -370,18 +370,18 @@ pub struct CVSS {
     /// Defined in CVSS v3, CVSS v2
     #[serde(rename="attackComplexity")]
     
-    pub attack_complexity: Option<String>,
+    pub attack_complexity: Option<CVSAttackComplexityEnum>,
     /// Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments. Defined in CVSS v3, CVSS v2
     #[serde(rename="attackVector")]
     
-    pub attack_vector: Option<String>,
+    pub attack_vector: Option<CVSAttackVectorEnum>,
     /// Defined in CVSS v2
     
-    pub authentication: Option<String>,
+    pub authentication: Option<CVSAuthenticationEnum>,
     /// Defined in CVSS v3, CVSS v2
     #[serde(rename="availabilityImpact")]
     
-    pub availability_impact: Option<String>,
+    pub availability_impact: Option<CVSAvailabilityImpactEnum>,
     /// The base score is a function of the base metric scores.
     #[serde(rename="baseScore")]
     
@@ -389,7 +389,7 @@ pub struct CVSS {
     /// Defined in CVSS v3, CVSS v2
     #[serde(rename="confidentialityImpact")]
     
-    pub confidentiality_impact: Option<String>,
+    pub confidentiality_impact: Option<CVSConfidentialityImpactEnum>,
     /// no description provided
     #[serde(rename="exploitabilityScore")]
     
@@ -401,18 +401,18 @@ pub struct CVSS {
     /// Defined in CVSS v3, CVSS v2
     #[serde(rename="integrityImpact")]
     
-    pub integrity_impact: Option<String>,
+    pub integrity_impact: Option<CVSIntegrityImpactEnum>,
     /// Defined in CVSS v3
     #[serde(rename="privilegesRequired")]
     
-    pub privileges_required: Option<String>,
+    pub privileges_required: Option<CVSPrivilegesRequiredEnum>,
     /// Defined in CVSS v3
     
-    pub scope: Option<String>,
+    pub scope: Option<CVSScopeEnum>,
     /// Defined in CVSS v3
     #[serde(rename="userInteraction")]
     
-    pub user_interaction: Option<String>,
+    pub user_interaction: Option<CVSUserInteractionEnum>,
 }
 
 impl client::Part for CVSS {}
@@ -428,15 +428,15 @@ pub struct CVSSv3 {
     /// no description provided
     #[serde(rename="attackComplexity")]
     
-    pub attack_complexity: Option<String>,
+    pub attack_complexity: Option<CVSSv3AttackComplexityEnum>,
     /// Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.
     #[serde(rename="attackVector")]
     
-    pub attack_vector: Option<String>,
+    pub attack_vector: Option<CVSSv3AttackVectorEnum>,
     /// no description provided
     #[serde(rename="availabilityImpact")]
     
-    pub availability_impact: Option<String>,
+    pub availability_impact: Option<CVSSv3AvailabilityImpactEnum>,
     /// The base score is a function of the base metric scores.
     #[serde(rename="baseScore")]
     
@@ -444,7 +444,7 @@ pub struct CVSSv3 {
     /// no description provided
     #[serde(rename="confidentialityImpact")]
     
-    pub confidentiality_impact: Option<String>,
+    pub confidentiality_impact: Option<CVSSv3ConfidentialityImpactEnum>,
     /// no description provided
     #[serde(rename="exploitabilityScore")]
     
@@ -456,18 +456,18 @@ pub struct CVSSv3 {
     /// no description provided
     #[serde(rename="integrityImpact")]
     
-    pub integrity_impact: Option<String>,
+    pub integrity_impact: Option<CVSSv3IntegrityImpactEnum>,
     /// no description provided
     #[serde(rename="privilegesRequired")]
     
-    pub privileges_required: Option<String>,
+    pub privileges_required: Option<CVSSv3PrivilegesRequiredEnum>,
     /// no description provided
     
-    pub scope: Option<String>,
+    pub scope: Option<CVSSv3ScopeEnum>,
     /// no description provided
     #[serde(rename="userInteraction")]
     
-    pub user_interaction: Option<String>,
+    pub user_interaction: Option<CVSSv3UserInteractionEnum>,
 }
 
 impl client::Part for CVSSv3 {}
@@ -563,7 +563,7 @@ pub struct Deployment {
     pub deploy_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Platform hosting this deployment.
     
-    pub platform: Option<String>,
+    pub platform: Option<DeploymentPlatformEnum>,
     /// Output only. Resource URI for the artifact being deployed taken from the deployable field with the same name.
     #[serde(rename="resourceUri")]
     
@@ -716,7 +716,7 @@ pub struct Discovered {
     /// The status of discovery for the resource.
     #[serde(rename="analysisStatus")]
     
-    pub analysis_status: Option<String>,
+    pub analysis_status: Option<DiscoveredAnalysisStatusEnum>,
     /// When an error is encountered this will contain a LocalizedMessage under details to show to the user. The LocalizedMessage is output only and populated by the API.
     #[serde(rename="analysisStatusError")]
     
@@ -724,7 +724,7 @@ pub struct Discovered {
     /// Whether the resource is continuously analyzed.
     #[serde(rename="continuousAnalysis")]
     
-    pub continuous_analysis: Option<String>,
+    pub continuous_analysis: Option<DiscoveredContinuousAnalysisEnum>,
     /// The last time continuous analysis was done for this resource. Deprecated, do not use.
     #[serde(rename="lastAnalysisTime")]
     
@@ -744,7 +744,7 @@ pub struct Discovery {
     /// Required. Immutable. The kind of analysis that is handled by this discovery.
     #[serde(rename="analysisKind")]
     
-    pub analysis_kind: Option<String>,
+    pub analysis_kind: Option<DiscoveryAnalysisKindEnum>,
 }
 
 impl client::Part for Discovery {}
@@ -759,7 +759,7 @@ impl client::Part for Discovery {}
 pub struct Distribution {
     /// The CPU architecture for which packages in this distribution channel were built.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<DistributionArchitectureEnum>,
     /// Required. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package.
     #[serde(rename="cpeUri")]
     
@@ -953,7 +953,7 @@ impl client::Part for Expr {}
 pub struct ExternalRef {
     /// An External Reference allows a Package to reference an external source of additional information, metadata, enumerations, asset identifiers, or downloadable content believed to be relevant to the Package
     
-    pub category: Option<String>,
+    pub category: Option<ExternalRefCategoryEnum>,
     /// Human-readable information about the purpose and target of the reference
     
     pub comment: Option<String>,
@@ -998,7 +998,7 @@ pub struct FileNote {
     /// This field provides information about the type of file identified
     #[serde(rename="fileType")]
     
-    pub file_type: Option<String>,
+    pub file_type: Option<FileNoteFileTypeEnum>,
     /// Identify the full path and filename that corresponds to the file information in this section
     
     pub title: Option<String>,
@@ -1086,7 +1086,7 @@ pub struct FixableTotalByDigest {
     pub resource: Option<Resource>,
     /// The severity for this count. SEVERITY_UNSPECIFIED indicates total across all severities.
     
-    pub severity: Option<String>,
+    pub severity: Option<FixableTotalByDigestSeverityEnum>,
     /// The total number of vulnerabilities associated with this resource.
     #[serde(rename="totalCount")]
     
@@ -1107,7 +1107,7 @@ pub struct GenericSignedAttestation {
     /// Type (for example schema) of the attestation payload that was signed. The verifier must ensure that the provided type is one that the verifier supports, and that the attestation payload is a valid instantiation of that type (for example by validating a JSON schema).
     #[serde(rename="contentType")]
     
-    pub content_type: Option<String>,
+    pub content_type: Option<GenericSignedAttestationContentTypeEnum>,
     /// The serialized payload that is verified by one or more `signatures`. The encoding and semantic meaning of this payload must match what is set in `content_type`.
     #[serde(rename="serializedPayload")]
     
@@ -1353,11 +1353,11 @@ pub struct GrafeasV1beta1VulnerabilityDetails {
     /// Output only. CVSS version used to populate cvss_score and severity.
     #[serde(rename="cvssVersion")]
     
-    pub cvss_version: Option<String>,
+    pub cvss_version: Option<GrafeasV1beta1VulnerabilityDetailCvssVersionEnum>,
     /// The distro assigned severity for this vulnerability when it is available, and note provider assigned severity when distro has not yet assigned a severity for this vulnerability. When there are multiple PackageIssues for this vulnerability, they can have different effective severities because some might be provided by the distro while others are provided by the language ecosystem for a language pack. For this reason, it is advised to use the effective severity on the PackageIssue level. In the case where multiple PackageIssues have differing effective severities, this field should be the highest severity for any of the PackageIssues.
     #[serde(rename="effectiveSeverity")]
     
-    pub effective_severity: Option<String>,
+    pub effective_severity: Option<GrafeasV1beta1VulnerabilityDetailEffectiveSeverityEnum>,
     /// Output only. A detailed description of this vulnerability.
     #[serde(rename="longDescription")]
     
@@ -1372,7 +1372,7 @@ pub struct GrafeasV1beta1VulnerabilityDetails {
     pub related_urls: Option<Vec<RelatedUrl>>,
     /// Output only. The note provider assigned Severity of the vulnerability.
     
-    pub severity: Option<String>,
+    pub severity: Option<GrafeasV1beta1VulnerabilityDetailSeverityEnum>,
     /// Output only. A one sentence description of this vulnerability.
     #[serde(rename="shortDescription")]
     
@@ -1396,7 +1396,7 @@ pub struct Hash {
     /// Required. The type of hash that was performed.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<HashTypeEnum>,
     /// Required. The hash value.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -1467,7 +1467,7 @@ impl client::Part for InToto {}
 pub struct Installation {
     /// Output only. The CPU architecture for which packages in this distribution channel were built. Architecture will be blank for language packages.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<InstallationArchitectureEnum>,
     /// Output only. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package. The cpe_uri will be blank for language packages.
     #[serde(rename="cpeUri")]
     
@@ -1523,7 +1523,7 @@ pub struct Layer {
     pub arguments: Option<String>,
     /// Required. The recovered Dockerfile directive used to construct this layer.
     
-    pub directive: Option<String>,
+    pub directive: Option<LayerDirectiveEnum>,
 }
 
 impl client::Part for Layer {}
@@ -1709,7 +1709,7 @@ pub struct Note {
     pub intoto: Option<InToto>,
     /// Output only. The type of analysis. This field can be used as a filter in list requests.
     
-    pub kind: Option<String>,
+    pub kind: Option<NoteKindEnum>,
     /// A detailed description of this note.
     #[serde(rename="longDescription")]
     
@@ -1804,7 +1804,7 @@ pub struct Occurrence {
     pub intoto: Option<GrafeasV1beta1IntotoDetails>,
     /// Output only. This explicitly denotes which of the occurrence details are specified. This field can be used as a filter in list requests.
     
-    pub kind: Option<String>,
+    pub kind: Option<OccurrenceKindEnum>,
     /// Output only. The name of the occurrence in the form of `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     
     pub name: Option<String>,
@@ -1855,7 +1855,7 @@ impl client::ResponseResult for Occurrence {}
 pub struct Package {
     /// The CPU architecture for which packages in this distribution channel were built. Architecture will be blank for language packages.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<PackageArchitectureEnum>,
     /// The cpe_uri in [CPE format](https://cpe.mitre.org/specification/) denoting the package manager version distributing a package. The cpe_uri will be blank for language packages.
     #[serde(rename="cpeUri")]
     
@@ -2026,7 +2026,7 @@ pub struct PackageIssue {
     /// Output only. The distro or language system assigned severity for this vulnerability when that is available and note provider assigned severity when it is not available.
     #[serde(rename="effectiveSeverity")]
     
-    pub effective_severity: Option<String>,
+    pub effective_severity: Option<PackageIssueEffectiveSeverityEnum>,
     /// The location of the available fix for vulnerability.
     #[serde(rename="fixedLocation")]
     
@@ -2054,7 +2054,7 @@ pub struct PgpSignedAttestation {
     /// Type (for example schema) of the attestation payload that was signed. The verifier must ensure that the provided type is one that the verifier supports, and that the attestation payload is a valid instantiation of that type (for example by validating a JSON schema).
     #[serde(rename="contentType")]
     
-    pub content_type: Option<String>,
+    pub content_type: Option<PgpSignedAttestationContentTypeEnum>,
     /// The cryptographic fingerprint of the key used to generate the signature, as output by, e.g. `gpg --list-keys`. This should be the version 4, full 160-bit fingerprint, expressed as a 40 character hexadecimal string. See https://tools.ietf.org/html/rfc4880#section-12.2 for details. Implementations may choose to acknowledge "LONG", "SHORT", or other abbreviated key IDs, but only the full fingerprint is guaranteed to work. In gpg, the full fingerprint can be retrieved from the `fpr` field returned when calling --list-keys with --with-colons. For example: ``` gpg --with-colons --with-fingerprint --force-v4-certs \ --list-keys attester@example.com tru::1:1513631572:0:3:1:5 pub:...... fpr:::::::::24FF6481B76AC91E66A00AC657A93A81EF3AE6FB: ``` Above, the fingerprint is `24FF6481B76AC91E66A00AC657A93A81EF3AE6FB`.
     #[serde(rename="pgpKeyId")]
     
@@ -2144,7 +2144,7 @@ pub struct RelationshipNote {
     /// The type of relationship between the source and target SPDX elements
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RelationshipNoteTypeEnum>,
 }
 
 impl client::Part for RelationshipNote {}
@@ -2169,7 +2169,7 @@ pub struct RelationshipOccurrence {
     /// Output only. The type of relationship between the source and target SPDX elements
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RelationshipOccurrenceTypeEnum>,
 }
 
 impl client::Part for RelationshipOccurrence {}
@@ -2412,7 +2412,7 @@ pub struct Version {
     pub inclusive: Option<bool>,
     /// Required. Distinguishes between sentinel MIN/MAX versions and normal versions.
     
-    pub kind: Option<String>,
+    pub kind: Option<VersionKindEnum>,
     /// Required only when version kind is NORMAL. The main part of the version name.
     
     pub name: Option<String>,
@@ -2446,7 +2446,7 @@ pub struct Vulnerability {
     /// CVSS version used to populate cvss_score and severity.
     #[serde(rename="cvssVersion")]
     
-    pub cvss_version: Option<String>,
+    pub cvss_version: Option<VulnerabilityCvssVersionEnum>,
     /// A list of CWE for this vulnerability. For details, see: https://cwe.mitre.org/index.html
     
     pub cwe: Option<Vec<String>>,
@@ -2455,7 +2455,7 @@ pub struct Vulnerability {
     pub details: Option<Vec<Detail>>,
     /// Note provider assigned impact of the vulnerability.
     
-    pub severity: Option<String>,
+    pub severity: Option<VulnerabilitySeverityEnum>,
     /// The time this information was last changed at the source. This is an upstream timestamp from the underlying information source - e.g. Ubuntu security tracker.
     #[serde(rename="sourceUpdateTime")]
     

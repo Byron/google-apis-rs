@@ -26,7 +26,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.url().get("shortUrl")
-///              .projection("sed")
+///              .projection(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -35,7 +35,7 @@ pub struct UrlGetCall<'a, S>
 
    pub(super) hub: &'a Urlshortener<S>,
    pub(super) _short_url: String,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<UrlProjectionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -72,7 +72,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("shortUrl", self._short_url);
+        params.push("shortUrl", &self._short_url);
         if let Some(value) = self._projection.as_ref() {
             params.push("projection", value);
         }
@@ -186,8 +186,8 @@ where
     /// Additional information to return.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> UrlGetCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &UrlProjectionEnum) -> UrlGetCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -558,8 +558,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.url().list()
-///              .start_token("amet.")
-///              .projection("takimata")
+///              .start_token("voluptua.")
+///              .projection(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -568,7 +568,7 @@ pub struct UrlListCall<'a, S>
 
    pub(super) hub: &'a Urlshortener<S>,
    pub(super) _start_token: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<UrlProjectionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -718,8 +718,8 @@ where
     /// Additional information to return.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> UrlListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &UrlProjectionEnum) -> UrlListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

@@ -29,12 +29,12 @@ use super::*;
 ///              .start_index(-75)
 ///              .sort("dolor")
 ///              .segment("ea")
-///              .sampling_level("ipsum")
-///              .output("invidunt")
-///              .max_results(-47)
-///              .include_empty_rows(true)
-///              .filters("sed")
-///              .dimensions("ut")
+///              .sampling_level(&Default::default())
+///              .output(&Default::default())
+///              .max_results(-55)
+///              .include_empty_rows(false)
+///              .filters("amet")
+///              .dimensions("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -49,8 +49,8 @@ pub struct DataGaGetCall<'a, S>
    pub(super) _start_index: Option<i32>,
    pub(super) _sort: Option<String>,
    pub(super) _segment: Option<String>,
-   pub(super) _sampling_level: Option<String>,
-   pub(super) _output: Option<String>,
+   pub(super) _sampling_level: Option<DataSamplingLevelEnum>,
+   pub(super) _output: Option<DataOutputEnum>,
    pub(super) _max_results: Option<i32>,
    pub(super) _include_empty_rows: Option<bool>,
    pub(super) _filters: Option<String>,
@@ -91,10 +91,10 @@ where
         }
 
         let mut params = Params::with_capacity(15 + self._additional_params.len());
-        params.push("ids", self._ids);
-        params.push("start-date", self._start_date);
-        params.push("end-date", self._end_date);
-        params.push("metrics", self._metrics);
+        params.push("ids", &self._ids);
+        params.push("start-date", &self._start_date);
+        params.push("end-date", &self._end_date);
+        params.push("metrics", &self._metrics);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -283,15 +283,15 @@ where
     /// The desired sampling level.
     ///
     /// Sets the *sampling level* query property to the given value.
-    pub fn sampling_level(mut self, new_value: &str) -> DataGaGetCall<'a, S> {
-        self._sampling_level = Some(new_value.to_string());
+    pub fn sampling_level(mut self, new_value: &DataSamplingLevelEnum) -> DataGaGetCall<'a, S> {
+        self._sampling_level = Some(new_value.clone());
         self
     }
     /// The selected format for the response. Default format is JSON.
     ///
     /// Sets the *output* query property to the given value.
-    pub fn output(mut self, new_value: &str) -> DataGaGetCall<'a, S> {
-        self._output = Some(new_value.to_string());
+    pub fn output(mut self, new_value: &DataOutputEnum) -> DataGaGetCall<'a, S> {
+        self._output = Some(new_value.clone());
         self
     }
     /// The maximum number of entries to include in this feed.
@@ -421,12 +421,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.data().mcf_get("ids", "start-date", "end-date", "metrics")
-///              .start_index(-50)
+///              .start_index(-16)
 ///              .sort("est")
-///              .sampling_level("gubergren")
-///              .max_results(-17)
-///              .filters("dolor")
-///              .dimensions("Lorem")
+///              .sampling_level(&Default::default())
+///              .max_results(-50)
+///              .filters("ipsum")
+///              .dimensions("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -440,7 +440,7 @@ pub struct DataMcfGetCall<'a, S>
    pub(super) _metrics: String,
    pub(super) _start_index: Option<i32>,
    pub(super) _sort: Option<String>,
-   pub(super) _sampling_level: Option<String>,
+   pub(super) _sampling_level: Option<DataSamplingLevelEnum>,
    pub(super) _max_results: Option<i32>,
    pub(super) _filters: Option<String>,
    pub(super) _dimensions: Option<String>,
@@ -480,10 +480,10 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("ids", self._ids);
-        params.push("start-date", self._start_date);
-        params.push("end-date", self._end_date);
-        params.push("metrics", self._metrics);
+        params.push("ids", &self._ids);
+        params.push("start-date", &self._start_date);
+        params.push("end-date", &self._end_date);
+        params.push("metrics", &self._metrics);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -656,8 +656,8 @@ where
     /// The desired sampling level.
     ///
     /// Sets the *sampling level* query property to the given value.
-    pub fn sampling_level(mut self, new_value: &str) -> DataMcfGetCall<'a, S> {
-        self._sampling_level = Some(new_value.to_string());
+    pub fn sampling_level(mut self, new_value: &DataSamplingLevelEnum) -> DataMcfGetCall<'a, S> {
+        self._sampling_level = Some(new_value.clone());
         self
     }
     /// The maximum number of entries to include in this feed.
@@ -780,10 +780,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.data().realtime_get("ids", "metrics")
-///              .sort("sed")
-///              .max_results(-70)
-///              .filters("sed")
-///              .dimensions("no")
+///              .sort("dolor")
+///              .max_results(-56)
+///              .filters("eos")
+///              .dimensions("labore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -833,8 +833,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("ids", self._ids);
-        params.push("metrics", self._metrics);
+        params.push("ids", &self._ids);
+        params.push("metrics", &self._metrics);
         if let Some(value) = self._sort.as_ref() {
             params.push("sort", value);
         }
@@ -1091,8 +1091,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().account_summaries_list()
-///              .start_index(-15)
-///              .max_results(-13)
+///              .start_index(-43)
+///              .max_results(-70)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1399,8 +1399,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1664,7 +1664,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1901,8 +1901,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().account_user_links_list("accountId")
-///              .start_index(-76)
-///              .max_results(-31)
+///              .start_index(-24)
+///              .max_results(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1949,7 +1949,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -2235,8 +2235,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2483,8 +2483,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().accounts_list()
-///              .start_index(-34)
-///              .max_results(-22)
+///              .start_index(-76)
+///              .max_results(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3015,8 +3015,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().custom_data_sources_list("accountId", "webPropertyId")
-///              .start_index(-96)
-///              .max_results(-92)
+///              .start_index(-34)
+///              .max_results(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3064,8 +3064,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -3355,9 +3355,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDimensionId", self._custom_dimension_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDimensionId", &self._custom_dimension_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3643,8 +3643,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3891,8 +3891,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().custom_dimensions_list("accountId", "webPropertyId")
-///              .start_index(-76)
-///              .max_results(-76)
+///              .start_index(-95)
+///              .max_results(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3940,8 +3940,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -4191,7 +4191,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().custom_dimensions_patch(req, "accountId", "webPropertyId", "customDimensionId")
-///              .ignore_custom_data_source_links(true)
+///              .ignore_custom_data_source_links(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4240,9 +4240,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDimensionId", self._custom_dimension_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDimensionId", &self._custom_dimension_id);
         if let Some(value) = self._ignore_custom_data_source_links.as_ref() {
             params.push("ignoreCustomDataSourceLinks", value.to_string());
         }
@@ -4515,7 +4515,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().custom_dimensions_update(req, "accountId", "webPropertyId", "customDimensionId")
-///              .ignore_custom_data_source_links(false)
+///              .ignore_custom_data_source_links(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4564,9 +4564,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDimensionId", self._custom_dimension_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDimensionId", &self._custom_dimension_id);
         if let Some(value) = self._ignore_custom_data_source_links.as_ref() {
             params.push("ignoreCustomDataSourceLinks", value.to_string());
         }
@@ -4879,9 +4879,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customMetricId", self._custom_metric_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customMetricId", &self._custom_metric_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5167,8 +5167,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5415,8 +5415,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().custom_metrics_list("accountId", "webPropertyId")
-///              .start_index(-2)
-///              .max_results(-30)
+///              .start_index(-28)
+///              .max_results(-72)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5464,8 +5464,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -5715,7 +5715,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.management().custom_metrics_patch(req, "accountId", "webPropertyId", "customMetricId")
-///              .ignore_custom_data_source_links(false)
+///              .ignore_custom_data_source_links(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5764,9 +5764,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customMetricId", self._custom_metric_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customMetricId", &self._custom_metric_id);
         if let Some(value) = self._ignore_custom_data_source_links.as_ref() {
             params.push("ignoreCustomDataSourceLinks", value.to_string());
         }
@@ -6088,9 +6088,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customMetricId", self._custom_metric_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customMetricId", &self._custom_metric_id);
         if let Some(value) = self._ignore_custom_data_source_links.as_ref() {
             params.push("ignoreCustomDataSourceLinks", value.to_string());
         }
@@ -6404,10 +6404,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("experimentId", self._experiment_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("experimentId", &self._experiment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6687,10 +6687,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("experimentId", self._experiment_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("experimentId", &self._experiment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6987,9 +6987,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7296,9 +7296,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -7606,10 +7606,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("experimentId", self._experiment_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("experimentId", &self._experiment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7930,10 +7930,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("experimentId", self._experiment_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("experimentId", &self._experiment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8245,8 +8245,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("filterId", self._filter_id);
+        params.push("accountId", &self._account_id);
+        params.push("filterId", &self._filter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8515,8 +8515,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("filterId", self._filter_id);
+        params.push("accountId", &self._account_id);
+        params.push("filterId", &self._filter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8791,7 +8791,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9076,7 +9076,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -9362,8 +9362,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("filterId", self._filter_id);
+        params.push("accountId", &self._account_id);
+        params.push("filterId", &self._filter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9662,8 +9662,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("filterId", self._filter_id);
+        params.push("accountId", &self._account_id);
+        params.push("filterId", &self._filter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9957,10 +9957,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("goalId", self._goal_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("goalId", &self._goal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10257,9 +10257,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10566,9 +10566,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -10876,10 +10876,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("goalId", self._goal_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("goalId", &self._goal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11200,10 +11200,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("goalId", self._goal_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("goalId", &self._goal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11517,10 +11517,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11800,10 +11800,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12100,9 +12100,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12409,9 +12409,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -12719,10 +12719,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13043,10 +13043,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13360,10 +13360,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13649,9 +13649,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13958,9 +13958,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -14268,10 +14268,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14584,9 +14584,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14855,9 +14855,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15143,8 +15143,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15440,8 +15440,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -15738,9 +15738,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16050,9 +16050,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16355,9 +16355,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("remarketingAudienceId", self._remarketing_audience_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("remarketingAudienceId", &self._remarketing_audience_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16626,9 +16626,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("remarketingAudienceId", self._remarketing_audience_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("remarketingAudienceId", &self._remarketing_audience_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16914,8 +16914,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17213,8 +17213,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -17520,9 +17520,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("remarketingAudienceId", self._remarketing_audience_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("remarketingAudienceId", &self._remarketing_audience_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17832,9 +17832,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("remarketingAudienceId", self._remarketing_audience_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("remarketingAudienceId", &self._remarketing_audience_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18401,10 +18401,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("unsampledReportId", self._unsampled_report_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("unsampledReportId", &self._unsampled_report_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18684,10 +18684,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
-        params.push("unsampledReportId", self._unsampled_report_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
+        params.push("unsampledReportId", &self._unsampled_report_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18984,9 +18984,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19293,9 +19293,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("profileId", self._profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("profileId", &self._profile_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -19602,9 +19602,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDataSourceId", self._custom_data_source_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDataSourceId", &self._custom_data_source_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19897,10 +19897,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDataSourceId", self._custom_data_source_id);
-        params.push("uploadId", self._upload_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDataSourceId", &self._custom_data_source_id);
+        params.push("uploadId", &self._upload_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20194,9 +20194,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDataSourceId", self._custom_data_source_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDataSourceId", &self._custom_data_source_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -20498,9 +20498,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("customDataSourceId", self._custom_data_source_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("customDataSourceId", &self._custom_data_source_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20888,9 +20888,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("webPropertyAdWordsLinkId", self._web_property_ad_words_link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("webPropertyAdWordsLinkId", &self._web_property_ad_words_link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21159,9 +21159,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("webPropertyAdWordsLinkId", self._web_property_ad_words_link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("webPropertyAdWordsLinkId", &self._web_property_ad_words_link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21447,8 +21447,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21744,8 +21744,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -22042,9 +22042,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("webPropertyAdWordsLinkId", self._web_property_ad_words_link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("webPropertyAdWordsLinkId", &self._web_property_ad_words_link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22354,9 +22354,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("webPropertyAdWordsLinkId", self._web_property_ad_words_link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("webPropertyAdWordsLinkId", &self._web_property_ad_words_link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22658,8 +22658,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22934,7 +22934,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -23219,7 +23219,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -23505,8 +23505,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -23805,8 +23805,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24099,9 +24099,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24376,8 +24376,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24673,8 +24673,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("start-index", value.to_string());
         }
@@ -24971,9 +24971,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("webPropertyId", self._web_property_id);
-        params.push("linkId", self._link_id);
+        params.push("accountId", &self._account_id);
+        params.push("webPropertyId", &self._web_property_id);
+        params.push("linkId", &self._link_id);
 
         params.extend(self._additional_params.iter());
 
@@ -25274,7 +25274,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("reportType", self._report_type);
+        params.push("reportType", &self._report_type);
 
         params.extend(self._additional_params.iter());
 

@@ -47,7 +47,7 @@ pub struct AsymmetricDecryptResponse {
     /// The ProtectionLevel of the CryptoKeyVersion used in decryption.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<AsymmetricDecryptResponseProtectionLevelEnum>,
     /// Integrity verification field. A flag indicating whether AsymmetricDecryptRequest.ciphertext_crc32c was received by KeyManagementService and used for the integrity verification of the ciphertext. A false value of this field indicates either that AsymmetricDecryptRequest.ciphertext_crc32c was left unset or that it was not delivered to KeyManagementService. If you've set AsymmetricDecryptRequest.ciphertext_crc32c but this field is still false, discard the response and perform a limited number of retries.
     #[serde(rename="verifiedCiphertextCrc32c")]
     
@@ -107,7 +107,7 @@ pub struct AsymmetricSignResponse {
     /// The ProtectionLevel of the CryptoKeyVersion used for signing.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<AsymmetricSignResponseProtectionLevelEnum>,
     /// The created signature.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -163,7 +163,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -306,7 +306,7 @@ pub struct CryptoKey {
     pub primary: Option<CryptoKeyVersion>,
     /// Immutable. The immutable purpose of this CryptoKey.
     
-    pub purpose: Option<String>,
+    pub purpose: Option<CryptoKeyPurposeEnum>,
     /// next_rotation_time will be advanced by this period when the service automatically rotates a key. Must be at least 24 hours and at most 876,000 hours. If rotation_period is set, next_rotation_time must also be set. Keys with purpose ENCRYPT_DECRYPT support automatic rotation. For other keys, this field must be omitted.
     #[serde(rename="rotationPeriod")]
     
@@ -340,7 +340,7 @@ impl client::ResponseResult for CryptoKey {}
 pub struct CryptoKeyVersion {
     /// Output only. The CryptoKeyVersionAlgorithm that this CryptoKeyVersion supports.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<CryptoKeyVersionAlgorithmEnum>,
     /// Output only. Statement that was generated and signed by the HSM at key creation time. Use this statement to verify attributes of the key as stored on the HSM, independently of Google. Only provided for key versions with protection_level HSM.
     
     pub attestation: Option<KeyOperationAttestation>,
@@ -382,14 +382,14 @@ pub struct CryptoKeyVersion {
     /// Output only. The ProtectionLevel describing how crypto operations are performed with this CryptoKeyVersion.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<CryptoKeyVersionProtectionLevelEnum>,
     /// Output only. Whether or not this key version is eligible for reimport, by being specified as a target in ImportCryptoKeyVersionRequest.crypto_key_version.
     #[serde(rename="reimportEligible")]
     
     pub reimport_eligible: Option<bool>,
     /// The current state of the CryptoKeyVersion.
     
-    pub state: Option<String>,
+    pub state: Option<CryptoKeyVersionStateEnum>,
 }
 
 impl client::RequestValue for CryptoKeyVersion {}
@@ -405,11 +405,11 @@ impl client::ResponseResult for CryptoKeyVersion {}
 pub struct CryptoKeyVersionTemplate {
     /// Required. Algorithm to use when creating a CryptoKeyVersion based on this template. For backwards compatibility, GOOGLE_SYMMETRIC_ENCRYPTION is implied if both this field is omitted and CryptoKey.purpose is ENCRYPT_DECRYPT.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<CryptoKeyVersionTemplateAlgorithmEnum>,
     /// ProtectionLevel to use when creating a CryptoKeyVersion based on this template. Immutable. Defaults to SOFTWARE.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<CryptoKeyVersionTemplateProtectionLevelEnum>,
 }
 
 impl client::Part for CryptoKeyVersionTemplate {}
@@ -473,7 +473,7 @@ pub struct DecryptResponse {
     /// The ProtectionLevel of the CryptoKeyVersion used in decryption.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<DecryptResponseProtectionLevelEnum>,
     /// Whether the Decryption was performed using the primary key version.
     #[serde(rename="usedPrimary")]
     
@@ -616,7 +616,7 @@ pub struct EncryptResponse {
     /// The ProtectionLevel of the CryptoKeyVersion used in encryption.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<EncryptResponseProtectionLevelEnum>,
     /// Integrity verification field. A flag indicating whether EncryptRequest.additional_authenticated_data_crc32c was received by KeyManagementService and used for the integrity verification of the AAD. A false value of this field indicates either that EncryptRequest.additional_authenticated_data_crc32c was left unset or that it was not delivered to KeyManagementService. If you've set EncryptRequest.additional_authenticated_data_crc32c but this field is still false, discard the response and perform a limited number of retries.
     #[serde(rename="verifiedAdditionalAuthenticatedDataCrc32c")]
     
@@ -692,7 +692,7 @@ pub struct GenerateRandomBytesRequest {
     /// The ProtectionLevel to use when generating the random data. Currently, only HSM protection level is supported.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<GenerateRandomBytesRequestProtectionLevelEnum>,
 }
 
 impl client::RequestValue for GenerateRandomBytesRequest {}
@@ -736,7 +736,7 @@ impl client::ResponseResult for GenerateRandomBytesResponse {}
 pub struct ImportCryptoKeyVersionRequest {
     /// Required. The algorithm of the key being imported. This does not need to match the version_template of the CryptoKey this version imports into.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<ImportCryptoKeyVersionRequestAlgorithmEnum>,
     /// Optional. The optional name of an existing CryptoKeyVersion to target for an import operation. If this field is not present, a new CryptoKeyVersion containing the supplied key material is created. If this field is present, the supplied key material is imported into the existing CryptoKeyVersion. To import into an existing CryptoKeyVersion, the CryptoKeyVersion must be a child of ImportCryptoKeyVersionRequest.parent, have been previously created via ImportCryptoKeyVersion, and be in DESTROYED or IMPORT_FAILED state. The key material and algorithm must match the previous CryptoKeyVersion exactly if the CryptoKeyVersion has ever contained key material.
     #[serde(rename="cryptoKeyVersion")]
     
@@ -794,21 +794,21 @@ pub struct ImportJob {
     /// Required. Immutable. The wrapping method to be used for incoming key material.
     #[serde(rename="importMethod")]
     
-    pub import_method: Option<String>,
+    pub import_method: Option<ImportJobImportMethodEnum>,
     /// Output only. The resource name for this ImportJob in the format `projects/*/locations/*/keyRings/*/importJobs/*`.
     
     pub name: Option<String>,
     /// Required. Immutable. The protection level of the ImportJob. This must match the protection_level of the version_template on the CryptoKey you attempt to import into.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<ImportJobProtectionLevelEnum>,
     /// Output only. The public key with which to wrap key material prior to import. Only returned if state is ACTIVE.
     #[serde(rename="publicKey")]
     
     pub public_key: Option<WrappingPublicKey>,
     /// Output only. The current state of the ImportJob, indicating if it can be used.
     
-    pub state: Option<String>,
+    pub state: Option<ImportJobStateEnum>,
 }
 
 impl client::RequestValue for ImportJob {}
@@ -832,7 +832,7 @@ pub struct KeyOperationAttestation {
     pub content: Option<Vec<u8>>,
     /// Output only. The format of the attestation data.
     
-    pub format: Option<String>,
+    pub format: Option<KeyOperationAttestationFormatEnum>,
 }
 
 impl client::Part for KeyOperationAttestation {}
@@ -1110,7 +1110,7 @@ pub struct MacSignResponse {
     /// The ProtectionLevel of the CryptoKeyVersion used for signing.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<MacSignResponseProtectionLevelEnum>,
     /// Integrity verification field. A flag indicating whether MacSignRequest.data_crc32c was received by KeyManagementService and used for the integrity verification of the data. A false value of this field indicates either that MacSignRequest.data_crc32c was left unset or that it was not delivered to KeyManagementService. If you've set MacSignRequest.data_crc32c but this field is still false, discard the response and perform a limited number of retries.
     #[serde(rename="verifiedDataCrc32c")]
     
@@ -1171,7 +1171,7 @@ pub struct MacVerifyResponse {
     /// The ProtectionLevel of the CryptoKeyVersion used for verification.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<MacVerifyResponseProtectionLevelEnum>,
     /// This field indicates whether or not the verification operation for MacVerifyRequest.mac over MacVerifyRequest.data was successful.
     
     pub success: Option<bool>,
@@ -1244,7 +1244,7 @@ impl client::ResponseResult for Policy {}
 pub struct PublicKey {
     /// The Algorithm associated with this key.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<PublicKeyAlgorithmEnum>,
     /// The name of the CryptoKeyVersion public key. Provided here for verification. NOTE: This field is in Beta.
     
     pub name: Option<String>,
@@ -1259,7 +1259,7 @@ pub struct PublicKey {
     /// The ProtectionLevel of the CryptoKeyVersion public key.
     #[serde(rename="protectionLevel")]
     
-    pub protection_level: Option<String>,
+    pub protection_level: Option<PublicKeyProtectionLevelEnum>,
 }
 
 impl client::ResponseResult for PublicKey {}

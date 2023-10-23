@@ -26,7 +26,7 @@ pub struct AndroidConfig {
     pub notification: Option<AndroidNotification>,
     /// Message priority. Can take "normal" and "high" values. For more information, see [Setting the priority of a message](https://goo.gl/GjONJv).
     
-    pub priority: Option<String>,
+    pub priority: Option<AndroidConfigPriorityEnum>,
     /// Package name of the application where the registration token must match in order to receive the message.
     #[serde(rename="restrictedPackageName")]
     
@@ -126,7 +126,7 @@ pub struct AndroidNotification {
     /// Set the relative priority for this notification. Priority is an indication of how much of the user's attention should be consumed by this notification. Low-priority notifications may be hidden from the user in certain situations, while the user might be interrupted for a higher-priority notification. The effect of setting the same priorities may differ slightly on different platforms. Note this priority differs from `AndroidMessagePriority`. This priority is processed by the client after the message has been delivered, whereas [AndroidMessagePriority](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority) is an FCM concept that controls when the message is delivered.
     #[serde(rename="notificationPriority")]
     
-    pub notification_priority: Option<String>,
+    pub notification_priority: Option<AndroidNotificationNotificationPriorityEnum>,
     /// The sound to play when the device receives the notification. Supports "default" or the filename of a sound resource bundled in the app. Sound files must reside in /res/raw/.
     
     pub sound: Option<String>,
@@ -157,7 +157,7 @@ pub struct AndroidNotification {
     pub vibrate_timings: Option<Vec<client::chrono::Duration>>,
     /// Set the [Notification.visibility](https://developer.android.com/reference/android/app/Notification.html#visibility) of the notification.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<AndroidNotificationVisibilityEnum>,
 }
 
 impl client::Part for AndroidNotification {}

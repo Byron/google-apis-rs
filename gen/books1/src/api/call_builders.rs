@@ -79,8 +79,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("shelf", self._shelf);
+        params.push("userId", &self._user_id);
+        params.push("shelf", &self._shelf);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -395,8 +395,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("shelf", self._shelf);
+        params.push("userId", &self._user_id);
+        params.push("shelf", &self._shelf);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -680,7 +680,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -1243,7 +1243,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
+        params.push("volumeId", &self._volume_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1771,7 +1771,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("cpksver", self._cpksver);
+        params.push("cpksver", &self._cpksver);
 
         params.extend(self._additional_params.iter());
 
@@ -2854,10 +2854,10 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
-        params.push("layerId", self._layer_id);
-        params.push("annotationDataId", self._annotation_data_id);
-        params.push("contentVersion", self._content_version);
+        params.push("volumeId", &self._volume_id);
+        params.push("layerId", &self._layer_id);
+        params.push("annotationDataId", &self._annotation_data_id);
+        params.push("contentVersion", &self._content_version);
         if let Some(value) = self._w.as_ref() {
             params.push("w", value.to_string());
         }
@@ -3231,9 +3231,9 @@ where
         }
 
         let mut params = Params::with_capacity(15 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
-        params.push("layerId", self._layer_id);
-        params.push("contentVersion", self._content_version);
+        params.push("volumeId", &self._volume_id);
+        params.push("layerId", &self._layer_id);
+        params.push("contentVersion", &self._content_version);
         if let Some(value) = self._w.as_ref() {
             params.push("w", value.to_string());
         }
@@ -3624,9 +3624,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
-        params.push("layerId", self._layer_id);
-        params.push("annotationId", self._annotation_id);
+        params.push("volumeId", &self._volume_id);
+        params.push("layerId", &self._layer_id);
+        params.push("annotationId", &self._annotation_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -3954,9 +3954,9 @@ where
         }
 
         let mut params = Params::with_capacity(17 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
-        params.push("layerId", self._layer_id);
-        params.push("contentVersion", self._content_version);
+        params.push("volumeId", &self._volume_id);
+        params.push("layerId", &self._layer_id);
+        params.push("contentVersion", &self._content_version);
         if let Some(value) = self._volume_annotations_version.as_ref() {
             params.push("volumeAnnotationsVersion", value);
         }
@@ -4363,8 +4363,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
-        params.push("summaryId", self._summary_id);
+        params.push("volumeId", &self._volume_id);
+        params.push("summaryId", &self._summary_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -4664,7 +4664,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -5226,7 +5226,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("cpksver", self._cpksver);
+        params.push("cpksver", &self._cpksver);
         if self._volume_ids.len() > 0 {
             for f in self._volume_ids.iter() {
                 params.push("volumeIds", f);
@@ -5474,7 +5474,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().request_access("cpksver", "nonce", "source", "volumeId")
 ///              .locale("Lorem")
-///              .license_types("est")
+///              .license_types(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5487,7 +5487,7 @@ pub struct MyconfigRequestAccesCall<'a, S>
    pub(super) _source: String,
    pub(super) _volume_id: String,
    pub(super) _locale: Option<String>,
-   pub(super) _license_types: Option<String>,
+   pub(super) _license_types: Option<MyconfigLicenseTypesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5524,10 +5524,10 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("cpksver", self._cpksver);
-        params.push("nonce", self._nonce);
-        params.push("source", self._source);
-        params.push("volumeId", self._volume_id);
+        params.push("cpksver", &self._cpksver);
+        params.push("nonce", &self._nonce);
+        params.push("source", &self._source);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._locale.as_ref() {
             params.push("locale", value);
         }
@@ -5681,8 +5681,8 @@ where
     /// The type of access license to request. If not specified, the default is BOTH.
     ///
     /// Sets the *license types* query property to the given value.
-    pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
-        self._license_types = Some(new_value.to_string());
+    pub fn license_types(mut self, new_value: &MyconfigLicenseTypesEnum) -> MyconfigRequestAccesCall<'a, S> {
+        self._license_types = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5790,9 +5790,9 @@ where
 /// let result = hub.myconfig().sync_volume_licenses("cpksver", "nonce", "source")
 ///              .add_volume_ids("dolores")
 ///              .show_preorders(true)
-///              .locale("sed")
+///              .locale("et")
 ///              .include_non_comics_series(false)
-///              .add_features("elitr")
+///              .add_features(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5807,7 +5807,7 @@ pub struct MyconfigSyncVolumeLicenseCall<'a, S>
    pub(super) _show_preorders: Option<bool>,
    pub(super) _locale: Option<String>,
    pub(super) _include_non_comics_series: Option<bool>,
-   pub(super) _features: Vec<String>,
+   pub(super) _features: Option<MyconfigFeaturesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5844,9 +5844,9 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("cpksver", self._cpksver);
-        params.push("nonce", self._nonce);
-        params.push("source", self._source);
+        params.push("cpksver", &self._cpksver);
+        params.push("nonce", &self._nonce);
+        params.push("source", &self._source);
         if self._volume_ids.len() > 0 {
             for f in self._volume_ids.iter() {
                 params.push("volumeIds", f);
@@ -6026,8 +6026,8 @@ where
     ///
     /// Append the given value to the *features* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
-        self._features.push(new_value.to_string());
+    pub fn add_features(mut self, new_value: &MyconfigFeaturesEnum) -> MyconfigSyncVolumeLicenseCall<'a, S> {
+        self._features.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6406,7 +6406,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_delete("annotationId")
-///              .source("no")
+///              .source("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6452,7 +6452,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("annotationId", self._annotation_id);
+        params.push("annotationId", &self._annotation_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -6686,10 +6686,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_insert(req)
-///              .source("nonumy")
+///              .source("elitr")
 ///              .show_only_summary_in_response(false)
-///              .country("sadipscing")
-///              .annotation_id("aliquyam")
+///              .country("no")
+///              .annotation_id("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7001,16 +7001,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_list()
-///              .volume_id("dolores")
+///              .volume_id("At")
 ///              .updated_min("sadipscing")
-///              .updated_max("erat")
-///              .source("aliquyam")
-///              .show_deleted(true)
-///              .page_token("est")
-///              .max_results(77)
-///              .add_layer_ids("sea")
-///              .layer_id("consetetur")
-///              .content_version("consetetur")
+///              .updated_max("aliquyam")
+///              .source("dolores")
+///              .show_deleted(false)
+///              .page_token("erat")
+///              .max_results(19)
+///              .add_layer_ids("amet")
+///              .layer_id("est")
+///              .content_version("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7366,7 +7366,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mylibrary().annotations_summary(&vec!["Stet".into()], "volumeId")
+/// let result = hub.mylibrary().annotations_summary(&vec!["sea".into()], "volumeId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7417,7 +7417,7 @@ where
                 params.push("layerIds", f);
             }
         }
-        params.push("volumeId", self._volume_id);
+        params.push("volumeId", &self._volume_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7645,7 +7645,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("elitr")
+///              .source("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7692,7 +7692,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("annotationId", self._annotation_id);
+        params.push("annotationId", &self._annotation_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -7943,13 +7943,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_volumes_list("shelf")
-///              .start_index(59)
-///              .source("est")
+///              .start_index(19)
+///              .source("elitr")
 ///              .show_preorders(true)
-///              .q("sed")
-///              .projection("eos")
-///              .max_results(45)
-///              .country("ea")
+///              .q("est")
+///              .projection(&Default::default())
+///              .max_results(48)
+///              .country("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7962,7 +7962,7 @@ pub struct MylibraryBookshelfVolumeListCall<'a, S>
    pub(super) _source: Option<String>,
    pub(super) _show_preorders: Option<bool>,
    pub(super) _q: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<MylibraryProjectionEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _country: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8001,7 +8001,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("shelf", self._shelf);
+        params.push("shelf", &self._shelf);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -8168,8 +8168,8 @@ where
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelfVolumeListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &MylibraryProjectionEnum) -> MylibraryBookshelfVolumeListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Maximum number of results to return
@@ -8289,8 +8289,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_add_volume("shelf", "volumeId")
-///              .source("eos")
-///              .reason("et")
+///              .source("ea")
+///              .reason(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -8301,7 +8301,7 @@ pub struct MylibraryBookshelfAddVolumeCall<'a, S>
    pub(super) _shelf: String,
    pub(super) _volume_id: String,
    pub(super) _source: Option<String>,
-   pub(super) _reason: Option<String>,
+   pub(super) _reason: Option<MylibraryReasonEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -8338,8 +8338,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("shelf", self._shelf);
-        params.push("volumeId", self._volume_id);
+        params.push("shelf", &self._shelf);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -8480,8 +8480,8 @@ where
     /// The reason for which the book is added to the library.
     ///
     /// Sets the *reason* query property to the given value.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelfAddVolumeCall<'a, S> {
-        self._reason = Some(new_value.to_string());
+    pub fn reason(mut self, new_value: &MylibraryReasonEnum) -> MylibraryBookshelfAddVolumeCall<'a, S> {
+        self._reason = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8587,7 +8587,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_clear_volumes("shelf")
-///              .source("et")
+///              .source("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8633,7 +8633,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("shelf", self._shelf);
+        params.push("shelf", &self._shelf);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -8861,7 +8861,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("dolore")
+///              .source("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8907,7 +8907,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("shelf", self._shelf);
+        params.push("shelf", &self._shelf);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -9135,7 +9135,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("eirmod")
+///              .source("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9389,8 +9389,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -47)
-///              .source("erat")
+/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -84)
+///              .source("eirmod")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9438,9 +9438,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("shelf", self._shelf);
-        params.push("volumeId", self._volume_id);
-        params.push("volumePosition", self._volume_position.to_string());
+        params.push("shelf", &self._shelf);
+        params.push("volumeId", &self._volume_id);
+        params.push("volumePosition", &self._volume_position.to_string());
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -9688,8 +9688,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("accusam")
-///              .reason("sea")
+///              .source("amet")
+///              .reason(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -9700,7 +9700,7 @@ pub struct MylibraryBookshelfRemoveVolumeCall<'a, S>
    pub(super) _shelf: String,
    pub(super) _volume_id: String,
    pub(super) _source: Option<String>,
-   pub(super) _reason: Option<String>,
+   pub(super) _reason: Option<MylibraryReasonEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -9737,8 +9737,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("shelf", self._shelf);
-        params.push("volumeId", self._volume_id);
+        params.push("shelf", &self._shelf);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -9879,8 +9879,8 @@ where
     /// The reason for which the book is removed from the library.
     ///
     /// Sets the *reason* query property to the given value.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
-        self._reason = Some(new_value.to_string());
+    pub fn reason(mut self, new_value: &MylibraryReasonEnum) -> MylibraryBookshelfRemoveVolumeCall<'a, S> {
+        self._reason = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9986,8 +9986,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("Lorem")
-///              .content_version("et")
+///              .source("dolores")
+///              .content_version("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10034,7 +10034,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -10272,10 +10272,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "position", "timestamp")
-///              .source("sit")
-///              .device_cookie("erat")
-///              .content_version("sea")
-///              .action("nonumy")
+///              .source("Lorem")
+///              .device_cookie("et")
+///              .content_version("At")
+///              .action(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -10289,7 +10289,7 @@ pub struct MylibraryReadingpositionSetPositionCall<'a, S>
    pub(super) _source: Option<String>,
    pub(super) _device_cookie: Option<String>,
    pub(super) _content_version: Option<String>,
-   pub(super) _action: Option<String>,
+   pub(super) _action: Option<MylibraryActionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10326,9 +10326,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
-        params.push("position", self._position);
-        params.push("timestamp", self._timestamp);
+        params.push("volumeId", &self._volume_id);
+        params.push("position", &self._position);
+        params.push("timestamp", &self._timestamp);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -10499,8 +10499,8 @@ where
     /// Action that caused this reading position to be set.
     ///
     /// Sets the *action* query property to the given value.
-    pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
-        self._action = Some(new_value.to_string());
+    pub fn action(mut self, new_value: &MylibraryActionEnum) -> MylibraryReadingpositionSetPositionCall<'a, S> {
+        self._action = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10606,8 +10606,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notification().get("notification_id")
-///              .source("gubergren")
-///              .locale("justo")
+///              .source("et")
+///              .locale("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10654,7 +10654,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("notification_id", self._notification_id);
+        params.push("notification_id", &self._notification_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -10885,7 +10885,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_categories()
-///              .locale("sea")
+///              .locale("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11140,11 +11140,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_category_volumes()
-///              .page_token("consetetur")
-///              .page_size(3)
-///              .max_allowed_maturity_rating("aliquyam")
-///              .locale("eos")
-///              .add_category_id("At")
+///              .page_token("sea")
+///              .page_size(60)
+///              .max_allowed_maturity_rating(&Default::default())
+///              .locale("et")
+///              .add_category_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11154,7 +11154,7 @@ pub struct OnboardingListCategoryVolumeCall<'a, S>
    pub(super) hub: &'a Books<S>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<u32>,
-   pub(super) _max_allowed_maturity_rating: Option<String>,
+   pub(super) _max_allowed_maturity_rating: Option<OnboardingMaxAllowedMaturityRatingEnum>,
    pub(super) _locale: Option<String>,
    pub(super) _category_id: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11324,8 +11324,8 @@ where
     /// The maximum allowed maturity rating of returned volumes. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, S> {
-        self._max_allowed_maturity_rating = Some(new_value.to_string());
+    pub fn max_allowed_maturity_rating(mut self, new_value: &OnboardingMaxAllowedMaturityRatingEnum) -> OnboardingListCategoryVolumeCall<'a, S> {
+        self._max_allowed_maturity_rating = Some(new_value.clone());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
@@ -11446,9 +11446,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.personalizedstream().get()
-///              .source("dolores")
-///              .max_allowed_maturity_rating("consetetur")
-///              .locale("gubergren")
+///              .source("justo")
+///              .max_allowed_maturity_rating(&Default::default())
+///              .locale("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11457,7 +11457,7 @@ pub struct PersonalizedstreamGetCall<'a, S>
 
    pub(super) hub: &'a Books<S>,
    pub(super) _source: Option<String>,
-   pub(super) _max_allowed_maturity_rating: Option<String>,
+   pub(super) _max_allowed_maturity_rating: Option<PersonalizedstreamMaxAllowedMaturityRatingEnum>,
    pub(super) _locale: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -11611,8 +11611,8 @@ where
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a, S> {
-        self._max_allowed_maturity_rating = Some(new_value.to_string());
+    pub fn max_allowed_maturity_rating(mut self, new_value: &PersonalizedstreamMaxAllowedMaturityRatingEnum) -> PersonalizedstreamGetCall<'a, S> {
+        self._max_allowed_maturity_rating = Some(new_value.clone());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
@@ -11725,13 +11725,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().accept()
-///              .volume_id("dolor")
-///              .serial("aliquyam")
-///              .product("no")
-///              .offer_id("amet.")
-///              .model("ipsum")
-///              .manufacturer("Lorem")
-///              .device("accusam")
+///              .volume_id("consetetur")
+///              .serial("sit")
+///              .product("aliquyam")
+///              .offer_id("eos")
+///              .model("At")
+///              .manufacturer("dolores")
+///              .device("consetetur")
 ///              .android_id("gubergren")
 ///              .doit().await;
 /// # }
@@ -12063,13 +12063,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().dismiss()
-///              .serial("sadipscing")
-///              .product("At")
-///              .offer_id("sit")
-///              .model("duo")
-///              .manufacturer("sit")
-///              .device("magna")
-///              .android_id("et")
+///              .serial("dolor")
+///              .product("aliquyam")
+///              .offer_id("no")
+///              .model("amet.")
+///              .manufacturer("ipsum")
+///              .device("Lorem")
+///              .android_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12390,12 +12390,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().get()
-///              .serial("rebum.")
-///              .product("dolor")
-///              .model("Lorem")
-///              .manufacturer("justo")
-///              .device("amet.")
-///              .android_id("no")
+///              .serial("gubergren")
+///              .product("sadipscing")
+///              .model("At")
+///              .manufacturer("sit")
+///              .device("duo")
+///              .android_id("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12705,8 +12705,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.series().membership_get("series_id")
-///              .page_token("sed")
-///              .page_size(88)
+///              .page_token("et")
+///              .page_size(35)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12753,7 +12753,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("series_id", self._series_id);
+        params.push("series_id", &self._series_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("page_token", value);
         }
@@ -12983,7 +12983,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.series().get(&vec!["Lorem".into()])
+/// let result = hub.series().get(&vec!["dolor".into()])
 ///              .doit().await;
 /// # }
 /// ```
@@ -13244,10 +13244,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().associated_list("volumeId")
-///              .source("nonumy")
-///              .max_allowed_maturity_rating("rebum.")
-///              .locale("tempor")
-///              .association("dolore")
+///              .source("justo")
+///              .max_allowed_maturity_rating(&Default::default())
+///              .locale("amet.")
+///              .association(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -13257,9 +13257,9 @@ pub struct VolumeAssociatedListCall<'a, S>
    pub(super) hub: &'a Books<S>,
    pub(super) _volume_id: String,
    pub(super) _source: Option<String>,
-   pub(super) _max_allowed_maturity_rating: Option<String>,
+   pub(super) _max_allowed_maturity_rating: Option<VolumeMaxAllowedMaturityRatingEnum>,
    pub(super) _locale: Option<String>,
-   pub(super) _association: Option<String>,
+   pub(super) _association: Option<VolumeAssociationEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -13296,7 +13296,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -13433,8 +13433,8 @@ where
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
-        self._max_allowed_maturity_rating = Some(new_value.to_string());
+    pub fn max_allowed_maturity_rating(mut self, new_value: &VolumeMaxAllowedMaturityRatingEnum) -> VolumeAssociatedListCall<'a, S> {
+        self._max_allowed_maturity_rating = Some(new_value.clone());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
@@ -13447,8 +13447,8 @@ where
     /// Association type.
     ///
     /// Sets the *association* query property to the given value.
-    pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
-        self._association = Some(new_value.to_string());
+    pub fn association(mut self, new_value: &VolumeAssociationEnum) -> VolumeAssociatedListCall<'a, S> {
+        self._association = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13554,13 +13554,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().mybooks_list()
-///              .start_index(76)
-///              .source("amet.")
-///              .add_processing_state("dolore")
-///              .max_results(4)
-///              .locale("ut")
-///              .country("At")
-///              .add_acquire_method("sit")
+///              .start_index(90)
+///              .source("nonumy")
+///              .add_processing_state(&Default::default())
+///              .max_results(58)
+///              .locale("kasd")
+///              .country("Lorem")
+///              .add_acquire_method(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -13570,11 +13570,11 @@ pub struct VolumeMybookListCall<'a, S>
    pub(super) hub: &'a Books<S>,
    pub(super) _start_index: Option<u32>,
    pub(super) _source: Option<String>,
-   pub(super) _processing_state: Vec<String>,
+   pub(super) _processing_state: Option<VolumeProcessingStateEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _locale: Option<String>,
    pub(super) _country: Option<String>,
-   pub(super) _acquire_method: Vec<String>,
+   pub(super) _acquire_method: Option<VolumeAcquireMethodEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -13751,8 +13751,8 @@ where
     ///
     /// Append the given value to the *processing state* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
-        self._processing_state.push(new_value.to_string());
+    pub fn add_processing_state(mut self, new_value: &VolumeProcessingStateEnum) -> VolumeMybookListCall<'a, S> {
+        self._processing_state.push(new_value.clone());
         self
     }
     /// Maximum number of results to return.
@@ -13780,8 +13780,8 @@ where
     ///
     /// Append the given value to the *acquire method* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
-        self._acquire_method.push(new_value.to_string());
+    pub fn add_acquire_method(mut self, new_value: &VolumeAcquireMethodEnum) -> VolumeMybookListCall<'a, S> {
+        self._acquire_method.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13887,9 +13887,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().recommended_list()
-///              .source("vero")
-///              .max_allowed_maturity_rating("duo")
-///              .locale("sadipscing")
+///              .source("sanctus")
+///              .max_allowed_maturity_rating(&Default::default())
+///              .locale("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13898,7 +13898,7 @@ pub struct VolumeRecommendedListCall<'a, S>
 
    pub(super) hub: &'a Books<S>,
    pub(super) _source: Option<String>,
-   pub(super) _max_allowed_maturity_rating: Option<String>,
+   pub(super) _max_allowed_maturity_rating: Option<VolumeMaxAllowedMaturityRatingEnum>,
    pub(super) _locale: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -14052,8 +14052,8 @@ where
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, S> {
-        self._max_allowed_maturity_rating = Some(new_value.to_string());
+    pub fn max_allowed_maturity_rating(mut self, new_value: &VolumeMaxAllowedMaturityRatingEnum) -> VolumeRecommendedListCall<'a, S> {
+        self._max_allowed_maturity_rating = Some(new_value.clone());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
@@ -14165,9 +14165,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.volumes().recommended_rate("rating", "volumeId")
-///              .source("duo")
-///              .locale("kasd")
+/// let result = hub.volumes().recommended_rate(&Default::default(), "volumeId")
+///              .source("tempor")
+///              .locale("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14175,7 +14175,7 @@ pub struct VolumeRecommendedRateCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Books<S>,
-   pub(super) _rating: String,
+   pub(super) _rating: VolumeRatingEnum,
    pub(super) _volume_id: String,
    pub(super) _source: Option<String>,
    pub(super) _locale: Option<String>,
@@ -14215,8 +14215,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("rating", self._rating);
-        params.push("volumeId", self._volume_id);
+        params.push("rating", &self._rating);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -14326,8 +14326,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, S> {
-        self._rating = new_value.to_string();
+    pub fn rating(mut self, new_value: &VolumeRatingEnum) -> VolumeRecommendedRateCall<'a, S> {
+        self._rating = new_value.clone();
         self
     }
     /// ID of the source volume.
@@ -14457,12 +14457,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().useruploaded_list()
-///              .add_volume_id("sadipscing")
-///              .start_index(62)
-///              .source("sea")
-///              .add_processing_state("et")
-///              .max_results(45)
-///              .locale("magna")
+///              .add_volume_id("eos")
+///              .start_index(49)
+///              .source("dolore")
+///              .add_processing_state(&Default::default())
+///              .max_results(4)
+///              .locale("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14473,7 +14473,7 @@ pub struct VolumeUseruploadedListCall<'a, S>
    pub(super) _volume_id: Vec<String>,
    pub(super) _start_index: Option<u32>,
    pub(super) _source: Option<String>,
-   pub(super) _processing_state: Vec<String>,
+   pub(super) _processing_state: Option<VolumeProcessingStateEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _locale: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14657,8 +14657,8 @@ where
     ///
     /// Append the given value to the *processing state* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, S> {
-        self._processing_state.push(new_value.to_string());
+    pub fn add_processing_state(mut self, new_value: &VolumeProcessingStateEnum) -> VolumeUseruploadedListCall<'a, S> {
+        self._processing_state.push(new_value.clone());
         self
     }
     /// Maximum number of results to return.
@@ -14779,10 +14779,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().get("volumeId")
 ///              .user_library_consistent_read(true)
-///              .source("At")
-///              .projection("invidunt")
-///              .partner("clita")
-///              .include_non_comics_series(false)
+///              .source("vero")
+///              .projection(&Default::default())
+///              .partner("duo")
+///              .include_non_comics_series(true)
 ///              .country("ut")
 ///              .doit().await;
 /// # }
@@ -14794,7 +14794,7 @@ pub struct VolumeGetCall<'a, S>
    pub(super) _volume_id: String,
    pub(super) _user_library_consistent_read: Option<bool>,
    pub(super) _source: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<VolumeProjectionEnum>,
    pub(super) _partner: Option<String>,
    pub(super) _include_non_comics_series: Option<bool>,
    pub(super) _country: Option<String>,
@@ -14834,7 +14834,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("volumeId", self._volume_id);
+        params.push("volumeId", &self._volume_id);
         if let Some(value) = self._user_library_consistent_read.as_ref() {
             params.push("user_library_consistent_read", value.to_string());
         }
@@ -14983,8 +14983,8 @@ where
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &VolumeProjectionEnum) -> VolumeGetCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Brand results for partner ID.
@@ -15111,19 +15111,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().list("q")
-///              .start_index(75)
-///              .source("rebum.")
+///              .start_index(31)
+///              .source("kasd")
 ///              .show_preorders(false)
-///              .projection("dolores")
-///              .print_type("sed")
-///              .partner("invidunt")
-///              .order_by("clita")
-///              .max_results(2)
-///              .max_allowed_maturity_rating("aliquyam")
-///              .library_restrict("magna")
-///              .lang_restrict("diam")
-///              .filter("nonumy")
-///              .download("et")
+///              .projection(&Default::default())
+///              .print_type(&Default::default())
+///              .partner("tempor")
+///              .order_by(&Default::default())
+///              .max_results(91)
+///              .max_allowed_maturity_rating(&Default::default())
+///              .library_restrict(&Default::default())
+///              .lang_restrict("et")
+///              .filter(&Default::default())
+///              .download(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -15135,16 +15135,16 @@ pub struct VolumeListCall<'a, S>
    pub(super) _start_index: Option<u32>,
    pub(super) _source: Option<String>,
    pub(super) _show_preorders: Option<bool>,
-   pub(super) _projection: Option<String>,
-   pub(super) _print_type: Option<String>,
+   pub(super) _projection: Option<VolumeProjectionEnum>,
+   pub(super) _print_type: Option<VolumePrintTypeEnum>,
    pub(super) _partner: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<VolumeOrderByEnum>,
    pub(super) _max_results: Option<u32>,
-   pub(super) _max_allowed_maturity_rating: Option<String>,
-   pub(super) _library_restrict: Option<String>,
+   pub(super) _max_allowed_maturity_rating: Option<VolumeMaxAllowedMaturityRatingEnum>,
+   pub(super) _library_restrict: Option<VolumeLibraryRestrictEnum>,
    pub(super) _lang_restrict: Option<String>,
-   pub(super) _filter: Option<String>,
-   pub(super) _download: Option<String>,
+   pub(super) _filter: Option<VolumeFilterEnum>,
+   pub(super) _download: Option<VolumeDownloadEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -15181,7 +15181,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("q", self._q);
+        params.push("q", &self._q);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -15352,15 +15352,15 @@ where
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &VolumeProjectionEnum) -> VolumeListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Restrict to books or magazines.
     ///
     /// Sets the *print type* query property to the given value.
-    pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._print_type = Some(new_value.to_string());
+    pub fn print_type(mut self, new_value: &VolumePrintTypeEnum) -> VolumeListCall<'a, S> {
+        self._print_type = Some(new_value.clone());
         self
     }
     /// Restrict and brand results for partner ID.
@@ -15373,8 +15373,8 @@ where
     /// Sort search results.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &VolumeOrderByEnum) -> VolumeListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// Maximum number of results to return.
@@ -15387,15 +15387,15 @@ where
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._max_allowed_maturity_rating = Some(new_value.to_string());
+    pub fn max_allowed_maturity_rating(mut self, new_value: &VolumeMaxAllowedMaturityRatingEnum) -> VolumeListCall<'a, S> {
+        self._max_allowed_maturity_rating = Some(new_value.clone());
         self
     }
     /// Restrict search to this user's library.
     ///
     /// Sets the *library restrict* query property to the given value.
-    pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._library_restrict = Some(new_value.to_string());
+    pub fn library_restrict(mut self, new_value: &VolumeLibraryRestrictEnum) -> VolumeListCall<'a, S> {
+        self._library_restrict = Some(new_value.clone());
         self
     }
     /// Restrict results to books with this language code.
@@ -15408,15 +15408,15 @@ where
     /// Filter search results.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._filter = Some(new_value.to_string());
+    pub fn filter(mut self, new_value: &VolumeFilterEnum) -> VolumeListCall<'a, S> {
+        self._filter = Some(new_value.clone());
         self
     }
     /// Restrict to volumes by download availability.
     ///
     /// Sets the *download* query property to the given value.
-    pub fn download(mut self, new_value: &str) -> VolumeListCall<'a, S> {
-        self._download = Some(new_value.to_string());
+    pub fn download(mut self, new_value: &VolumeDownloadEnum) -> VolumeListCall<'a, S> {
+        self._download = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

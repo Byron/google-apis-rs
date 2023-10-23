@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -580,7 +580,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.access_policies().access_levels_get("name")
-///              .access_level_format("sanctus")
+///              .access_level_format(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -589,7 +589,7 @@ pub struct AccessPolicyAccessLevelGetCall<'a, S>
 
    pub(super) hub: &'a AccessContextManager<S>,
    pub(super) _name: String,
-   pub(super) _access_level_format: Option<String>,
+   pub(super) _access_level_format: Option<AccessPolicyAccessLevelFormatEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -626,7 +626,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._access_level_format.as_ref() {
             params.push("accessLevelFormat", value);
         }
@@ -747,8 +747,8 @@ where
     /// Whether to return `BasicLevels` in the Cloud Common Expression Language rather than as `BasicLevels`. Defaults to AS_DEFINED, where Access Levels are returned as `BasicLevels` or `CustomLevels` based on how they were created. If set to CEL, all Access Levels are returned as `CustomLevels`. In the CEL case, `BasicLevels` are translated to equivalent `CustomLevels`.
     ///
     /// Sets the *access level format* query property to the given value.
-    pub fn access_level_format(mut self, new_value: &str) -> AccessPolicyAccessLevelGetCall<'a, S> {
-        self._access_level_format = Some(new_value.to_string());
+    pub fn access_level_format(mut self, new_value: &AccessPolicyAccessLevelFormatEnum) -> AccessPolicyAccessLevelGetCall<'a, S> {
+        self._access_level_format = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -854,9 +854,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.access_policies().access_levels_list("parent")
-///              .page_token("amet.")
-///              .page_size(-59)
-///              .access_level_format("amet.")
+///              .page_token("sed")
+///              .page_size(-2)
+///              .access_level_format(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -867,7 +867,7 @@ pub struct AccessPolicyAccessLevelListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _access_level_format: Option<String>,
+   pub(super) _access_level_format: Option<AccessPolicyAccessLevelFormatEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -904,7 +904,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1045,8 +1045,8 @@ where
     /// Whether to return `BasicLevels` in the Cloud Common Expression language, as `CustomLevels`, rather than as `BasicLevels`. Defaults to returning `AccessLevels` in the format they were defined.
     ///
     /// Sets the *access level format* query property to the given value.
-    pub fn access_level_format(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a, S> {
-        self._access_level_format = Some(new_value.to_string());
+    pub fn access_level_format(mut self, new_value: &AccessPolicyAccessLevelFormatEnum) -> AccessPolicyAccessLevelListCall<'a, S> {
+        self._access_level_format = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1205,7 +1205,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1507,7 +1507,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1792,7 +1792,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2054,7 +2054,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2272,8 +2272,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.access_policies().service_perimeters_list("parent")
-///              .page_token("eos")
-///              .page_size(-4)
+///              .page_token("Lorem")
+///              .page_size(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2320,7 +2320,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2611,7 +2611,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3179,7 +3179,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3441,7 +3441,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3659,9 +3659,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.access_policies().list()
-///              .parent("amet")
-///              .page_token("duo")
-///              .page_size(-50)
+///              .parent("ipsum")
+///              .page_token("invidunt")
+///              .page_size(-47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3991,7 +3991,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4286,7 +4286,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

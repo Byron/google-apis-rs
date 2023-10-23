@@ -36,7 +36,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -52,7 +52,7 @@ pub struct AuthorizationLoggingOptions {
     /// The type of the permission that was checked.
     #[serde(rename="permissionType")]
     
-    pub permission_type: Option<String>,
+    pub permission_type: Option<AuthorizationLoggingOptionPermissionTypeEnum>,
 }
 
 impl client::Part for AuthorizationLoggingOptions {}
@@ -112,7 +112,7 @@ pub struct CloudAuditOptions {
     /// The log_name to populate in the Cloud Audit Record.
     #[serde(rename="logName")]
     
-    pub log_name: Option<String>,
+    pub log_name: Option<CloudAuditOptionLogNameEnum>,
 }
 
 impl client::Part for CloudAuditOptions {}
@@ -127,16 +127,16 @@ impl client::Part for CloudAuditOptions {}
 pub struct Condition {
     /// Trusted attributes supplied by the IAM system.
     
-    pub iam: Option<String>,
+    pub iam: Option<ConditionIamEnum>,
     /// An operator to apply the subject with.
     
-    pub op: Option<String>,
+    pub op: Option<ConditionOpEnum>,
     /// Trusted attributes discharged by the service.
     
     pub svc: Option<String>,
     /// Trusted attributes supplied by any service that owns resources and uses the IAM system for access control.
     
-    pub sys: Option<String>,
+    pub sys: Option<ConditionSysEnum>,
     /// The objects of the condition.
     
     pub values: Option<Vec<String>>,
@@ -195,7 +195,7 @@ pub struct DataAccessOptions {
     /// no description provided
     #[serde(rename="logMode")]
     
-    pub log_mode: Option<String>,
+    pub log_mode: Option<DataAccessOptionLogModeEnum>,
 }
 
 impl client::Part for DataAccessOptions {}
@@ -417,7 +417,7 @@ impl client::ResponseResult for Policy {}
 pub struct Rule {
     /// Required
     
-    pub action: Option<String>,
+    pub action: Option<RuleActionEnum>,
     /// Additional restrictions that must be met. All conditions must pass for the rule to match.
     
     pub conditions: Option<Vec<Condition>>,

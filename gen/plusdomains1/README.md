@@ -110,9 +110,9 @@ let mut hub = PlusDomains::new(hyper::Client::builder().build(hyper_rustls::Http
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.comments().list("activityId")
-             .sort_order("magna")
-             .page_token("no")
-             .max_results(46)
+             .sort_order(&Default::default())
+             .page_token("magna")
+             .max_results(90)
              .doit().await;
 
 match result {

@@ -25,8 +25,8 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().get("role", "roleId")
-///              .advertiser_id("et")
+/// let result = hub.advertisers().get(&Default::default(), "roleId")
+///              .advertiser_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -34,7 +34,7 @@ pub struct AdvertiserGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: AdvertiserRoleEnum,
    pub(super) _role_id: String,
    pub(super) _advertiser_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -72,8 +72,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value);
         }
@@ -177,8 +177,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> AdvertiserGetCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &AdvertiserRoleEnum) -> AdvertiserGetCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -262,14 +262,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().list("role", "roleId")
-///              .relationship_status("sed")
-///              .page_token("duo")
-///              .min_seven_day_epc(0.5254434270373415)
-///              .min_payout_rank(-22)
-///              .min_ninety_day_epc(0.9697780726648698)
-///              .max_results(99)
-///              .advertiser_category("consetetur")
+/// let result = hub.advertisers().list(&Default::default(), "roleId")
+///              .relationship_status(&Default::default())
+///              .page_token("ea")
+///              .min_seven_day_epc(0.017825676742989738)
+///              .min_payout_rank(-56)
+///              .min_ninety_day_epc(0.5944568076620798)
+///              .max_results(58)
+///              .advertiser_category("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -277,9 +277,9 @@ pub struct AdvertiserListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: AdvertiserRoleEnum,
    pub(super) _role_id: String,
-   pub(super) _relationship_status: Option<String>,
+   pub(super) _relationship_status: Option<AdvertiserRelationshipStatusEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _min_seven_day_epc: Option<f64>,
    pub(super) _min_payout_rank: Option<i32>,
@@ -321,8 +321,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
         if let Some(value) = self._relationship_status.as_ref() {
             params.push("relationshipStatus", value);
         }
@@ -444,8 +444,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &AdvertiserRoleEnum) -> AdvertiserListCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -461,8 +461,8 @@ where
     /// Filters out all advertisers for which do not have the given relationship status with the requesting publisher.
     ///
     /// Sets the *relationship status* query property to the given value.
-    pub fn relationship_status(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
-        self._relationship_status = Some(new_value.to_string());
+    pub fn relationship_status(mut self, new_value: &AdvertiserRelationshipStatusEnum) -> AdvertiserListCall<'a, S> {
+        self._relationship_status = Some(new_value.clone());
         self
     }
     /// The value of 'nextPageToken' from the previous page. Optional.
@@ -572,8 +572,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cc_offers().list("publisher")
-///              .projection("dolor")
-///              .add_advertiser("et")
+///              .projection(&Default::default())
+///              .add_advertiser("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -582,7 +582,7 @@ pub struct CcOfferListCall<'a, S>
 
    pub(super) hub: &'a Gan<S>,
    pub(super) _publisher: String,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<CcOfferProjectionEnum>,
    pub(super) _advertiser: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -619,7 +619,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("publisher", self._publisher);
+        params.push("publisher", &self._publisher);
         if let Some(value) = self._projection.as_ref() {
             params.push("projection", value);
         }
@@ -735,8 +735,8 @@ where
     /// The set of fields to return.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> CcOfferListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &CcOfferProjectionEnum) -> CcOfferListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// The advertiser ID of a card issuer whose offers to include. Optional, may be repeated.
@@ -811,23 +811,23 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.events().list("role", "roleId")
-///              .type_("Stet")
-///              .status("dolor")
-///              .sku("duo")
-///              .publisher_id("vero")
-///              .product_category("vero")
-///              .page_token("invidunt")
-///              .order_id("Stet")
+/// let result = hub.events().list(&Default::default(), "roleId")
+///              .type_(&Default::default())
+///              .status(&Default::default())
+///              .sku("kasd")
+///              .publisher_id("et")
+///              .product_category("sed")
+///              .page_token("et")
+///              .order_id("et")
 ///              .modify_date_min("vero")
-///              .modify_date_max("elitr")
-///              .member_id("Lorem")
-///              .max_results(72)
-///              .link_id("no")
-///              .event_date_min("ipsum")
-///              .event_date_max("accusam")
-///              .charge_type("takimata")
-///              .advertiser_id("consetetur")
+///              .modify_date_max("erat")
+///              .member_id("sed")
+///              .max_results(81)
+///              .link_id("dolore")
+///              .event_date_min("et")
+///              .event_date_max("voluptua.")
+///              .charge_type(&Default::default())
+///              .advertiser_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -835,10 +835,10 @@ pub struct EventListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: EventRoleEnum,
    pub(super) _role_id: String,
-   pub(super) _type_: Option<String>,
-   pub(super) _status: Option<String>,
+   pub(super) _type_: Option<EventTypeEnum>,
+   pub(super) _status: Option<EventStatusEnum>,
    pub(super) _sku: Option<String>,
    pub(super) _publisher_id: Option<String>,
    pub(super) _product_category: Option<String>,
@@ -851,7 +851,7 @@ pub struct EventListCall<'a, S>
    pub(super) _link_id: Option<String>,
    pub(super) _event_date_min: Option<String>,
    pub(super) _event_date_max: Option<String>,
-   pub(super) _charge_type: Option<String>,
+   pub(super) _charge_type: Option<EventChargeTypeEnum>,
    pub(super) _advertiser_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -888,8 +888,8 @@ where
         }
 
         let mut params = Params::with_capacity(20 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -1038,8 +1038,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> EventListCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &EventRoleEnum) -> EventListCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -1055,15 +1055,15 @@ where
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', 'charge'. Optional.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> EventListCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &EventTypeEnum) -> EventListCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled'. Optional.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> EventListCall<'a, S> {
-        self._status = Some(new_value.to_string());
+    pub fn status(mut self, new_value: &EventStatusEnum) -> EventListCall<'a, S> {
+        self._status = Some(new_value.clone());
         self
     }
     /// Caret(^) delimited list of SKUs. Filters out all events that do not reference one of the given SKU. Optional.
@@ -1153,8 +1153,8 @@ where
     /// Filters out all charge events that are not of the given charge type. Valid values: 'other', 'slotting_fee', 'monthly_minimum', 'tier_bonus', 'credit', 'debit'. Optional.
     ///
     /// Sets the *charge type* query property to the given value.
-    pub fn charge_type(mut self, new_value: &str) -> EventListCall<'a, S> {
-        self._charge_type = Some(new_value.to_string());
+    pub fn charge_type(mut self, new_value: &EventChargeTypeEnum) -> EventListCall<'a, S> {
+        self._charge_type = Some(new_value.clone());
         self
     }
     /// Caret(^) delimited list of advertiser IDs. Filters out all events that do not reference one of the given advertiser IDs. Only used when under publishers role. Optional.
@@ -1228,7 +1228,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.links().get("role", "roleId", -31)
+/// let result = hub.links().get(&Default::default(), "roleId", -92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1236,7 +1236,7 @@ pub struct LinkGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: LinkRoleEnum,
    pub(super) _role_id: String,
    pub(super) _link_id: i64,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1274,9 +1274,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
-        params.push("linkId", self._link_id.to_string());
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
+        params.push("linkId", &self._link_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1377,8 +1377,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> LinkGetCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &LinkRoleEnum) -> LinkGetCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -1471,7 +1471,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.links().insert(req, "role", "roleId")
+/// let result = hub.links().insert(req, &Default::default(), "roleId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1480,7 +1480,7 @@ pub struct LinkInsertCall<'a, S>
 
    pub(super) hub: &'a Gan<S>,
    pub(super) _request: Link,
-   pub(super) _role: String,
+   pub(super) _role: LinkRoleEnum,
    pub(super) _role_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -1517,8 +1517,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1642,8 +1642,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> LinkInsertCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &LinkRoleEnum) -> LinkInsertCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -1720,20 +1720,20 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.links().list("role", "roleId")
-///              .start_date_min("dolores")
-///              .start_date_max("gubergren")
-///              .search_text("et")
-///              .relationship_status("accusam")
-///              .add_promotion_type("voluptua.")
-///              .page_token("dolore")
-///              .max_results(67)
-///              .link_type("dolore")
-///              .create_date_min("voluptua.")
-///              .create_date_max("amet.")
-///              .authorship("ea")
-///              .add_asset_size("sadipscing")
-///              .add_advertiser_id(-6)
+/// let result = hub.links().list(&Default::default(), "roleId")
+///              .start_date_min("et")
+///              .start_date_max("sadipscing")
+///              .search_text("Stet")
+///              .relationship_status(&Default::default())
+///              .add_promotion_type(&Default::default())
+///              .page_token("dolor")
+///              .max_results(81)
+///              .link_type(&Default::default())
+///              .create_date_min("vero")
+///              .create_date_max("vero")
+///              .authorship(&Default::default())
+///              .add_asset_size("invidunt")
+///              .add_advertiser_id(-65)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1741,19 +1741,19 @@ pub struct LinkListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: LinkRoleEnum,
    pub(super) _role_id: String,
    pub(super) _start_date_min: Option<String>,
    pub(super) _start_date_max: Option<String>,
    pub(super) _search_text: Option<String>,
-   pub(super) _relationship_status: Option<String>,
-   pub(super) _promotion_type: Vec<String>,
+   pub(super) _relationship_status: Option<LinkRelationshipStatusEnum>,
+   pub(super) _promotion_type: Option<LinkPromotionTypeEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
-   pub(super) _link_type: Option<String>,
+   pub(super) _link_type: Option<LinkLinkTypeEnum>,
    pub(super) _create_date_min: Option<String>,
    pub(super) _create_date_max: Option<String>,
-   pub(super) _authorship: Option<String>,
+   pub(super) _authorship: Option<LinkAuthorshipEnum>,
    pub(super) _asset_size: Vec<String>,
    pub(super) _advertiser_id: Vec<i64>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1791,8 +1791,8 @@ where
         }
 
         let mut params = Params::with_capacity(17 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
         if let Some(value) = self._start_date_min.as_ref() {
             params.push("startDateMin", value);
         }
@@ -1938,8 +1938,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> LinkListCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &LinkRoleEnum) -> LinkListCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -1976,16 +1976,16 @@ where
     /// The status of the relationship.
     ///
     /// Sets the *relationship status* query property to the given value.
-    pub fn relationship_status(mut self, new_value: &str) -> LinkListCall<'a, S> {
-        self._relationship_status = Some(new_value.to_string());
+    pub fn relationship_status(mut self, new_value: &LinkRelationshipStatusEnum) -> LinkListCall<'a, S> {
+        self._relationship_status = Some(new_value.clone());
         self
     }
     /// The promotion type.
     ///
     /// Append the given value to the *promotion type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_promotion_type(mut self, new_value: &str) -> LinkListCall<'a, S> {
-        self._promotion_type.push(new_value.to_string());
+    pub fn add_promotion_type(mut self, new_value: &LinkPromotionTypeEnum) -> LinkListCall<'a, S> {
+        self._promotion_type.push(new_value.clone());
         self
     }
     /// The value of 'nextPageToken' from the previous page. Optional.
@@ -2005,8 +2005,8 @@ where
     /// The type of the link.
     ///
     /// Sets the *link type* query property to the given value.
-    pub fn link_type(mut self, new_value: &str) -> LinkListCall<'a, S> {
-        self._link_type = Some(new_value.to_string());
+    pub fn link_type(mut self, new_value: &LinkLinkTypeEnum) -> LinkListCall<'a, S> {
+        self._link_type = Some(new_value.clone());
         self
     }
     /// The beginning of the create date range.
@@ -2026,8 +2026,8 @@ where
     /// The role of the author of the link.
     ///
     /// Sets the *authorship* query property to the given value.
-    pub fn authorship(mut self, new_value: &str) -> LinkListCall<'a, S> {
-        self._authorship = Some(new_value.to_string());
+    pub fn authorship(mut self, new_value: &LinkAuthorshipEnum) -> LinkListCall<'a, S> {
+        self._authorship = Some(new_value.clone());
         self
     }
     /// The size of the given asset.
@@ -2110,8 +2110,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.publishers().get("role", "roleId")
-///              .publisher_id("est")
+/// let result = hub.publishers().get(&Default::default(), "roleId")
+///              .publisher_id("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2119,7 +2119,7 @@ pub struct PublisherGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: PublisherRoleEnum,
    pub(super) _role_id: String,
    pub(super) _publisher_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2157,8 +2157,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
         if let Some(value) = self._publisher_id.as_ref() {
             params.push("publisherId", value);
         }
@@ -2262,8 +2262,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> PublisherGetCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &PublisherRoleEnum) -> PublisherGetCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -2347,14 +2347,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.publishers().list("role", "roleId")
-///              .relationship_status("sit")
-///              .publisher_category("et")
-///              .page_token("tempor")
-///              .min_seven_day_epc(0.5423272308124675)
-///              .min_payout_rank(-18)
-///              .min_ninety_day_epc(0.728870793677753)
-///              .max_results(45)
+/// let result = hub.publishers().list(&Default::default(), "roleId")
+///              .relationship_status(&Default::default())
+///              .publisher_category("diam")
+///              .page_token("no")
+///              .min_seven_day_epc(0.012465497817154336)
+///              .min_payout_rank(-23)
+///              .min_ninety_day_epc(0.333591971041029)
+///              .max_results(73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2362,9 +2362,9 @@ pub struct PublisherListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: PublisherRoleEnum,
    pub(super) _role_id: String,
-   pub(super) _relationship_status: Option<String>,
+   pub(super) _relationship_status: Option<PublisherRelationshipStatusEnum>,
    pub(super) _publisher_category: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _min_seven_day_epc: Option<f64>,
@@ -2406,8 +2406,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
         if let Some(value) = self._relationship_status.as_ref() {
             params.push("relationshipStatus", value);
         }
@@ -2529,8 +2529,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> PublisherListCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &PublisherRoleEnum) -> PublisherListCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -2546,8 +2546,8 @@ where
     /// Filters out all publishers for which do not have the given relationship status with the requesting publisher.
     ///
     /// Sets the *relationship status* query property to the given value.
-    pub fn relationship_status(mut self, new_value: &str) -> PublisherListCall<'a, S> {
-        self._relationship_status = Some(new_value.to_string());
+    pub fn relationship_status(mut self, new_value: &PublisherRelationshipStatusEnum) -> PublisherListCall<'a, S> {
+        self._relationship_status = Some(new_value.clone());
         self
     }
     /// Caret(^) delimted list of publisher categories. Valid categories: (unclassified|community_and_content|shopping_and_promotion|loyalty_and_rewards|network|search_specialist|comparison_shopping|email). Filters out all publishers not in one of the given advertiser categories. Optional.
@@ -2656,18 +2656,18 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().get("role", "roleId", "reportType")
-///              .status("dolores")
-///              .start_index(32)
-///              .start_date("et")
-///              .add_publisher_id("sed")
-///              .add_order_id("no")
-///              .max_results(16)
-///              .add_link_id("elitr")
-///              .event_type("sed")
-///              .end_date("no")
+/// let result = hub.reports().get(&Default::default(), "roleId", &Default::default())
+///              .status(&Default::default())
+///              .start_index(70)
+///              .start_date("consetetur")
+///              .add_publisher_id("amet.")
+///              .add_order_id("sed")
+///              .max_results(92)
+///              .add_link_id("dolores")
+///              .event_type(&Default::default())
+///              .end_date("gubergren")
 ///              .calculate_totals(false)
-///              .add_advertiser_id("At")
+///              .add_advertiser_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2675,17 +2675,17 @@ pub struct ReportGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Gan<S>,
-   pub(super) _role: String,
+   pub(super) _role: ReportRoleEnum,
    pub(super) _role_id: String,
-   pub(super) _report_type: String,
-   pub(super) _status: Option<String>,
+   pub(super) _report_type: ReportReportTypeEnum,
+   pub(super) _status: Option<ReportStatusEnum>,
    pub(super) _start_index: Option<u32>,
    pub(super) _start_date: Option<String>,
    pub(super) _publisher_id: Vec<String>,
    pub(super) _order_id: Vec<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _link_id: Vec<String>,
-   pub(super) _event_type: Option<String>,
+   pub(super) _event_type: Option<ReportEventTypeEnum>,
    pub(super) _end_date: Option<String>,
    pub(super) _calculate_totals: Option<bool>,
    pub(super) _advertiser_id: Vec<String>,
@@ -2724,9 +2724,9 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("role", self._role);
-        params.push("roleId", self._role_id);
-        params.push("reportType", self._report_type);
+        params.push("role", &self._role);
+        params.push("roleId", &self._role_id);
+        params.push("reportType", &self._report_type);
         if let Some(value) = self._status.as_ref() {
             params.push("status", value);
         }
@@ -2868,8 +2868,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> ReportGetCall<'a, S> {
-        self._role = new_value.to_string();
+    pub fn role(mut self, new_value: &ReportRoleEnum) -> ReportGetCall<'a, S> {
+        self._role = new_value.clone();
         self
     }
     /// The ID of the requesting advertiser or publisher.
@@ -2888,15 +2888,15 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn report_type(mut self, new_value: &str) -> ReportGetCall<'a, S> {
-        self._report_type = new_value.to_string();
+    pub fn report_type(mut self, new_value: &ReportReportTypeEnum) -> ReportGetCall<'a, S> {
+        self._report_type = new_value.clone();
         self
     }
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled', or 'invalid'. Optional.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> ReportGetCall<'a, S> {
-        self._status = Some(new_value.to_string());
+    pub fn status(mut self, new_value: &ReportStatusEnum) -> ReportGetCall<'a, S> {
+        self._status = Some(new_value.clone());
         self
     }
     /// Offset on which to return results when paging. Optional.
@@ -2947,8 +2947,8 @@ where
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', or 'charge'. Optional.
     ///
     /// Sets the *event type* query property to the given value.
-    pub fn event_type(mut self, new_value: &str) -> ReportGetCall<'a, S> {
-        self._event_type = Some(new_value.to_string());
+    pub fn event_type(mut self, new_value: &ReportEventTypeEnum) -> ReportGetCall<'a, S> {
+        self._event_type = Some(new_value.clone());
         self
     }
     /// The end date (exclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day after startDate, if that is given, or today. Optional.

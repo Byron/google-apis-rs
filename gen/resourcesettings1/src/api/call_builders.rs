@@ -26,7 +26,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().settings_get("name")
-///              .view("sed")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -35,7 +35,7 @@ pub struct FolderSettingGetCall<'a, S>
 
    pub(super) hub: &'a ResourceSettings<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<FolderViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -72,7 +72,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -193,8 +193,8 @@ where
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> FolderSettingGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &FolderViewEnum) -> FolderSettingGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -300,9 +300,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().settings_list("parent")
-///              .view("takimata")
-///              .page_token("amet.")
-///              .page_size(-20)
+///              .view(&Default::default())
+///              .page_token("At")
+///              .page_size(-8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -311,7 +311,7 @@ pub struct FolderSettingListCall<'a, S>
 
    pub(super) hub: &'a ResourceSettings<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<FolderViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -350,7 +350,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -477,8 +477,8 @@ where
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> FolderSettingListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &FolderViewEnum) -> FolderSettingListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Unused. A page token used to retrieve the next page.
@@ -649,7 +649,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -890,7 +890,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().settings_get("name")
-///              .view("Lorem")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -899,7 +899,7 @@ pub struct OrganizationSettingGetCall<'a, S>
 
    pub(super) hub: &'a ResourceSettings<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<OrganizationViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -936,7 +936,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1057,8 +1057,8 @@ where
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> OrganizationSettingGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &OrganizationViewEnum) -> OrganizationSettingGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1164,9 +1164,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().settings_list("parent")
-///              .view("eos")
-///              .page_token("dolor")
-///              .page_size(-17)
+///              .view(&Default::default())
+///              .page_token("amet.")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1175,7 +1175,7 @@ pub struct OrganizationSettingListCall<'a, S>
 
    pub(super) hub: &'a ResourceSettings<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<OrganizationViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1214,7 +1214,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1341,8 +1341,8 @@ where
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> OrganizationSettingListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &OrganizationViewEnum) -> OrganizationSettingListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Unused. A page token used to retrieve the next page.
@@ -1513,7 +1513,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1754,7 +1754,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().settings_get("name")
-///              .view("amet")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1763,7 +1763,7 @@ pub struct ProjectSettingGetCall<'a, S>
 
    pub(super) hub: &'a ResourceSettings<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1800,7 +1800,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1921,8 +1921,8 @@ where
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSettingGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectSettingGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2028,9 +2028,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().settings_list("parent")
-///              .view("ipsum")
-///              .page_token("sed")
-///              .page_size(-37)
+///              .view(&Default::default())
+///              .page_token("gubergren")
+///              .page_size(-75)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2039,7 +2039,7 @@ pub struct ProjectSettingListCall<'a, S>
 
    pub(super) hub: &'a ResourceSettings<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2078,7 +2078,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -2205,8 +2205,8 @@ where
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSettingListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectSettingListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Unused. A page token used to retrieve the next page.
@@ -2377,7 +2377,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

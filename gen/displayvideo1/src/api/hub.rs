@@ -31,11 +31,11 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-51, -12, "targetingType")
-///              .page_token("dolor")
-///              .page_size(-17)
-///              .order_by("ipsum")
-///              .filter("invidunt")
+/// let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-55, -62, &Default::default())
+///              .page_token("Lorem")
+///              .page_size(-12)
+///              .order_by("eos")
+///              .filter("dolor")
 ///              .doit().await;
 /// 
 /// match result {

@@ -26,10 +26,10 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().creatives_list("parent")
-///              .view("eos")
-///              .page_token("dolor")
-///              .page_size(-17)
-///              .filter("ipsum")
+///              .view(&Default::default())
+///              .page_token("gubergren")
+///              .page_size(-51)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -38,7 +38,7 @@ pub struct BidderCreativeListCall<'a, S>
 
    pub(super) hub: &'a RealTimeBidding<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<BidderViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _filter: Option<String>,
@@ -78,7 +78,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -208,8 +208,8 @@ where
     /// Controls the amount of information included in the response. By default only creativeServingDecision is included. To retrieve the entire creative resource (including the declared fields and the creative content) specify the view as "FULL".
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BidderCreativeListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &BidderViewEnum) -> BidderCreativeListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativesResponse.nextPageToken returned from the previous call to the 'ListCreatives' method. Page tokens for continued pages are valid for up to five hours, counting from the call to 'ListCreatives' for the first page.
@@ -387,7 +387,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -672,7 +672,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -891,7 +891,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().endpoints_list("parent")
 ///              .page_token("ipsum")
-///              .page_size(-93)
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -938,7 +938,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1229,7 +1229,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1531,7 +1531,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1823,7 +1823,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("pretargetingConfig", self._pretargeting_config);
+        params.push("pretargetingConfig", &self._pretargeting_config);
 
         params.extend(self._additional_params.iter());
 
@@ -2115,7 +2115,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("pretargetingConfig", self._pretargeting_config);
+        params.push("pretargetingConfig", &self._pretargeting_config);
 
         params.extend(self._additional_params.iter());
 
@@ -2407,7 +2407,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("pretargetingConfig", self._pretargeting_config);
+        params.push("pretargetingConfig", &self._pretargeting_config);
 
         params.extend(self._additional_params.iter());
 
@@ -2699,7 +2699,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2984,7 +2984,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3246,7 +3246,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3464,8 +3464,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().pretargeting_configs_list("parent")
-///              .page_token("dolor")
-///              .page_size(-56)
+///              .page_token("ipsum")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3512,7 +3512,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3803,7 +3803,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4105,7 +4105,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("pretargetingConfig", self._pretargeting_config);
+        params.push("pretargetingConfig", &self._pretargeting_config);
 
         params.extend(self._additional_params.iter());
 
@@ -4397,7 +4397,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("pretargetingConfig", self._pretargeting_config);
+        params.push("pretargetingConfig", &self._pretargeting_config);
 
         params.extend(self._additional_params.iter());
 
@@ -4689,7 +4689,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("pretargetingConfig", self._pretargeting_config);
+        params.push("pretargetingConfig", &self._pretargeting_config);
 
         params.extend(self._additional_params.iter());
 
@@ -4981,7 +4981,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5273,7 +5273,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -5565,7 +5565,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -5850,7 +5850,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6068,10 +6068,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().publisher_connections_list("parent")
-///              .page_token("sed")
-///              .page_size(-24)
-///              .order_by("et")
-///              .filter("vero")
+///              .page_token("no")
+///              .page_size(-15)
+///              .order_by("kasd")
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6120,7 +6120,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6422,7 +6422,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6640,8 +6640,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().list()
-///              .page_token("sed")
-///              .page_size(-20)
+///              .page_token("et")
+///              .page_size(-68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6958,7 +6958,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -7199,7 +7199,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buyers().creatives_get("name")
-///              .view("voluptua.")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -7208,7 +7208,7 @@ pub struct BuyerCreativeGetCall<'a, S>
 
    pub(super) hub: &'a RealTimeBidding<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<BuyerViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -7245,7 +7245,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -7366,8 +7366,8 @@ where
     /// Controls the amount of information included in the response. By default only creativeServingDecision is included. To retrieve the entire creative resource (including the declared fields and the creative content) specify the view as "FULL".
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BuyerCreativeGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &BuyerViewEnum) -> BuyerCreativeGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7473,9 +7473,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buyers().creatives_list("parent")
-///              .view("consetetur")
-///              .page_token("diam")
-///              .page_size(-49)
+///              .view(&Default::default())
+///              .page_token("duo")
+///              .page_size(-34)
 ///              .filter("et")
 ///              .doit().await;
 /// # }
@@ -7485,7 +7485,7 @@ pub struct BuyerCreativeListCall<'a, S>
 
    pub(super) hub: &'a RealTimeBidding<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<BuyerViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _filter: Option<String>,
@@ -7525,7 +7525,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -7655,8 +7655,8 @@ where
     /// Controls the amount of information included in the response. By default only creativeServingDecision is included. To retrieve the entire creative resource (including the declared fields and the creative content) specify the view as "FULL".
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BuyerCreativeListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &BuyerViewEnum) -> BuyerCreativeListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativesResponse.nextPageToken returned from the previous call to the 'ListCreatives' method. Page tokens for continued pages are valid for up to five hours, counting from the call to 'ListCreatives' for the first page.
@@ -7836,7 +7836,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8138,7 +8138,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8430,7 +8430,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -8715,7 +8715,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8977,7 +8977,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9195,8 +9195,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buyers().user_lists_list("parent")
-///              .page_token("vero")
-///              .page_size(-88)
+///              .page_token("et")
+///              .page_size(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9243,7 +9243,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9532,7 +9532,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9824,7 +9824,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10109,7 +10109,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10371,7 +10371,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10589,8 +10589,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buyers().list()
-///              .page_token("diam")
-///              .page_size(-61)
+///              .page_token("vero")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```

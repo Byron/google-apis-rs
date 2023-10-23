@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -294,7 +294,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_channels_releases_create(req, "parent")
-///              .version_name("Lorem")
+///              .version_name("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -341,7 +341,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_name.as_ref() {
             params.push("versionName", value);
         }
@@ -592,8 +592,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_channels_releases_list("parent")
-///              .page_token("eos")
-///              .page_size(-4)
+///              .page_token("gubergren")
+///              .page_size(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -640,7 +640,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -884,7 +884,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_channels_create(req, "parent")
-///              .channel_id("ipsum")
+///              .channel_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -931,7 +931,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._channel_id.as_ref() {
             params.push("channelId", value);
         }
@@ -1226,7 +1226,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1488,7 +1488,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1706,8 +1706,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_channels_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-93)
+///              .page_token("invidunt")
+///              .page_size(-47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1754,7 +1754,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2045,7 +2045,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2347,7 +2347,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2632,7 +2632,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2894,7 +2894,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3112,8 +3112,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_domains_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-7)
+///              .page_token("rebum.")
+///              .page_size(-57)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3160,7 +3160,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3449,7 +3449,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3696,7 +3696,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_releases_create(req, "parent")
-///              .version_name("dolor")
+///              .version_name("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3743,7 +3743,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_name.as_ref() {
             params.push("versionName", value);
         }
@@ -3994,8 +3994,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_releases_list("parent")
-///              .page_token("eos")
-///              .page_size(-86)
+///              .page_token("ea")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4042,7 +4042,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4280,9 +4280,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_versions_files_list("parent")
-///              .status("duo")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .status(&Default::default())
+///              .page_token("eos")
+///              .page_size(-86)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4291,7 +4291,7 @@ pub struct ProjectSiteVersionFileListCall<'a, S>
 
    pub(super) hub: &'a FirebaseHosting<S>,
    pub(super) _parent: String,
-   pub(super) _status: Option<String>,
+   pub(super) _status: Option<ProjectStatusEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4330,7 +4330,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._status.as_ref() {
             params.push("status", value);
         }
@@ -4457,8 +4457,8 @@ where
     ///  The type of files that should be listed for the specified version.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, S> {
-        self._status = Some(new_value.to_string());
+    pub fn status(mut self, new_value: &ProjectStatusEnum) -> ProjectSiteVersionFileListCall<'a, S> {
+        self._status = Some(new_value.clone());
         self
     }
     /// A token from a previous call to `ListVersionFiles` that tells the server where to resume listing.
@@ -4629,7 +4629,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4876,8 +4876,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_versions_create(req, "parent")
-///              .version_id("et")
-///              .size_bytes(-43)
+///              .version_id("sed")
+///              .size_bytes(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4925,7 +4925,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_id.as_ref() {
             params.push("versionId", value);
         }
@@ -5230,7 +5230,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5448,9 +5448,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_versions_list("parent")
-///              .page_token("vero")
-///              .page_size(-31)
-///              .filter("sed")
+///              .page_token("et")
+///              .page_size(-43)
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5498,7 +5498,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5799,7 +5799,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -6101,7 +6101,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6348,7 +6348,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_create(req, "parent")
-///              .site_id("voluptua.")
+///              .site_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6395,7 +6395,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._site_id.as_ref() {
             params.push("siteId", value);
         }
@@ -6690,7 +6690,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6952,7 +6952,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7214,7 +7214,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7432,8 +7432,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_list("parent")
-///              .page_token("et")
-///              .page_size(-22)
+///              .page_token("amet.")
+///              .page_size(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7480,7 +7480,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7771,7 +7771,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8075,7 +8075,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8332,7 +8332,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().channels_releases_create(req, "parent")
-///              .version_name("duo")
+///              .version_name("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8379,7 +8379,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_name.as_ref() {
             params.push("versionName", value);
         }
@@ -8630,8 +8630,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().channels_releases_list("parent")
-///              .page_token("vero")
-///              .page_size(-88)
+///              .page_token("Stet")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8678,7 +8678,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8969,7 +8969,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._channel_id.as_ref() {
             params.push("channelId", value);
         }
@@ -9264,7 +9264,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9526,7 +9526,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9744,8 +9744,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().channels_list("parent")
-///              .page_token("no")
-///              .page_size(-100)
+///              .page_token("vero")
+///              .page_size(-44)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9792,7 +9792,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10083,7 +10083,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -10385,7 +10385,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -10670,7 +10670,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10932,7 +10932,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11150,8 +11150,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().domains_list("parent")
-///              .page_token("erat")
-///              .page_size(-96)
+///              .page_token("takimata")
+///              .page_size(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11198,7 +11198,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11487,7 +11487,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11734,7 +11734,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().releases_create(req, "parent")
-///              .version_name("takimata")
+///              .version_name("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11781,7 +11781,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_name.as_ref() {
             params.push("versionName", value);
         }
@@ -12032,8 +12032,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().releases_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-74)
+///              .page_token("amet.")
+///              .page_size(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12080,7 +12080,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12318,9 +12318,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_files_list("parent")
-///              .status("voluptua.")
-///              .page_token("dolore")
-///              .page_size(-34)
+///              .status(&Default::default())
+///              .page_token("dolores")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12329,7 +12329,7 @@ pub struct SiteVersionFileListCall<'a, S>
 
    pub(super) hub: &'a FirebaseHosting<S>,
    pub(super) _parent: String,
-   pub(super) _status: Option<String>,
+   pub(super) _status: Option<SiteStatusEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12368,7 +12368,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._status.as_ref() {
             params.push("status", value);
         }
@@ -12495,8 +12495,8 @@ where
     ///  The type of files that should be listed for the specified version.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> SiteVersionFileListCall<'a, S> {
-        self._status = Some(new_value.to_string());
+    pub fn status(mut self, new_value: &SiteStatusEnum) -> SiteVersionFileListCall<'a, S> {
+        self._status = Some(new_value.clone());
         self
     }
     /// A token from a previous call to `ListVersionFiles` that tells the server where to resume listing.
@@ -12667,7 +12667,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -12914,8 +12914,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_create(req, "parent")
-///              .version_id("amet.")
-///              .size_bytes(-17)
+///              .version_id("voluptua.")
+///              .size_bytes(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12963,7 +12963,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_id.as_ref() {
             params.push("versionId", value);
         }
@@ -13268,7 +13268,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13486,9 +13486,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-11)
-///              .filter("est")
+///              .page_token("voluptua.")
+///              .page_size(-2)
+///              .filter("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13536,7 +13536,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13837,7 +13837,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -14139,7 +14139,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -14424,7 +14424,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14695,7 +14695,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }

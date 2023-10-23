@@ -236,10 +236,10 @@ pub struct DynamicLinkEventStat {
     pub count: Option<i64>,
     /// Link event.
     
-    pub event: Option<String>,
+    pub event: Option<DynamicLinkEventStatEventEnum>,
     /// Requested platform.
     
-    pub platform: Option<String>,
+    pub platform: Option<DynamicLinkEventStatPlatformEnum>,
 }
 
 impl client::Part for DynamicLinkEventStat {}
@@ -322,7 +322,7 @@ pub struct DynamicLinkWarning {
     /// The warning code.
     #[serde(rename="warningCode")]
     
-    pub warning_code: Option<String>,
+    pub warning_code: Option<DynamicLinkWarningWarningCodeEnum>,
     /// The document describing the warning, and helps resolve.
     #[serde(rename="warningDocumentLink")]
     
@@ -366,7 +366,7 @@ pub struct GetIosPostInstallAttributionRequest {
     /// App post install attribution retrieval information. Disambiguates mechanism (iSDK or developer invoked) to retrieve payload from clicked link.
     #[serde(rename="retrievalMethod")]
     
-    pub retrieval_method: Option<String>,
+    pub retrieval_method: Option<GetIosPostInstallAttributionRequestRetrievalMethodEnum>,
     /// Google SDK version. Version takes the form "$major.$minor.$patch"
     #[serde(rename="sdkVersion")]
     
@@ -378,7 +378,7 @@ pub struct GetIosPostInstallAttributionRequest {
     /// Strong match page information. Disambiguates between default UI and custom page to present when strong match succeeds/fails to find cookie.
     #[serde(rename="visualStyle")]
     
-    pub visual_style: Option<String>,
+    pub visual_style: Option<GetIosPostInstallAttributionRequestVisualStyleEnum>,
 }
 
 impl client::RequestValue for GetIosPostInstallAttributionRequest {}
@@ -402,7 +402,7 @@ pub struct GetIosPostInstallAttributionResponse {
     /// The confidence of the returned attribution.
     #[serde(rename="attributionConfidence")]
     
-    pub attribution_confidence: Option<String>,
+    pub attribution_confidence: Option<GetIosPostInstallAttributionResponseAttributionConfidenceEnum>,
     /// The deep-link attributed post-install via one of several techniques (fingerprint, copy unique).
     #[serde(rename="deepLink")]
     
@@ -430,7 +430,7 @@ pub struct GetIosPostInstallAttributionResponse {
     /// Which IP version the request was made from.
     #[serde(rename="requestIpVersion")]
     
-    pub request_ip_version: Option<String>,
+    pub request_ip_version: Option<GetIosPostInstallAttributionResponseRequestIpVersionEnum>,
     /// Entire FDL (short or long) attributed post-install via one of several techniques (fingerprint, copy unique).
     #[serde(rename="requestedLink")]
     
@@ -661,7 +661,7 @@ pub struct ManagedShortLink {
     /// Attributes that have been flagged about this short url.
     #[serde(rename="flaggedAttribute")]
     
-    pub flagged_attribute: Option<Vec<String>>,
+    pub flagged_attribute: Option<Vec<ManagedShortLinkFlaggedAttributeEnum>>,
     /// Full Dyamic Link info
     
     pub info: Option<DynamicLinkInfo>,
@@ -674,7 +674,7 @@ pub struct ManagedShortLink {
     pub link_name: Option<String>,
     /// Visibility status of link.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<ManagedShortLinkVisibilityEnum>,
 }
 
 impl client::Resource for ManagedShortLink {}
@@ -733,7 +733,7 @@ pub struct Suffix {
     pub custom_suffix: Option<String>,
     /// Suffix option.
     
-    pub option: Option<String>,
+    pub option: Option<SuffixOptionEnum>,
 }
 
 impl client::Part for Suffix {}

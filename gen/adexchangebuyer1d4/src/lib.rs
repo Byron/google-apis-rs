@@ -123,12 +123,12 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.creatives().list()
-//!              .page_token("sanctus")
-//!              .open_auction_status_filter("sed")
-//!              .max_results(99)
-//!              .deals_status_filter("takimata")
-//!              .add_buyer_creative_id("amet.")
-//!              .add_account_id(-20)
+//!              .page_token("voluptua.")
+//!              .open_auction_status_filter(&Default::default())
+//!              .max_results(74)
+//!              .deals_status_filter(&Default::default())
+//!              .add_buyer_creative_id("sanctus")
+//!              .add_account_id(-80)
 //!              .doit().await;
 //! 
 //! match result {

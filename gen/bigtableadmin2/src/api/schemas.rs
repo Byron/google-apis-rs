@@ -68,7 +68,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -161,7 +161,7 @@ pub struct Backup {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of the backup.
     
-    pub state: Option<String>,
+    pub state: Option<BackupStateEnum>,
 }
 
 impl client::RequestValue for Backup {}
@@ -280,7 +280,7 @@ pub struct Cluster {
     /// Immutable. The type of storage used by this cluster to serve its parent instance's tables, unless explicitly overridden.
     #[serde(rename="defaultStorageType")]
     
-    pub default_storage_type: Option<String>,
+    pub default_storage_type: Option<ClusterDefaultStorageTypeEnum>,
     /// Immutable. The encryption configuration for CMEK-protected clusters.
     #[serde(rename="encryptionConfig")]
     
@@ -297,7 +297,7 @@ pub struct Cluster {
     pub serve_nodes: Option<i32>,
     /// Output only. The current state of the cluster.
     
-    pub state: Option<String>,
+    pub state: Option<ClusterStateEnum>,
 }
 
 impl client::RequestValue for Cluster {}
@@ -354,7 +354,7 @@ pub struct ClusterState {
     /// Output only. The state of replication for the table in this cluster.
     #[serde(rename="replicationState")]
     
-    pub replication_state: Option<String>,
+    pub replication_state: Option<ClusterStateReplicationStateEnum>,
 }
 
 impl client::Part for ClusterState {}
@@ -565,7 +565,7 @@ pub struct EncryptionInfo {
     /// Output only. The type of encryption used to protect this resource.
     #[serde(rename="encryptionType")]
     
-    pub encryption_type: Option<String>,
+    pub encryption_type: Option<EncryptionInfoEncryptionTypeEnum>,
     /// Output only. The version of the Cloud KMS key specified in the parent cluster that is in use for the data underlying this table.
     #[serde(rename="kmsKeyVersion")]
     
@@ -770,11 +770,11 @@ pub struct Instance {
     pub satisfies_pzs: Option<bool>,
     /// Output only. The current state of the instance.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// The type of the instance. Defaults to `PRODUCTION`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InstanceTypeEnum>,
 }
 
 impl client::RequestValue for Instance {}
@@ -1181,7 +1181,7 @@ pub struct RestoreInfo {
     /// The type of the restore source.
     #[serde(rename="sourceType")]
     
-    pub source_type: Option<String>,
+    pub source_type: Option<RestoreInfoSourceTypeEnum>,
 }
 
 impl client::Part for RestoreInfo {}
@@ -1320,7 +1320,7 @@ pub struct Table {
     pub deletion_protection: Option<bool>,
     /// Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored in this table. Timestamps not matching the granularity will be rejected. If unspecified at creation time, the value will be set to `MILLIS`. Views: `SCHEMA_VIEW`, `FULL`.
     
-    pub granularity: Option<String>,
+    pub granularity: Option<TableGranularityEnum>,
     /// The unique name of the table. Values are of the form `projects/{project}/instances/{instance}/tables/_a-zA-Z0-9*`. Views: `NAME_ONLY`, `SCHEMA_VIEW`, `REPLICATION_VIEW`, `STATS_VIEW`, `FULL`
     
     pub name: Option<String>,

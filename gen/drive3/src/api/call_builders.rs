@@ -265,7 +265,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("dolore")
+///              .team_drive_id("duo")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
 ///              .drive_id("dolor")
@@ -622,7 +622,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("pageToken", self._page_token);
+        params.push("pageToken", &self._page_token);
         if let Some(value) = self._team_drive_id.as_ref() {
             params.push("teamDriveId", value);
         }
@@ -1036,7 +1036,7 @@ where
         }
 
         let mut params = Params::with_capacity(17 + self._additional_params.len());
-        params.push("pageToken", self._page_token);
+        params.push("pageToken", &self._page_token);
         if let Some(value) = self._team_drive_id.as_ref() {
             params.push("teamDriveId", value);
         }
@@ -1705,7 +1705,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1987,8 +1987,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2248,8 +2248,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
         if let Some(value) = self._include_deleted.as_ref() {
             params.push("includeDeleted", value.to_string());
         }
@@ -2535,7 +2535,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._start_modified_time.as_ref() {
             params.push("startModifiedTime", value);
         }
@@ -2841,8 +2841,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3140,7 +3140,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("requestId", self._request_id);
+        params.push("requestId", &self._request_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3418,7 +3418,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -3687,7 +3687,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -3955,7 +3955,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4500,7 +4500,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4767,7 +4767,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -5081,7 +5081,7 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -5939,7 +5939,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -6460,8 +6460,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("mimeType", self._mime_type);
+        params.push("fileId", &self._file_id);
+        params.push("mimeType", &self._mime_type);
 
         params.extend(self._additional_params.iter());
 
@@ -7008,7 +7008,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -7294,8 +7294,8 @@ where
 ///              .include_labels("dolor")
 ///              .include_items_from_all_drives(true)
 ///              .drive_id("amet.")
-///              .corpus("ipsum")
-///              .corpora("Lorem")
+///              .corpus(&Default::default())
+///              .corpora("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7316,7 +7316,7 @@ pub struct FileListCall<'a, S>
    pub(super) _include_labels: Option<String>,
    pub(super) _include_items_from_all_drives: Option<bool>,
    pub(super) _drive_id: Option<String>,
-   pub(super) _corpus: Option<String>,
+   pub(super) _corpus: Option<FileCorpusEnum>,
    pub(super) _corpora: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -7590,8 +7590,8 @@ where
     /// The source of files to list. Deprecated: use 'corpora' instead.
     ///
     /// Sets the *corpus* query property to the given value.
-    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, S> {
-        self._corpus = Some(new_value.to_string());
+    pub fn corpus(mut self, new_value: &FileCorpusEnum) -> FileListCall<'a, S> {
+        self._corpus = Some(new_value.clone());
         self
     }
     /// Groupings of files to which the query applies. Supported groupings are: 'user' (files created by, opened by, or shared directly with the user), 'drive' (files in the specified shared drive as indicated by the 'driveId'), 'domain' (files shared to the user's domain), and 'allDrives' (A combination of 'user' and 'drive' for all drives where the user is a member). When able, use 'user' or 'drive', instead of 'allDrives', for efficiency.
@@ -7700,8 +7700,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list_labels("fileId")
-///              .page_token("gubergren")
-///              .max_results(-45)
+///              .page_token("accusam")
+///              .max_results(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7748,7 +7748,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8033,7 +8033,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8278,10 +8278,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().update(req, "fileId")
 ///              .use_content_as_indexable_text(true)
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
-///              .remove_parents("dolor")
-///              .ocr_language("Lorem")
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
+///              .remove_parents("et")
+///              .ocr_language("rebum.")
 ///              .keep_revision_forever(false)
 ///              .include_permissions_for_view("amet.")
 ///              .include_labels("no")
@@ -8341,7 +8341,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
         }
@@ -8512,7 +8512,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
         }
@@ -9027,7 +9027,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -9390,7 +9390,7 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -9758,8 +9758,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -10053,8 +10053,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -10364,7 +10364,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -10700,8 +10700,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -11050,8 +11050,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11344,9 +11344,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11617,9 +11617,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
         if let Some(value) = self._include_deleted.as_ref() {
             params.push("includeDeleted", value.to_string());
         }
@@ -11914,8 +11914,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12222,9 +12222,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12526,8 +12526,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12792,8 +12792,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
         if let Some(value) = self._acknowledge_abuse.as_ref() {
             params.push("acknowledgeAbuse", value.to_string());
         }
@@ -13084,7 +13084,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13370,8 +13370,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13669,7 +13669,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("requestId", self._request_id);
+        params.push("requestId", &self._request_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13943,7 +13943,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("teamDriveId", self._team_drive_id);
+        params.push("teamDriveId", &self._team_drive_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14192,7 +14192,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("teamDriveId", self._team_drive_id);
+        params.push("teamDriveId", &self._team_drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -14756,7 +14756,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("teamDriveId", self._team_drive_id);
+        params.push("teamDriveId", &self._team_drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }

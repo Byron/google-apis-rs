@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("property", self._property);
+        params.push("property", &self._property);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("property", self._property);
+        params.push("property", &self._property);
 
         params.extend(self._additional_params.iter());
 
@@ -661,7 +661,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("property", self._property);
+        params.push("property", &self._property);
 
         params.extend(self._additional_params.iter());
 
@@ -946,7 +946,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1215,7 +1215,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("property", self._property);
+        params.push("property", &self._property);
 
         params.extend(self._additional_params.iter());
 
@@ -1507,7 +1507,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("property", self._property);
+        params.push("property", &self._property);
 
         params.extend(self._additional_params.iter());
 
@@ -1799,7 +1799,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("property", self._property);
+        params.push("property", &self._property);
 
         params.extend(self._additional_params.iter());
 

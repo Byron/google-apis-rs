@@ -51,7 +51,7 @@ pub struct RemoteConfigCondition {
     /// displaying the condition.
     #[serde(rename="tagColor")]
     
-    pub tag_color: Option<String>,
+    pub tag_color: Option<RemoteConfigConditionTagColorEnum>,
     /// Required.
     /// A non empty and unique name of this condition.
     

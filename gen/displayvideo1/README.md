@@ -211,11 +211,11 @@ let mut hub = DisplayVideo::new(hyper::Client::builder().build(hyper_rustls::Htt
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-22, -33, "targetingType")
-             .page_token("ipsum")
-             .page_size(-28)
-             .order_by("At")
-             .filter("sanctus")
+let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-22, -33, &Default::default())
+             .page_token("no")
+             .page_size(-55)
+             .order_by("voluptua.")
+             .filter("At")
              .doit().await;
 
 match result {

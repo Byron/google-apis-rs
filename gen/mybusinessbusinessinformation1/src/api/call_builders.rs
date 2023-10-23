@@ -80,7 +80,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -350,7 +350,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -856,9 +856,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.categories().batch_get()
-///              .view("rebum.")
-///              .region_code("est")
-///              .add_names("ipsum")
+///              .view(&Default::default())
+///              .region_code("rebum.")
+///              .add_names("est")
 ///              .language_code("ipsum")
 ///              .doit().await;
 /// # }
@@ -867,7 +867,7 @@ pub struct CategoryBatchGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a MyBusinessBusinessInformation<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<CategoryViewEnum>,
    pub(super) _region_code: Option<String>,
    pub(super) _names: Vec<String>,
    pub(super) _language_code: Option<String>,
@@ -1010,8 +1010,8 @@ where
     /// Required. Specifies which parts to the Category resource should be returned in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CategoryBatchGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &CategoryViewEnum) -> CategoryBatchGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Optional. The ISO 3166-1 alpha-2 country code used to infer non-standard language.
@@ -1105,12 +1105,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.categories().list()
-///              .view("est")
-///              .region_code("gubergren")
-///              .page_token("ea")
-///              .page_size(-99)
-///              .language_code("Lorem")
-///              .filter("eos")
+///              .view(&Default::default())
+///              .region_code("ipsum")
+///              .page_token("est")
+///              .page_size(-62)
+///              .language_code("ea")
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1118,7 +1118,7 @@ pub struct CategoryListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a MyBusinessBusinessInformation<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<CategoryViewEnum>,
    pub(super) _region_code: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -1267,8 +1267,8 @@ where
     /// Required. Specifies which parts to the Category resource should be returned in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CategoryListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &CategoryViewEnum) -> CategoryListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Required. The ISO 3166-1 alpha-2 country code.
@@ -1418,7 +1418,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1592,8 +1592,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.chains().search()
-///              .page_size(-43)
-///              .chain_name("duo")
+///              .page_size(-25)
+///              .chain_name("labore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2085,7 +2085,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2309,7 +2309,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2556,7 +2556,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2796,7 +2796,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3015,7 +3015,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -3242,7 +3242,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3461,7 +3461,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -3651,7 +3651,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().patch(req, "name")
-///              .validate_only(false)
+///              .validate_only(true)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -3699,7 +3699,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -3968,7 +3968,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._attribute_mask.as_ref() {
             params.push("attributeMask", value.to_string());
         }

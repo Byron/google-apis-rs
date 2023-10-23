@@ -25,7 +25,7 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_active_ad_summaries().get(-17, -55)
+/// let result = hub.account_active_ad_summaries().get(-55, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("summaryAccountId", self._summary_account_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("summaryAccountId", &self._summary_account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -295,7 +295,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_permission_groups().get(-88, -47)
+/// let result = hub.account_permission_groups().get(-51, -12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -341,8 +341,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -565,7 +565,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_permission_groups().list(-20)
+/// let result = hub.account_permission_groups().list(-75)
 ///              .doit().await;
 /// # }
 /// ```
@@ -610,7 +610,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -823,7 +823,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_permissions().get(-50, -93)
+/// let result = hub.account_permissions().get(-4, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -869,8 +869,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1093,7 +1093,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_permissions().list(-37)
+/// let result = hub.account_permissions().list(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1138,7 +1138,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1351,7 +1351,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_user_profiles().get(-12, -16)
+/// let result = hub.account_user_profiles().get(-88, -47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1397,8 +1397,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1627,7 +1627,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_user_profiles().insert(req, -57)
+/// let result = hub.account_user_profiles().insert(req, -20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1673,7 +1673,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1910,14 +1910,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.account_user_profiles().list(-50)
-///              .user_role_id(-50)
-///              .subaccount_id(-7)
-///              .sort_order("gubergren")
-///              .sort_field("ea")
-///              .search_string("dolor")
-///              .page_token("Lorem")
-///              .max_results(-25)
-///              .add_ids(-86)
+///              .user_role_id(-93)
+///              .subaccount_id(-37)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("gubergren")
+///              .page_token("rebum.")
+///              .max_results(-57)
+///              .add_ids(-50)
 ///              .active(true)
 ///              .doit().await;
 /// # }
@@ -1929,8 +1929,8 @@ pub struct AccountUserProfileListCall<'a, S>
    pub(super) _profile_id: i64,
    pub(super) _user_role_id: Option<i64>,
    pub(super) _subaccount_id: Option<i64>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<AccountUserProfileSortOrderEnum>,
+   pub(super) _sort_field: Option<AccountUserProfileSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -1972,7 +1972,7 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._user_role_id.as_ref() {
             params.push("userRoleId", value.to_string());
         }
@@ -2133,15 +2133,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> AccountUserProfileListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &AccountUserProfileSortOrderEnum) -> AccountUserProfileListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> AccountUserProfileListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &AccountUserProfileSortFieldEnum) -> AccountUserProfileListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name, ID or email. Wildcards (*) are allowed. For example, "user profile*2015" will return objects with names like "user profile June 2015", "user profile April 2015", or simply "user profile 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "user profile" will match objects with name "my user profile", "user profile 2015", or simply "user profile".
@@ -2284,7 +2284,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_user_profiles().patch(req, -70, -80)
+/// let result = hub.account_user_profiles().patch(req, -7, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2331,8 +2331,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2584,7 +2584,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.account_user_profiles().update(req, -61)
+/// let result = hub.account_user_profiles().update(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2630,7 +2630,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2866,7 +2866,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().get(-15, -13)
+/// let result = hub.accounts().get(-99, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2912,8 +2912,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3136,14 +3136,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().list(-24)
-///              .sort_order("sed")
-///              .sort_field("et")
-///              .search_string("et")
-///              .page_token("vero")
-///              .max_results(-31)
-///              .add_ids(-93)
-///              .active(false)
+/// let result = hub.accounts().list(-25)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("labore")
+///              .page_token("sed")
+///              .max_results(-70)
+///              .add_ids(-80)
+///              .active(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3152,8 +3152,8 @@ pub struct AccountListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<AccountSortOrderEnum>,
+   pub(super) _sort_field: Option<AccountSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -3195,7 +3195,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -3336,15 +3336,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> AccountListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &AccountSortOrderEnum) -> AccountListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> AccountListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &AccountSortFieldEnum) -> AccountListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "account*2015" will return objects with names like "account June 2015", "account April 2015", or simply "account 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "account" will match objects with name "my account", "account 2015", or simply "account".
@@ -3487,7 +3487,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().patch(req, -92, -49)
+/// let result = hub.accounts().patch(req, -15, -13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3534,8 +3534,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3787,7 +3787,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().update(req, -18)
+/// let result = hub.accounts().update(req, -24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3833,7 +3833,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4069,7 +4069,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.ads().get(-22, -95)
+/// let result = hub.ads().get(-43, -24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4115,8 +4115,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4345,7 +4345,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.ads().insert(req, -15)
+/// let result = hub.ads().insert(req, -68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4391,7 +4391,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4627,30 +4627,30 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.ads().list(-99)
-///              .add_type("duo")
+/// let result = hub.ads().list(-76)
+///              .add_type(&Default::default())
 ///              .ssl_required(false)
 ///              .ssl_compliant(false)
-///              .sort_order("invidunt")
-///              .sort_field("Stet")
-///              .add_size_ids(-76)
-///              .search_string("elitr")
-///              .add_remarketing_list_ids(-6)
-///              .add_placement_ids(-29)
-///              .page_token("no")
-///              .overridden_event_tag_id(-100)
-///              .max_results(-23)
-///              .add_landing_page_ids(-59)
-///              .add_ids(-46)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_size_ids(-92)
+///              .search_string("dolor")
+///              .add_remarketing_list_ids(-18)
+///              .add_placement_ids(-22)
+///              .page_token("sadipscing")
+///              .overridden_event_tag_id(-15)
+///              .max_results(-99)
+///              .add_landing_page_ids(-20)
+///              .add_ids(-76)
 ///              .dynamic_click_tracker(false)
-///              .add_creative_optimization_configuration_ids(-31)
-///              .add_creative_ids(-96)
-///              .compatibility("amet.")
-///              .add_campaign_ids(-30)
-///              .add_audience_segment_ids(-9)
+///              .add_creative_optimization_configuration_ids(-88)
+///              .add_creative_ids(-65)
+///              .compatibility(&Default::default())
+///              .add_campaign_ids(-76)
+///              .add_audience_segment_ids(-44)
 ///              .archived(true)
-///              .advertiser_id(-74)
-///              .active(false)
+///              .advertiser_id(-100)
+///              .active(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4659,11 +4659,11 @@ pub struct AdListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _type_: Vec<String>,
+   pub(super) _type_: Option<AdTypeEnum>,
    pub(super) _ssl_required: Option<bool>,
    pub(super) _ssl_compliant: Option<bool>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<AdSortOrderEnum>,
+   pub(super) _sort_field: Option<AdSortFieldEnum>,
    pub(super) _size_ids: Vec<i64>,
    pub(super) _search_string: Option<String>,
    pub(super) _remarketing_list_ids: Vec<i64>,
@@ -4676,7 +4676,7 @@ pub struct AdListCall<'a, S>
    pub(super) _dynamic_click_tracker: Option<bool>,
    pub(super) _creative_optimization_configuration_ids: Vec<i64>,
    pub(super) _creative_ids: Vec<i64>,
-   pub(super) _compatibility: Option<String>,
+   pub(super) _compatibility: Option<AdCompatibilityEnum>,
    pub(super) _campaign_ids: Vec<i64>,
    pub(super) _audience_segment_ids: Vec<i64>,
    pub(super) _archived: Option<bool>,
@@ -4718,7 +4718,7 @@ where
         }
 
         let mut params = Params::with_capacity(26 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._type_.len() > 0 {
             for f in self._type_.iter() {
                 params.push("type", f);
@@ -4926,8 +4926,8 @@ where
     ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_type(mut self, new_value: &str) -> AdListCall<'a, S> {
-        self._type_.push(new_value.to_string());
+    pub fn add_type(mut self, new_value: &AdTypeEnum) -> AdListCall<'a, S> {
+        self._type_.push(new_value.clone());
         self
     }
     /// Select only ads that require SSL.
@@ -4947,15 +4947,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> AdListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &AdSortOrderEnum) -> AdListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> AdListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &AdSortFieldEnum) -> AdListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only ads with these size IDs.
@@ -5052,8 +5052,8 @@ where
     /// Select default ads with the specified compatibility. Applicable when type is AD_SERVING_DEFAULT_AD. DISPLAY and DISPLAY_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps. IN_STREAM_VIDEO refers to rendering an in-stream video ads developed with the VAST standard.
     ///
     /// Sets the *compatibility* query property to the given value.
-    pub fn compatibility(mut self, new_value: &str) -> AdListCall<'a, S> {
-        self._compatibility = Some(new_value.to_string());
+    pub fn compatibility(mut self, new_value: &AdCompatibilityEnum) -> AdListCall<'a, S> {
+        self._compatibility = Some(new_value.clone());
         self
     }
     /// Select only ads with these campaign IDs.
@@ -5197,7 +5197,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.ads().patch(req, -34, -34)
+/// let result = hub.ads().patch(req, -46, -28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5244,8 +5244,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -5497,7 +5497,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.ads().update(req, -34)
+/// let result = hub.ads().update(req, -72)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5543,7 +5543,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -5779,7 +5779,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_groups().delete(-78, -2)
+/// let result = hub.advertiser_groups().delete(-31, -96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5825,8 +5825,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6038,7 +6038,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_groups().get(-17, -95)
+/// let result = hub.advertiser_groups().get(-2, -30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6084,8 +6084,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6314,7 +6314,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_groups().insert(req, -6)
+/// let result = hub.advertiser_groups().insert(req, -9)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6360,7 +6360,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6596,13 +6596,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_groups().list(-38)
-///              .sort_order("no")
-///              .sort_field("est")
-///              .search_string("At")
-///              .page_token("sed")
-///              .max_results(-98)
-///              .add_ids(-35)
+/// let result = hub.advertiser_groups().list(-19)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("gubergren")
+///              .page_token("et")
+///              .max_results(-23)
+///              .add_ids(-78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6611,8 +6611,8 @@ pub struct AdvertiserGroupListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<AdvertiserGroupSortOrderEnum>,
+   pub(super) _sort_field: Option<AdvertiserGroupSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -6653,7 +6653,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -6791,15 +6791,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &AdvertiserGroupSortOrderEnum) -> AdvertiserGroupListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &AdvertiserGroupSortFieldEnum) -> AdvertiserGroupListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "advertiser*2015" will return objects with names like "advertiser group June 2015", "advertiser group April 2015", or simply "advertiser group 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "advertisergroup" will match objects with name "my advertisergroup", "advertisergroup 2015", or simply "advertisergroup".
@@ -6935,7 +6935,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_groups().patch(req, -39, -32)
+/// let result = hub.advertiser_groups().patch(req, -34, -34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6982,8 +6982,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -7235,7 +7235,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_groups().update(req, -5)
+/// let result = hub.advertiser_groups().update(req, -34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7281,7 +7281,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -7517,7 +7517,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_landing_pages().get(-18, -8)
+/// let result = hub.advertiser_landing_pages().get(-78, -2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7563,8 +7563,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -7793,7 +7793,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_landing_pages().insert(req, -56)
+/// let result = hub.advertiser_landing_pages().insert(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7839,7 +7839,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8075,16 +8075,16 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_landing_pages().list(-7)
-///              .subaccount_id(-30)
-///              .sort_order("diam")
-///              .sort_field("dolores")
-///              .search_string("dolores")
-///              .page_token("et")
-///              .max_results(-93)
-///              .add_ids(-11)
-///              .archived(false)
-///              .add_advertiser_ids(-94)
+/// let result = hub.advertiser_landing_pages().list(-95)
+///              .subaccount_id(-6)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("invidunt")
+///              .page_token("no")
+///              .max_results(-7)
+///              .add_ids(-27)
+///              .archived(true)
+///              .add_advertiser_ids(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8094,8 +8094,8 @@ pub struct AdvertiserLandingPageListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _subaccount_id: Option<i64>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<AdvertiserLandingPageSortOrderEnum>,
+   pub(super) _sort_field: Option<AdvertiserLandingPageSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -8138,7 +8138,7 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._subaccount_id.as_ref() {
             params.push("subaccountId", value.to_string());
         }
@@ -8294,15 +8294,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> AdvertiserLandingPageListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &AdvertiserLandingPageSortOrderEnum) -> AdvertiserLandingPageListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> AdvertiserLandingPageListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &AdvertiserLandingPageSortFieldEnum) -> AdvertiserLandingPageListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for landing pages by name or ID. Wildcards (*) are allowed. For example, "landingpage*2017" will return landing pages with names like "landingpage July 2017", "landingpage March 2017", or simply "landingpage 2017". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "landingpage" will match campaigns with name "my landingpage", "landingpage 2015", or simply "landingpage".
@@ -8453,7 +8453,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_landing_pages().patch(req, -80, -61)
+/// let result = hub.advertiser_landing_pages().patch(req, -35, -39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8500,8 +8500,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8753,7 +8753,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertiser_landing_pages().update(req, -91)
+/// let result = hub.advertiser_landing_pages().update(req, -32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8799,7 +8799,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -9035,7 +9035,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().get(-77, -45)
+/// let result = hub.advertisers().get(-5, -18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9081,8 +9081,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -9311,7 +9311,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insert(req, -32)
+/// let result = hub.advertisers().insert(req, -8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9357,7 +9357,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -9593,18 +9593,18 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().list(-69)
-///              .subaccount_id(-95)
-///              .status("erat")
-///              .sort_order("aliquyam")
-///              .sort_field("amet")
-///              .search_string("est")
-///              .page_token("et")
-///              .only_parent(false)
-///              .max_results(-46)
-///              .include_advertisers_without_groups_only(true)
-///              .add_ids(-7)
-///              .add_floodlight_configuration_ids(-82)
+/// let result = hub.advertisers().list(-56)
+///              .subaccount_id(-7)
+///              .status(&Default::default())
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("sed")
+///              .page_token("diam")
+///              .only_parent(true)
+///              .max_results(-68)
+///              .include_advertisers_without_groups_only(false)
+///              .add_ids(-11)
+///              .add_floodlight_configuration_ids(-85)
 ///              .add_advertiser_group_ids(-94)
 ///              .doit().await;
 /// # }
@@ -9615,9 +9615,9 @@ pub struct AdvertiserListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _subaccount_id: Option<i64>,
-   pub(super) _status: Option<String>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _status: Option<AdvertiserStatusEnum>,
+   pub(super) _sort_order: Option<AdvertiserSortOrderEnum>,
+   pub(super) _sort_field: Option<AdvertiserSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _only_parent: Option<bool>,
@@ -9662,7 +9662,7 @@ where
         }
 
         let mut params = Params::with_capacity(15 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._subaccount_id.as_ref() {
             params.push("subaccountId", value.to_string());
         }
@@ -9829,22 +9829,22 @@ where
     /// Select only advertisers with the specified status.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
-        self._status = Some(new_value.to_string());
+    pub fn status(mut self, new_value: &AdvertiserStatusEnum) -> AdvertiserListCall<'a, S> {
+        self._status = Some(new_value.clone());
         self
     }
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &AdvertiserSortOrderEnum) -> AdvertiserListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &AdvertiserSortFieldEnum) -> AdvertiserListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "advertiser*2015" will return objects with names like "advertiser June 2015", "advertiser April 2015", or simply "advertiser 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "advertiser" will match objects with name "my advertiser", "advertiser 2015", or simply "advertiser".
@@ -10010,7 +10010,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().patch(req, -20, -42)
+/// let result = hub.advertisers().patch(req, -80, -61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10057,8 +10057,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -10310,7 +10310,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().update(req, -57)
+/// let result = hub.advertisers().update(req, -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10356,7 +10356,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -10592,7 +10592,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.browsers().list(-53)
+/// let result = hub.browsers().list(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10637,7 +10637,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -10856,7 +10856,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaign_creative_associations().insert(req, -93, -75)
+/// let result = hub.campaign_creative_associations().insert(req, -45, -32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10903,8 +10903,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -11150,10 +11150,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaign_creative_associations().list(-56, -17)
-///              .sort_order("Stet")
-///              .page_token("dolores")
-///              .max_results(-25)
+/// let result = hub.campaign_creative_associations().list(-69, -95)
+///              .sort_order(&Default::default())
+///              .page_token("erat")
+///              .max_results(-82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11163,7 +11163,7 @@ pub struct CampaignCreativeAssociationListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _campaign_id: i64,
-   pub(super) _sort_order: Option<String>,
+   pub(super) _sort_order: Option<CampaignCreativeAssociationSortOrderEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11202,8 +11202,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -11340,8 +11340,8 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CampaignCreativeAssociationListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CampaignCreativeAssociationSortOrderEnum) -> CampaignCreativeAssociationListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Value of the nextPageToken from the previous result page.
@@ -11456,7 +11456,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaigns().get(-68, -10)
+/// let result = hub.campaigns().get(-47, -57)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11502,8 +11502,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -11732,7 +11732,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaigns().insert(req, -74)
+/// let result = hub.campaigns().insert(req, -24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11778,7 +11778,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -12014,20 +12014,20 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaigns().list(-77)
-///              .subaccount_id(-84)
-///              .sort_order("eirmod")
-///              .sort_field("Lorem")
-///              .search_string("accusam")
-///              .page_token("amet")
-///              .overridden_event_tag_id(-31)
-///              .max_results(-69)
-///              .add_ids(-81)
-///              .add_excluded_ids(-73)
+/// let result = hub.campaigns().list(-10)
+///              .subaccount_id(-96)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("consetetur")
+///              .page_token("Stet")
+///              .overridden_event_tag_id(-7)
+///              .max_results(-82)
+///              .add_ids(-94)
+///              .add_excluded_ids(-20)
 ///              .at_least_one_optimization_activity(true)
 ///              .archived(true)
-///              .add_advertiser_ids(-22)
-///              .add_advertiser_group_ids(-77)
+///              .add_advertiser_ids(-53)
+///              .add_advertiser_group_ids(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12037,8 +12037,8 @@ pub struct CampaignListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _subaccount_id: Option<i64>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<CampaignSortOrderEnum>,
+   pub(super) _sort_field: Option<CampaignSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _overridden_event_tag_id: Option<i64>,
@@ -12085,7 +12085,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._subaccount_id.as_ref() {
             params.push("subaccountId", value.to_string());
         }
@@ -12257,15 +12257,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CampaignListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CampaignSortOrderEnum) -> CampaignListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> CampaignListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &CampaignSortFieldEnum) -> CampaignListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for campaigns by name or ID. Wildcards (*) are allowed. For example, "campaign*2015" will return campaigns with names like "campaign June 2015", "campaign April 2015", or simply "campaign 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "campaign" will match campaigns with name "my campaign", "campaign 2015", or simply "campaign".
@@ -12446,7 +12446,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaigns().patch(req, -4, -22)
+/// let result = hub.campaigns().patch(req, -75, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12493,8 +12493,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -12746,7 +12746,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.campaigns().update(req, -48)
+/// let result = hub.campaigns().update(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12792,7 +12792,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -13028,7 +13028,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.change_logs().get(-81, -10)
+/// let result = hub.change_logs().get(-15, -19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13074,8 +13074,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -13298,17 +13298,17 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.change_logs().list(-41)
-///              .add_user_profile_ids(-22)
-///              .search_string("gubergren")
-///              .page_token("justo")
-///              .object_type("sea")
-///              .add_object_ids(-96)
-///              .min_change_time("sit")
-///              .max_results(-32)
-///              .max_change_time("eos")
-///              .add_ids(-77)
-///              .action("dolores")
+/// let result = hub.change_logs().list(-25)
+///              .add_user_profile_ids(-68)
+///              .search_string("sea")
+///              .page_token("et")
+///              .object_type(&Default::default())
+///              .add_object_ids(-77)
+///              .min_change_time("dolore")
+///              .max_results(-40)
+///              .max_change_time("Lorem")
+///              .add_ids(-23)
+///              .action(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -13320,13 +13320,13 @@ pub struct ChangeLogListCall<'a, S>
    pub(super) _user_profile_ids: Vec<i64>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _object_type: Option<String>,
+   pub(super) _object_type: Option<ChangeLogObjectTypeEnum>,
    pub(super) _object_ids: Vec<i64>,
    pub(super) _min_change_time: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _max_change_time: Option<String>,
    pub(super) _ids: Vec<i64>,
-   pub(super) _action: Option<String>,
+   pub(super) _action: Option<ChangeLogActionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -13363,7 +13363,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._user_profile_ids.len() > 0 {
             for f in self._user_profile_ids.iter() {
                 params.push("userProfileIds", f.to_string());
@@ -13539,8 +13539,8 @@ where
     /// Select only change logs with the specified object type.
     ///
     /// Sets the *object type* query property to the given value.
-    pub fn object_type(mut self, new_value: &str) -> ChangeLogListCall<'a, S> {
-        self._object_type = Some(new_value.to_string());
+    pub fn object_type(mut self, new_value: &ChangeLogObjectTypeEnum) -> ChangeLogListCall<'a, S> {
+        self._object_type = Some(new_value.clone());
         self
     }
     /// Select only change logs with these object IDs.
@@ -13583,8 +13583,8 @@ where
     /// Select only change logs with the specified action.
     ///
     /// Sets the *action* query property to the given value.
-    pub fn action(mut self, new_value: &str) -> ChangeLogListCall<'a, S> {
-        self._action = Some(new_value.to_string());
+    pub fn action(mut self, new_value: &ChangeLogActionEnum) -> ChangeLogListCall<'a, S> {
+        self._action = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13685,11 +13685,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.cities().list(-46)
-///              .add_region_dart_ids(-62)
-///              .name_prefix("dolor")
-///              .add_dart_ids(-32)
-///              .add_country_dart_ids(-61)
+/// let result = hub.cities().list(-47)
+///              .add_region_dart_ids(-31)
+///              .name_prefix("dolores")
+///              .add_dart_ids(-81)
+///              .add_country_dart_ids(-73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13738,7 +13738,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._region_dart_ids.len() > 0 {
             for f in self._region_dart_ids.iter() {
                 params.push("regionDartIds", f.to_string());
@@ -14000,7 +14000,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.connection_types().get(-2, -50)
+/// let result = hub.connection_types().get(-10, -59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14046,8 +14046,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14270,7 +14270,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.connection_types().list(-56)
+/// let result = hub.connection_types().list(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14315,7 +14315,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14528,7 +14528,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.content_categories().delete(-73, -62)
+/// let result = hub.content_categories().delete(-22, -77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14574,8 +14574,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14787,7 +14787,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.content_categories().get(-45, -27)
+/// let result = hub.content_categories().get(-4, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14833,8 +14833,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -15063,7 +15063,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.content_categories().insert(req, -53)
+/// let result = hub.content_categories().insert(req, -48)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15109,7 +15109,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -15345,13 +15345,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.content_categories().list(-20)
-///              .sort_order("sit")
-///              .sort_field("magna")
-///              .search_string("et")
-///              .page_token("rebum.")
-///              .max_results(-4)
-///              .add_ids(-6)
+/// let result = hub.content_categories().list(-81)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("sea")
+///              .page_token("nonumy")
+///              .max_results(-22)
+///              .add_ids(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15360,8 +15360,8 @@ pub struct ContentCategoryListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<ContentCategorySortOrderEnum>,
+   pub(super) _sort_field: Option<ContentCategorySortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -15402,7 +15402,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -15540,15 +15540,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> ContentCategoryListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &ContentCategorySortOrderEnum) -> ContentCategoryListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> ContentCategoryListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &ContentCategorySortFieldEnum) -> ContentCategoryListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "contentcategory*2015" will return objects with names like "contentcategory June 2015", "contentcategory April 2015", or simply "contentcategory 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "contentcategory" will match objects with name "my contentcategory", "contentcategory 2015", or simply "contentcategory".
@@ -15684,7 +15684,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.content_categories().patch(req, -71, -52)
+/// let result = hub.content_categories().patch(req, -21, -60)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15731,8 +15731,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -15984,7 +15984,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.content_categories().update(req, -11)
+/// let result = hub.content_categories().update(req, -96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16030,7 +16030,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -16272,7 +16272,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.conversions().batchinsert(req, -91)
+/// let result = hub.conversions().batchinsert(req, -98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16318,7 +16318,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -16560,7 +16560,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.conversions().batchupdate(req, -43)
+/// let result = hub.conversions().batchupdate(req, -32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16606,7 +16606,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -16842,7 +16842,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.countries().get(-13, -101)
+/// let result = hub.countries().get(-25, -77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16888,8 +16888,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("dartId", self._dart_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("dartId", &self._dart_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -17112,7 +17112,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.countries().list(-58)
+/// let result = hub.countries().list(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17157,7 +17157,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -17377,7 +17377,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_assets().insert(req, -91, -66)
+/// let result = hub.creative_assets().insert(req, -46, -62)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -17425,8 +17425,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -17784,7 +17784,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_field_values().delete(-39, -34, -25)
+/// let result = hub.creative_field_values().delete(-4, -32, -61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17831,9 +17831,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("creativeFieldId", self._creative_field_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("creativeFieldId", &self._creative_field_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -18055,7 +18055,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_field_values().get(-52, -84, -97)
+/// let result = hub.creative_field_values().get(-2, -50, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18102,9 +18102,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("creativeFieldId", self._creative_field_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("creativeFieldId", &self._creative_field_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -18343,7 +18343,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_field_values().insert(req, -37, -27)
+/// let result = hub.creative_field_values().insert(req, -73, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18390,8 +18390,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("creativeFieldId", self._creative_field_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("creativeFieldId", &self._creative_field_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -18637,13 +18637,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_field_values().list(-53, -76)
-///              .sort_order("duo")
-///              .sort_field("sadipscing")
-///              .search_string("ut")
-///              .page_token("rebum.")
-///              .max_results(-70)
-///              .add_ids(-63)
+/// let result = hub.creative_field_values().list(-45, -27)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("sit")
+///              .page_token("duo")
+///              .max_results(-53)
+///              .add_ids(-83)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18653,8 +18653,8 @@ pub struct CreativeFieldValueListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _creative_field_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<CreativeFieldValueSortOrderEnum>,
+   pub(super) _sort_field: Option<CreativeFieldValueSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -18695,8 +18695,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("creativeFieldId", self._creative_field_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("creativeFieldId", &self._creative_field_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -18844,15 +18844,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CreativeFieldValueSortOrderEnum) -> CreativeFieldValueListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &CreativeFieldValueSortFieldEnum) -> CreativeFieldValueListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for creative field values by their values. Wildcards (e.g. *) are not allowed.
@@ -18988,7 +18988,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_field_values().patch(req, -95, -39, -10)
+/// let result = hub.creative_field_values().patch(req, -22, -66, -4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19036,9 +19036,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("creativeFieldId", self._creative_field_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("creativeFieldId", &self._creative_field_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -19300,7 +19300,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_field_values().update(req, -74, -56)
+/// let result = hub.creative_field_values().update(req, -6, -71)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19347,8 +19347,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("creativeFieldId", self._creative_field_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("creativeFieldId", &self._creative_field_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -19594,7 +19594,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_fields().delete(-33, -59)
+/// let result = hub.creative_fields().delete(-52, -11)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19640,8 +19640,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -19853,7 +19853,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_fields().get(-66, -27)
+/// let result = hub.creative_fields().get(-91, -43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19899,8 +19899,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -20129,7 +20129,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_fields().insert(req, -88)
+/// let result = hub.creative_fields().insert(req, -13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20175,7 +20175,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -20411,14 +20411,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_fields().list(-14)
-///              .sort_order("Stet")
-///              .sort_field("aliquyam")
-///              .search_string("ut")
-///              .page_token("sit")
-///              .max_results(-26)
-///              .add_ids(-16)
-///              .add_advertiser_ids(-19)
+/// let result = hub.creative_fields().list(-101)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("sanctus")
+///              .page_token("nonumy")
+///              .max_results(-66)
+///              .add_ids(-39)
+///              .add_advertiser_ids(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20427,8 +20427,8 @@ pub struct CreativeFieldListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<CreativeFieldSortOrderEnum>,
+   pub(super) _sort_field: Option<CreativeFieldSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -20470,7 +20470,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -20613,15 +20613,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CreativeFieldListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CreativeFieldSortOrderEnum) -> CreativeFieldListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> CreativeFieldListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &CreativeFieldSortFieldEnum) -> CreativeFieldListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for creative fields by name or ID. Wildcards (*) are allowed. For example, "creativefield*2015" will return creative fields with names like "creativefield June 2015", "creativefield April 2015", or simply "creativefield 2015". Most of the searches also add wild-cards implicitly at the start and the end of the search string. For example, a search string of "creativefield" will match creative fields with the name "my creativefield", "creativefield 2015", or simply "creativefield".
@@ -20765,7 +20765,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_fields().patch(req, -96, -19)
+/// let result = hub.creative_fields().patch(req, -25, -52)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20812,8 +20812,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -21065,7 +21065,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_fields().update(req, -30)
+/// let result = hub.creative_fields().update(req, -84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21111,7 +21111,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -21347,7 +21347,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_groups().get(-38, -64)
+/// let result = hub.creative_groups().get(-97, -37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21393,8 +21393,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -21623,7 +21623,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_groups().insert(req, -99)
+/// let result = hub.creative_groups().insert(req, -27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21669,7 +21669,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -21905,15 +21905,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_groups().list(-82)
-///              .sort_order("magna")
-///              .sort_field("diam")
-///              .search_string("nonumy")
-///              .page_token("et")
-///              .max_results(-8)
-///              .add_ids(-23)
-///              .group_number(-39)
-///              .add_advertiser_ids(-43)
+/// let result = hub.creative_groups().list(-53)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("vero")
+///              .page_token("duo")
+///              .max_results(-45)
+///              .add_ids(-87)
+///              .group_number(-16)
+///              .add_advertiser_ids(-70)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21922,8 +21922,8 @@ pub struct CreativeGroupListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<CreativeGroupSortOrderEnum>,
+   pub(super) _sort_field: Option<CreativeGroupSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -21966,7 +21966,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -22112,15 +22112,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CreativeGroupListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CreativeGroupSortOrderEnum) -> CreativeGroupListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> CreativeGroupListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &CreativeGroupSortFieldEnum) -> CreativeGroupListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for creative groups by name or ID. Wildcards (*) are allowed. For example, "creativegroup*2015" will return creative groups with names like "creativegroup June 2015", "creativegroup April 2015", or simply "creativegroup 2015". Most of the searches also add wild-cards implicitly at the start and the end of the search string. For example, a search string of "creativegroup" will match creative groups with the name "my creativegroup", "creativegroup 2015", or simply "creativegroup".
@@ -22271,7 +22271,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_groups().patch(req, -7, -9)
+/// let result = hub.creative_groups().patch(req, -63, -95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22318,8 +22318,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -22571,7 +22571,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creative_groups().update(req, -99)
+/// let result = hub.creative_groups().update(req, -39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22617,7 +22617,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -22853,7 +22853,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().get(-79, -77)
+/// let result = hub.creatives().get(-10, -74)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22899,8 +22899,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -23129,7 +23129,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().insert(req, -81)
+/// let result = hub.creatives().insert(req, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23175,7 +23175,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -23411,22 +23411,22 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().list(-71)
-///              .add_types("ipsum")
-///              .studio_creative_id(-73)
-///              .sort_order("dolores")
-///              .sort_field("consetetur")
-///              .add_size_ids(-11)
-///              .search_string("justo")
-///              .add_rendering_ids(-45)
-///              .page_token("diam")
-///              .max_results(-10)
-///              .add_ids(-50)
-///              .add_creative_field_ids(-15)
-///              .add_companion_creative_ids(-62)
-///              .campaign_id(-5)
-///              .archived(true)
-///              .advertiser_id(-98)
+/// let result = hub.creatives().list(-33)
+///              .add_types(&Default::default())
+///              .studio_creative_id(-59)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_size_ids(-66)
+///              .search_string("At")
+///              .add_rendering_ids(-88)
+///              .page_token("clita")
+///              .max_results(-15)
+///              .add_ids(-82)
+///              .add_creative_field_ids(-37)
+///              .add_companion_creative_ids(-3)
+///              .campaign_id(-26)
+///              .archived(false)
+///              .advertiser_id(-19)
 ///              .active(true)
 ///              .doit().await;
 /// # }
@@ -23436,10 +23436,10 @@ pub struct CreativeListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _types: Vec<String>,
+   pub(super) _types: Option<CreativeTypesEnum>,
    pub(super) _studio_creative_id: Option<i64>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<CreativeSortOrderEnum>,
+   pub(super) _sort_field: Option<CreativeSortFieldEnum>,
    pub(super) _size_ids: Vec<i64>,
    pub(super) _search_string: Option<String>,
    pub(super) _rendering_ids: Vec<i64>,
@@ -23488,7 +23488,7 @@ where
         }
 
         let mut params = Params::with_capacity(19 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._types.len() > 0 {
             for f in self._types.iter() {
                 params.push("types", f);
@@ -23667,8 +23667,8 @@ where
     ///
     /// Append the given value to the *types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_types(mut self, new_value: &str) -> CreativeListCall<'a, S> {
-        self._types.push(new_value.to_string());
+    pub fn add_types(mut self, new_value: &CreativeTypesEnum) -> CreativeListCall<'a, S> {
+        self._types.push(new_value.clone());
         self
     }
     /// Select only creatives corresponding to this Studio creative ID.
@@ -23681,15 +23681,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CreativeListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CreativeSortOrderEnum) -> CreativeListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> CreativeListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &CreativeSortFieldEnum) -> CreativeListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only creatives with these size IDs.
@@ -23885,7 +23885,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().patch(req, -56, -21)
+/// let result = hub.creatives().patch(req, -64, -99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23932,8 +23932,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -24185,7 +24185,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().update(req, -88)
+/// let result = hub.creatives().update(req, -82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24231,7 +24231,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -24473,8 +24473,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.dimension_values().query(req, -1)
-///              .page_token("sed")
+/// let result = hub.dimension_values().query(req, -83)
+///              .page_token("diam")
 ///              .max_results(-91)
 ///              .doit().await;
 /// # }
@@ -24523,7 +24523,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -24779,7 +24779,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.directory_site_contacts().get(-10, -100)
+/// let result = hub.directory_site_contacts().get(-18, -8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24825,8 +24825,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -25049,14 +25049,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.directory_site_contacts().list(-63)
-///              .sort_order("justo")
-///              .sort_field("ea")
-///              .search_string("At")
-///              .page_token("erat")
-///              .max_results(-14)
-///              .add_ids(-76)
-///              .add_directory_site_ids(-88)
+/// let result = hub.directory_site_contacts().list(-23)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("tempor")
+///              .page_token("sed")
+///              .max_results(-7)
+///              .add_ids(-9)
+///              .add_directory_site_ids(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25065,8 +25065,8 @@ pub struct DirectorySiteContactListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<DirectorySiteContactSortOrderEnum>,
+   pub(super) _sort_field: Option<DirectorySiteContactSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -25108,7 +25108,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -25251,15 +25251,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &DirectorySiteContactSortOrderEnum) -> DirectorySiteContactListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &DirectorySiteContactSortFieldEnum) -> DirectorySiteContactListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name, ID or email. Wildcards (*) are allowed. For example, "directory site contact*2015" will return objects with names like "directory site contact June 2015", "directory site contact April 2015", or simply "directory site contact 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "directory site contact" will match objects with name "my directory site contact", "directory site contact 2015", or simply "directory site contact".
@@ -25397,7 +25397,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.directory_sites().get(-91, -81)
+/// let result = hub.directory_sites().get(-79, -77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25443,8 +25443,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -25673,7 +25673,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.directory_sites().insert(req, -31)
+/// let result = hub.directory_sites().insert(req, -81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25719,7 +25719,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -25955,16 +25955,16 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.directory_sites().list(-19)
-///              .sort_order("ipsum")
-///              .sort_field("voluptua.")
-///              .search_string("eos")
-///              .parent_id(-70)
-///              .page_token("elitr")
-///              .max_results(-46)
-///              .add_ids(-72)
-///              .dfp_network_code("clita")
-///              .country_id(-1)
+/// let result = hub.directory_sites().list(-71)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("ipsum")
+///              .parent_id(-73)
+///              .page_token("dolores")
+///              .max_results(-96)
+///              .add_ids(-11)
+///              .dfp_network_code("justo")
+///              .country_id(-45)
 ///              .active(true)
 ///              .accepts_publisher_paid_placements(true)
 ///              .accepts_interstitial_placements(true)
@@ -25977,8 +25977,8 @@ pub struct DirectorySiteListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<DirectorySiteSortOrderEnum>,
+   pub(super) _sort_field: Option<DirectorySiteSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _parent_id: Option<i64>,
    pub(super) _page_token: Option<String>,
@@ -26026,7 +26026,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -26185,15 +26185,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> DirectorySiteListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &DirectorySiteSortOrderEnum) -> DirectorySiteListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> DirectorySiteListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &DirectorySiteSortFieldEnum) -> DirectorySiteListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name, ID or URL. Wildcards (*) are allowed. For example, "directory site*2015" will return objects with names like "directory site June 2015", "directory site April 2015", or simply "directory site 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "directory site" will match objects with name "my directory site", "directory site 2015" or simply, "directory site".
@@ -26372,7 +26372,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.dynamic_targeting_keys().delete(-6, -77, "name", "objectType")
+/// let result = hub.dynamic_targeting_keys().delete(-98, -13, "name", &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -26383,7 +26383,7 @@ pub struct DynamicTargetingKeyDeleteCall<'a, S>
    pub(super) _profile_id: i64,
    pub(super) _object_id: i64,
    pub(super) _name: String,
-   pub(super) _object_type: String,
+   pub(super) _object_type: DynamicTargetingKeyObjectTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -26420,10 +26420,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("objectId", self._object_id.to_string());
-        params.push("name", self._name);
-        params.push("objectType", self._object_type);
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("objectId", &self._object_id.to_string());
+        params.push("name", &self._name);
+        params.push("objectType", &self._object_type);
 
         params.extend(self._additional_params.iter());
 
@@ -26553,8 +26553,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object_type(mut self, new_value: &str) -> DynamicTargetingKeyDeleteCall<'a, S> {
-        self._object_type = new_value.to_string();
+    pub fn object_type(mut self, new_value: &DynamicTargetingKeyObjectTypeEnum) -> DynamicTargetingKeyDeleteCall<'a, S> {
+        self._object_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -26661,7 +26661,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.dynamic_targeting_keys().insert(req, -93)
+/// let result = hub.dynamic_targeting_keys().insert(req, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26707,7 +26707,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -26943,11 +26943,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.dynamic_targeting_keys().list(-18)
-///              .object_type("ea")
-///              .object_id(-84)
-///              .add_names("ipsum")
-///              .advertiser_id(-67)
+/// let result = hub.dynamic_targeting_keys().list(-21)
+///              .object_type(&Default::default())
+///              .object_id(-88)
+///              .add_names("sed")
+///              .advertiser_id(-91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26956,7 +26956,7 @@ pub struct DynamicTargetingKeyListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _object_type: Option<String>,
+   pub(super) _object_type: Option<DynamicTargetingKeyObjectTypeEnum>,
    pub(super) _object_id: Option<i64>,
    pub(super) _names: Vec<String>,
    pub(super) _advertiser_id: Option<i64>,
@@ -26996,7 +26996,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._object_type.as_ref() {
             params.push("objectType", value);
         }
@@ -27128,8 +27128,8 @@ where
     /// Select only dynamic targeting keys with this object type.
     ///
     /// Sets the *object type* query property to the given value.
-    pub fn object_type(mut self, new_value: &str) -> DynamicTargetingKeyListCall<'a, S> {
-        self._object_type = Some(new_value.to_string());
+    pub fn object_type(mut self, new_value: &DynamicTargetingKeyObjectTypeEnum) -> DynamicTargetingKeyListCall<'a, S> {
+        self._object_type = Some(new_value.clone());
         self
     }
     /// Select only dynamic targeting keys with this object ID.
@@ -27252,7 +27252,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.event_tags().delete(-27, -53)
+/// let result = hub.event_tags().delete(-10, -100)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27298,8 +27298,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -27511,7 +27511,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.event_tags().get(-98, -101)
+/// let result = hub.event_tags().get(-63, -21)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27557,8 +27557,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -27787,7 +27787,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.event_tags().insert(req, -15)
+/// let result = hub.event_tags().insert(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27833,7 +27833,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -28069,17 +28069,17 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.event_tags().list(-70)
-///              .sort_order("elitr")
-///              .sort_field("aliquyam")
+/// let result = hub.event_tags().list(-77)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
 ///              .search_string("erat")
-///              .add_ids(-87)
-///              .add_event_tag_types("et")
-///              .enabled(true)
-///              .definitions_only(true)
-///              .campaign_id(-35)
-///              .advertiser_id(-30)
-///              .ad_id(-65)
+///              .add_ids(-14)
+///              .add_event_tag_types(&Default::default())
+///              .enabled(false)
+///              .definitions_only(false)
+///              .campaign_id(-91)
+///              .advertiser_id(-81)
+///              .ad_id(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28088,11 +28088,11 @@ pub struct EventTagListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<EventTagSortOrderEnum>,
+   pub(super) _sort_field: Option<EventTagSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _ids: Vec<i64>,
-   pub(super) _event_tag_types: Vec<String>,
+   pub(super) _event_tag_types: Option<EventTagEventTagTypesEnum>,
    pub(super) _enabled: Option<bool>,
    pub(super) _definitions_only: Option<bool>,
    pub(super) _campaign_id: Option<i64>,
@@ -28134,7 +28134,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -28286,15 +28286,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> EventTagListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &EventTagSortOrderEnum) -> EventTagListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> EventTagListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &EventTagSortFieldEnum) -> EventTagListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "eventtag*2015" will return objects with names like "eventtag June 2015", "eventtag April 2015", or simply "eventtag 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "eventtag" will match objects with name "my eventtag", "eventtag 2015", or simply "eventtag".
@@ -28316,8 +28316,8 @@ where
     ///
     /// Append the given value to the *event tag types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_event_tag_types(mut self, new_value: &str) -> EventTagListCall<'a, S> {
-        self._event_tag_types.push(new_value.to_string());
+    pub fn add_event_tag_types(mut self, new_value: &EventTagEventTagTypesEnum) -> EventTagListCall<'a, S> {
+        self._event_tag_types.push(new_value.clone());
         self
     }
     /// Select only enabled event tags. What is considered enabled or disabled depends on the definitionsOnly parameter. When definitionsOnly is set to true, only the specified advertiser or campaign's event tags' enabledByDefault field is examined. When definitionsOnly is set to false, the specified ad or specified campaign's parent advertiser's or parent campaign's event tags' enabledByDefault and status fields are examined as well.
@@ -28459,7 +28459,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.event_tags().patch(req, -82, -13)
+/// let result = hub.event_tags().patch(req, -19, -50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28506,8 +28506,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -28759,7 +28759,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.event_tags().update(req, -101)
+/// let result = hub.event_tags().update(req, -28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28805,7 +28805,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -29046,7 +29046,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.files().get(-48, -63)
+/// let result = hub.files().get(-25, -70)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29092,8 +29092,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("reportId", self._report_id.to_string());
-        params.push("fileId", self._file_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
+        params.push("fileId", &self._file_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -29325,12 +29325,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.files().list(-39)
-///              .sort_order("dolor")
-///              .sort_field("amet")
-///              .scope("sit")
-///              .page_token("rebum.")
-///              .max_results(-60)
+/// let result = hub.files().list(-94)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .scope(&Default::default())
+///              .page_token("consetetur")
+///              .max_results(-72)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29339,9 +29339,9 @@ pub struct FileListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
-   pub(super) _scope: Option<String>,
+   pub(super) _sort_order: Option<FileSortOrderEnum>,
+   pub(super) _sort_field: Option<FileSortFieldEnum>,
+   pub(super) _scope: Option<FileScopeEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29380,7 +29380,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -29513,22 +29513,22 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> FileListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &FileSortOrderEnum) -> FileListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// The field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> FileListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &FileSortFieldEnum) -> FileListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// The scope that defines which results are returned.
     ///
     /// Sets the *scope* query property to the given value.
-    pub fn scope(mut self, new_value: &str) -> FileListCall<'a, S> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &FileScopeEnum) -> FileListCall<'a, S> {
+        self._scope = Some(new_value.clone());
         self
     }
     /// The value of the nextToken from the previous result page.
@@ -29643,7 +29643,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().delete(-100, -5)
+/// let result = hub.floodlight_activities().delete(-14, -1)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29689,8 +29689,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -29902,8 +29902,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().generatetag(-24)
-///              .floodlight_activity_id(-94)
+/// let result = hub.floodlight_activities().generatetag(-48)
+///              .floodlight_activity_id(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29949,7 +29949,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._floodlight_activity_id.as_ref() {
             params.push("floodlightActivityId", value.to_string());
         }
@@ -30172,7 +30172,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().get(-90, -4)
+/// let result = hub.floodlight_activities().get(-31, -42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30218,8 +30218,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -30448,7 +30448,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().insert(req, -95)
+/// let result = hub.floodlight_activities().insert(req, -41)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30494,7 +30494,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -30730,20 +30730,20 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().list(-4)
-///              .tag_string("dolor")
-///              .sort_order("consetetur")
-///              .sort_field("et")
-///              .search_string("sit")
-///              .page_token("Lorem")
-///              .max_results(-41)
-///              .add_ids(-79)
-///              .floodlight_configuration_id(-100)
-///              .floodlight_activity_group_type("invidunt")
-///              .floodlight_activity_group_tag_string("Stet")
-///              .floodlight_activity_group_name("voluptua.")
-///              .add_floodlight_activity_group_ids(-77)
-///              .advertiser_id(-92)
+/// let result = hub.floodlight_activities().list(-6)
+///              .tag_string("At")
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("diam")
+///              .page_token("diam")
+///              .max_results(-93)
+///              .add_ids(-18)
+///              .floodlight_configuration_id(-17)
+///              .floodlight_activity_group_type(&Default::default())
+///              .floodlight_activity_group_tag_string("dolore")
+///              .floodlight_activity_group_name("ipsum")
+///              .add_floodlight_activity_group_ids(-67)
+///              .advertiser_id(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30753,14 +30753,14 @@ pub struct FloodlightActivityListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _tag_string: Option<String>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<FloodlightActivitySortOrderEnum>,
+   pub(super) _sort_field: Option<FloodlightActivitySortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _ids: Vec<i64>,
    pub(super) _floodlight_configuration_id: Option<i64>,
-   pub(super) _floodlight_activity_group_type: Option<String>,
+   pub(super) _floodlight_activity_group_type: Option<FloodlightActivityFloodlightActivityGroupTypeEnum>,
    pub(super) _floodlight_activity_group_tag_string: Option<String>,
    pub(super) _floodlight_activity_group_name: Option<String>,
    pub(super) _floodlight_activity_group_ids: Vec<i64>,
@@ -30801,7 +30801,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._tag_string.as_ref() {
             params.push("tagString", value);
         }
@@ -30969,15 +30969,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> FloodlightActivityListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &FloodlightActivitySortOrderEnum) -> FloodlightActivityListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> FloodlightActivityListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &FloodlightActivitySortFieldEnum) -> FloodlightActivityListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "floodlightactivity*2015" will return objects with names like "floodlightactivity June 2015", "floodlightactivity April 2015", or simply "floodlightactivity 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "floodlightactivity" will match objects with name "my floodlightactivity activity", "floodlightactivity 2015", or simply "floodlightactivity".
@@ -31019,8 +31019,8 @@ where
     /// Select only floodlight activities with the specified floodlight activity group type.
     ///
     /// Sets the *floodlight activity group type* query property to the given value.
-    pub fn floodlight_activity_group_type(mut self, new_value: &str) -> FloodlightActivityListCall<'a, S> {
-        self._floodlight_activity_group_type = Some(new_value.to_string());
+    pub fn floodlight_activity_group_type(mut self, new_value: &FloodlightActivityFloodlightActivityGroupTypeEnum) -> FloodlightActivityListCall<'a, S> {
+        self._floodlight_activity_group_type = Some(new_value.clone());
         self
     }
     /// Select only floodlight activities with the specified floodlight activity group tag string.
@@ -31156,7 +31156,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().patch(req, -47, -77)
+/// let result = hub.floodlight_activities().patch(req, -53, -98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31203,8 +31203,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -31456,7 +31456,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activities().update(req, -90)
+/// let result = hub.floodlight_activities().update(req, -101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31502,7 +31502,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -31738,7 +31738,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activity_groups().get(-31, -20)
+/// let result = hub.floodlight_activity_groups().get(-15, -70)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31784,8 +31784,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -32014,7 +32014,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activity_groups().insert(req, -35)
+/// let result = hub.floodlight_activity_groups().insert(req, -94)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32060,7 +32060,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -32296,16 +32296,16 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activity_groups().list(-1)
-///              .type_("erat")
-///              .sort_order("sit")
-///              .sort_field("accusam")
-///              .search_string("et")
-///              .page_token("nonumy")
-///              .max_results(-73)
-///              .add_ids(-37)
-///              .floodlight_configuration_id(-78)
-///              .advertiser_id(-46)
+/// let result = hub.floodlight_activity_groups().list(-32)
+///              .type_(&Default::default())
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("erat")
+///              .page_token("ut")
+///              .max_results(-18)
+///              .add_ids(-51)
+///              .floodlight_configuration_id(-66)
+///              .advertiser_id(-35)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32314,9 +32314,9 @@ pub struct FloodlightActivityGroupListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _type_: Option<String>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _type_: Option<FloodlightActivityGroupTypeEnum>,
+   pub(super) _sort_order: Option<FloodlightActivityGroupSortOrderEnum>,
+   pub(super) _sort_field: Option<FloodlightActivityGroupSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -32359,7 +32359,7 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -32506,22 +32506,22 @@ where
     /// Select only floodlight activity groups with the specified floodlight activity group type.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &FloodlightActivityGroupTypeEnum) -> FloodlightActivityGroupListCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &FloodlightActivityGroupSortOrderEnum) -> FloodlightActivityGroupListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &FloodlightActivityGroupSortFieldEnum) -> FloodlightActivityGroupListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "floodlightactivitygroup*2015" will return objects with names like "floodlightactivitygroup June 2015", "floodlightactivitygroup April 2015", or simply "floodlightactivitygroup 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "floodlightactivitygroup" will match objects with name "my floodlightactivitygroup activity", "floodlightactivitygroup 2015", or simply "floodlightactivitygroup".
@@ -32671,7 +32671,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activity_groups().patch(req, -99, -47)
+/// let result = hub.floodlight_activity_groups().patch(req, -30, -65)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32718,8 +32718,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -32971,7 +32971,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_activity_groups().update(req, -35)
+/// let result = hub.floodlight_activity_groups().update(req, -82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33017,7 +33017,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -33253,7 +33253,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_configurations().get(-32, -5)
+/// let result = hub.floodlight_configurations().get(-13, -101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33299,8 +33299,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -33523,8 +33523,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_configurations().list(-62)
-///              .add_ids(-88)
+/// let result = hub.floodlight_configurations().list(-48)
+///              .add_ids(-63)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33570,7 +33570,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._ids.len() > 0 {
             for f in self._ids.iter() {
                 params.push("ids", f.to_string());
@@ -33802,7 +33802,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_configurations().patch(req, -10, -20)
+/// let result = hub.floodlight_configurations().patch(req, -39, -54)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33849,8 +33849,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -34102,7 +34102,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_configurations().update(req, -60)
+/// let result = hub.floodlight_configurations().update(req, -97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34148,7 +34148,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -34384,7 +34384,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_items().get(-65, -95, -11)
+/// let result = hub.inventory_items().get(-3, -16, -60)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34431,9 +34431,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("projectId", self._project_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("projectId", &self._project_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -34666,16 +34666,16 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_items().list(-39, -55)
-///              .type_("sea")
-///              .sort_order("sit")
-///              .sort_field("amet.")
-///              .add_site_id(-55)
-///              .page_token("At")
-///              .add_order_id(-26)
-///              .max_results(-59)
+/// let result = hub.inventory_items().list(-100, -5)
+///              .type_(&Default::default())
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_site_id(-24)
+///              .page_token("elitr")
+///              .add_order_id(-90)
+///              .max_results(-4)
 ///              .in_plan(false)
-///              .add_ids(-88)
+///              .add_ids(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34685,9 +34685,9 @@ pub struct InventoryItemListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _project_id: i64,
-   pub(super) _type_: Option<String>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _type_: Option<InventoryItemTypeEnum>,
+   pub(super) _sort_order: Option<InventoryItemSortOrderEnum>,
+   pub(super) _sort_field: Option<InventoryItemSortFieldEnum>,
    pub(super) _site_id: Vec<i64>,
    pub(super) _page_token: Option<String>,
    pub(super) _order_id: Vec<i64>,
@@ -34730,8 +34730,8 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("projectId", self._project_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("projectId", &self._project_id.to_string());
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -34892,22 +34892,22 @@ where
     /// Select only inventory items with this type.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> InventoryItemListCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &InventoryItemTypeEnum) -> InventoryItemListCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> InventoryItemListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &InventoryItemSortOrderEnum) -> InventoryItemListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> InventoryItemListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &InventoryItemSortFieldEnum) -> InventoryItemListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only inventory items that are associated with these sites.
@@ -35053,7 +35053,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.languages().list(-33)
+/// let result = hub.languages().list(-54)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35098,7 +35098,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -35311,7 +35311,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.metros().list(-98)
+/// let result = hub.metros().list(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35356,7 +35356,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -35569,7 +35569,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mobile_carriers().get(-12, -94)
+/// let result = hub.mobile_carriers().get(-22, -48)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35615,8 +35615,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -35839,7 +35839,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mobile_carriers().list(-50)
+/// let result = hub.mobile_carriers().list(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35884,7 +35884,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -36097,7 +36097,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.operating_system_versions().get(-13, -34)
+/// let result = hub.operating_system_versions().get(-41, -79)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36143,8 +36143,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -36367,7 +36367,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.operating_system_versions().list(-51)
+/// let result = hub.operating_system_versions().list(-100)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36412,7 +36412,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -36625,7 +36625,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.operating_systems().get(-97, -50)
+/// let result = hub.operating_systems().get(-38, -15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36671,8 +36671,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("dartId", self._dart_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("dartId", &self._dart_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -36895,7 +36895,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.operating_systems().list(-101)
+/// let result = hub.operating_systems().list(-78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36940,7 +36940,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -37153,7 +37153,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.order_documents().get(-19, -96, -15)
+/// let result = hub.order_documents().get(-77, -92, -47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37200,9 +37200,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("projectId", self._project_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("projectId", &self._project_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -37435,15 +37435,15 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.order_documents().list(-23, -46)
-///              .sort_order("takimata")
-///              .sort_field("sed")
-///              .add_site_id(-91)
-///              .search_string("sea")
-///              .page_token("eos")
-///              .add_order_id(-34)
-///              .max_results(-23)
-///              .add_ids(-44)
+/// let result = hub.order_documents().list(-77, -90)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_site_id(-31)
+///              .search_string("duo")
+///              .page_token("et")
+///              .add_order_id(-1)
+///              .max_results(-81)
+///              .add_ids(-48)
 ///              .approved(false)
 ///              .doit().await;
 /// # }
@@ -37454,8 +37454,8 @@ pub struct OrderDocumentListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _project_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<OrderDocumentSortOrderEnum>,
+   pub(super) _sort_field: Option<OrderDocumentSortFieldEnum>,
    pub(super) _site_id: Vec<i64>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
@@ -37499,8 +37499,8 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("projectId", self._project_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("projectId", &self._project_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -37661,15 +37661,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> OrderDocumentListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &OrderDocumentSortOrderEnum) -> OrderDocumentListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> OrderDocumentListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &OrderDocumentSortFieldEnum) -> OrderDocumentListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only order documents that are associated with these sites.
@@ -37822,7 +37822,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().get(-90, -43, -27)
+/// let result = hub.orders().get(-24, -91, -73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37869,9 +37869,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("projectId", self._project_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("projectId", &self._project_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -38104,14 +38104,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().list(-15, -3)
-///              .sort_order("ipsum")
-///              .sort_field("Lorem")
-///              .add_site_id(-54)
-///              .search_string("amet")
-///              .page_token("magna")
-///              .max_results(-83)
-///              .add_ids(-88)
+/// let result = hub.orders().list(-37, -78)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_site_id(-46)
+///              .search_string("dolor")
+///              .page_token("amet")
+///              .max_results(-35)
+///              .add_ids(-32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38121,8 +38121,8 @@ pub struct OrderListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _project_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<OrderSortOrderEnum>,
+   pub(super) _sort_field: Option<OrderSortFieldEnum>,
    pub(super) _site_id: Vec<i64>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
@@ -38164,8 +38164,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("projectId", self._project_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("projectId", &self._project_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -38318,15 +38318,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> OrderListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &OrderSortOrderEnum) -> OrderListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> OrderListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &OrderSortFieldEnum) -> OrderListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only orders that are associated with these site IDs.
@@ -38464,7 +38464,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_groups().get(-72, -22)
+/// let result = hub.placement_groups().get(-5, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38510,8 +38510,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -38740,7 +38740,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_groups().insert(req, -49)
+/// let result = hub.placement_groups().insert(req, -88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38786,7 +38786,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -39022,26 +39022,26 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_groups().list(-81)
-///              .sort_order("dolore")
-///              .sort_field("vero")
-///              .add_site_ids(-17)
-///              .search_string("et")
-///              .add_pricing_types("amet.")
-///              .add_placement_strategy_ids(-40)
-///              .placement_group_type("sanctus")
-///              .page_token("sed")
-///              .min_start_date("dolor")
-///              .min_end_date("et")
-///              .max_start_date("et")
-///              .max_results(-81)
-///              .max_end_date("eos")
-///              .add_ids(-41)
-///              .add_directory_site_ids(-67)
-///              .add_content_category_ids(-32)
-///              .add_campaign_ids(-91)
+/// let result = hub.placement_groups().list(-10)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_site_ids(-20)
+///              .search_string("sea")
+///              .add_pricing_types(&Default::default())
+///              .add_placement_strategy_ids(-65)
+///              .placement_group_type(&Default::default())
+///              .page_token("sadipscing")
+///              .min_start_date("no")
+///              .min_end_date("tempor")
+///              .max_start_date("ipsum")
+///              .max_results(-60)
+///              .max_end_date("sit")
+///              .add_ids(-2)
+///              .add_directory_site_ids(-55)
+///              .add_content_category_ids(-27)
+///              .add_campaign_ids(-26)
 ///              .archived(true)
-///              .add_advertiser_ids(-40)
+///              .add_advertiser_ids(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39050,13 +39050,13 @@ pub struct PlacementGroupListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<PlacementGroupSortOrderEnum>,
+   pub(super) _sort_field: Option<PlacementGroupSortFieldEnum>,
    pub(super) _site_ids: Vec<i64>,
    pub(super) _search_string: Option<String>,
-   pub(super) _pricing_types: Vec<String>,
+   pub(super) _pricing_types: Option<PlacementGroupPricingTypesEnum>,
    pub(super) _placement_strategy_ids: Vec<i64>,
-   pub(super) _placement_group_type: Option<String>,
+   pub(super) _placement_group_type: Option<PlacementGroupPlacementGroupTypeEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _min_start_date: Option<String>,
    pub(super) _min_end_date: Option<String>,
@@ -39105,7 +39105,7 @@ where
         }
 
         let mut params = Params::with_capacity(22 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -39296,15 +39296,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> PlacementGroupListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &PlacementGroupSortOrderEnum) -> PlacementGroupListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> PlacementGroupListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &PlacementGroupSortFieldEnum) -> PlacementGroupListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only placement groups that are associated with these sites.
@@ -39326,8 +39326,8 @@ where
     ///
     /// Append the given value to the *pricing types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_pricing_types(mut self, new_value: &str) -> PlacementGroupListCall<'a, S> {
-        self._pricing_types.push(new_value.to_string());
+    pub fn add_pricing_types(mut self, new_value: &PlacementGroupPricingTypesEnum) -> PlacementGroupListCall<'a, S> {
+        self._pricing_types.push(new_value.clone());
         self
     }
     /// Select only placement groups that are associated with these placement strategies.
@@ -39341,8 +39341,8 @@ where
     /// Select only placement groups belonging with this group type. A package is a simple group of placements that acts as a single pricing point for a group of tags. A roadblock is a group of placements that not only acts as a single pricing point but also assumes that all the tags in it will be served at the same time. A roadblock requires one of its assigned placements to be marked as primary for reporting.
     ///
     /// Sets the *placement group type* query property to the given value.
-    pub fn placement_group_type(mut self, new_value: &str) -> PlacementGroupListCall<'a, S> {
-        self._placement_group_type = Some(new_value.to_string());
+    pub fn placement_group_type(mut self, new_value: &PlacementGroupPlacementGroupTypeEnum) -> PlacementGroupListCall<'a, S> {
+        self._placement_group_type = Some(new_value.clone());
         self
     }
     /// Value of the nextPageToken from the previous result page.
@@ -39538,7 +39538,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_groups().patch(req, -69, -82)
+/// let result = hub.placement_groups().patch(req, -74, -88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39585,8 +39585,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -39838,7 +39838,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_groups().update(req, -8)
+/// let result = hub.placement_groups().update(req, -33)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39884,7 +39884,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -40120,7 +40120,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_strategies().delete(-88, -4)
+/// let result = hub.placement_strategies().delete(-98, -12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40166,8 +40166,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -40379,7 +40379,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_strategies().get(-75, -83)
+/// let result = hub.placement_strategies().get(-94, -50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40425,8 +40425,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -40655,7 +40655,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_strategies().insert(req, -11)
+/// let result = hub.placement_strategies().insert(req, -13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40701,7 +40701,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -40937,13 +40937,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_strategies().list(-12)
-///              .sort_order("erat")
-///              .sort_field("aliquyam")
-///              .search_string("consetetur")
-///              .page_token("ea")
-///              .max_results(-101)
-///              .add_ids(-94)
+/// let result = hub.placement_strategies().list(-34)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("Lorem")
+///              .page_token("amet")
+///              .max_results(-50)
+///              .add_ids(-101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40952,8 +40952,8 @@ pub struct PlacementStrategyListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<PlacementStrategySortOrderEnum>,
+   pub(super) _sort_field: Option<PlacementStrategySortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -40994,7 +40994,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -41132,15 +41132,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> PlacementStrategyListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &PlacementStrategySortOrderEnum) -> PlacementStrategyListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> PlacementStrategyListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &PlacementStrategySortFieldEnum) -> PlacementStrategyListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "placementstrategy*2015" will return objects with names like "placementstrategy June 2015", "placementstrategy April 2015", or simply "placementstrategy 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "placementstrategy" will match objects with name "my placementstrategy", "placementstrategy 2015", or simply "placementstrategy".
@@ -41276,7 +41276,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_strategies().patch(req, -71, -1)
+/// let result = hub.placement_strategies().patch(req, -19, -96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -41323,8 +41323,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -41576,7 +41576,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placement_strategies().update(req, -56)
+/// let result = hub.placement_strategies().update(req, -15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -41622,7 +41622,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -41858,10 +41858,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placements().generatetags(-86)
-///              .add_tag_formats("gubergren")
-///              .add_placement_ids(-76)
-///              .campaign_id(-17)
+/// let result = hub.placements().generatetags(-23)
+///              .add_tag_formats(&Default::default())
+///              .add_placement_ids(-46)
+///              .campaign_id(-9)
 ///              .doit().await;
 /// # }
 /// ```
@@ -41870,7 +41870,7 @@ pub struct PlacementGeneratetagCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _tag_formats: Vec<String>,
+   pub(super) _tag_formats: Option<PlacementTagFormatsEnum>,
    pub(super) _placement_ids: Vec<i64>,
    pub(super) _campaign_id: Option<i64>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -41909,7 +41909,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._tag_formats.len() > 0 {
             for f in self._tag_formats.iter() {
                 params.push("tagFormats", f);
@@ -42043,8 +42043,8 @@ where
     ///
     /// Append the given value to the *tag formats* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_tag_formats(mut self, new_value: &str) -> PlacementGeneratetagCall<'a, S> {
-        self._tag_formats.push(new_value.to_string());
+    pub fn add_tag_formats(mut self, new_value: &PlacementTagFormatsEnum) -> PlacementGeneratetagCall<'a, S> {
+        self._tag_formats.push(new_value.clone());
         self
     }
     /// Generate tags for these placements.
@@ -42160,7 +42160,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placements().get(-93, -8)
+/// let result = hub.placements().get(-43, -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42206,8 +42206,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -42436,7 +42436,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placements().insert(req, -36)
+/// let result = hub.placements().insert(req, -60)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42482,7 +42482,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -42718,29 +42718,29 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placements().list(-47)
-///              .sort_order("et")
-///              .sort_field("dolore")
-///              .add_size_ids(-28)
-///              .add_site_ids(-53)
-///              .search_string("sanctus")
-///              .add_pricing_types("ipsum")
-///              .add_placement_strategy_ids(-90)
-///              .payment_source("vero")
-///              .page_token("voluptua.")
-///              .min_start_date("sea")
-///              .min_end_date("ipsum")
-///              .max_start_date("sea")
-///              .max_results(-74)
-///              .max_end_date("gubergren")
-///              .add_ids(-34)
-///              .add_group_ids(-17)
-///              .add_directory_site_ids(-94)
-///              .add_content_category_ids(-9)
-///              .add_compatibilities("duo")
-///              .add_campaign_ids(-89)
-///              .archived(true)
-///              .add_advertiser_ids(-30)
+/// let result = hub.placements().list(-25)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .add_size_ids(-34)
+///              .add_site_ids(-23)
+///              .search_string("elitr")
+///              .add_pricing_types(&Default::default())
+///              .add_placement_strategy_ids(-30)
+///              .payment_source(&Default::default())
+///              .page_token("labore")
+///              .min_start_date("et")
+///              .min_end_date("eirmod")
+///              .max_start_date("sed")
+///              .max_results(-27)
+///              .max_end_date("Stet")
+///              .add_ids(-3)
+///              .add_group_ids(-55)
+///              .add_directory_site_ids(-6)
+///              .add_content_category_ids(-54)
+///              .add_compatibilities(&Default::default())
+///              .add_campaign_ids(-97)
+///              .archived(false)
+///              .add_advertiser_ids(-83)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42749,14 +42749,14 @@ pub struct PlacementListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<PlacementSortOrderEnum>,
+   pub(super) _sort_field: Option<PlacementSortFieldEnum>,
    pub(super) _size_ids: Vec<i64>,
    pub(super) _site_ids: Vec<i64>,
    pub(super) _search_string: Option<String>,
-   pub(super) _pricing_types: Vec<String>,
+   pub(super) _pricing_types: Option<PlacementPricingTypesEnum>,
    pub(super) _placement_strategy_ids: Vec<i64>,
-   pub(super) _payment_source: Option<String>,
+   pub(super) _payment_source: Option<PlacementPaymentSourceEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _min_start_date: Option<String>,
    pub(super) _min_end_date: Option<String>,
@@ -42767,7 +42767,7 @@ pub struct PlacementListCall<'a, S>
    pub(super) _group_ids: Vec<i64>,
    pub(super) _directory_site_ids: Vec<i64>,
    pub(super) _content_category_ids: Vec<i64>,
-   pub(super) _compatibilities: Vec<String>,
+   pub(super) _compatibilities: Option<PlacementCompatibilitiesEnum>,
    pub(super) _campaign_ids: Vec<i64>,
    pub(super) _archived: Option<bool>,
    pub(super) _advertiser_ids: Vec<i64>,
@@ -42807,7 +42807,7 @@ where
         }
 
         let mut params = Params::with_capacity(25 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -43013,15 +43013,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> PlacementListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &PlacementSortOrderEnum) -> PlacementListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> PlacementListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &PlacementSortFieldEnum) -> PlacementListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Select only placements that are associated with these sizes.
@@ -43051,8 +43051,8 @@ where
     ///
     /// Append the given value to the *pricing types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_pricing_types(mut self, new_value: &str) -> PlacementListCall<'a, S> {
-        self._pricing_types.push(new_value.to_string());
+    pub fn add_pricing_types(mut self, new_value: &PlacementPricingTypesEnum) -> PlacementListCall<'a, S> {
+        self._pricing_types.push(new_value.clone());
         self
     }
     /// Select only placements that are associated with these placement strategies.
@@ -43066,8 +43066,8 @@ where
     /// Select only placements with this payment source.
     ///
     /// Sets the *payment source* query property to the given value.
-    pub fn payment_source(mut self, new_value: &str) -> PlacementListCall<'a, S> {
-        self._payment_source = Some(new_value.to_string());
+    pub fn payment_source(mut self, new_value: &PlacementPaymentSourceEnum) -> PlacementListCall<'a, S> {
+        self._payment_source = Some(new_value.clone());
         self
     }
     /// Value of the nextPageToken from the previous result page.
@@ -43148,8 +43148,8 @@ where
     ///
     /// Append the given value to the *compatibilities* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_compatibilities(mut self, new_value: &str) -> PlacementListCall<'a, S> {
-        self._compatibilities.push(new_value.to_string());
+    pub fn add_compatibilities(mut self, new_value: &PlacementCompatibilitiesEnum) -> PlacementListCall<'a, S> {
+        self._compatibilities.push(new_value.clone());
         self
     }
     /// Select only placements that belong to these campaigns.
@@ -43279,7 +43279,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placements().patch(req, -61, -65)
+/// let result = hub.placements().patch(req, -88, -72)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43326,8 +43326,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -43579,7 +43579,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.placements().update(req, -60)
+/// let result = hub.placements().update(req, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43625,7 +43625,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -43861,7 +43861,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.platform_types().get(-64, -96)
+/// let result = hub.platform_types().get(-49, -81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43907,8 +43907,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -44131,7 +44131,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.platform_types().list(-69)
+/// let result = hub.platform_types().list(-84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -44176,7 +44176,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -44389,7 +44389,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.postal_codes().get(-48, "code")
+/// let result = hub.postal_codes().get(-76, "code")
 ///              .doit().await;
 /// # }
 /// ```
@@ -44435,8 +44435,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("code", self._code);
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("code", &self._code);
 
         params.extend(self._additional_params.iter());
 
@@ -44659,7 +44659,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.postal_codes().list(-58)
+/// let result = hub.postal_codes().list(-68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -44704,7 +44704,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -44917,7 +44917,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().get(-13, -90)
+/// let result = hub.projects().get(-52, -40)
 ///              .doit().await;
 /// # }
 /// ```
@@ -44963,8 +44963,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -45187,14 +45187,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().list(-19)
-///              .sort_order("aliquyam")
-///              .sort_field("dolor")
-///              .search_string("vero")
-///              .page_token("ea")
-///              .max_results(-33)
-///              .add_ids(-66)
-///              .add_advertiser_ids(-97)
+/// let result = hub.projects().list(-58)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("sed")
+///              .page_token("dolor")
+///              .max_results(-22)
+///              .add_ids(-74)
+///              .add_advertiser_ids(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -45203,8 +45203,8 @@ pub struct ProjectListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<ProjectSortOrderEnum>,
+   pub(super) _sort_field: Option<ProjectSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -45246,7 +45246,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -45389,15 +45389,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> ProjectListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &ProjectSortOrderEnum) -> ProjectListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> ProjectListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &ProjectSortFieldEnum) -> ProjectListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for projects by name or ID. Wildcards (*) are allowed. For example, "project*2015" will return projects with names like "project June 2015", "project April 2015", or simply "project 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "project" will match projects with name "my project", "project 2015", or simply "project".
@@ -45535,7 +45535,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.regions().list(-60)
+/// let result = hub.regions().list(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -45580,7 +45580,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -45793,7 +45793,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_list_shares().get(-95, -84)
+/// let result = hub.remarketing_list_shares().get(-41, -67)
 ///              .doit().await;
 /// # }
 /// ```
@@ -45839,8 +45839,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("remarketingListId", self._remarketing_list_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("remarketingListId", &self._remarketing_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -46069,7 +46069,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_list_shares().patch(req, -47, -38)
+/// let result = hub.remarketing_list_shares().patch(req, -32, -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46116,8 +46116,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("remarketingListId", self._remarketing_list_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("remarketingListId", &self._remarketing_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -46369,7 +46369,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_list_shares().update(req, -38)
+/// let result = hub.remarketing_list_shares().update(req, -15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46415,7 +46415,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -46651,7 +46651,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_lists().get(-19, -29)
+/// let result = hub.remarketing_lists().get(-66, -40)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46697,8 +46697,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -46927,7 +46927,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_lists().insert(req, -58)
+/// let result = hub.remarketing_lists().insert(req, -69)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46973,7 +46973,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -47209,13 +47209,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_lists().list(-80, -25)
-///              .sort_order("sit")
-///              .sort_field("et")
-///              .page_token("ea")
+/// let result = hub.remarketing_lists().list(-82, -8)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .page_token("invidunt")
 ///              .name("dolor")
-///              .max_results(-45)
-///              .floodlight_activity_id(-92)
+///              .max_results(-75)
+///              .floodlight_activity_id(-83)
 ///              .active(false)
 ///              .doit().await;
 /// # }
@@ -47226,8 +47226,8 @@ pub struct RemarketingListListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _advertiser_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<RemarketingListSortOrderEnum>,
+   pub(super) _sort_field: Option<RemarketingListSortFieldEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _name: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -47269,8 +47269,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -47419,15 +47419,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> RemarketingListListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &RemarketingListSortOrderEnum) -> RemarketingListListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> RemarketingListListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &RemarketingListSortFieldEnum) -> RemarketingListListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Value of the nextPageToken from the previous result page.
@@ -47569,7 +47569,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_lists().patch(req, -13, -33)
+/// let result = hub.remarketing_lists().patch(req, -82, -96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -47616,8 +47616,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -47869,7 +47869,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.remarketing_lists().update(req, -52)
+/// let result = hub.remarketing_lists().update(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -47915,7 +47915,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -48157,7 +48157,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().compatible_fields_query(req, -7)
+/// let result = hub.reports().compatible_fields_query(req, -101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48203,7 +48203,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -48444,7 +48444,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().files_get(-62, -75, -34)
+/// let result = hub.reports().files_get(-94, -71, -1)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48491,9 +48491,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
-        params.push("fileId", self._file_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
+        params.push("fileId", &self._file_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -48735,11 +48735,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().files_list(-39, -15)
-///              .sort_order("accusam")
-///              .sort_field("et")
-///              .page_token("dolor")
-///              .max_results(-29)
+/// let result = hub.reports().files_list(-56, -86)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .page_token("gubergren")
+///              .max_results(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48749,8 +48749,8 @@ pub struct ReportFileListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _report_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<ReportSortOrderEnum>,
+   pub(super) _sort_field: Option<ReportSortFieldEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -48789,8 +48789,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -48930,15 +48930,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> ReportFileListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &ReportSortOrderEnum) -> ReportFileListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// The field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> ReportFileListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &ReportSortFieldEnum) -> ReportFileListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// The value of the nextToken from the previous result page.
@@ -49053,7 +49053,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().delete(-44, -10)
+/// let result = hub.reports().delete(-17, -93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49099,8 +49099,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -49312,7 +49312,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().get(-26, -85)
+/// let result = hub.reports().get(-8, -36)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49358,8 +49358,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -49588,7 +49588,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().insert(req, -51)
+/// let result = hub.reports().insert(req, -47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49634,7 +49634,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -49870,12 +49870,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().list(-53)
-///              .sort_order("Lorem")
-///              .sort_field("amet.")
-///              .scope("diam")
-///              .page_token("diam")
-///              .max_results(-68)
+/// let result = hub.reports().list(-22)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .scope(&Default::default())
+///              .page_token("dolore")
+///              .max_results(-28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49884,9 +49884,9 @@ pub struct ReportListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
-   pub(super) _scope: Option<String>,
+   pub(super) _sort_order: Option<ReportSortOrderEnum>,
+   pub(super) _sort_field: Option<ReportSortFieldEnum>,
+   pub(super) _scope: Option<ReportScopeEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -49925,7 +49925,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -50058,22 +50058,22 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> ReportListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &ReportSortOrderEnum) -> ReportListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// The field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> ReportListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &ReportSortFieldEnum) -> ReportListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// The scope that defines which results are returned.
     ///
     /// Sets the *scope* query property to the given value.
-    pub fn scope(mut self, new_value: &str) -> ReportListCall<'a, S> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &ReportScopeEnum) -> ReportListCall<'a, S> {
+        self._scope = Some(new_value.clone());
         self
     }
     /// The value of the nextToken from the previous result page.
@@ -50194,7 +50194,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().patch(req, -59, -85)
+/// let result = hub.reports().patch(req, -53, -8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50241,8 +50241,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -50488,8 +50488,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().run(-69, -19)
-///              .synchronous(true)
+/// let result = hub.reports().run(-50, -90)
+///              .synchronous(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50536,8 +50536,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
         if let Some(value) = self._synchronous.as_ref() {
             params.push("synchronous", value.to_string());
         }
@@ -50776,7 +50776,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().update(req, -10, -34)
+/// let result = hub.reports().update(req, -78, -10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50823,8 +50823,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("reportId", self._report_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("reportId", &self._report_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -51070,7 +51070,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().get(-69, -88)
+/// let result = hub.sites().get(-55, -10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -51116,8 +51116,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -51346,7 +51346,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().insert(req, -89)
+/// let result = hub.sites().insert(req, -74)
 ///              .doit().await;
 /// # }
 /// ```
@@ -51392,7 +51392,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -51628,21 +51628,21 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().list(-22)
+/// let result = hub.sites().list(-12)
 ///              .unmapped_site(false)
-///              .subaccount_id(-85)
-///              .sort_order("est")
-///              .sort_field("Stet")
-///              .search_string("dolor")
-///              .page_token("et")
-///              .max_results(-36)
-///              .add_ids(-86)
-///              .add_directory_site_ids(-18)
-///              .add_campaign_ids(-82)
+///              .subaccount_id(-9)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("duo")
+///              .page_token("tempor")
+///              .max_results(-64)
+///              .add_ids(-30)
+///              .add_directory_site_ids(-61)
+///              .add_campaign_ids(-65)
 ///              .approved(true)
 ///              .ad_words_site(true)
-///              .accepts_publisher_paid_placements(true)
-///              .accepts_interstitial_placements(false)
+///              .accepts_publisher_paid_placements(false)
+///              .accepts_interstitial_placements(true)
 ///              .accepts_in_stream_video_placements(true)
 ///              .doit().await;
 /// # }
@@ -51654,8 +51654,8 @@ pub struct SiteListCall<'a, S>
    pub(super) _profile_id: i64,
    pub(super) _unmapped_site: Option<bool>,
    pub(super) _subaccount_id: Option<i64>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<SiteSortOrderEnum>,
+   pub(super) _sort_field: Option<SiteSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -51703,7 +51703,7 @@ where
         }
 
         let mut params = Params::with_capacity(18 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._unmapped_site.as_ref() {
             params.push("unmappedSite", value.to_string());
         }
@@ -51886,15 +51886,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> SiteListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &SiteSortOrderEnum) -> SiteListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> SiteListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &SiteSortFieldEnum) -> SiteListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name, ID or keyName. Wildcards (*) are allowed. For example, "site*2015" will return objects with names like "site June 2015", "site April 2015", or simply "site 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "site" will match objects with name "my site", "site 2015", or simply "site".
@@ -52081,7 +52081,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().patch(req, -90, -52)
+/// let result = hub.sites().patch(req, -60, -58)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52128,8 +52128,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -52381,7 +52381,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().update(req, -9)
+/// let result = hub.sites().update(req, -13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52427,7 +52427,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -52663,7 +52663,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sizes().get(-52, -22)
+/// let result = hub.sizes().get(-90, -19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52709,8 +52709,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -52939,7 +52939,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sizes().insert(req, -36)
+/// let result = hub.sizes().insert(req, -32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52985,7 +52985,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -53221,11 +53221,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sizes().list(-43)
-///              .width(-3)
-///              .add_ids(-98)
-///              .iab_standard(false)
-///              .height(-94)
+/// let result = hub.sizes().list(-4)
+///              .width(-26)
+///              .add_ids(-67)
+///              .iab_standard(true)
+///              .height(-97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -53274,7 +53274,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._width.as_ref() {
             params.push("width", value.to_string());
         }
@@ -53530,7 +53530,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subaccounts().get(-28, -71)
+/// let result = hub.subaccounts().get(-60, -95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -53576,8 +53576,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -53806,7 +53806,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subaccounts().insert(req, -2)
+/// let result = hub.subaccounts().insert(req, -84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -53852,7 +53852,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -54088,13 +54088,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subaccounts().list(-82)
-///              .sort_order("et")
-///              .sort_field("gubergren")
-///              .search_string("sed")
-///              .page_token("no")
-///              .max_results(-98)
-///              .add_ids(-7)
+/// let result = hub.subaccounts().list(-47)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("invidunt")
+///              .page_token("invidunt")
+///              .max_results(-19)
+///              .add_ids(-29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -54103,8 +54103,8 @@ pub struct SubaccountListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<SubaccountSortOrderEnum>,
+   pub(super) _sort_field: Option<SubaccountSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -54145,7 +54145,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -54283,15 +54283,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> SubaccountListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &SubaccountSortOrderEnum) -> SubaccountListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> SubaccountListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &SubaccountSortFieldEnum) -> SubaccountListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "subaccount*2015" will return objects with names like "subaccount June 2015", "subaccount April 2015", or simply "subaccount 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "subaccount" will match objects with name "my subaccount", "subaccount 2015", or simply "subaccount".
@@ -54427,7 +54427,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subaccounts().patch(req, -94, -22)
+/// let result = hub.subaccounts().patch(req, -58, -80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -54474,8 +54474,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -54727,7 +54727,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subaccounts().update(req, -96)
+/// let result = hub.subaccounts().update(req, -25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -54773,7 +54773,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -55009,7 +55009,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targetable_remarketing_lists().get(-27, -35)
+/// let result = hub.targetable_remarketing_lists().get(-53, -35)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55055,8 +55055,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -55279,13 +55279,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targetable_remarketing_lists().list(-23, -98)
-///              .sort_order("voluptua.")
-///              .sort_field("kasd")
-///              .page_token("no")
-///              .name("amet.")
-///              .max_results(-82)
-///              .active(true)
+/// let result = hub.targetable_remarketing_lists().list(-17, -99)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .page_token("sadipscing")
+///              .name("diam")
+///              .max_results(-27)
+///              .active(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55295,8 +55295,8 @@ pub struct TargetableRemarketingListListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _advertiser_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<TargetableRemarketingListSortOrderEnum>,
+   pub(super) _sort_field: Option<TargetableRemarketingListSortFieldEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _name: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -55337,8 +55337,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -55484,15 +55484,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> TargetableRemarketingListListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &TargetableRemarketingListSortOrderEnum) -> TargetableRemarketingListListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> TargetableRemarketingListListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &TargetableRemarketingListSortFieldEnum) -> TargetableRemarketingListListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Value of the nextPageToken from the previous result page.
@@ -55621,7 +55621,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_templates().get(-70, -63)
+/// let result = hub.targeting_templates().get(-13, -33)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55667,8 +55667,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -55897,7 +55897,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_templates().insert(req, -25)
+/// let result = hub.targeting_templates().insert(req, -52)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55943,7 +55943,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -56179,14 +56179,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_templates().list(-11)
-///              .sort_order("kasd")
-///              .sort_field("sanctus")
+/// let result = hub.targeting_templates().list(-7)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
 ///              .search_string("gubergren")
-///              .page_token("accusam")
-///              .max_results(-51)
-///              .add_ids(-4)
-///              .advertiser_id(-58)
+///              .page_token("eos")
+///              .max_results(-34)
+///              .add_ids(-39)
+///              .advertiser_id(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -56195,8 +56195,8 @@ pub struct TargetingTemplateListCall<'a, S>
 
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<TargetingTemplateSortOrderEnum>,
+   pub(super) _sort_field: Option<TargetingTemplateSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -56238,7 +56238,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -56379,15 +56379,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> TargetingTemplateListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &TargetingTemplateSortOrderEnum) -> TargetingTemplateListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> TargetingTemplateListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &TargetingTemplateSortFieldEnum) -> TargetingTemplateListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "template*2015" will return objects with names like "template June 2015", "template April 2015", or simply "template 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "template" will match objects with name "my template", "template 2015", or simply "template".
@@ -56530,7 +56530,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_templates().patch(req, -10, -79)
+/// let result = hub.targeting_templates().patch(req, -23, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -56577,8 +56577,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -56830,7 +56830,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_templates().update(req, -97)
+/// let result = hub.targeting_templates().update(req, -49)
 ///              .doit().await;
 /// # }
 /// ```
@@ -56876,7 +56876,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -57112,7 +57112,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_profiles().get(-33)
+/// let result = hub.user_profiles().get(-29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -57157,7 +57157,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -57609,7 +57609,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_role_permission_groups().get(-23, -51)
+/// let result = hub.user_role_permission_groups().get(-44, -10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -57655,8 +57655,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -57879,7 +57879,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_role_permission_groups().list(-89)
+/// let result = hub.user_role_permission_groups().list(-26)
 ///              .doit().await;
 /// # }
 /// ```
@@ -57924,7 +57924,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -58137,7 +58137,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_role_permissions().get(-46, -47)
+/// let result = hub.user_role_permissions().get(-85, -51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -58183,8 +58183,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -58407,8 +58407,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_role_permissions().list(-50)
-///              .add_ids(-72)
+/// let result = hub.user_role_permissions().list(-53)
+///              .add_ids(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -58454,7 +58454,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if self._ids.len() > 0 {
             for f in self._ids.iter() {
                 params.push("ids", f.to_string());
@@ -58680,7 +58680,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_roles().delete(-44, -4)
+/// let result = hub.user_roles().delete(-52, -79)
 ///              .doit().await;
 /// # }
 /// ```
@@ -58726,8 +58726,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -58939,7 +58939,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_roles().get(-20, -92)
+/// let result = hub.user_roles().get(-92, -68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -58985,8 +58985,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -59215,7 +59215,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_roles().insert(req, -72)
+/// let result = hub.user_roles().insert(req, -59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -59261,7 +59261,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -59497,14 +59497,14 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_roles().list(-101)
-///              .subaccount_id(-11)
-///              .sort_order("sea")
-///              .sort_field("et")
-///              .search_string("voluptua.")
-///              .page_token("ipsum")
+/// let result = hub.user_roles().list(-85)
+///              .subaccount_id(-69)
+///              .sort_order(&Default::default())
+///              .sort_field(&Default::default())
+///              .search_string("dolores")
+///              .page_token("diam")
 ///              .max_results(-67)
-///              .add_ids(-5)
+///              .add_ids(-10)
 ///              .account_user_role_only(true)
 ///              .doit().await;
 /// # }
@@ -59515,8 +59515,8 @@ pub struct UserRoleListCall<'a, S>
    pub(super) hub: &'a Dfareporting<S>,
    pub(super) _profile_id: i64,
    pub(super) _subaccount_id: Option<i64>,
-   pub(super) _sort_order: Option<String>,
-   pub(super) _sort_field: Option<String>,
+   pub(super) _sort_order: Option<UserRoleSortOrderEnum>,
+   pub(super) _sort_field: Option<UserRoleSortFieldEnum>,
    pub(super) _search_string: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -59558,7 +59558,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
         if let Some(value) = self._subaccount_id.as_ref() {
             params.push("subaccountId", value.to_string());
         }
@@ -59709,15 +59709,15 @@ where
     /// Order of sorted results.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> UserRoleListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &UserRoleSortOrderEnum) -> UserRoleListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Field by which to sort the list.
     ///
     /// Sets the *sort field* query property to the given value.
-    pub fn sort_field(mut self, new_value: &str) -> UserRoleListCall<'a, S> {
-        self._sort_field = Some(new_value.to_string());
+    pub fn sort_field(mut self, new_value: &UserRoleSortFieldEnum) -> UserRoleListCall<'a, S> {
+        self._sort_field = Some(new_value.clone());
         self
     }
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "userrole*2015" will return objects with names like "userrole June 2015", "userrole April 2015", or simply "userrole 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "userrole" will match objects with name "my userrole", "userrole 2015", or simply "userrole".
@@ -59860,7 +59860,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_roles().patch(req, -69, -44)
+/// let result = hub.user_roles().patch(req, -88, -89)
 ///              .doit().await;
 /// # }
 /// ```
@@ -59907,8 +59907,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -60160,7 +60160,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.user_roles().update(req, -79)
+/// let result = hub.user_roles().update(req, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -60206,7 +60206,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -60442,7 +60442,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.video_formats().get(-93, -101)
+/// let result = hub.video_formats().get(-78, -85)
 ///              .doit().await;
 /// # }
 /// ```
@@ -60488,8 +60488,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
-        params.push("id", self._id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -60712,7 +60712,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.video_formats().list(-33)
+/// let result = hub.video_formats().list(-57)
 ///              .doit().await;
 /// # }
 /// ```
@@ -60757,7 +60757,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("profileId", self._profile_id.to_string());
+        params.push("profileId", &self._profile_id.to_string());
 
         params.extend(self._additional_params.iter());
 

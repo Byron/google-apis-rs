@@ -72,9 +72,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("autoscaler", self._autoscaler);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("autoscaler", &self._autoscaler);
 
         params.extend(self._additional_params.iter());
 
@@ -354,9 +354,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("autoscaler", self._autoscaler);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("autoscaler", &self._autoscaler);
 
         params.extend(self._additional_params.iter());
 
@@ -642,8 +642,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
 
         params.extend(self._additional_params.iter());
 
@@ -941,8 +941,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1246,9 +1246,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("autoscaler", self._autoscaler);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("autoscaler", &self._autoscaler);
 
         params.extend(self._additional_params.iter());
 
@@ -1558,9 +1558,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("autoscaler", self._autoscaler);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("autoscaler", &self._autoscaler);
 
         params.extend(self._additional_params.iter());
 
@@ -1863,9 +1863,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("operation", &self._operation);
 
         params.extend(self._additional_params.iter());
 
@@ -2131,9 +2131,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("operation", &self._operation);
 
         params.extend(self._additional_params.iter());
 
@@ -2415,8 +2415,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2715,7 +2715,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

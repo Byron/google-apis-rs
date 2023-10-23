@@ -73,8 +73,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
         if let Some(value) = self._get_stats.as_ref() {
             params.push("getStats", value.to_string());
         }
@@ -354,9 +354,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
-        params.push("task", self._task);
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
+        params.push("task", &self._task);
 
         params.extend(self._additional_params.iter());
 
@@ -625,9 +625,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
-        params.push("task", self._task);
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
+        params.push("task", &self._task);
 
         params.extend(self._additional_params.iter());
 
@@ -913,8 +913,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
 
         params.extend(self._additional_params.iter());
 
@@ -1212,10 +1212,10 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
-        params.push("numTasks", self._num_tasks.to_string());
-        params.push("leaseSecs", self._lease_secs.to_string());
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
+        params.push("numTasks", &self._num_tasks.to_string());
+        params.push("leaseSecs", &self._lease_secs.to_string());
         if let Some(value) = self._tag.as_ref() {
             params.push("tag", value);
         }
@@ -1524,8 +1524,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
 
         params.extend(self._additional_params.iter());
 
@@ -1803,10 +1803,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
-        params.push("task", self._task);
-        params.push("newLeaseSeconds", self._new_lease_seconds.to_string());
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
+        params.push("task", &self._task);
+        params.push("newLeaseSeconds", &self._new_lease_seconds.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2125,10 +2125,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("taskqueue", self._taskqueue);
-        params.push("task", self._task);
-        params.push("newLeaseSeconds", self._new_lease_seconds.to_string());
+        params.push("project", &self._project);
+        params.push("taskqueue", &self._taskqueue);
+        params.push("task", &self._task);
+        params.push("newLeaseSeconds", &self._new_lease_seconds.to_string());
 
         params.extend(self._additional_params.iter());
 

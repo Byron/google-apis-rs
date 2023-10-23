@@ -203,7 +203,7 @@ pub struct DestinationStatus {
     pub destination: Option<String>,
     /// The status of the destination.
     
-    pub status: Option<String>,
+    pub status: Option<DestinationStatuStatusEnum>,
 }
 
 impl client::Part for DestinationStatus {}
@@ -321,11 +321,11 @@ pub struct Image {
     pub image_url: Option<String>,
     /// The status of the image. @OutputOnly
     
-    pub status: Option<String>,
+    pub status: Option<ImageStatusEnum>,
     /// The type of the image, i.e., crawled or uploaded. @OutputOnly
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ImageTypeEnum>,
 }
 
 impl client::Part for Image {}
@@ -349,10 +349,10 @@ pub struct Issue {
     pub destination: Option<String>,
     /// What needs to happen to resolve the issue.
     
-    pub resolution: Option<String>,
+    pub resolution: Option<IssueResolutionEnum>,
     /// The severity of the issue.
     
-    pub severity: Option<String>,
+    pub severity: Option<IssueSeverityEnum>,
     /// The timestamp when this issue appeared.
     
     pub timestamp: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,

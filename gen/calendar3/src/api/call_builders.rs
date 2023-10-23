@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("ruleId", self._rule_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("ruleId", &self._rule_id);
 
         params.extend(self._additional_params.iter());
 
@@ -330,8 +330,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("ruleId", self._rule_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("ruleId", &self._rule_id);
 
         params.extend(self._additional_params.iter());
 
@@ -608,7 +608,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._send_notifications.as_ref() {
             params.push("sendNotifications", value.to_string());
         }
@@ -907,7 +907,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._sync_token.as_ref() {
             params.push("syncToken", value);
         }
@@ -1218,8 +1218,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("ruleId", self._rule_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("ruleId", &self._rule_id);
         if let Some(value) = self._send_notifications.as_ref() {
             params.push("sendNotifications", value.to_string());
         }
@@ -1530,8 +1530,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("ruleId", self._rule_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("ruleId", &self._rule_id);
         if let Some(value) = self._send_notifications.as_ref() {
             params.push("sendNotifications", value.to_string());
         }
@@ -1847,7 +1847,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._sync_token.as_ref() {
             params.push("syncToken", value);
         }
@@ -2171,7 +2171,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2418,7 +2418,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2917,8 +2917,8 @@ where
 ///              .show_hidden(false)
 ///              .show_deleted(false)
 ///              .page_token("amet.")
-///              .min_access_role("ea")
-///              .max_results(-95)
+///              .min_access_role(&Default::default())
+///              .max_results(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2930,7 +2930,7 @@ pub struct CalendarListListCall<'a, S>
    pub(super) _show_hidden: Option<bool>,
    pub(super) _show_deleted: Option<bool>,
    pub(super) _page_token: Option<String>,
-   pub(super) _min_access_role: Option<String>,
+   pub(super) _min_access_role: Option<CalendarListMinAccessRoleEnum>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -3118,8 +3118,8 @@ where
     /// The minimum access role for the user in the returned entries. Optional. The default is no restriction.
     ///
     /// Sets the *min access role* query property to the given value.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, S> {
-        self._min_access_role = Some(new_value.to_string());
+    pub fn min_access_role(mut self, new_value: &CalendarListMinAccessRoleEnum) -> CalendarListListCall<'a, S> {
+        self._min_access_role = Some(new_value.clone());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
@@ -3281,7 +3281,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._color_rgb_format.as_ref() {
             params.push("colorRgbFormat", value.to_string());
         }
@@ -3581,7 +3581,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._color_rgb_format.as_ref() {
             params.push("colorRgbFormat", value.to_string());
         }
@@ -3838,8 +3838,8 @@ where
 ///              .show_hidden(true)
 ///              .show_deleted(true)
 ///              .page_token("est")
-///              .min_access_role("sed")
-///              .max_results(-29)
+///              .min_access_role(&Default::default())
+///              .max_results(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3852,7 +3852,7 @@ pub struct CalendarListWatchCall<'a, S>
    pub(super) _show_hidden: Option<bool>,
    pub(super) _show_deleted: Option<bool>,
    pub(super) _page_token: Option<String>,
-   pub(super) _min_access_role: Option<String>,
+   pub(super) _min_access_role: Option<CalendarListMinAccessRoleEnum>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -4063,8 +4063,8 @@ where
     /// The minimum access role for the user in the returned entries. Optional. The default is no restriction.
     ///
     /// Sets the *min access role* query property to the given value.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, S> {
-        self._min_access_role = Some(new_value.to_string());
+    pub fn min_access_role(mut self, new_value: &CalendarListMinAccessRoleEnum) -> CalendarListWatchCall<'a, S> {
+        self._min_access_role = Some(new_value.clone());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
@@ -4217,7 +4217,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4464,7 +4464,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4711,7 +4711,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5245,7 +5245,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5533,7 +5533,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6267,8 +6267,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().delete("calendarId", "eventId")
-///              .send_updates("sed")
-///              .send_notifications(true)
+///              .send_updates(&Default::default())
+///              .send_notifications(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6278,7 +6278,7 @@ pub struct EventDeleteCall<'a, S>
    pub(super) hub: &'a CalendarHub<S>,
    pub(super) _calendar_id: String,
    pub(super) _event_id: String,
-   pub(super) _send_updates: Option<String>,
+   pub(super) _send_updates: Option<EventSendUpdatesEnum>,
    pub(super) _send_notifications: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -6316,8 +6316,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("eventId", self._event_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("eventId", &self._event_id);
         if let Some(value) = self._send_updates.as_ref() {
             params.push("sendUpdates", value);
         }
@@ -6440,8 +6440,8 @@ where
     /// Guests who should receive notifications about the deletion of the event.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventDeleteCall<'a, S> {
-        self._send_updates = Some(new_value.to_string());
+    pub fn send_updates(mut self, new_value: &EventSendUpdatesEnum) -> EventDeleteCall<'a, S> {
+        self._send_updates = Some(new_value.clone());
         self
     }
     /// Deprecated. Please use sendUpdates instead.
@@ -6552,8 +6552,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().get("calendarId", "eventId")
-///              .time_zone("sadipscing")
-///              .max_attendees(-32)
+///              .time_zone("nonumy")
+///              .max_attendees(-77)
 ///              .always_include_email(true)
 ///              .doit().await;
 /// # }
@@ -6603,8 +6603,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("eventId", self._event_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("eventId", &self._event_id);
         if let Some(value) = self._time_zone.as_ref() {
             params.push("timeZone", value);
         }
@@ -6864,8 +6864,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().import(req, "calendarId")
-///              .supports_attachments(false)
-///              .conference_data_version(-47)
+///              .supports_attachments(true)
+///              .conference_data_version(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6913,7 +6913,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._supports_attachments.as_ref() {
             params.push("supportsAttachments", value.to_string());
         }
@@ -7177,10 +7177,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().insert(req, "calendarId")
 ///              .supports_attachments(false)
-///              .send_updates("consetetur")
+///              .send_updates(&Default::default())
 ///              .send_notifications(true)
-///              .max_attendees(-7)
-///              .conference_data_version(-82)
+///              .max_attendees(-57)
+///              .conference_data_version(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7191,7 +7191,7 @@ pub struct EventInsertCall<'a, S>
    pub(super) _request: Event,
    pub(super) _calendar_id: String,
    pub(super) _supports_attachments: Option<bool>,
-   pub(super) _send_updates: Option<String>,
+   pub(super) _send_updates: Option<EventSendUpdatesEnum>,
    pub(super) _send_notifications: Option<bool>,
    pub(super) _max_attendees: Option<i32>,
    pub(super) _conference_data_version: Option<i32>,
@@ -7231,7 +7231,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._supports_attachments.as_ref() {
             params.push("supportsAttachments", value.to_string());
         }
@@ -7394,8 +7394,8 @@ where
     /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent. The default is false.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventInsertCall<'a, S> {
-        self._send_updates = Some(new_value.to_string());
+    pub fn send_updates(mut self, new_value: &EventSendUpdatesEnum) -> EventInsertCall<'a, S> {
+        self._send_updates = Some(new_value.clone());
         self
     }
     /// Deprecated. Please use sendUpdates instead.
@@ -7520,14 +7520,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().instances("calendarId", "eventId")
-///              .time_zone("diam")
+///              .time_zone("consetetur")
 ///              .time_min(chrono::Utc::now())
 ///              .time_max(chrono::Utc::now())
 ///              .show_deleted(true)
-///              .page_token("sit")
-///              .original_start("sed")
-///              .max_results(-75)
-///              .max_attendees(-56)
+///              .page_token("est")
+///              .original_start("aliquyam")
+///              .max_results(-94)
+///              .max_attendees(-20)
 ///              .always_include_email(true)
 ///              .doit().await;
 /// # }
@@ -7583,8 +7583,8 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("eventId", self._event_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("eventId", &self._event_id);
         if let Some(value) = self._time_zone.as_ref() {
             params.push("timeZone", value);
         }
@@ -7899,21 +7899,21 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list("calendarId")
 ///              .updated_min(chrono::Utc::now())
-///              .time_zone("et")
+///              .time_zone("sit")
 ///              .time_min(chrono::Utc::now())
 ///              .time_max(chrono::Utc::now())
-///              .sync_token("At")
+///              .sync_token("sed")
 ///              .single_events(false)
 ///              .show_hidden_invitations(true)
 ///              .show_deleted(true)
-///              .add_shared_extended_property("accusam")
-///              .q("amet")
-///              .add_private_extended_property("erat")
-///              .page_token("dolores")
-///              .order_by("erat")
-///              .max_results(-73)
-///              .max_attendees(-10)
-///              .i_cal_uid("takimata")
+///              .add_shared_extended_property("sea")
+///              .q("et")
+///              .add_private_extended_property("At")
+///              .page_token("dolore")
+///              .order_by(&Default::default())
+///              .max_results(-40)
+///              .max_attendees(-51)
+///              .i_cal_uid("accusam")
 ///              .always_include_email(true)
 ///              .doit().await;
 /// # }
@@ -7935,7 +7935,7 @@ pub struct EventListCall<'a, S>
    pub(super) _q: Option<String>,
    pub(super) _private_extended_property: Vec<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<EventOrderByEnum>,
    pub(super) _max_results: Option<i32>,
    pub(super) _max_attendees: Option<i32>,
    pub(super) _i_cal_uid: Option<String>,
@@ -7976,7 +7976,7 @@ where
         }
 
         let mut params = Params::with_capacity(20 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", ::client::serde::datetime_to_string(&value));
         }
@@ -8248,8 +8248,8 @@ where
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &EventOrderByEnum) -> EventListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
@@ -8379,8 +8379,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().move_("calendarId", "eventId", "destination")
-///              .send_updates("et")
-///              .send_notifications(true)
+///              .send_updates(&Default::default())
+///              .send_notifications(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8391,7 +8391,7 @@ pub struct EventMoveCall<'a, S>
    pub(super) _calendar_id: String,
    pub(super) _event_id: String,
    pub(super) _destination: String,
-   pub(super) _send_updates: Option<String>,
+   pub(super) _send_updates: Option<EventSendUpdatesEnum>,
    pub(super) _send_notifications: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -8429,9 +8429,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("eventId", self._event_id);
-        params.push("destination", self._destination);
+        params.push("calendarId", &self._calendar_id);
+        params.push("eventId", &self._event_id);
+        params.push("destination", &self._destination);
         if let Some(value) = self._send_updates.as_ref() {
             params.push("sendUpdates", value);
         }
@@ -8575,8 +8575,8 @@ where
     /// Guests who should receive notifications about the change of the event's organizer.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventMoveCall<'a, S> {
-        self._send_updates = Some(new_value.to_string());
+    pub fn send_updates(mut self, new_value: &EventSendUpdatesEnum) -> EventMoveCall<'a, S> {
+        self._send_updates = Some(new_value.clone());
         self
     }
     /// Deprecated. Please use sendUpdates instead.
@@ -8694,11 +8694,11 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().patch(req, "calendarId", "eventId")
 ///              .supports_attachments(true)
-///              .send_updates("et")
-///              .send_notifications(true)
-///              .max_attendees(-96)
-///              .conference_data_version(-98)
-///              .always_include_email(false)
+///              .send_updates(&Default::default())
+///              .send_notifications(false)
+///              .max_attendees(-4)
+///              .conference_data_version(-22)
+///              .always_include_email(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8710,7 +8710,7 @@ pub struct EventPatchCall<'a, S>
    pub(super) _calendar_id: String,
    pub(super) _event_id: String,
    pub(super) _supports_attachments: Option<bool>,
-   pub(super) _send_updates: Option<String>,
+   pub(super) _send_updates: Option<EventSendUpdatesEnum>,
    pub(super) _send_notifications: Option<bool>,
    pub(super) _max_attendees: Option<i32>,
    pub(super) _conference_data_version: Option<i32>,
@@ -8751,8 +8751,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("eventId", self._event_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("eventId", &self._event_id);
         if let Some(value) = self._supports_attachments.as_ref() {
             params.push("supportsAttachments", value.to_string());
         }
@@ -8928,8 +8928,8 @@ where
     /// Guests who should receive notifications about the event update (for example, title changes, etc.).
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventPatchCall<'a, S> {
-        self._send_updates = Some(new_value.to_string());
+    pub fn send_updates(mut self, new_value: &EventSendUpdatesEnum) -> EventPatchCall<'a, S> {
+        self._send_updates = Some(new_value.clone());
         self
     }
     /// Deprecated. Please use sendUpdates instead.
@@ -9061,7 +9061,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().quick_add("calendarId", "text")
-///              .send_updates("gubergren")
+///              .send_updates(&Default::default())
 ///              .send_notifications(true)
 ///              .doit().await;
 /// # }
@@ -9072,7 +9072,7 @@ pub struct EventQuickAddCall<'a, S>
    pub(super) hub: &'a CalendarHub<S>,
    pub(super) _calendar_id: String,
    pub(super) _text: String,
-   pub(super) _send_updates: Option<String>,
+   pub(super) _send_updates: Option<EventSendUpdatesEnum>,
    pub(super) _send_notifications: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -9110,8 +9110,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("text", self._text);
+        params.push("calendarId", &self._calendar_id);
+        params.push("text", &self._text);
         if let Some(value) = self._send_updates.as_ref() {
             params.push("sendUpdates", value);
         }
@@ -9245,8 +9245,8 @@ where
     /// Guests who should receive notifications about the creation of the new event.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventQuickAddCall<'a, S> {
-        self._send_updates = Some(new_value.to_string());
+    pub fn send_updates(mut self, new_value: &EventSendUpdatesEnum) -> EventQuickAddCall<'a, S> {
+        self._send_updates = Some(new_value.clone());
         self
     }
     /// Deprecated. Please use sendUpdates instead.
@@ -9364,11 +9364,11 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().update(req, "calendarId", "eventId")
 ///              .supports_attachments(true)
-///              .send_updates("accusam")
-///              .send_notifications(true)
-///              .max_attendees(-45)
-///              .conference_data_version(-27)
-///              .always_include_email(true)
+///              .send_updates(&Default::default())
+///              .send_notifications(false)
+///              .max_attendees(-98)
+///              .conference_data_version(-32)
+///              .always_include_email(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9380,7 +9380,7 @@ pub struct EventUpdateCall<'a, S>
    pub(super) _calendar_id: String,
    pub(super) _event_id: String,
    pub(super) _supports_attachments: Option<bool>,
-   pub(super) _send_updates: Option<String>,
+   pub(super) _send_updates: Option<EventSendUpdatesEnum>,
    pub(super) _send_notifications: Option<bool>,
    pub(super) _max_attendees: Option<i32>,
    pub(super) _conference_data_version: Option<i32>,
@@ -9421,8 +9421,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
-        params.push("eventId", self._event_id);
+        params.push("calendarId", &self._calendar_id);
+        params.push("eventId", &self._event_id);
         if let Some(value) = self._supports_attachments.as_ref() {
             params.push("supportsAttachments", value.to_string());
         }
@@ -9598,8 +9598,8 @@ where
     /// Guests who should receive notifications about the event update (for example, title changes, etc.).
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventUpdateCall<'a, S> {
-        self._send_updates = Some(new_value.to_string());
+    pub fn send_updates(mut self, new_value: &EventSendUpdatesEnum) -> EventUpdateCall<'a, S> {
+        self._send_updates = Some(new_value.clone());
         self
     }
     /// Deprecated. Please use sendUpdates instead.
@@ -9738,22 +9738,22 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().watch(req, "calendarId")
 ///              .updated_min(chrono::Utc::now())
-///              .time_zone("sit")
+///              .time_zone("consetetur")
 ///              .time_min(chrono::Utc::now())
 ///              .time_max(chrono::Utc::now())
-///              .sync_token("magna")
+///              .sync_token("gubergren")
 ///              .single_events(true)
-///              .show_hidden_invitations(false)
+///              .show_hidden_invitations(true)
 ///              .show_deleted(true)
-///              .add_shared_extended_property("no")
-///              .q("nonumy")
-///              .add_private_extended_property("sed")
-///              .page_token("kasd")
-///              .order_by("Lorem")
-///              .max_results(-58)
-///              .max_attendees(-91)
-///              .i_cal_uid("rebum.")
-///              .always_include_email(true)
+///              .add_shared_extended_property("accusam")
+///              .q("gubergren")
+///              .add_private_extended_property("sadipscing")
+///              .page_token("At")
+///              .order_by(&Default::default())
+///              .max_results(-53)
+///              .max_attendees(-20)
+///              .i_cal_uid("sit")
+///              .always_include_email(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9775,7 +9775,7 @@ pub struct EventWatchCall<'a, S>
    pub(super) _q: Option<String>,
    pub(super) _private_extended_property: Vec<String>,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<EventOrderByEnum>,
    pub(super) _max_results: Option<i32>,
    pub(super) _max_attendees: Option<i32>,
    pub(super) _i_cal_uid: Option<String>,
@@ -9816,7 +9816,7 @@ where
         }
 
         let mut params = Params::with_capacity(21 + self._additional_params.len());
-        params.push("calendarId", self._calendar_id);
+        params.push("calendarId", &self._calendar_id);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", ::client::serde::datetime_to_string(&value));
         }
@@ -10111,8 +10111,8 @@ where
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &EventOrderByEnum) -> EventWatchCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
@@ -10555,7 +10555,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("setting", self._setting);
+        params.push("setting", &self._setting);
 
         params.extend(self._additional_params.iter());
 
@@ -10769,9 +10769,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.settings().list()
-///              .sync_token("eos")
-///              .page_token("amet.")
-///              .max_results(-84)
+///              .sync_token("rebum.")
+///              .page_token("dolor")
+///              .max_results(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11053,9 +11053,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.settings().watch(req)
-///              .sync_token("amet")
-///              .page_token("ut")
-///              .max_results(-27)
+///              .sync_token("justo")
+///              .page_token("amet.")
+///              .max_results(-11)
 ///              .doit().await;
 /// # }
 /// ```

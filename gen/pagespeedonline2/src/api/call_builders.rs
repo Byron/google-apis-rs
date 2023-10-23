@@ -26,11 +26,11 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pagespeedapi().runpagespeed("url")
-///              .strategy("amet")
+///              .strategy(&Default::default())
 ///              .screenshot(true)
-///              .add_rule("sed")
-///              .locale("ut")
-///              .filter_third_party_resources(true)
+///              .add_rule("duo")
+///              .locale("ipsum")
+///              .filter_third_party_resources(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39,7 +39,7 @@ pub struct PagespeedapiRunpagespeedCall<'a, S>
 
    pub(super) hub: &'a Pagespeedonline<S>,
    pub(super) _url: String,
-   pub(super) _strategy: Option<String>,
+   pub(super) _strategy: Option<PagespeedapiStrategyEnum>,
    pub(super) _screenshot: Option<bool>,
    pub(super) _rule: Vec<String>,
    pub(super) _locale: Option<String>,
@@ -79,7 +79,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("url", self._url);
+        params.push("url", &self._url);
         if let Some(value) = self._strategy.as_ref() {
             params.push("strategy", value);
         }
@@ -197,8 +197,8 @@ where
     /// The analysis strategy to use
     ///
     /// Sets the *strategy* query property to the given value.
-    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
-        self._strategy = Some(new_value.to_string());
+    pub fn strategy(mut self, new_value: &PagespeedapiStrategyEnum) -> PagespeedapiRunpagespeedCall<'a, S> {
+        self._strategy = Some(new_value.clone());
         self
     }
     /// Indicates if binary data containing a screenshot should be included

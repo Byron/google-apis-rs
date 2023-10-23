@@ -122,9 +122,9 @@ let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.sites().versions_files_list("parent")
-             .status("magna")
-             .page_token("no")
-             .page_size(-55)
+             .status(&Default::default())
+             .page_token("magna")
+             .page_size(-11)
              .doit().await;
 
 match result {

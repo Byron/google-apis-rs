@@ -56,7 +56,7 @@ pub struct Execution {
     /// The call logging level associated to this execution.
     #[serde(rename="callLogLevel")]
     
-    pub call_log_level: Option<String>,
+    pub call_log_level: Option<ExecutionCallLogLevelEnum>,
     /// Output only. Measures the duration of the execution.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -80,7 +80,7 @@ pub struct Execution {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Current state of the execution.
     
-    pub state: Option<String>,
+    pub state: Option<ExecutionStateEnum>,
     /// Output only. Status tracks the current steps and progress data of this execution.
     
     pub status: Option<Status>,

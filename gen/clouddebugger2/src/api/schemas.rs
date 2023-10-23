@@ -8,7 +8,7 @@ use super::*;
 pub struct AliasContext {
     /// The alias kind.
     
-    pub kind: Option<String>,
+    pub kind: Option<AliasContextKindEnum>,
     /// The alias name.
     
     pub name: Option<String>,
@@ -30,7 +30,7 @@ impl client::Part for AliasContext {}
 pub struct Breakpoint {
     /// Action that the agent should perform when the code at the breakpoint location is hit.
     
-    pub action: Option<String>,
+    pub action: Option<BreakpointActionEnum>,
     /// The deadline for the breakpoint to stay in CANARY_ACTIVE state. The value is meaningless when the breakpoint is not in CANARY_ACTIVE state.
     #[serde(rename="canaryExpireTime")]
     
@@ -69,7 +69,7 @@ pub struct Breakpoint {
     /// Indicates the severity of the log. Only relevant when action is `LOG`.
     #[serde(rename="logLevel")]
     
-    pub log_level: Option<String>,
+    pub log_level: Option<BreakpointLogLevelEnum>,
     /// Only relevant when action is `LOG`. Defines the message to log when the breakpoint hits. The message may include parameter placeholders `$0`, `$1`, etc. These placeholders are replaced with the evaluated value of the appropriate expression. Expressions not referenced in `log_message_format` are not logged. Example: `Message received, id = $0, count = $1` with `expressions` = `[ message.id, message.count ]`.
     #[serde(rename="logMessageFormat")]
     
@@ -80,7 +80,7 @@ pub struct Breakpoint {
     pub stack_frames: Option<Vec<StackFrame>>,
     /// The current state of the breakpoint.
     
-    pub state: Option<String>,
+    pub state: Option<BreakpointStateEnum>,
     /// Breakpoint status. The status includes an error flag and a human readable message. This field is usually unset. The message can be either informational or an error message. Regardless, clients should always display the text message back to the user. Error status indicates complete failure of the breakpoint. Example (non-final state): `Still loading symbols...` Examples (final state): * `Invalid line number` referring to location * `Field f not found in class C` referring to condition
     
     pub status: Option<StatusMessage>,
@@ -178,7 +178,7 @@ pub struct Debuggee {
     /// Used when setting breakpoint canary for this debuggee.
     #[serde(rename="canaryMode")]
     
-    pub canary_mode: Option<String>,
+    pub canary_mode: Option<DebuggeeCanaryModeEnum>,
     /// Human readable description of the debuggee. Including a human-readable project name, environment name and version information is recommended.
     
     pub description: Option<String>,
@@ -596,7 +596,7 @@ pub struct StatusMessage {
     /// Reference to which the message applies.
     #[serde(rename="refersTo")]
     
-    pub refers_to: Option<String>,
+    pub refers_to: Option<StatusMessageRefersToEnum>,
 }
 
 impl client::Part for StatusMessage {}

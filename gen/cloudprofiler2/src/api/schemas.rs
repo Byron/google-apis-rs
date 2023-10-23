@@ -16,7 +16,7 @@ pub struct CreateProfileRequest {
     /// Required. One or more profile types that the agent is capable of providing.
     #[serde(rename="profileType")]
     
-    pub profile_type: Option<Vec<String>>,
+    pub profile_type: Option<Vec<CreateProfileRequestProfileTypeEnum>>,
 }
 
 impl client::RequestValue for CreateProfileRequest {}
@@ -78,7 +78,7 @@ pub struct Profile {
     /// Type of profile. For offline mode, this must be specified when creating the profile. For online mode it is assigned and returned by the server.
     #[serde(rename="profileType")]
     
-    pub profile_type: Option<String>,
+    pub profile_type: Option<ProfileProfileTypeEnum>,
 }
 
 impl client::RequestValue for Profile {}

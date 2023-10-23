@@ -79,7 +79,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("alertId", self._alert_id);
+        params.push("alertId", &self._alert_id);
         if let Some(value) = self._customer_id.as_ref() {
             params.push("customerId", value);
         }
@@ -378,7 +378,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("alertId", self._alert_id);
+        params.push("alertId", &self._alert_id);
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
         }
@@ -1208,7 +1208,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("alertId", self._alert_id);
+        params.push("alertId", &self._alert_id);
         if let Some(value) = self._customer_id.as_ref() {
             params.push("customerId", value);
         }
@@ -1482,7 +1482,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("alertId", self._alert_id);
+        params.push("alertId", &self._alert_id);
         if let Some(value) = self._customer_id.as_ref() {
             params.push("customerId", value);
         }
@@ -1756,7 +1756,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("alertId", self._alert_id);
+        params.push("alertId", &self._alert_id);
         if let Some(value) = self._customer_id.as_ref() {
             params.push("customerId", value);
         }
@@ -2338,7 +2338,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("alertId", self._alert_id);
+        params.push("alertId", &self._alert_id);
 
         params.extend(self._additional_params.iter());
 

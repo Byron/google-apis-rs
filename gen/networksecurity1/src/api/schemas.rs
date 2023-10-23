@@ -14,7 +14,7 @@ use super::*;
 pub struct AuthorizationPolicy {
     /// Required. The action to take when a rule match is found. Possible values are "ALLOW" or "DENY".
     
-    pub action: Option<String>,
+    pub action: Option<AuthorizationPolicyActionEnum>,
     /// Output only. The timestamp when the resource was created.
     #[serde(rename="createTime")]
     
@@ -253,7 +253,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

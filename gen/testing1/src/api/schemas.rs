@@ -101,7 +101,7 @@ pub struct AndroidInstrumentationTest {
     /// The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not. ** Orchestrator is only compatible with AndroidJUnitRunner version 1.1 or higher! ** Orchestrator offers the following benefits: - No shared state - Crashes are isolated - Logs are scoped per test See for more information about Android Test Orchestrator. If not set, the test will be run without the orchestrator.
     #[serde(rename="orchestratorOption")]
     
-    pub orchestrator_option: Option<String>,
+    pub orchestrator_option: Option<AndroidInstrumentationTestOrchestratorOptionEnum>,
     /// The option to run tests in multiple shards in parallel.
     #[serde(rename="shardingOption")]
     
@@ -168,11 +168,11 @@ pub struct AndroidModel {
     pub codename: Option<String>,
     /// Whether this device is virtual or physical.
     
-    pub form: Option<String>,
+    pub form: Option<AndroidModelFormEnum>,
     /// Whether this device is a phone, tablet, wearable, etc.
     #[serde(rename="formFactor")]
     
-    pub form_factor: Option<String>,
+    pub form_factor: Option<AndroidModelFormFactorEnum>,
     /// The unique opaque id for this model. Use this for invoking the TestExecutionService.
     
     pub id: Option<String>,
@@ -256,7 +256,7 @@ pub struct AndroidRoboTest {
     /// The mode in which Robo should run. Most clients should allow the server to populate this field automatically.
     #[serde(rename="roboMode")]
     
-    pub robo_mode: Option<String>,
+    pub robo_mode: Option<AndroidRoboTestRoboModeEnum>,
     /// A JSON file with a sequence of actions Robo should perform as a prologue for the crawl.
     #[serde(rename="roboScript")]
     
@@ -477,7 +477,7 @@ pub struct CancelTestMatrixResponse {
     /// The current rolled-up state of the test matrix. If this state is already final, then the cancelation request will have no effect.
     #[serde(rename="testState")]
     
-    pub test_state: Option<String>,
+    pub test_state: Option<CancelTestMatrixResponseTestStateEnum>,
 }
 
 impl client::ResponseResult for CancelTestMatrixResponse {}
@@ -577,7 +577,7 @@ pub struct DeviceIpBlock {
     pub block: Option<String>,
     /// Whether this block is used by physical or virtual devices
     
-    pub form: Option<String>,
+    pub form: Option<DeviceIpBlockFormEnum>,
 }
 
 impl client::Part for DeviceIpBlock {}
@@ -877,7 +877,7 @@ pub struct IosModel {
     /// Whether this device is a phone, tablet, wearable, etc.
     #[serde(rename="formFactor")]
     
-    pub form_factor: Option<String>,
+    pub form_factor: Option<IosModelFormFactorEnum>,
     /// The unique opaque id for this model. Use this for invoking the TestExecutionService.
     
     pub id: Option<String>,
@@ -1262,7 +1262,7 @@ pub struct RoboDirective {
     /// Required. The type of action that Robo should perform on the specified element.
     #[serde(rename="actionType")]
     
-    pub action_type: Option<String>,
+    pub action_type: Option<RoboDirectiveActionTypeEnum>,
     /// The text that Robo is directed to set. If left empty, the directive will be treated as a CLICK on the element matching the resource_name.
     #[serde(rename="inputText")]
     
@@ -1463,7 +1463,7 @@ pub struct TestExecution {
     pub shard: Option<Shard>,
     /// Output only. Indicates the current progress of the test execution (e.g., FINISHED).
     
-    pub state: Option<String>,
+    pub state: Option<TestExecutionStateEnum>,
     /// Output only. Additional details about the running test.
     #[serde(rename="testDetails")]
     
@@ -1515,11 +1515,11 @@ pub struct TestMatrix {
     /// Output only. Describes why the matrix is considered invalid. Only useful for matrices in the INVALID state.
     #[serde(rename="invalidMatrixDetails")]
     
-    pub invalid_matrix_details: Option<String>,
+    pub invalid_matrix_details: Option<TestMatrixInvalidMatrixDetailsEnum>,
     /// Output Only. The overall outcome of the test. Only set when the test matrix state is FINISHED.
     #[serde(rename="outcomeSummary")]
     
-    pub outcome_summary: Option<String>,
+    pub outcome_summary: Option<TestMatrixOutcomeSummaryEnum>,
     /// The cloud project that owns the test matrix.
     #[serde(rename="projectId")]
     
@@ -1530,7 +1530,7 @@ pub struct TestMatrix {
     pub result_storage: Option<ResultStorage>,
     /// Output only. Indicates the current progress of the test matrix.
     
-    pub state: Option<String>,
+    pub state: Option<TestMatrixStateEnum>,
     /// Output only. The list of test executions that the service creates for this matrix.
     #[serde(rename="testExecutions")]
     

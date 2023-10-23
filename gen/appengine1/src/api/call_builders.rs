@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
 
         params.extend(self._additional_params.iter());
 
@@ -363,8 +363,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("authorizedCertificatesId", self._authorized_certificates_id);
+        params.push("appsId", &self._apps_id);
+        params.push("authorizedCertificatesId", &self._authorized_certificates_id);
 
         params.extend(self._additional_params.iter());
 
@@ -592,7 +592,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().authorized_certificates_get("appsId", "authorizedCertificatesId")
-///              .view("dolor")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -602,7 +602,7 @@ pub struct AppAuthorizedCertificateGetCall<'a, S>
    pub(super) hub: &'a Appengine<S>,
    pub(super) _apps_id: String,
    pub(super) _authorized_certificates_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<AppViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -639,8 +639,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("authorizedCertificatesId", self._authorized_certificates_id);
+        params.push("appsId", &self._apps_id);
+        params.push("authorizedCertificatesId", &self._authorized_certificates_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -771,8 +771,8 @@ where
     /// Controls the set of fields returned in the GET response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppAuthorizedCertificateGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &AppViewEnum) -> AppAuthorizedCertificateGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -878,9 +878,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().authorized_certificates_list("appsId")
-///              .view("ipsum")
-///              .page_token("invidunt")
-///              .page_size(-47)
+///              .view(&Default::default())
+///              .page_token("ea")
+///              .page_size(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -889,7 +889,7 @@ pub struct AppAuthorizedCertificateListCall<'a, S>
 
    pub(super) hub: &'a Appengine<S>,
    pub(super) _apps_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<AppViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -928,7 +928,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1055,8 +1055,8 @@ where
     /// Controls the set of fields returned in the LIST response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppAuthorizedCertificateListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &AppViewEnum) -> AppAuthorizedCertificateListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Continuation token for fetching the next page of results.
@@ -1230,8 +1230,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("authorizedCertificatesId", self._authorized_certificates_id);
+        params.push("appsId", &self._apps_id);
+        params.push("authorizedCertificatesId", &self._authorized_certificates_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1492,8 +1492,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().authorized_domains_list("appsId")
-///              .page_token("ut")
-///              .page_size(-12)
+///              .page_token("ipsum")
+///              .page_size(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1540,7 +1540,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1784,7 +1784,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().domain_mappings_create(req, "appsId")
-///              .override_strategy("est")
+///              .override_strategy(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1794,7 +1794,7 @@ pub struct AppDomainMappingCreateCall<'a, S>
    pub(super) hub: &'a Appengine<S>,
    pub(super) _request: DomainMapping,
    pub(super) _apps_id: String,
-   pub(super) _override_strategy: Option<String>,
+   pub(super) _override_strategy: Option<AppOverrideStrategyEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1831,7 +1831,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._override_strategy.as_ref() {
             params.push("overrideStrategy", value);
         }
@@ -1975,8 +1975,8 @@ where
     /// Whether the domain creation should override any existing mappings for this domain. By default, overrides are rejected.
     ///
     /// Sets the *override strategy* query property to the given value.
-    pub fn override_strategy(mut self, new_value: &str) -> AppDomainMappingCreateCall<'a, S> {
-        self._override_strategy = Some(new_value.to_string());
+    pub fn override_strategy(mut self, new_value: &AppOverrideStrategyEnum) -> AppDomainMappingCreateCall<'a, S> {
+        self._override_strategy = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2127,8 +2127,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("domainMappingsId", self._domain_mappings_id);
+        params.push("appsId", &self._apps_id);
+        params.push("domainMappingsId", &self._domain_mappings_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2401,8 +2401,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("domainMappingsId", self._domain_mappings_id);
+        params.push("appsId", &self._apps_id);
+        params.push("domainMappingsId", &self._domain_mappings_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2630,8 +2630,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().domain_mappings_list("appsId")
-///              .page_token("dolor")
-///              .page_size(-56)
+///              .page_token("est")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2678,7 +2678,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2970,8 +2970,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("domainMappingsId", self._domain_mappings_id);
+        params.push("appsId", &self._apps_id);
+        params.push("domainMappingsId", &self._domain_mappings_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3283,7 +3283,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3575,7 +3575,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3861,8 +3861,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("ingressRulesId", self._ingress_rules_id);
+        params.push("appsId", &self._apps_id);
+        params.push("ingressRulesId", &self._ingress_rules_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4135,8 +4135,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("ingressRulesId", self._ingress_rules_id);
+        params.push("appsId", &self._apps_id);
+        params.push("ingressRulesId", &self._ingress_rules_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4364,8 +4364,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().firewall_ingress_rules_list("appsId")
-///              .page_token("sed")
-///              .page_size(-24)
+///              .page_token("Stet")
+///              .page_size(-13)
 ///              .matching_address("et")
 ///              .doit().await;
 /// # }
@@ -4414,7 +4414,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4716,8 +4716,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("ingressRulesId", self._ingress_rules_id);
+        params.push("appsId", &self._apps_id);
+        params.push("ingressRulesId", &self._ingress_rules_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -5023,8 +5023,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("locationsId", self._locations_id);
+        params.push("appsId", &self._apps_id);
+        params.push("locationsId", &self._locations_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5252,9 +5252,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().locations_list("appsId")
-///              .page_token("et")
-///              .page_size(-28)
-///              .filter("amet.")
+///              .page_token("sed")
+///              .page_size(-20)
+///              .filter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5302,7 +5302,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5595,8 +5595,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("operationsId", self._operations_id);
+        params.push("appsId", &self._apps_id);
+        params.push("operationsId", &self._operations_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5824,9 +5824,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().operations_list("appsId")
-///              .page_token("et")
-///              .page_size(-22)
-///              .filter("sadipscing")
+///              .page_token("consetetur")
+///              .page_size(-92)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5874,7 +5874,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6176,10 +6176,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
-        params.push("instancesId", self._instances_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
+        params.push("instancesId", &self._instances_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6497,10 +6497,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
-        params.push("instancesId", self._instances_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
+        params.push("instancesId", &self._instances_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6795,10 +6795,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
-        params.push("instancesId", self._instances_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
+        params.push("instancesId", &self._instances_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7046,8 +7046,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_instances_list("appsId", "servicesId", "versionsId")
-///              .page_token("consetetur")
-///              .page_size(-28)
+///              .page_token("ipsum")
+///              .page_size(-23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7096,9 +7096,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7408,8 +7408,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7706,9 +7706,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7946,7 +7946,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_get("appsId", "servicesId", "versionsId")
-///              .view("et")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -7957,7 +7957,7 @@ pub struct AppServiceVersionGetCall<'a, S>
    pub(super) _apps_id: String,
    pub(super) _services_id: String,
    pub(super) _versions_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<AppViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -7994,9 +7994,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -8137,8 +8137,8 @@ where
     /// Controls the set of fields returned in the Get response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppServiceVersionGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &AppViewEnum) -> AppServiceVersionGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8244,9 +8244,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_list("appsId", "servicesId")
-///              .view("dolore")
-///              .page_token("dolore")
-///              .page_size(-34)
+///              .view(&Default::default())
+///              .page_token("gubergren")
+///              .page_size(-74)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8256,7 +8256,7 @@ pub struct AppServiceVersionListCall<'a, S>
    pub(super) hub: &'a Appengine<S>,
    pub(super) _apps_id: String,
    pub(super) _services_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<AppViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8295,8 +8295,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -8433,8 +8433,8 @@ where
     /// Controls the set of fields returned in the List response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppServiceVersionListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &AppViewEnum) -> AppServiceVersionListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Continuation token for fetching the next page of results.
@@ -8609,9 +8609,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
-        params.push("versionsId", self._versions_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
+        params.push("versionsId", &self._versions_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8927,8 +8927,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9201,8 +9201,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9430,8 +9430,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_list("appsId")
-///              .page_token("At")
-///              .page_size(-43)
+///              .page_token("sadipscing")
+///              .page_size(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9478,7 +9478,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9772,8 +9772,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
-        params.push("servicesId", self._services_id);
+        params.push("appsId", &self._apps_id);
+        params.push("servicesId", &self._services_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -10361,7 +10361,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10632,7 +10632,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -10934,7 +10934,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("appsId", self._apps_id);
+        params.push("appsId", &self._apps_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11221,9 +11221,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectsId", self._projects_id);
-        params.push("locationsId", self._locations_id);
-        params.push("applicationsId", self._applications_id);
+        params.push("projectsId", &self._projects_id);
+        params.push("locationsId", &self._locations_id);
+        params.push("applicationsId", &self._applications_id);
 
         params.extend(self._additional_params.iter());
 

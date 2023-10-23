@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1183,7 +1183,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1475,7 +1475,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1767,7 +1767,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2052,7 +2052,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2873,7 +2873,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3165,7 +3165,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3457,7 +3457,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3749,7 +3749,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4034,7 +4034,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4855,7 +4855,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5147,7 +5147,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5439,7 +5439,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5724,7 +5724,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6545,7 +6545,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6837,7 +6837,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7122,7 +7122,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7943,7 +7943,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8235,7 +8235,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8520,7 +8520,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9341,7 +9341,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9633,7 +9633,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9925,7 +9925,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10210,7 +10210,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11031,7 +11031,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11323,7 +11323,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11615,7 +11615,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11900,7 +11900,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12721,7 +12721,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13013,7 +13013,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13298,7 +13298,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id.to_string());
+        params.push("resourceId", &self._resource_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14083,7 +14083,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id.to_string());
+        params.push("resourceId", &self._resource_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14375,7 +14375,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id.to_string());
+        params.push("resourceId", &self._resource_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14940,7 +14940,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15225,7 +15225,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16046,7 +16046,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16338,7 +16338,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16630,7 +16630,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16915,7 +16915,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17736,7 +17736,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18028,7 +18028,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18320,7 +18320,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18614,7 +18614,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("issuerId", self._issuer_id.to_string());
+        params.push("issuerId", &self._issuer_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -18936,7 +18936,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19221,7 +19221,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20042,7 +20042,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20334,7 +20334,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20626,7 +20626,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20911,7 +20911,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21732,7 +21732,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22024,7 +22024,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22309,7 +22309,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id.to_string());
+        params.push("resourceId", &self._resource_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -22578,7 +22578,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id.to_string());
+        params.push("resourceId", &self._resource_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -23143,7 +23143,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -23428,7 +23428,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24249,7 +24249,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24541,7 +24541,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -24833,7 +24833,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -25118,7 +25118,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -25939,7 +25939,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 
@@ -26231,7 +26231,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceId", self._resource_id);
+        params.push("resourceId", &self._resource_id);
 
         params.extend(self._additional_params.iter());
 

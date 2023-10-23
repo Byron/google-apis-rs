@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -317,7 +317,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -851,7 +851,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("verificationMethod", self._verification_method);
+        params.push("verificationMethod", &self._verification_method);
 
         params.extend(self._additional_params.iter());
 
@@ -1371,7 +1371,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1659,7 +1659,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 

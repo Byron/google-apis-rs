@@ -26,9 +26,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.about().get()
-///              .start_change_id(-30)
-///              .max_change_id_count(-9)
-///              .include_subscribed(true)
+///              .start_change_id(-59)
+///              .max_change_id_count(-46)
+///              .include_subscribed(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -345,7 +345,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("appId", self._app_id);
+        params.push("appId", &self._app_id);
 
         params.extend(self._additional_params.iter());
 
@@ -559,9 +559,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().list()
-///              .language_code("accusam")
-///              .app_filter_mime_types("voluptua.")
-///              .app_filter_extensions("dolore")
+///              .language_code("consetetur")
+///              .app_filter_mime_types("amet.")
+///              .app_filter_extensions("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -834,10 +834,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get("changeId")
-///              .team_drive_id("dolore")
-///              .supports_team_drives(false)
+///              .team_drive_id("dolores")
+///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .drive_id("Lorem")
+///              .drive_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -886,7 +886,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("changeId", self._change_id);
+        params.push("changeId", &self._change_id);
         if let Some(value) = self._team_drive_id.as_ref() {
             params.push("teamDriveId", value);
         }
@@ -1140,10 +1140,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("invidunt")
-///              .supports_team_drives(true)
+///              .team_drive_id("voluptua.")
+///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
-///              .drive_id("et")
+///              .drive_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1427,21 +1427,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list()
-///              .team_drive_id("tempor")
+///              .team_drive_id("invidunt")
 ///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .start_change_id(-68)
-///              .spaces("sed")
-///              .page_token("no")
-///              .max_results(-85)
-///              .include_team_drive_items(false)
-///              .include_subscribed(false)
-///              .include_permissions_for_view("no")
-///              .include_labels("nonumy")
+///              .supports_all_drives(false)
+///              .start_change_id(-35)
+///              .spaces("tempor")
+///              .page_token("aliquyam")
+///              .max_results(-5)
+///              .include_team_drive_items(true)
+///              .include_subscribed(true)
+///              .include_permissions_for_view("et")
+///              .include_labels("sed")
 ///              .include_items_from_all_drives(false)
-///              .include_deleted(true)
-///              .include_corpus_removals(true)
-///              .drive_id("sadipscing")
+///              .include_deleted(false)
+///              .include_corpus_removals(false)
+///              .drive_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1852,21 +1852,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req)
-///              .team_drive_id("erat")
+///              .team_drive_id("nonumy")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .start_change_id(-57)
-///              .spaces("et")
-///              .page_token("sea")
-///              .max_results(-96)
-///              .include_team_drive_items(true)
+///              .start_change_id(-32)
+///              .spaces("dolores")
+///              .page_token("sadipscing")
+///              .max_results(-31)
+///              .include_team_drive_items(false)
 ///              .include_subscribed(true)
 ///              .include_permissions_for_view("est")
-///              .include_labels("aliquyam")
+///              .include_labels("et")
 ///              .include_items_from_all_drives(false)
 ///              .include_deleted(true)
 ///              .include_corpus_removals(true)
-///              .drive_id("sit")
+///              .drive_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2600,8 +2600,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("folderId", self._folder_id);
-        params.push("childId", self._child_id);
+        params.push("folderId", &self._folder_id);
+        params.push("childId", &self._child_id);
         if let Some(value) = self._enforce_single_parent.as_ref() {
             params.push("enforceSingleParent", value.to_string());
         }
@@ -2869,8 +2869,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("folderId", self._folder_id);
-        params.push("childId", self._child_id);
+        params.push("folderId", &self._folder_id);
+        params.push("childId", &self._child_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3100,9 +3100,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().insert(req, "folderId")
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .enforce_single_parent(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .enforce_single_parent(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3151,7 +3151,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("folderId", self._folder_id);
+        params.push("folderId", &self._folder_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -3418,10 +3418,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().list("folderId")
-///              .q("eirmod")
-///              .page_token("Lorem")
-///              .order_by("accusam")
-///              .max_results(-47)
+///              .q("et")
+///              .page_token("At")
+///              .order_by("dolore")
+///              .max_results(-40)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3470,7 +3470,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("folderId", self._folder_id);
+        params.push("folderId", &self._folder_id);
         if let Some(value) = self._q.as_ref() {
             params.push("q", value);
         }
@@ -3769,8 +3769,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4030,8 +4030,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
         if let Some(value) = self._include_deleted.as_ref() {
             params.push("includeDeleted", value.to_string());
         }
@@ -4316,7 +4316,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4553,10 +4553,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .updated_min("At")
-///              .page_token("dolor")
-///              .max_results(-22)
-///              .include_deleted(true)
+///              .updated_min("sea")
+///              .page_token("takimata")
+///              .max_results(-51)
+///              .include_deleted(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4605,7 +4605,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", value);
         }
@@ -4911,8 +4911,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5211,8 +5211,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5460,7 +5460,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().delete("driveId")
 ///              .use_domain_admin_access(true)
-///              .allow_item_deletion(false)
+///              .allow_item_deletion(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5507,7 +5507,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -5776,7 +5776,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -6044,7 +6044,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6309,7 +6309,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("requestId", self._request_id);
+        params.push("requestId", &self._request_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6539,10 +6539,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().list()
-///              .use_domain_admin_access(true)
-///              .q("dolor")
-///              .page_token("aliquyam")
-///              .max_results(-61)
+///              .use_domain_admin_access(false)
+///              .q("dolores")
+///              .page_token("consetetur")
+///              .max_results(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6870,7 +6870,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7137,7 +7137,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("driveId", self._drive_id);
+        params.push("driveId", &self._drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -7390,16 +7390,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().copy(req, "fileId")
-///              .visibility("gubergren")
-///              .timed_text_track_name("sadipscing")
-///              .timed_text_language("At")
-///              .supports_team_drives(true)
+///              .visibility(&Default::default())
+///              .timed_text_track_name("ipsum")
+///              .timed_text_language("Lorem")
+///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .pinned(false)
-///              .ocr_language("et")
+///              .pinned(true)
+///              .ocr_language("At")
 ///              .ocr(true)
-///              .include_permissions_for_view("dolor")
-///              .include_labels("Lorem")
+///              .include_permissions_for_view("duo")
+///              .include_labels("sit")
 ///              .enforce_single_parent(false)
 ///              .convert(true)
 ///              .doit().await;
@@ -7411,7 +7411,7 @@ pub struct FileCopyCall<'a, S>
    pub(super) hub: &'a DriveHub<S>,
    pub(super) _request: File,
    pub(super) _file_id: String,
-   pub(super) _visibility: Option<String>,
+   pub(super) _visibility: Option<FileVisibilityEnum>,
    pub(super) _timed_text_track_name: Option<String>,
    pub(super) _timed_text_language: Option<String>,
    pub(super) _supports_team_drives: Option<bool>,
@@ -7459,7 +7459,7 @@ where
         }
 
         let mut params = Params::with_capacity(16 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._visibility.as_ref() {
             params.push("visibility", value);
         }
@@ -7636,8 +7636,8 @@ where
     /// The visibility of the new file. This parameter is only relevant when the source is not a native Google Doc and convert=false.
     ///
     /// Sets the *visibility* query property to the given value.
-    pub fn visibility(mut self, new_value: &str) -> FileCopyCall<'a, S> {
-        self._visibility = Some(new_value.to_string());
+    pub fn visibility(mut self, new_value: &FileVisibilityEnum) -> FileCopyCall<'a, S> {
+        self._visibility = Some(new_value.clone());
         self
     }
     /// The timed text track name.
@@ -7866,7 +7866,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -8387,8 +8387,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("mimeType", self._mime_type);
+        params.push("fileId", &self._file_id);
+        params.push("mimeType", &self._mime_type);
 
         params.extend(self._additional_params.iter());
 
@@ -8601,9 +8601,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().generate_ids()
-///              .type_("tempor")
-///              .space("dolore")
-///              .max_results(-25)
+///              .type_("sanctus")
+///              .space("nonumy")
+///              .max_results(-66)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8881,13 +8881,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
-///              .update_viewed_date(false)
+///              .update_viewed_date(true)
 ///              .supports_team_drives(false)
-///              .supports_all_drives(true)
-///              .revision_id("vero")
-///              .projection("duo")
-///              .include_permissions_for_view("sadipscing")
-///              .include_labels("ut")
+///              .supports_all_drives(false)
+///              .revision_id("ut")
+///              .projection(&Default::default())
+///              .include_permissions_for_view("At")
+///              .include_labels("sit")
 ///              .acknowledge_abuse(false)
 ///              .doit().await;
 /// # }
@@ -8901,7 +8901,7 @@ pub struct FileGetCall<'a, S>
    pub(super) _supports_team_drives: Option<bool>,
    pub(super) _supports_all_drives: Option<bool>,
    pub(super) _revision_id: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<FileProjectionEnum>,
    pub(super) _include_permissions_for_view: Option<String>,
    pub(super) _include_labels: Option<String>,
    pub(super) _acknowledge_abuse: Option<bool>,
@@ -8941,7 +8941,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._update_viewed_date.as_ref() {
             params.push("updateViewedDate", value.to_string());
         }
@@ -9120,8 +9120,8 @@ where
     /// This parameter is deprecated and has no function.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> FileGetCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &FileProjectionEnum) -> FileGetCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
@@ -9251,19 +9251,19 @@ where
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().insert(req)
-///              .visibility("kasd")
-///              .use_content_as_indexable_text(false)
-///              .timed_text_track_name("tempor")
-///              .timed_text_language("sea")
+///              .visibility(&Default::default())
+///              .use_content_as_indexable_text(true)
+///              .timed_text_track_name("ut")
+///              .timed_text_language("rebum.")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .pinned(true)
-///              .ocr_language("rebum.")
+///              .pinned(false)
+///              .ocr_language("tempor")
 ///              .ocr(false)
-///              .include_permissions_for_view("clita")
-///              .include_labels("Stet")
-///              .enforce_single_parent(false)
-///              .convert(false)
+///              .include_permissions_for_view("Lorem")
+///              .include_labels("magna")
+///              .enforce_single_parent(true)
+///              .convert(true)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -9272,7 +9272,7 @@ pub struct FileInsertCall<'a, S>
 
    pub(super) hub: &'a DriveHub<S>,
    pub(super) _request: File,
-   pub(super) _visibility: Option<String>,
+   pub(super) _visibility: Option<FileVisibilityEnum>,
    pub(super) _use_content_as_indexable_text: Option<bool>,
    pub(super) _timed_text_track_name: Option<String>,
    pub(super) _timed_text_language: Option<String>,
@@ -9596,8 +9596,8 @@ where
     /// The visibility of the new file. This parameter is only relevant when convert=false.
     ///
     /// Sets the *visibility* query property to the given value.
-    pub fn visibility(mut self, new_value: &str) -> FileInsertCall<'a, S> {
-        self._visibility = Some(new_value.to_string());
+    pub fn visibility(mut self, new_value: &FileVisibilityEnum) -> FileInsertCall<'a, S> {
+        self._visibility = Some(new_value.clone());
         self
     }
     /// Whether to use the content as indexable text.
@@ -9783,22 +9783,22 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("dolores")
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .spaces("dolor")
-///              .q("aliquyam")
-///              .projection("magna")
-///              .page_token("diam")
-///              .order_by("nonumy")
-///              .max_results(-18)
-///              .include_team_drive_items(true)
-///              .include_permissions_for_view("sed")
-///              .include_labels("est")
-///              .include_items_from_all_drives(false)
-///              .drive_id("diam")
-///              .corpus("At")
-///              .corpora("erat")
+///              .team_drive_id("At")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
+///              .spaces("ut")
+///              .q("sit")
+///              .projection(&Default::default())
+///              .page_token("vero")
+///              .order_by("rebum.")
+///              .max_results(-19)
+///              .include_team_drive_items(false)
+///              .include_permissions_for_view("dolores")
+///              .include_labels("sed")
+///              .include_items_from_all_drives(true)
+///              .drive_id("clita")
+///              .corpus(&Default::default())
+///              .corpora("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9811,7 +9811,7 @@ pub struct FileListCall<'a, S>
    pub(super) _supports_all_drives: Option<bool>,
    pub(super) _spaces: Option<String>,
    pub(super) _q: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<FileProjectionEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _order_by: Option<String>,
    pub(super) _max_results: Option<i32>,
@@ -9820,7 +9820,7 @@ pub struct FileListCall<'a, S>
    pub(super) _include_labels: Option<String>,
    pub(super) _include_items_from_all_drives: Option<bool>,
    pub(super) _drive_id: Option<String>,
-   pub(super) _corpus: Option<String>,
+   pub(super) _corpus: Option<FileCorpusEnum>,
    pub(super) _corpora: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -10041,8 +10041,8 @@ where
     /// This parameter is deprecated and has no function.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> FileListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &FileProjectionEnum) -> FileListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Page token for files.
@@ -10104,8 +10104,8 @@ where
     /// The body of items (files/documents) to which the query applies. Deprecated: use 'corpora' instead.
     ///
     /// Sets the *corpus* query property to the given value.
-    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, S> {
-        self._corpus = Some(new_value.to_string());
+    pub fn corpus(mut self, new_value: &FileCorpusEnum) -> FileListCall<'a, S> {
+        self._corpus = Some(new_value.clone());
         self
     }
     /// Groupings of files to which the query applies. Supported groupings are: 'user' (files created by, opened by, or shared directly with the user), 'drive' (files in the specified shared drive as indicated by the 'driveId'), 'domain' (files shared to the user's domain), and 'allDrives' (A combination of 'user' and 'drive' for all drives where the user is a member). When able, use 'user' or 'drive', instead of 'allDrives', for efficiency.
@@ -10214,8 +10214,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list_labels("fileId")
-///              .page_token("ipsum")
-///              .max_results(-73)
+///              .page_token("magna")
+///              .max_results(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10262,7 +10262,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10547,7 +10547,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10792,22 +10792,22 @@ where
 /// let result = hub.files().patch(req, "fileId")
 ///              .use_content_as_indexable_text(true)
 ///              .update_viewed_date(true)
-///              .timed_text_track_name("sea")
-///              .timed_text_language("ipsum")
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
+///              .timed_text_track_name("est")
+///              .timed_text_language("takimata")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
 ///              .set_modified_date(false)
-///              .remove_parents("kasd")
-///              .pinned(true)
-///              .ocr_language("Lorem")
+///              .remove_parents("erat")
+///              .pinned(false)
+///              .ocr_language("ipsum")
 ///              .ocr(false)
 ///              .new_revision(false)
-///              .modified_date_behavior("nonumy")
-///              .include_permissions_for_view("sea")
-///              .include_labels("ipsum")
+///              .modified_date_behavior(&Default::default())
+///              .include_permissions_for_view("no")
+///              .include_labels("justo")
 ///              .enforce_single_parent(true)
-///              .convert(false)
-///              .add_parents("erat")
+///              .convert(true)
+///              .add_parents("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10829,7 +10829,7 @@ pub struct FilePatchCall<'a, S>
    pub(super) _ocr_language: Option<String>,
    pub(super) _ocr: Option<bool>,
    pub(super) _new_revision: Option<bool>,
-   pub(super) _modified_date_behavior: Option<String>,
+   pub(super) _modified_date_behavior: Option<FileModifiedDateBehaviorEnum>,
    pub(super) _include_permissions_for_view: Option<String>,
    pub(super) _include_labels: Option<String>,
    pub(super) _enforce_single_parent: Option<bool>,
@@ -10871,7 +10871,7 @@ where
         }
 
         let mut params = Params::with_capacity(22 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
         }
@@ -11150,8 +11150,8 @@ where
     /// Determines the behavior in which modifiedDate is updated. This overrides setModifiedDate.
     ///
     /// Sets the *modified date behavior* query property to the given value.
-    pub fn modified_date_behavior(mut self, new_value: &str) -> FilePatchCall<'a, S> {
-        self._modified_date_behavior = Some(new_value.to_string());
+    pub fn modified_date_behavior(mut self, new_value: &FileModifiedDateBehaviorEnum) -> FilePatchCall<'a, S> {
+        self._modified_date_behavior = Some(new_value.clone());
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
@@ -11288,10 +11288,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().touch("fileId")
-///              .supports_team_drives(false)
-///              .supports_all_drives(false)
-///              .include_permissions_for_view("nonumy")
-///              .include_labels("erat")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .include_permissions_for_view("sit")
+///              .include_labels("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11340,7 +11340,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -11596,8 +11596,8 @@ where
 /// let result = hub.files().trash("fileId")
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .include_permissions_for_view("elitr")
-///              .include_labels("consetetur")
+///              .include_permissions_for_view("sed")
+///              .include_labels("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11646,7 +11646,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -11900,10 +11900,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().untrash("fileId")
-///              .supports_team_drives(true)
+///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .include_permissions_for_view("erat")
-///              .include_labels("diam")
+///              .include_permissions_for_view("justo")
+///              .include_labels("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11952,7 +11952,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -12215,22 +12215,22 @@ where
 /// let result = hub.files().update(req, "fileId")
 ///              .use_content_as_indexable_text(false)
 ///              .update_viewed_date(false)
-///              .timed_text_track_name("diam")
-///              .timed_text_language("sed")
+///              .timed_text_track_name("invidunt")
+///              .timed_text_language("nonumy")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .set_modified_date(true)
-///              .remove_parents("At")
+///              .set_modified_date(false)
+///              .remove_parents("elitr")
 ///              .pinned(true)
-///              .ocr_language("sit")
-///              .ocr(false)
-///              .new_revision(false)
-///              .modified_date_behavior("elitr")
-///              .include_permissions_for_view("aliquyam")
-///              .include_labels("erat")
-///              .enforce_single_parent(false)
-///              .convert(true)
-///              .add_parents("rebum.")
+///              .ocr_language("et")
+///              .ocr(true)
+///              .new_revision(true)
+///              .modified_date_behavior(&Default::default())
+///              .include_permissions_for_view("erat")
+///              .include_labels("diam")
+///              .enforce_single_parent(true)
+///              .convert(false)
+///              .add_parents("diam")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -12252,7 +12252,7 @@ pub struct FileUpdateCall<'a, S>
    pub(super) _ocr_language: Option<String>,
    pub(super) _ocr: Option<bool>,
    pub(super) _new_revision: Option<bool>,
-   pub(super) _modified_date_behavior: Option<String>,
+   pub(super) _modified_date_behavior: Option<FileModifiedDateBehaviorEnum>,
    pub(super) _include_permissions_for_view: Option<String>,
    pub(super) _include_labels: Option<String>,
    pub(super) _enforce_single_parent: Option<bool>,
@@ -12293,7 +12293,7 @@ where
         }
 
         let mut params = Params::with_capacity(22 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
         }
@@ -12488,7 +12488,7 @@ where
         }
 
         let mut params = Params::with_capacity(22 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_content_as_indexable_text.as_ref() {
             params.push("useContentAsIndexableText", value.to_string());
         }
@@ -12879,8 +12879,8 @@ where
     /// Determines the behavior in which modifiedDate is updated. This overrides setModifiedDate.
     ///
     /// Sets the *modified date behavior* query property to the given value.
-    pub fn modified_date_behavior(mut self, new_value: &str) -> FileUpdateCall<'a, S> {
-        self._modified_date_behavior = Some(new_value.to_string());
+    pub fn modified_date_behavior(mut self, new_value: &FileModifiedDateBehaviorEnum) -> FileUpdateCall<'a, S> {
+        self._modified_date_behavior = Some(new_value.clone());
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
@@ -13028,13 +13028,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().watch(req, "fileId")
-///              .update_viewed_date(true)
+///              .update_viewed_date(false)
 ///              .supports_team_drives(false)
-///              .supports_all_drives(false)
-///              .revision_id("sit")
-///              .projection("kasd")
-///              .include_permissions_for_view("tempor")
-///              .include_labels("dolor")
+///              .supports_all_drives(true)
+///              .revision_id("ea")
+///              .projection(&Default::default())
+///              .include_permissions_for_view("At")
+///              .include_labels("sit")
 ///              .acknowledge_abuse(false)
 ///              .doit().await;
 /// # }
@@ -13049,7 +13049,7 @@ pub struct FileWatchCall<'a, S>
    pub(super) _supports_team_drives: Option<bool>,
    pub(super) _supports_all_drives: Option<bool>,
    pub(super) _revision_id: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<FileProjectionEnum>,
    pub(super) _include_permissions_for_view: Option<String>,
    pub(super) _include_labels: Option<String>,
    pub(super) _acknowledge_abuse: Option<bool>,
@@ -13089,7 +13089,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._update_viewed_date.as_ref() {
             params.push("updateViewedDate", value.to_string());
         }
@@ -13291,8 +13291,8 @@ where
     /// This parameter is deprecated and has no function.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> FileWatchCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &FileProjectionEnum) -> FileWatchCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
@@ -13415,7 +13415,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.parents().delete("fileId", "parentId")
-///              .enforce_single_parent(true)
+///              .enforce_single_parent(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13462,8 +13462,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("parentId", self._parent_id);
+        params.push("fileId", &self._file_id);
+        params.push("parentId", &self._parent_id);
         if let Some(value) = self._enforce_single_parent.as_ref() {
             params.push("enforceSingleParent", value.to_string());
         }
@@ -13731,8 +13731,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("parentId", self._parent_id);
+        params.push("fileId", &self._file_id);
+        params.push("parentId", &self._parent_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13963,8 +13963,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.parents().insert(req, "fileId")
 ///              .supports_team_drives(false)
-///              .supports_all_drives(false)
-///              .enforce_single_parent(false)
+///              .supports_all_drives(true)
+///              .enforce_single_parent(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14013,7 +14013,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._supports_team_drives.as_ref() {
             params.push("supportsTeamDrives", value.to_string());
         }
@@ -14324,7 +14324,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14538,8 +14538,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().delete("fileId", "permissionId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(true)
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
 ///              .doit().await;
 /// # }
@@ -14589,8 +14589,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -14835,7 +14835,7 @@ where
 /// let result = hub.permissions().get("fileId", "permissionId")
 ///              .use_domain_admin_access(true)
 ///              .supports_team_drives(false)
-///              .supports_all_drives(false)
+///              .supports_all_drives(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14884,8 +14884,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -15183,7 +15183,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("email", self._email);
+        params.push("email", &self._email);
 
         params.extend(self._additional_params.iter());
 
@@ -15407,9 +15407,9 @@ where
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
 ///              .send_notification_emails(true)
-///              .move_to_new_owners_root(false)
-///              .enforce_single_parent(false)
-///              .email_message("accusam")
+///              .move_to_new_owners_root(true)
+///              .enforce_single_parent(true)
+///              .email_message("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15462,7 +15462,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -15770,11 +15770,11 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
 ///              .use_domain_admin_access(false)
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .page_token("amet")
-///              .max_results(-35)
-///              .include_permissions_for_view("aliquyam")
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .page_token("Stet")
+///              .max_results(-78)
+///              .include_permissions_for_view("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15825,7 +15825,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -16106,10 +16106,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().patch(req, "fileId", "permissionId")
 ///              .use_domain_admin_access(false)
-///              .transfer_ownership(true)
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .remove_expiration(true)
+///              .transfer_ownership(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .remove_expiration(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16161,8 +16161,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -16466,10 +16466,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
 ///              .use_domain_admin_access(false)
-///              .transfer_ownership(true)
+///              .transfer_ownership(false)
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .remove_expiration(false)
+///              .remove_expiration(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16521,8 +16521,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("permissionId", self._permission_id);
+        params.push("fileId", &self._file_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -16819,7 +16819,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().delete("fileId", "propertyKey")
-///              .visibility("gubergren")
+///              .visibility("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16866,8 +16866,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("propertyKey", self._property_key);
+        params.push("fileId", &self._file_id);
+        params.push("propertyKey", &self._property_key);
         if let Some(value) = self._visibility.as_ref() {
             params.push("visibility", value);
         }
@@ -17090,7 +17090,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().get("fileId", "propertyKey")
-///              .visibility("kasd")
+///              .visibility("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17137,8 +17137,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("propertyKey", self._property_key);
+        params.push("fileId", &self._file_id);
+        params.push("propertyKey", &self._property_key);
         if let Some(value) = self._visibility.as_ref() {
             params.push("visibility", value);
         }
@@ -17423,7 +17423,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17704,7 +17704,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17924,7 +17924,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().patch(req, "fileId", "propertyKey")
-///              .visibility("Lorem")
+///              .visibility("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17972,8 +17972,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("propertyKey", self._property_key);
+        params.push("fileId", &self._file_id);
+        params.push("propertyKey", &self._property_key);
         if let Some(value) = self._visibility.as_ref() {
             params.push("visibility", value);
         }
@@ -18236,7 +18236,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().update(req, "fileId", "propertyKey")
-///              .visibility("Stet")
+///              .visibility("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18284,8 +18284,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("propertyKey", self._property_key);
+        params.push("fileId", &self._file_id);
+        params.push("propertyKey", &self._property_key);
         if let Some(value) = self._visibility.as_ref() {
             params.push("visibility", value);
         }
@@ -18588,9 +18588,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18813,7 +18813,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().get("fileId", "commentId", "replyId")
-///              .include_deleted(true)
+///              .include_deleted(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18861,9 +18861,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
         if let Some(value) = self._include_deleted.as_ref() {
             params.push("includeDeleted", value.to_string());
         }
@@ -19159,8 +19159,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19407,8 +19407,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("sed")
-///              .max_results(-27)
+///              .page_token("elitr")
+///              .max_results(-50)
 ///              .include_deleted(true)
 ///              .doit().await;
 /// # }
@@ -19458,8 +19458,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -19766,9 +19766,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20078,9 +20078,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("commentId", self._comment_id);
-        params.push("replyId", self._reply_id);
+        params.push("fileId", &self._file_id);
+        params.push("commentId", &self._comment_id);
+        params.push("replyId", &self._reply_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20382,8 +20382,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20641,8 +20641,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20866,8 +20866,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("vero")
-///              .max_results(-17)
+///              .page_token("sea")
+///              .max_results(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20914,7 +20914,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
+        params.push("fileId", &self._file_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21200,8 +21200,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21500,8 +21500,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("fileId", self._file_id);
-        params.push("revisionId", self._revision_id);
+        params.push("fileId", &self._file_id);
+        params.push("revisionId", &self._revision_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21792,7 +21792,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("teamDriveId", self._team_drive_id);
+        params.push("teamDriveId", &self._team_drive_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22041,7 +22041,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("teamDriveId", self._team_drive_id);
+        params.push("teamDriveId", &self._team_drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }
@@ -22316,7 +22316,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("requestId", self._request_id);
+        params.push("requestId", &self._request_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22547,9 +22547,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
 ///              .use_domain_admin_access(true)
-///              .q("ea")
-///              .page_token("aliquyam")
-///              .max_results(-91)
+///              .q("Lorem")
+///              .page_token("dolor")
+///              .max_results(-97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22839,7 +22839,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().update(req, "teamDriveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22886,7 +22886,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("teamDriveId", self._team_drive_id);
+        params.push("teamDriveId", &self._team_drive_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
         }

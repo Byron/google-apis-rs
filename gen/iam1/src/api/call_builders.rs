@@ -616,7 +616,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -878,7 +878,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1140,7 +1140,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1402,7 +1402,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1671,7 +1671,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1958,7 +1958,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", ::client::serde::urlsafe_base64::to_string(&value));
         }
@@ -2230,7 +2230,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2448,10 +2448,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().roles_list("parent")
-///              .view("Lorem")
-///              .show_deleted(false)
-///              .page_token("dolor")
-///              .page_size(-17)
+///              .view(&Default::default())
+///              .show_deleted(true)
+///              .page_token("gubergren")
+///              .page_size(-75)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2460,7 +2460,7 @@ pub struct OrganizationRoleListCall<'a, S>
 
    pub(super) hub: &'a Iam<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<OrganizationViewEnum>,
    pub(super) _show_deleted: Option<bool>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -2500,7 +2500,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -2630,8 +2630,8 @@ where
     /// Optional view for the returned Role objects. When `FULL` is specified, the `includedPermissions` field is returned, which includes a list of all permissions in the role. The default value is `BASIC`, which does not return the `includedPermissions` field.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> OrganizationRoleListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &OrganizationViewEnum) -> OrganizationRoleListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Include Roles that have been deleted.
@@ -2811,7 +2811,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3113,7 +3113,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3671,7 +3671,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3933,7 +3933,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4195,7 +4195,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4419,7 +4419,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_providers_create(req, "parent")
-///              .workload_identity_pool_provider_id("ut")
+///              .workload_identity_pool_provider_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4466,7 +4466,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._workload_identity_pool_provider_id.as_ref() {
             params.push("workloadIdentityPoolProviderId", value);
         }
@@ -4761,7 +4761,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5023,7 +5023,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5243,7 +5243,7 @@ where
 /// let result = hub.projects().locations_workload_identity_pools_providers_list("parent")
 ///              .show_deleted(true)
 ///              .page_token("ipsum")
-///              .page_size(-7)
+///              .page_size(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5291,7 +5291,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._show_deleted.as_ref() {
             params.push("showDeleted", value.to_string());
         }
@@ -5592,7 +5592,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -5894,7 +5894,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6141,7 +6141,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_create(req, "parent")
-///              .workload_identity_pool_id("Lorem")
+///              .workload_identity_pool_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6188,7 +6188,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._workload_identity_pool_id.as_ref() {
             params.push("workloadIdentityPoolId", value);
         }
@@ -6483,7 +6483,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6745,7 +6745,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6963,9 +6963,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_list("parent")
-///              .show_deleted(false)
-///              .page_token("sed")
-///              .page_size(-61)
+///              .show_deleted(true)
+///              .page_token("duo")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7013,7 +7013,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._show_deleted.as_ref() {
             params.push("showDeleted", value.to_string());
         }
@@ -7314,7 +7314,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -7616,7 +7616,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7908,7 +7908,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -8195,7 +8195,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._etag.as_ref() {
             params.push("etag", ::client::serde::urlsafe_base64::to_string(&value));
         }
@@ -8467,7 +8467,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8685,10 +8685,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().roles_list("parent")
-///              .view("vero")
-///              .show_deleted(false)
-///              .page_token("duo")
-///              .page_size(-34)
+///              .view(&Default::default())
+///              .show_deleted(true)
+///              .page_token("vero")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8697,7 +8697,7 @@ pub struct ProjectRoleListCall<'a, S>
 
    pub(super) hub: &'a Iam<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _show_deleted: Option<bool>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -8737,7 +8737,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -8867,8 +8867,8 @@ where
     /// Optional view for the returned Role objects. When `FULL` is specified, the `includedPermissions` field is returned, which includes a list of all permissions in the role. The default value is `BASIC`, which does not return the `includedPermissions` field.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectRoleListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectRoleListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Include Roles that have been deleted.
@@ -9048,7 +9048,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -9350,7 +9350,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9642,7 +9642,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9927,7 +9927,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10196,7 +10196,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10488,7 +10488,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10729,7 +10729,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_keys_get("name")
-///              .public_key_type("et")
+///              .public_key_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -10738,7 +10738,7 @@ pub struct ProjectServiceAccountKeyGetCall<'a, S>
 
    pub(super) hub: &'a Iam<S>,
    pub(super) _name: String,
-   pub(super) _public_key_type: Option<String>,
+   pub(super) _public_key_type: Option<ProjectPublicKeyTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10775,7 +10775,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._public_key_type.as_ref() {
             params.push("publicKeyType", value);
         }
@@ -10896,8 +10896,8 @@ where
     /// Optional. The output format of the public key. The default is `TYPE_NONE`, which means that the public key is not returned.
     ///
     /// Sets the *public key type* query property to the given value.
-    pub fn public_key_type(mut self, new_value: &str) -> ProjectServiceAccountKeyGetCall<'a, S> {
-        self._public_key_type = Some(new_value.to_string());
+    pub fn public_key_type(mut self, new_value: &ProjectPublicKeyTypeEnum) -> ProjectServiceAccountKeyGetCall<'a, S> {
+        self._public_key_type = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11003,7 +11003,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_keys_list("name")
-///              .add_key_types("Stet")
+///              .add_key_types(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -11012,7 +11012,7 @@ pub struct ProjectServiceAccountKeyListCall<'a, S>
 
    pub(super) hub: &'a Iam<S>,
    pub(super) _name: String,
-   pub(super) _key_types: Vec<String>,
+   pub(super) _key_types: Option<ProjectKeyTypesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -11049,7 +11049,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if self._key_types.len() > 0 {
             for f in self._key_types.iter() {
                 params.push("keyTypes", f);
@@ -11173,8 +11173,8 @@ where
     ///
     /// Append the given value to the *key types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_key_types(mut self, new_value: &str) -> ProjectServiceAccountKeyListCall<'a, S> {
-        self._key_types.push(new_value.to_string());
+    pub fn add_key_types(mut self, new_value: &ProjectKeyTypesEnum) -> ProjectServiceAccountKeyListCall<'a, S> {
+        self._key_types.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11331,7 +11331,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11623,7 +11623,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11908,7 +11908,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12177,7 +12177,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12469,7 +12469,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12754,7 +12754,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12972,7 +12972,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_get_iam_policy("resource")
-///              .options_requested_policy_version(-44)
+///              .options_requested_policy_version(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13018,7 +13018,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -13246,8 +13246,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_list("name")
-///              .page_token("diam")
-///              .page_size(-61)
+///              .page_token("invidunt")
+///              .page_size(-65)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13294,7 +13294,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13583,7 +13583,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13875,7 +13875,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -14167,7 +14167,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14459,7 +14459,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14751,7 +14751,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -15043,7 +15043,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15335,7 +15335,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15620,7 +15620,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15838,11 +15838,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.roles().list()
-///              .view("amet.")
+///              .view(&Default::default())
 ///              .show_deleted(true)
-///              .parent("et")
-///              .page_token("accusam")
-///              .page_size(-78)
+///              .parent("voluptua.")
+///              .page_token("et")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15850,7 +15850,7 @@ pub struct RoleListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Iam<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<RoleViewEnum>,
    pub(super) _show_deleted: Option<bool>,
    pub(super) _parent: Option<String>,
    pub(super) _page_token: Option<String>,
@@ -16006,8 +16006,8 @@ where
     /// Optional view for the returned Role objects. When `FULL` is specified, the `includedPermissions` field is returned, which includes a list of all permissions in the role. The default value is `BASIC`, which does not return the `includedPermissions` field.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> RoleListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &RoleViewEnum) -> RoleListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Include Roles that have been deleted.

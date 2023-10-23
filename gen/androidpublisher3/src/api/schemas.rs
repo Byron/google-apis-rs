@@ -250,11 +250,11 @@ pub struct AutoRenewingBasePlanType {
     /// The proration mode for the base plan determines what happens when a user switches to this plan from another base plan. If unspecified, defaults to CHARGE_ON_NEXT_BILLING_DATE.
     #[serde(rename="prorationMode")]
     
-    pub proration_mode: Option<String>,
+    pub proration_mode: Option<AutoRenewingBasePlanTypeProrationModeEnum>,
     /// Whether users should be able to resubscribe to this base plan in Google Play surfaces. Defaults to RESUBSCRIBE_STATE_ACTIVE if not specified.
     #[serde(rename="resubscribeState")]
     
-    pub resubscribe_state: Option<String>,
+    pub resubscribe_state: Option<AutoRenewingBasePlanTypeResubscribeStateEnum>,
 }
 
 impl client::Part for AutoRenewingBasePlanType {}
@@ -313,7 +313,7 @@ pub struct BasePlan {
     pub regional_configs: Option<Vec<RegionalBasePlanConfig>>,
     /// Output only. The state of the base plan, i.e. whether it's active. Draft and inactive base plans can be activated or deleted. Active base plans can be made inactive. Inactive base plans can be canceled. This field cannot be changed by updating the resource. Use the dedicated endpoints instead.
     
-    pub state: Option<String>,
+    pub state: Option<BasePlanStateEnum>,
 }
 
 impl client::Part for BasePlan {}
@@ -376,7 +376,7 @@ impl client::ResponseResult for BundlesListResponse {}
 pub struct CancelSurveyResult {
     /// The reason the user selected in the cancel survey.
     
-    pub reason: Option<String>,
+    pub reason: Option<CancelSurveyResultReasonEnum>,
     /// Only set for CANCEL_SURVEY_REASON_OTHERS. This is the user's freeform response to the survey.
     #[serde(rename="reasonUserInput")]
     
@@ -579,7 +579,7 @@ pub struct DeobfuscationFile {
     /// The type of the deobfuscation file.
     #[serde(rename="symbolType")]
     
-    pub symbol_type: Option<String>,
+    pub symbol_type: Option<DeobfuscationFileSymbolTypeEnum>,
 }
 
 impl client::Part for DeobfuscationFile {}
@@ -1178,7 +1178,7 @@ pub struct Grant {
     /// The permissions granted to the user for this app.
     #[serde(rename="appLevelPermissions")]
     
-    pub app_level_permissions: Option<Vec<String>>,
+    pub app_level_permissions: Option<Vec<GrantAppLevelPermissionsEnum>>,
     /// Required. Resource name for this grant, following the pattern "developers/{developer}/users/{email}/grants/{package_name}". If this grant is for a draft app, the app ID will be used in this resource name instead of the package name.
     
     pub name: Option<String>,
@@ -1317,13 +1317,13 @@ pub struct InAppProduct {
     /// The type of the product, e.g. a recurring subscription.
     #[serde(rename="purchaseType")]
     
-    pub purchase_type: Option<String>,
+    pub purchase_type: Option<InAppProductPurchaseTypeEnum>,
     /// Stock-keeping-unit (SKU) of the product, unique within an app.
     
     pub sku: Option<String>,
     /// The status of the product, e.g. whether it's active.
     
-    pub status: Option<String>,
+    pub status: Option<InAppProductStatusEnum>,
     /// Subscription period, specified in ISO 8601 format. Acceptable values are P1W (one week), P1M (one month), P3M (three months), P6M (six months), and P1Y (one year).
     #[serde(rename="subscriptionPeriod")]
     
@@ -1632,7 +1632,7 @@ pub struct ManagedProductTaxAndComplianceSettings {
     /// Digital content or service classification for products distributed to users in the European Economic Area (EEA). The withdrawal regime under EEA consumer laws depends on this classification. Refer to the [Help Center article](https://support.google.com/googleplay/android-developer/answer/10463498) for more information.
     #[serde(rename="eeaWithdrawalRightType")]
     
-    pub eea_withdrawal_right_type: Option<String>,
+    pub eea_withdrawal_right_type: Option<ManagedProductTaxAndComplianceSettingEeaWithdrawalRightTypeEnum>,
     /// A mapping from region code to tax rate details. The keys are region codes as defined by Unicode's "CLDR".
     #[serde(rename="taxRateInfoByRegionCode")]
     
@@ -1881,7 +1881,7 @@ pub struct PrepaidBasePlanType {
     /// Whether users should be able to extend this prepaid base plan in Google Play surfaces. Defaults to TIME_EXTENSION_ACTIVE if not specified.
     #[serde(rename="timeExtension")]
     
-    pub time_extension: Option<String>,
+    pub time_extension: Option<PrepaidBasePlanTypeTimeExtensionEnum>,
 }
 
 impl client::Part for PrepaidBasePlanType {}
@@ -2117,11 +2117,11 @@ pub struct RegionalTaxRateInfo {
     /// To collect communications or amusement taxes in the United States, choose the appropriate tax category. [Learn more](https://support.google.com/googleplay/android-developer/answer/10463498#streaming_tax).
     #[serde(rename="streamingTaxType")]
     
-    pub streaming_tax_type: Option<String>,
+    pub streaming_tax_type: Option<RegionalTaxRateInfoStreamingTaxTypeEnum>,
     /// Tax tier to specify reduced tax rate. Developers who sell digital news, magazines, newspapers, books, or audiobooks in various regions may be eligible for reduced tax rates. [Learn more](https://support.google.com/googleplay/android-developer/answer/10463498).
     #[serde(rename="taxTier")]
     
-    pub tax_tier: Option<String>,
+    pub tax_tier: Option<RegionalTaxRateInfoTaxTierEnum>,
 }
 
 impl client::Part for RegionalTaxRateInfo {}
@@ -2405,11 +2405,11 @@ pub struct SubscriptionItemPriceChangeDetails {
     /// Price change mode specifies how the subscription item price is changing.
     #[serde(rename="priceChangeMode")]
     
-    pub price_change_mode: Option<String>,
+    pub price_change_mode: Option<SubscriptionItemPriceChangeDetailPriceChangeModeEnum>,
     /// State the price change is currently in.
     #[serde(rename="priceChangeState")]
     
-    pub price_change_state: Option<String>,
+    pub price_change_state: Option<SubscriptionItemPriceChangeDetailPriceChangeStateEnum>,
 }
 
 impl client::Part for SubscriptionItemPriceChangeDetails {}
@@ -2488,7 +2488,7 @@ pub struct SubscriptionOffer {
     pub regional_configs: Option<Vec<RegionalSubscriptionOfferConfig>>,
     /// Output only. The current state of this offer. Can be changed using Activate and Deactivate actions. NB: the base plan state supersedes this state, so an active offer may not be available if the base plan is not active.
     
-    pub state: Option<String>,
+    pub state: Option<SubscriptionOfferStateEnum>,
     /// The requirements that users need to fulfil to be eligible for this offer. Represents the requirements that Play will evaluate to decide whether an offer should be returned. Developers may further filter these offers themselves.
     
     pub targeting: Option<SubscriptionOfferTargeting>,
@@ -2746,7 +2746,7 @@ pub struct SubscriptionPurchaseV2 {
     /// The acknowledgement state of the subscription.
     #[serde(rename="acknowledgementState")]
     
-    pub acknowledgement_state: Option<String>,
+    pub acknowledgement_state: Option<SubscriptionPurchaseV2AcknowledgementStateEnum>,
     /// Additional context around canceled subscriptions. Only present if the subscription currently has subscription_state SUBSCRIPTION_STATE_CANCELED.
     #[serde(rename="canceledStateContext")]
     
@@ -2789,7 +2789,7 @@ pub struct SubscriptionPurchaseV2 {
     /// The current state of the subscription.
     #[serde(rename="subscriptionState")]
     
-    pub subscription_state: Option<String>,
+    pub subscription_state: Option<SubscriptionPurchaseV2SubscriptionStateEnum>,
     /// Only present if this subscription purchase is a test purchase.
     #[serde(rename="testPurchase")]
     
@@ -2870,7 +2870,7 @@ pub struct SubscriptionTaxAndComplianceSettings {
     /// Digital content or service classification for products distributed to users in the European Economic Area (EEA). The withdrawal regime under EEA consumer laws depends on this classification. Refer to the [Help Center article](https://support.google.com/googleplay/android-developer/answer/10463498) for more information.
     #[serde(rename="eeaWithdrawalRightType")]
     
-    pub eea_withdrawal_right_type: Option<String>,
+    pub eea_withdrawal_right_type: Option<SubscriptionTaxAndComplianceSettingEeaWithdrawalRightTypeEnum>,
     /// A mapping from region code to tax rate details. The keys are region codes as defined by Unicode's "CLDR".
     #[serde(rename="taxRateInfoByRegionCode")]
     
@@ -3090,7 +3090,7 @@ pub struct TrackRelease {
     pub release_notes: Option<Vec<LocalizedText>>,
     /// The status of the release.
     
-    pub status: Option<String>,
+    pub status: Option<TrackReleaseStatusEnum>,
     /// Fraction of users who are eligible for a staged release. 0 < fraction < 1. Can only be set when status is "inProgress" or "halted".
     #[serde(rename="userFraction")]
     
@@ -3183,11 +3183,11 @@ pub struct User {
     /// Output only. The state of the user's access to the Play Console.
     #[serde(rename="accessState")]
     
-    pub access_state: Option<String>,
+    pub access_state: Option<UserAccessStateEnum>,
     /// Permissions for the user which apply across the developer account.
     #[serde(rename="developerAccountPermissions")]
     
-    pub developer_account_permissions: Option<Vec<String>>,
+    pub developer_account_permissions: Option<Vec<UserDeveloperAccountPermissionsEnum>>,
     /// Immutable. The user's email address.
     
     pub email: Option<String>,

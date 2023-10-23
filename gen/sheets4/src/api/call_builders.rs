@@ -25,7 +25,7 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.spreadsheets().developer_metadata_get("spreadsheetId", -50)
+/// let result = hub.spreadsheets().developer_metadata_get("spreadsheetId", -55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
-        params.push("metadataId", self._metadata_id.to_string());
+        params.push("spreadsheetId", &self._spreadsheet_id);
+        params.push("metadataId", &self._metadata_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -351,7 +351,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -644,8 +644,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
-        params.push("sheetId", self._sheet_id.to_string());
+        params.push("spreadsheetId", &self._spreadsheet_id);
+        params.push("sheetId", &self._sheet_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -902,11 +902,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spreadsheets().values_append(req, "spreadsheetId", "range")
-///              .value_input_option("ipsum")
-///              .response_value_render_option("ipsum")
-///              .response_date_time_render_option("est")
-///              .insert_data_option("gubergren")
-///              .include_values_in_response(false)
+///              .value_input_option(&Default::default())
+///              .response_value_render_option(&Default::default())
+///              .response_date_time_render_option(&Default::default())
+///              .insert_data_option(&Default::default())
+///              .include_values_in_response(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -917,10 +917,10 @@ pub struct SpreadsheetValueAppendCall<'a, S>
    pub(super) _request: ValueRange,
    pub(super) _spreadsheet_id: String,
    pub(super) _range: String,
-   pub(super) _value_input_option: Option<String>,
-   pub(super) _response_value_render_option: Option<String>,
-   pub(super) _response_date_time_render_option: Option<String>,
-   pub(super) _insert_data_option: Option<String>,
+   pub(super) _value_input_option: Option<SpreadsheetValueInputOptionEnum>,
+   pub(super) _response_value_render_option: Option<SpreadsheetResponseValueRenderOptionEnum>,
+   pub(super) _response_date_time_render_option: Option<SpreadsheetResponseDateTimeRenderOptionEnum>,
+   pub(super) _insert_data_option: Option<SpreadsheetInsertDataOptionEnum>,
    pub(super) _include_values_in_response: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -958,8 +958,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
-        params.push("range", self._range);
+        params.push("spreadsheetId", &self._spreadsheet_id);
+        params.push("range", &self._range);
         if let Some(value) = self._value_input_option.as_ref() {
             params.push("valueInputOption", value);
         }
@@ -1125,29 +1125,29 @@ where
     /// How the input data should be interpreted.
     ///
     /// Sets the *value input option* query property to the given value.
-    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
-        self._value_input_option = Some(new_value.to_string());
+    pub fn value_input_option(mut self, new_value: &SpreadsheetValueInputOptionEnum) -> SpreadsheetValueAppendCall<'a, S> {
+        self._value_input_option = Some(new_value.clone());
         self
     }
     /// Determines how values in the response should be rendered. The default render option is FORMATTED_VALUE.
     ///
     /// Sets the *response value render option* query property to the given value.
-    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
-        self._response_value_render_option = Some(new_value.to_string());
+    pub fn response_value_render_option(mut self, new_value: &SpreadsheetResponseValueRenderOptionEnum) -> SpreadsheetValueAppendCall<'a, S> {
+        self._response_value_render_option = Some(new_value.clone());
         self
     }
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *response date time render option* query property to the given value.
-    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
-        self._response_date_time_render_option = Some(new_value.to_string());
+    pub fn response_date_time_render_option(mut self, new_value: &SpreadsheetResponseDateTimeRenderOptionEnum) -> SpreadsheetValueAppendCall<'a, S> {
+        self._response_date_time_render_option = Some(new_value.clone());
         self
     }
     /// How the input data should be inserted.
     ///
     /// Sets the *insert data option* query property to the given value.
-    pub fn insert_data_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
-        self._insert_data_option = Some(new_value.to_string());
+    pub fn insert_data_option(mut self, new_value: &SpreadsheetInsertDataOptionEnum) -> SpreadsheetValueAppendCall<'a, S> {
+        self._insert_data_option = Some(new_value.clone());
         self
     }
     /// Determines if the update response should include the values of the cells that were appended. By default, responses do not include the updated values.
@@ -1311,7 +1311,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1603,7 +1603,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1844,10 +1844,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spreadsheets().values_batch_get("spreadsheetId")
-///              .value_render_option("sed")
-///              .add_ranges("duo")
-///              .major_dimension("sed")
-///              .date_time_render_option("no")
+///              .value_render_option(&Default::default())
+///              .add_ranges("ipsum")
+///              .major_dimension(&Default::default())
+///              .date_time_render_option(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1856,10 +1856,10 @@ pub struct SpreadsheetValueBatchGetCall<'a, S>
 
    pub(super) hub: &'a Sheets<S>,
    pub(super) _spreadsheet_id: String,
-   pub(super) _value_render_option: Option<String>,
+   pub(super) _value_render_option: Option<SpreadsheetValueRenderOptionEnum>,
    pub(super) _ranges: Vec<String>,
-   pub(super) _major_dimension: Option<String>,
-   pub(super) _date_time_render_option: Option<String>,
+   pub(super) _major_dimension: Option<SpreadsheetMajorDimensionEnum>,
+   pub(super) _date_time_render_option: Option<SpreadsheetDateTimeRenderOptionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1896,7 +1896,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
         if let Some(value) = self._value_render_option.as_ref() {
             params.push("valueRenderOption", value);
         }
@@ -2028,8 +2028,8 @@ where
     /// How values should be represented in the output. The default render option is ValueRenderOption.FORMATTED_VALUE.
     ///
     /// Sets the *value render option* query property to the given value.
-    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
-        self._value_render_option = Some(new_value.to_string());
+    pub fn value_render_option(mut self, new_value: &SpreadsheetValueRenderOptionEnum) -> SpreadsheetValueBatchGetCall<'a, S> {
+        self._value_render_option = Some(new_value.clone());
         self
     }
     /// The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the range to retrieve values from.
@@ -2043,15 +2043,15 @@ where
     /// The major dimension that results should use. For example, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `ranges=["A1:B2"],majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas requesting `ranges=["A1:B2"],majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     ///
     /// Sets the *major dimension* query property to the given value.
-    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
-        self._major_dimension = Some(new_value.to_string());
+    pub fn major_dimension(mut self, new_value: &SpreadsheetMajorDimensionEnum) -> SpreadsheetValueBatchGetCall<'a, S> {
+        self._major_dimension = Some(new_value.clone());
         self
     }
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *date time render option* query property to the given value.
-    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
-        self._date_time_render_option = Some(new_value.to_string());
+    pub fn date_time_render_option(mut self, new_value: &SpreadsheetDateTimeRenderOptionEnum) -> SpreadsheetValueBatchGetCall<'a, S> {
+        self._date_time_render_option = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2208,7 +2208,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2500,7 +2500,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2792,7 +2792,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3085,8 +3085,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
-        params.push("range", self._range);
+        params.push("spreadsheetId", &self._spreadsheet_id);
+        params.push("range", &self._range);
 
         params.extend(self._additional_params.iter());
 
@@ -3337,9 +3337,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spreadsheets().values_get("spreadsheetId", "range")
-///              .value_render_option("erat")
-///              .major_dimension("sed")
-///              .date_time_render_option("duo")
+///              .value_render_option(&Default::default())
+///              .major_dimension(&Default::default())
+///              .date_time_render_option(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3349,9 +3349,9 @@ pub struct SpreadsheetValueGetCall<'a, S>
    pub(super) hub: &'a Sheets<S>,
    pub(super) _spreadsheet_id: String,
    pub(super) _range: String,
-   pub(super) _value_render_option: Option<String>,
-   pub(super) _major_dimension: Option<String>,
-   pub(super) _date_time_render_option: Option<String>,
+   pub(super) _value_render_option: Option<SpreadsheetValueRenderOptionEnum>,
+   pub(super) _major_dimension: Option<SpreadsheetMajorDimensionEnum>,
+   pub(super) _date_time_render_option: Option<SpreadsheetDateTimeRenderOptionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3388,8 +3388,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
-        params.push("range", self._range);
+        params.push("spreadsheetId", &self._spreadsheet_id);
+        params.push("range", &self._range);
         if let Some(value) = self._value_render_option.as_ref() {
             params.push("valueRenderOption", value);
         }
@@ -3526,22 +3526,22 @@ where
     /// How values should be represented in the output. The default render option is FORMATTED_VALUE.
     ///
     /// Sets the *value render option* query property to the given value.
-    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
-        self._value_render_option = Some(new_value.to_string());
+    pub fn value_render_option(mut self, new_value: &SpreadsheetValueRenderOptionEnum) -> SpreadsheetValueGetCall<'a, S> {
+        self._value_render_option = Some(new_value.clone());
         self
     }
     /// The major dimension that results should use. For example, if the spreadsheet data in Sheet1 is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=Sheet1!A1:B2?majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas requesting `range=Sheet1!A1:B2?majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     ///
     /// Sets the *major dimension* query property to the given value.
-    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
-        self._major_dimension = Some(new_value.to_string());
+    pub fn major_dimension(mut self, new_value: &SpreadsheetMajorDimensionEnum) -> SpreadsheetValueGetCall<'a, S> {
+        self._major_dimension = Some(new_value.clone());
         self
     }
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *date time render option* query property to the given value.
-    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
-        self._date_time_render_option = Some(new_value.to_string());
+    pub fn date_time_render_option(mut self, new_value: &SpreadsheetDateTimeRenderOptionEnum) -> SpreadsheetValueGetCall<'a, S> {
+        self._date_time_render_option = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3653,9 +3653,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spreadsheets().values_update(req, "spreadsheetId", "range")
-///              .value_input_option("voluptua.")
-///              .response_value_render_option("amet.")
-///              .response_date_time_render_option("consetetur")
+///              .value_input_option(&Default::default())
+///              .response_value_render_option(&Default::default())
+///              .response_date_time_render_option(&Default::default())
 ///              .include_values_in_response(false)
 ///              .doit().await;
 /// # }
@@ -3667,9 +3667,9 @@ pub struct SpreadsheetValueUpdateCall<'a, S>
    pub(super) _request: ValueRange,
    pub(super) _spreadsheet_id: String,
    pub(super) _range: String,
-   pub(super) _value_input_option: Option<String>,
-   pub(super) _response_value_render_option: Option<String>,
-   pub(super) _response_date_time_render_option: Option<String>,
+   pub(super) _value_input_option: Option<SpreadsheetValueInputOptionEnum>,
+   pub(super) _response_value_render_option: Option<SpreadsheetResponseValueRenderOptionEnum>,
+   pub(super) _response_date_time_render_option: Option<SpreadsheetResponseDateTimeRenderOptionEnum>,
    pub(super) _include_values_in_response: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -3707,8 +3707,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
-        params.push("range", self._range);
+        params.push("spreadsheetId", &self._spreadsheet_id);
+        params.push("range", &self._range);
         if let Some(value) = self._value_input_option.as_ref() {
             params.push("valueInputOption", value);
         }
@@ -3871,22 +3871,22 @@ where
     /// How the input data should be interpreted.
     ///
     /// Sets the *value input option* query property to the given value.
-    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
-        self._value_input_option = Some(new_value.to_string());
+    pub fn value_input_option(mut self, new_value: &SpreadsheetValueInputOptionEnum) -> SpreadsheetValueUpdateCall<'a, S> {
+        self._value_input_option = Some(new_value.clone());
         self
     }
     /// Determines how values in the response should be rendered. The default render option is FORMATTED_VALUE.
     ///
     /// Sets the *response value render option* query property to the given value.
-    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
-        self._response_value_render_option = Some(new_value.to_string());
+    pub fn response_value_render_option(mut self, new_value: &SpreadsheetResponseValueRenderOptionEnum) -> SpreadsheetValueUpdateCall<'a, S> {
+        self._response_value_render_option = Some(new_value.clone());
         self
     }
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *response date time render option* query property to the given value.
-    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
-        self._response_date_time_render_option = Some(new_value.to_string());
+    pub fn response_date_time_render_option(mut self, new_value: &SpreadsheetResponseDateTimeRenderOptionEnum) -> SpreadsheetValueUpdateCall<'a, S> {
+        self._response_date_time_render_option = Some(new_value.clone());
         self
     }
     /// Determines if the update response should include the values of the cells that were updated. By default, responses do not include the updated values. If the range to write was larger than the range actually written, the response includes all values in the requested range (excluding trailing empty rows and columns).
@@ -4050,7 +4050,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4564,8 +4564,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spreadsheets().get("spreadsheetId")
-///              .add_ranges("et")
-///              .include_grid_data(false)
+///              .add_ranges("labore")
+///              .include_grid_data(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4612,7 +4612,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
         if self._ranges.len() > 0 {
             for f in self._ranges.iter() {
                 params.push("ranges", f);
@@ -4904,7 +4904,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("spreadsheetId", self._spreadsheet_id);
+        params.push("spreadsheetId", &self._spreadsheet_id);
 
         params.extend(self._additional_params.iter());
 

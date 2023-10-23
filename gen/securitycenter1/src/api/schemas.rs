@@ -141,7 +141,7 @@ pub struct AssetDiscoveryConfig {
     /// The mode to use for filtering asset discovery.
     #[serde(rename="inclusionMode")]
     
-    pub inclusion_mode: Option<String>,
+    pub inclusion_mode: Option<AssetDiscoveryConfigInclusionModeEnum>,
     /// The project ids to use for filtering asset discovery.
     #[serde(rename="projectIds")]
     
@@ -184,7 +184,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -274,7 +274,7 @@ pub struct Connection {
     pub destination_port: Option<i32>,
     /// IANA Internet Protocol Number such as TCP(6) and UDP(17).
     
-    pub protocol: Option<String>,
+    pub protocol: Option<ConnectionProtocolEnum>,
     /// Source IP address.
     #[serde(rename="sourceIp")]
     
@@ -378,15 +378,15 @@ pub struct Cvssv3 {
     /// This metric describes the conditions beyond the attacker's control that must exist in order to exploit the vulnerability.
     #[serde(rename="attackComplexity")]
     
-    pub attack_complexity: Option<String>,
+    pub attack_complexity: Option<Cvssv3AttackComplexityEnum>,
     /// Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments. This metric reflects the context by which vulnerability exploitation is possible.
     #[serde(rename="attackVector")]
     
-    pub attack_vector: Option<String>,
+    pub attack_vector: Option<Cvssv3AttackVectorEnum>,
     /// This metric measures the impact to the availability of the impacted component resulting from a successfully exploited vulnerability.
     #[serde(rename="availabilityImpact")]
     
-    pub availability_impact: Option<String>,
+    pub availability_impact: Option<Cvssv3AvailabilityImpactEnum>,
     /// The base score is a function of the base metric scores.
     #[serde(rename="baseScore")]
     
@@ -394,22 +394,22 @@ pub struct Cvssv3 {
     /// This metric measures the impact to the confidentiality of the information resources managed by a software component due to a successfully exploited vulnerability.
     #[serde(rename="confidentialityImpact")]
     
-    pub confidentiality_impact: Option<String>,
+    pub confidentiality_impact: Option<Cvssv3ConfidentialityImpactEnum>,
     /// This metric measures the impact to integrity of a successfully exploited vulnerability.
     #[serde(rename="integrityImpact")]
     
-    pub integrity_impact: Option<String>,
+    pub integrity_impact: Option<Cvssv3IntegrityImpactEnum>,
     /// This metric describes the level of privileges an attacker must possess before successfully exploiting the vulnerability.
     #[serde(rename="privilegesRequired")]
     
-    pub privileges_required: Option<String>,
+    pub privileges_required: Option<Cvssv3PrivilegesRequiredEnum>,
     /// The Scope metric captures whether a vulnerability in one vulnerable component impacts resources in components beyond its security scope.
     
-    pub scope: Option<String>,
+    pub scope: Option<Cvssv3ScopeEnum>,
     /// This metric captures the requirement for a human user, other than the attacker, to participate in the successful compromise of the vulnerable component.
     #[serde(rename="userInteraction")]
     
-    pub user_interaction: Option<String>,
+    pub user_interaction: Option<Cvssv3UserInteractionEnum>,
 }
 
 impl client::Part for Cvssv3 {}
@@ -673,7 +673,7 @@ pub struct Finding {
     /// The class of the finding.
     #[serde(rename="findingClass")]
     
-    pub finding_class: Option<String>,
+    pub finding_class: Option<FindingFindingClassEnum>,
     /// Represents IAM bindings associated with the Finding.
     #[serde(rename="iamBindings")]
     
@@ -694,7 +694,7 @@ pub struct Finding {
     pub mitre_attack: Option<MitreAttack>,
     /// Indicates the mute state of a finding (either muted, unmuted or undefined). Unlike other attributes of a finding, a finding provider shouldn't set the value of mute.
     
-    pub mute: Option<String>,
+    pub mute: Option<FindingMuteEnum>,
     /// First known as mute_annotation. Records additional information about the mute operation e.g. mute config that muted the finding, user who muted the finding, etc. Unlike other attributes of a finding, a finding provider shouldn't set the value of mute.
     #[serde(rename="muteInitiator")]
     
@@ -730,14 +730,14 @@ pub struct Finding {
     pub security_marks: Option<SecurityMarks>,
     /// The severity of the finding. This field is managed by the source that writes the finding.
     
-    pub severity: Option<String>,
+    pub severity: Option<FindingSeverityEnum>,
     /// Source specific properties. These properties are managed by the source that writes the finding. The key names in the source_properties map must be between 1 and 255 characters, and must start with a letter and contain alphanumeric characters or underscores only.
     #[serde(rename="sourceProperties")]
     
     pub source_properties: Option<HashMap<String, json::Value>>,
     /// The state of the finding.
     
-    pub state: Option<String>,
+    pub state: Option<FindingStateEnum>,
     /// Represents vulnerability-specific fields like CVE and CVSS scores. CVE stands for Common Vulnerabilities and Exposures (https://cve.mitre.org/about/)
     
     pub vulnerability: Option<Vulnerability>,
@@ -1190,7 +1190,7 @@ impl client::Part for GroupResult {}
 pub struct IamBinding {
     /// The action that was performed on a Binding.
     
-    pub action: Option<String>,
+    pub action: Option<IamBindingActionEnum>,
     /// A single identity requesting access for a Cloud Platform resource, e.g. "foo@google.com".
     
     pub member: Option<String>,
@@ -1387,7 +1387,7 @@ pub struct ListAssetsResult {
     /// State change of the asset between the points in time.
     #[serde(rename="stateChange")]
     
-    pub state_change: Option<String>,
+    pub state_change: Option<ListAssetsResultStateChangeEnum>,
 }
 
 impl client::Part for ListAssetsResult {}
@@ -1469,7 +1469,7 @@ pub struct ListFindingsResult {
     /// State change of the finding between the points in time.
     #[serde(rename="stateChange")]
     
-    pub state_change: Option<String>,
+    pub state_change: Option<ListFindingsResultStateChangeEnum>,
 }
 
 impl client::Part for ListFindingsResult {}
@@ -1604,19 +1604,19 @@ pub struct MitreAttack {
     /// Additional MITRE ATT&CK tactics related to this finding, if any.
     #[serde(rename="additionalTactics")]
     
-    pub additional_tactics: Option<Vec<String>>,
+    pub additional_tactics: Option<Vec<MitreAttackAdditionalTacticsEnum>>,
     /// Additional MITRE ATT&CK techniques related to this finding, if any, along with any of their respective parent techniques.
     #[serde(rename="additionalTechniques")]
     
-    pub additional_techniques: Option<Vec<String>>,
+    pub additional_techniques: Option<Vec<MitreAttackAdditionalTechniquesEnum>>,
     /// The MITRE ATT&CK tactic most closely represented by this finding, if any.
     #[serde(rename="primaryTactic")]
     
-    pub primary_tactic: Option<String>,
+    pub primary_tactic: Option<MitreAttackPrimaryTacticEnum>,
     /// The MITRE ATT&CK technique most closely represented by this finding, if any. primary_techniques is a repeated field because there are multiple levels of MITRE ATT&CK techniques. If the technique most closely represented by this finding is a sub-technique (e.g. `SCANNING_IP_BLOCKS`), both the sub-technique and its parent technique(s) will be listed (e.g. `SCANNING_IP_BLOCKS`, `ACTIVE_SCANNING`).
     #[serde(rename="primaryTechniques")]
     
-    pub primary_techniques: Option<Vec<String>>,
+    pub primary_techniques: Option<Vec<MitreAttackPrimaryTechniquesEnum>>,
     /// The MITRE ATT&CK version referenced by the above fields. E.g. "8".
     
     pub version: Option<String>,
@@ -1957,7 +1957,7 @@ impl client::Part for Resource {}
 pub struct Role {
     /// Role type.
     
-    pub kind: Option<String>,
+    pub kind: Option<RoleKindEnum>,
     /// Role name.
     
     pub name: Option<String>,
@@ -2102,7 +2102,7 @@ pub struct SetFindingStateRequest {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Required. The desired State of the finding.
     
-    pub state: Option<String>,
+    pub state: Option<SetFindingStateRequestStateEnum>,
 }
 
 impl client::RequestValue for SetFindingStateRequest {}
@@ -2146,7 +2146,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 pub struct SetMuteRequest {
     /// Required. The desired state of the Mute.
     
-    pub mute: Option<String>,
+    pub mute: Option<SetMuteRequestMuteEnum>,
 }
 
 impl client::RequestValue for SetMuteRequest {}
@@ -2230,7 +2230,7 @@ impl client::Part for StreamingConfig {}
 pub struct Subject {
     /// Authentication type for subject.
     
-    pub kind: Option<String>,
+    pub kind: Option<SubjectKindEnum>,
     /// Name for subject.
     
     pub name: Option<String>,

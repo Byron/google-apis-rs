@@ -13,7 +13,7 @@ pub struct SiteSummaryResponse {
     /// The site's Abusive Experience Report status.
     #[serde(rename="abusiveStatus")]
     
-    pub abusive_status: Option<String>,
+    pub abusive_status: Option<SiteSummaryResponseAbusiveStatusEnum>,
     /// The time at which [enforcement](https://support.google.com/webtools/answer/7538608) against the site began or will begin. Not set when the filter_status is OFF.
     #[serde(rename="enforcementTime")]
     
@@ -21,7 +21,7 @@ pub struct SiteSummaryResponse {
     /// The site's [enforcement status](https://support.google.com/webtools/answer/7538608).
     #[serde(rename="filterStatus")]
     
-    pub filter_status: Option<String>,
+    pub filter_status: Option<SiteSummaryResponseFilterStatusEnum>,
     /// The time at which the site's status last changed.
     #[serde(rename="lastChangeTime")]
     

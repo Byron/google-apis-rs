@@ -148,7 +148,7 @@ pub struct GoogleCloudRetailV2AttributesConfig {
     /// Output only. The AttributeConfigLevel used for this catalog.
     #[serde(rename="attributeConfigLevel")]
     
-    pub attribute_config_level: Option<String>,
+    pub attribute_config_level: Option<GoogleCloudRetailV2AttributesConfigAttributeConfigLevelEnum>,
     /// Enable attribute(s) config at catalog level. For example, indexable, dynamic_facetable, or searchable for each attribute. The key is catalog attribute's name. For example: `color`, `brands`, `attributes.custom_attribute`, such as `attributes.xyz`. The maximum number of catalog attributes allowed in a request is 1000.
     #[serde(rename="catalogAttributes")]
     
@@ -255,11 +255,11 @@ pub struct GoogleCloudRetailV2CatalogAttribute {
     /// If DYNAMIC_FACETABLE_ENABLED, attribute values are available for dynamic facet. Could only be DYNAMIC_FACETABLE_DISABLED if CatalogAttribute.indexable_option is INDEXABLE_DISABLED. Otherwise, an INVALID_ARGUMENT error is returned. Must be specified, otherwise throws INVALID_FORMAT error.
     #[serde(rename="dynamicFacetableOption")]
     
-    pub dynamic_facetable_option: Option<String>,
+    pub dynamic_facetable_option: Option<GoogleCloudRetailV2CatalogAttributeDynamicFacetableOptionEnum>,
     /// If EXACT_SEARCHABLE_ENABLED, attribute values will be exact searchable. This property only applies to textual custom attributes and requires indexable set to enabled to enable exact-searchable. If unset, the server behavior defaults to EXACT_SEARCHABLE_DISABLED.
     #[serde(rename="exactSearchableOption")]
     
-    pub exact_searchable_option: Option<String>,
+    pub exact_searchable_option: Option<GoogleCloudRetailV2CatalogAttributeExactSearchableOptionEnum>,
     /// Output only. Indicates whether this attribute has been used by any products. `True` if at least one Product is using this attribute in Product.attributes. Otherwise, this field is `False`. CatalogAttribute can be pre-loaded by using CatalogService.AddCatalogAttribute, CatalogService.ImportCatalogAttributes, or CatalogService.UpdateAttributesConfig APIs. This field is `False` for pre-loaded CatalogAttributes. Only pre-loaded catalog attributes that are neither in use by products nor predefined can be deleted. Catalog attributes that are either in use by products or are predefined attributes cannot be deleted; however, their configuration properties will reset to default values upon removal request. After catalog changes, it takes about 10 minutes for this field to update.
     #[serde(rename="inUse")]
     
@@ -267,22 +267,22 @@ pub struct GoogleCloudRetailV2CatalogAttribute {
     /// When AttributesConfig.attribute_config_level is CATALOG_LEVEL_ATTRIBUTE_CONFIG, if INDEXABLE_ENABLED attribute values are indexed so that it can be filtered, faceted, or boosted in SearchService.Search. Must be specified, otherwise throws INVALID_FORMAT error.
     #[serde(rename="indexableOption")]
     
-    pub indexable_option: Option<String>,
+    pub indexable_option: Option<GoogleCloudRetailV2CatalogAttributeIndexableOptionEnum>,
     /// Required. Attribute name. For example: `color`, `brands`, `attributes.custom_attribute`, such as `attributes.xyz`. To be indexable, the attribute name can contain only alpha-numeric characters and underscores. For example, an attribute named `attributes.abc_xyz` can be indexed, but an attribute named `attributes.abc-xyz` cannot be indexed. If the attribute key starts with `attributes.`, then the attribute is a custom attribute. Attributes such as `brands`, `patterns`, and `title` are built-in and called system attributes.
     
     pub key: Option<String>,
     /// If RETRIEVABLE_ENABLED, attribute values are retrievable in the search results. If unset, the server behavior defaults to RETRIEVABLE_DISABLED.
     #[serde(rename="retrievableOption")]
     
-    pub retrievable_option: Option<String>,
+    pub retrievable_option: Option<GoogleCloudRetailV2CatalogAttributeRetrievableOptionEnum>,
     /// When AttributesConfig.attribute_config_level is CATALOG_LEVEL_ATTRIBUTE_CONFIG, if SEARCHABLE_ENABLED, attribute values are searchable by text queries in SearchService.Search. If SEARCHABLE_ENABLED but attribute type is numerical, attribute values will not be searchable by text queries in SearchService.Search, as there are no text values associated to numerical attributes. Must be specified, otherwise throws INVALID_FORMAT error.
     #[serde(rename="searchableOption")]
     
-    pub searchable_option: Option<String>,
+    pub searchable_option: Option<GoogleCloudRetailV2CatalogAttributeSearchableOptionEnum>,
     /// Output only. The type of this attribute. This is derived from the attribute in Product.attributes.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudRetailV2CatalogAttributeTypeEnum>,
 }
 
 impl client::Part for GoogleCloudRetailV2CatalogAttribute {}
@@ -559,11 +559,11 @@ pub struct GoogleCloudRetailV2Control {
     /// Specifies the use case for the control. Affects what condition fields can be set. Only settable by search controls. Will default to SEARCH_SOLUTION_USE_CASE_SEARCH if not specified. Currently only allow one search_solution_use_case per control.
     #[serde(rename="searchSolutionUseCase")]
     
-    pub search_solution_use_case: Option<Vec<String>>,
+    pub search_solution_use_case: Option<Vec<GoogleCloudRetailV2ControlSearchSolutionUseCaseEnum>>,
     /// Required. Immutable. The solution types that the control is used for. Currently we support setting only one type of solution at creation time. Only `SOLUTION_TYPE_SEARCH` value is supported at the moment. If no solution type is provided at creation time, will default to SOLUTION_TYPE_SEARCH.
     #[serde(rename="solutionTypes")]
     
-    pub solution_types: Option<Vec<String>>,
+    pub solution_types: Option<Vec<GoogleCloudRetailV2ControlSolutionTypesEnum>>,
 }
 
 impl client::RequestValue for GoogleCloudRetailV2Control {}
@@ -747,7 +747,7 @@ pub struct GoogleCloudRetailV2ImportProductsRequest {
     /// The mode of reconciliation between existing products and the products to be imported. Defaults to ReconciliationMode.INCREMENTAL.
     #[serde(rename="reconciliationMode")]
     
-    pub reconciliation_mode: Option<String>,
+    pub reconciliation_mode: Option<GoogleCloudRetailV2ImportProductsRequestReconciliationModeEnum>,
     /// Deprecated. This field has no effect.
     #[serde(rename="requestId")]
     
@@ -1101,7 +1101,7 @@ pub struct GoogleCloudRetailV2Product {
     pub audience: Option<GoogleCloudRetailV2Audience>,
     /// The online availability of the Product. Default to Availability.IN_STOCK. Corresponding properties: Google Merchant Center property [availability](https://support.google.com/merchants/answer/6324448). Schema.org property [Offer.availability](https://schema.org/availability).
     
-    pub availability: Option<String>,
+    pub availability: Option<GoogleCloudRetailV2ProductAvailabilityEnum>,
     /// The available quantity of the item.
     #[serde(rename="availableQuantity")]
     
@@ -1202,7 +1202,7 @@ pub struct GoogleCloudRetailV2Product {
     /// Immutable. The type of the product. Default to Catalog.product_level_config.ingestion_product_type if unset.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudRetailV2ProductTypeEnum>,
     /// Canonical URL directly linking to the product detail page. It is strongly recommended to provide a valid uri for the product, otherwise the service performance could be significantly degraded. This field must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property [link](https://support.google.com/merchants/answer/6324416). Schema.org property [Offer.url](https://schema.org/url).
     
     pub uri: Option<String>,
@@ -1396,7 +1396,7 @@ pub struct GoogleCloudRetailV2RejoinUserEventsRequest {
     /// The type of the user event rejoin to define the scope and range of the user events to be rejoined with the latest product catalog. Defaults to `USER_EVENT_REJOIN_SCOPE_UNSPECIFIED` if this field is not set, or set to an invalid integer value.
     #[serde(rename="userEventRejoinScope")]
     
-    pub user_event_rejoin_scope: Option<String>,
+    pub user_event_rejoin_scope: Option<GoogleCloudRetailV2RejoinUserEventsRequestUserEventRejoinScopeEnum>,
 }
 
 impl client::RequestValue for GoogleCloudRetailV2RejoinUserEventsRequest {}
@@ -1792,7 +1792,7 @@ pub struct GoogleCloudRetailV2SearchRequest {
     /// The search mode of the search request. If not specified, a single search request triggers both product search and faceted search.
     #[serde(rename="searchMode")]
     
-    pub search_mode: Option<String>,
+    pub search_mode: Option<GoogleCloudRetailV2SearchRequestSearchModeEnum>,
     /// The spell correction specification that specifies the mode under which spell correction will take effect.
     #[serde(rename="spellCorrectionSpec")]
     
@@ -1861,7 +1861,7 @@ impl client::Part for GoogleCloudRetailV2SearchRequestBoostSpecConditionBoostSpe
 pub struct GoogleCloudRetailV2SearchRequestDynamicFacetSpec {
     /// Mode of the DynamicFacet feature. Defaults to Mode.DISABLED if it's unset.
     
-    pub mode: Option<String>,
+    pub mode: Option<GoogleCloudRetailV2SearchRequestDynamicFacetSpecModeEnum>,
 }
 
 impl client::Part for GoogleCloudRetailV2SearchRequestDynamicFacetSpec {}
@@ -1946,7 +1946,7 @@ impl client::Part for GoogleCloudRetailV2SearchRequestFacetSpecFacetKey {}
 pub struct GoogleCloudRetailV2SearchRequestPersonalizationSpec {
     /// Defaults to Mode.AUTO.
     
-    pub mode: Option<String>,
+    pub mode: Option<GoogleCloudRetailV2SearchRequestPersonalizationSpecModeEnum>,
 }
 
 impl client::Part for GoogleCloudRetailV2SearchRequestPersonalizationSpec {}
@@ -1961,7 +1961,7 @@ impl client::Part for GoogleCloudRetailV2SearchRequestPersonalizationSpec {}
 pub struct GoogleCloudRetailV2SearchRequestQueryExpansionSpec {
     /// The condition under which query expansion should occur. Default to Condition.DISABLED.
     
-    pub condition: Option<String>,
+    pub condition: Option<GoogleCloudRetailV2SearchRequestQueryExpansionSpecConditionEnum>,
     /// Whether to pin unexpanded results. If this field is set to true, unexpanded products are always at the top of the search results, followed by the expanded results.
     #[serde(rename="pinUnexpandedResults")]
     
@@ -1980,7 +1980,7 @@ impl client::Part for GoogleCloudRetailV2SearchRequestQueryExpansionSpec {}
 pub struct GoogleCloudRetailV2SearchRequestSpellCorrectionSpec {
     /// The mode under which spell correction should take effect to replace the original search query. Default to Mode.AUTO.
     
-    pub mode: Option<String>,
+    pub mode: Option<GoogleCloudRetailV2SearchRequestSpellCorrectionSpecModeEnum>,
 }
 
 impl client::Part for GoogleCloudRetailV2SearchRequestSpellCorrectionSpec {}
@@ -2178,7 +2178,7 @@ pub struct GoogleCloudRetailV2ServingConfig {
     /// What kind of diversity to use - data driven or rule based. If unset, the server behavior defaults to RULE_BASED_DIVERSITY.
     #[serde(rename="diversityType")]
     
-    pub diversity_type: Option<String>,
+    pub diversity_type: Option<GoogleCloudRetailV2ServingConfigDiversityTypeEnum>,
     /// Condition do not associate specifications. If multiple do not associate conditions match, all matching do not associate controls in the list will execute. - Order does not matter. - Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.
     #[serde(rename="doNotAssociateControlIds")]
     
@@ -2233,7 +2233,7 @@ pub struct GoogleCloudRetailV2ServingConfig {
     /// Required. Immutable. Specifies the solution types that a serving config can be associated with. Currently we support setting only one type of solution.
     #[serde(rename="solutionTypes")]
     
-    pub solution_types: Option<Vec<String>>,
+    pub solution_types: Option<Vec<GoogleCloudRetailV2ServingConfigSolutionTypesEnum>>,
     /// Condition synonyms specifications. If multiple syonyms conditions match, all matching synonyms control in the list will execute. Order of controls in the list will not matter. Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.
     #[serde(rename="twowaySynonymsControlIds")]
     

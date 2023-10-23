@@ -73,8 +73,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("jobId", self._job_id);
-        params.push("reportId", self._report_id);
+        params.push("jobId", &self._job_id);
+        params.push("reportId", &self._report_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -368,7 +368,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("jobId", self._job_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._start_time_before.as_ref() {
             params.push("startTimeBefore", ::client::serde::datetime_to_string(&value));
         }
@@ -977,7 +977,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("jobId", self._job_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -1251,7 +1251,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("jobId", self._job_id);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._on_behalf_of_content_owner.as_ref() {
             params.push("onBehalfOfContentOwner", value);
         }
@@ -1819,7 +1819,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 

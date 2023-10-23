@@ -96,13 +96,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.activities().list()
-//!              .user_id("sed")
-//!              .source("amet.")
-//!              .page_token("takimata")
-//!              .page_size(-52)
-//!              .grouping_strategy("duo")
-//!              .drive_file_id("ipsum")
-//!              .drive_ancestor_id("gubergren")
+//!              .user_id("sanctus")
+//!              .source("sed")
+//!              .page_token("amet.")
+//!              .page_size(-59)
+//!              .grouping_strategy(&Default::default())
+//!              .drive_file_id("amet.")
+//!              .drive_ancestor_id("duo")
 //!              .doit().await;
 //! 
 //! match result {

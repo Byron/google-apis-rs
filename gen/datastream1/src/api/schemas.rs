@@ -54,10 +54,10 @@ pub struct BackfillJob {
     pub last_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Backfill job state.
     
-    pub state: Option<String>,
+    pub state: Option<BackfillJobStateEnum>,
     /// Backfill job's triggering reason.
     
-    pub trigger: Option<String>,
+    pub trigger: Option<BackfillJobTriggerEnum>,
 }
 
 impl client::Part for BackfillJob {}
@@ -481,11 +481,11 @@ impl client::Part for GcsProfile {}
 pub struct JsonFileFormat {
     /// Compression of the loaded JSON file.
     
-    pub compression: Option<String>,
+    pub compression: Option<JsonFileFormatCompressionEnum>,
     /// The schema file format along JSON data files.
     #[serde(rename="schemaFileFormat")]
     
-    pub schema_file_format: Option<String>,
+    pub schema_file_format: Option<JsonFileFormatSchemaFileFormatEnum>,
 }
 
 impl client::Part for JsonFileFormat {}
@@ -1331,7 +1331,7 @@ pub struct PrivateConnection {
     pub name: Option<String>,
     /// Output only. The state of the Private Connection.
     
-    pub state: Option<String>,
+    pub state: Option<PrivateConnectionStateEnum>,
     /// Output only. The update time of the resource.
     #[serde(rename="updateTime")]
     
@@ -1642,7 +1642,7 @@ pub struct Stream {
     pub source_config: Option<SourceConfig>,
     /// The state of the stream.
     
-    pub state: Option<String>,
+    pub state: Option<StreamStateEnum>,
     /// Output only. The last update time of the stream.
     #[serde(rename="updateTime")]
     

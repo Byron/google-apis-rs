@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
 
         params.extend(self._additional_params.iter());
 
@@ -363,8 +363,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("alias", self._alias);
+        params.push("courseId", &self._course_id);
+        params.push("alias", &self._alias);
 
         params.extend(self._additional_params.iter());
 
@@ -592,8 +592,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().aliases_list("courseId")
-///              .page_token("ut")
-///              .page_size(-12)
+///              .page_token("ipsum")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -640,7 +640,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -929,7 +929,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1215,8 +1215,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1489,8 +1489,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1718,10 +1718,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().announcements_list("courseId")
-///              .page_token("ea")
-///              .page_size(-99)
-///              .order_by("Lorem")
-///              .add_announcement_states("eos")
+///              .page_token("rebum.")
+///              .page_size(-57)
+///              .order_by("ipsum")
+///              .add_announcement_states(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1733,7 +1733,7 @@ pub struct CourseAnnouncementListCall<'a, S>
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
-   pub(super) _announcement_states: Vec<String>,
+   pub(super) _announcement_states: Option<CourseAnnouncementStatesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1770,7 +1770,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1924,8 +1924,8 @@ where
     ///
     /// Append the given value to the *announcement states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_announcement_states(mut self, new_value: &str) -> CourseAnnouncementListCall<'a, S> {
-        self._announcement_states.push(new_value.to_string());
+    pub fn add_announcement_states(mut self, new_value: &CourseAnnouncementStatesEnum) -> CourseAnnouncementListCall<'a, S> {
+        self._announcement_states.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2083,8 +2083,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -2389,8 +2389,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2697,9 +2697,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -2937,11 +2937,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-///              .user_id("et")
-///              .add_states("et")
-///              .page_token("vero")
-///              .page_size(-31)
-///              .late("sed")
+///              .user_id("duo")
+///              .add_states(&Default::default())
+///              .page_token("sed")
+///              .page_size(-61)
+///              .late(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2952,10 +2952,10 @@ pub struct CourseCourseWorkStudentSubmissionListCall<'a, S>
    pub(super) _course_id: String,
    pub(super) _course_work_id: String,
    pub(super) _user_id: Option<String>,
-   pub(super) _states: Vec<String>,
+   pub(super) _states: Option<CourseStatesEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _late: Option<String>,
+   pub(super) _late: Option<CourseLateEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2992,8 +2992,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
         if let Some(value) = self._user_id.as_ref() {
             params.push("userId", value);
         }
@@ -3146,8 +3146,8 @@ where
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_states(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
-        self._states.push(new_value.to_string());
+    pub fn add_states(mut self, new_value: &CourseStatesEnum) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
+        self._states.push(new_value.clone());
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
@@ -3167,8 +3167,8 @@ where
     /// Requested lateness value. If specified, returned student submissions are restricted by the requested value. If unspecified, submissions are returned regardless of `late` value.
     ///
     /// Sets the *late* query property to the given value.
-    pub fn late(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
-        self._late = Some(new_value.to_string());
+    pub fn late(mut self, new_value: &CourseLateEnum) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
+        self._late = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3327,9 +3327,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -3645,9 +3645,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3971,9 +3971,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -4287,9 +4287,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -4603,9 +4603,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("courseWorkId", self._course_work_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("courseWorkId", &self._course_work_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -4917,7 +4917,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5203,8 +5203,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -5477,8 +5477,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -5706,10 +5706,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_list("courseId")
-///              .page_token("diam")
-///              .page_size(-61)
-///              .order_by("ipsum")
-///              .add_course_work_states("accusam")
+///              .page_token("dolor")
+///              .page_size(-20)
+///              .order_by("vero")
+///              .add_course_work_states(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5721,7 +5721,7 @@ pub struct CourseCourseWorkListCall<'a, S>
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
-   pub(super) _course_work_states: Vec<String>,
+   pub(super) _course_work_states: Option<CourseCourseWorkStatesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5758,7 +5758,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5912,8 +5912,8 @@ where
     ///
     /// Append the given value to the *course work states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_course_work_states(mut self, new_value: &str) -> CourseCourseWorkListCall<'a, S> {
-        self._course_work_states.push(new_value.to_string());
+    pub fn add_course_work_states(mut self, new_value: &CourseCourseWorkStatesEnum) -> CourseCourseWorkListCall<'a, S> {
+        self._course_work_states.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6071,8 +6071,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -6377,8 +6377,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -6690,7 +6690,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6976,8 +6976,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -7250,8 +7250,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -7479,12 +7479,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_materials_list("courseId")
-///              .page_token("gubergren")
-///              .page_size(-74)
-///              .order_by("accusam")
-///              .material_link("voluptua.")
-///              .material_drive_id("dolore")
-///              .add_course_work_material_states("dolore")
+///              .page_token("takimata")
+///              .page_size(-46)
+///              .order_by("voluptua.")
+///              .material_link("et")
+///              .material_drive_id("erat")
+///              .add_course_work_material_states(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -7498,7 +7498,7 @@ pub struct CourseCourseWorkMaterialListCall<'a, S>
    pub(super) _order_by: Option<String>,
    pub(super) _material_link: Option<String>,
    pub(super) _material_drive_id: Option<String>,
-   pub(super) _course_work_material_states: Vec<String>,
+   pub(super) _course_work_material_states: Option<CourseCourseWorkMaterialStatesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -7535,7 +7535,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7709,8 +7709,8 @@ where
     ///
     /// Append the given value to the *course work material states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_course_work_material_states(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
-        self._course_work_material_states.push(new_value.to_string());
+    pub fn add_course_work_material_states(mut self, new_value: &CourseCourseWorkMaterialStatesEnum) -> CourseCourseWorkMaterialListCall<'a, S> {
+        self._course_work_material_states.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7870,8 +7870,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8138,7 +8138,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_create(req, "courseId")
-///              .enrollment_code("ea")
+///              .enrollment_code("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8185,7 +8185,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._enrollment_code.as_ref() {
             params.push("enrollmentCode", value);
         }
@@ -8481,8 +8481,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("userId", self._user_id);
+        params.push("courseId", &self._course_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8755,8 +8755,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("userId", self._user_id);
+        params.push("courseId", &self._course_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8984,8 +8984,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_list("courseId")
-///              .page_token("At")
-///              .page_size(-43)
+///              .page_token("dolore")
+///              .page_size(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9032,7 +9032,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9321,7 +9321,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9607,8 +9607,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("userId", self._user_id);
+        params.push("courseId", &self._course_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9881,8 +9881,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("userId", self._user_id);
+        params.push("courseId", &self._course_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10110,8 +10110,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().teachers_list("courseId")
-///              .page_token("sanctus")
-///              .page_size(-56)
+///              .page_token("invidunt")
+///              .page_size(-11)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10158,7 +10158,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10447,7 +10447,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10733,8 +10733,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -11007,8 +11007,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -11236,8 +11236,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().topics_list("courseId")
-///              .page_token("sed")
-///              .page_size(-11)
+///              .page_token("aliquyam")
+///              .page_size(-5)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11284,7 +11284,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("courseId", self._course_id);
+        params.push("courseId", &self._course_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11576,8 +11576,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("courseId", self._course_id);
-        params.push("id", self._id);
+        params.push("courseId", &self._course_id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -12155,7 +12155,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -12417,7 +12417,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -12635,11 +12635,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().list()
-///              .teacher_id("nonumy")
-///              .student_id("At")
-///              .page_token("sadipscing")
-///              .page_size(-32)
-///              .add_course_states("dolores")
+///              .teacher_id("sed")
+///              .student_id("diam")
+///              .page_token("dolores")
+///              .page_size(-69)
+///              .add_course_states(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -12651,7 +12651,7 @@ pub struct CourseListCall<'a, S>
    pub(super) _student_id: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _course_states: Vec<String>,
+   pub(super) _course_states: Option<CourseCourseStatesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -12834,8 +12834,8 @@ where
     ///
     /// Append the given value to the *course states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_course_states(mut self, new_value: &str) -> CourseListCall<'a, S> {
-        self._course_states.push(new_value.to_string());
+    pub fn add_course_states(mut self, new_value: &CourseCourseStatesEnum) -> CourseListCall<'a, S> {
+        self._course_states.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -12994,7 +12994,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -13296,7 +13296,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -13581,7 +13581,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -14116,7 +14116,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -14378,7 +14378,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -14596,10 +14596,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.invitations().list()
-///              .user_id("et")
-///              .page_token("sea")
-///              .page_size(-96)
-///              .course_id("consetetur")
+///              .user_id("sed")
+///              .page_token("no")
+///              .page_size(-91)
+///              .course_id("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15204,7 +15204,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("registrationId", self._registration_id);
+        params.push("registrationId", &self._registration_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15473,7 +15473,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("studentId", self._student_id);
+        params.push("studentId", &self._student_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15759,8 +15759,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("studentId", self._student_id);
-        params.push("invitationId", self._invitation_id);
+        params.push("studentId", &self._student_id);
+        params.push("invitationId", &self._invitation_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15988,10 +15988,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_list("studentId")
-///              .add_states("diam")
-///              .page_token("est")
-///              .page_size(-53)
-///              .invited_email_address("sed")
+///              .add_states(&Default::default())
+///              .page_token("aliquyam")
+///              .page_size(-47)
+///              .invited_email_address("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16000,7 +16000,7 @@ pub struct UserProfileGuardianInvitationListCall<'a, S>
 
    pub(super) hub: &'a Classroom<S>,
    pub(super) _student_id: String,
-   pub(super) _states: Vec<String>,
+   pub(super) _states: Option<UserProfileStatesEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _invited_email_address: Option<String>,
@@ -16040,7 +16040,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("studentId", self._student_id);
+        params.push("studentId", &self._student_id);
         if self._states.len() > 0 {
             for f in self._states.iter() {
                 params.push("states", f);
@@ -16173,8 +16173,8 @@ where
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_states(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, S> {
-        self._states.push(new_value.to_string());
+    pub fn add_states(mut self, new_value: &UserProfileStatesEnum) -> UserProfileGuardianInvitationListCall<'a, S> {
+        self._states.push(new_value.clone());
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
@@ -16355,8 +16355,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("studentId", self._student_id);
-        params.push("invitationId", self._invitation_id);
+        params.push("studentId", &self._student_id);
+        params.push("invitationId", &self._invitation_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -16662,8 +16662,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("studentId", self._student_id);
-        params.push("guardianId", self._guardian_id);
+        params.push("studentId", &self._student_id);
+        params.push("guardianId", &self._guardian_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16936,8 +16936,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("studentId", self._student_id);
-        params.push("guardianId", self._guardian_id);
+        params.push("studentId", &self._student_id);
+        params.push("guardianId", &self._guardian_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17165,9 +17165,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardians_list("studentId")
-///              .page_token("sea")
-///              .page_size(-74)
-///              .invited_email_address("At")
+///              .page_token("elitr")
+///              .page_size(-20)
+///              .invited_email_address("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17215,7 +17215,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("studentId", self._student_id);
+        params.push("studentId", &self._student_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17507,7 +17507,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 

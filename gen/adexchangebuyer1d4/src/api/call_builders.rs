@@ -25,7 +25,7 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().get(-17)
+/// let result = hub.accounts().get(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -528,8 +528,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().patch(req, -55)
-///              .confirm_unsafe_account_change(false)
+/// let result = hub.accounts().patch(req, -62)
+///              .confirm_unsafe_account_change(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -576,7 +576,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
         if let Some(value) = self._confirm_unsafe_account_change.as_ref() {
             params.push("confirmUnsafeAccountChange", value.to_string());
         }
@@ -828,8 +828,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().update(req, -47)
-///              .confirm_unsafe_account_change(true)
+/// let result = hub.accounts().update(req, -12)
+///              .confirm_unsafe_account_change(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -876,7 +876,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
         if let Some(value) = self._confirm_unsafe_account_change.as_ref() {
             params.push("confirmUnsafeAccountChange", value.to_string());
         }
@@ -1122,7 +1122,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.billing_info().get(-93)
+/// let result = hub.billing_info().get(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1167,7 +1167,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1619,7 +1619,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.budget().get(-37, -12)
+/// let result = hub.budget().get(-17, -55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1665,8 +1665,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("billingId", self._billing_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("billingId", &self._billing_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1895,7 +1895,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.budget().patch(req, -16, -57)
+/// let result = hub.budget().patch(req, -88, -47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1942,8 +1942,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("billingId", self._billing_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("billingId", &self._billing_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2195,7 +2195,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.budget().update(req, -50, -50)
+/// let result = hub.budget().update(req, -20, -50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2242,8 +2242,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("billingId", self._billing_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("billingId", &self._billing_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2489,7 +2489,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().add_deal(-7, "buyerCreativeId", -17)
+/// let result = hub.creatives().add_deal(-93, "buyerCreativeId", -12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2536,9 +2536,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("buyerCreativeId", self._buyer_creative_id);
-        params.push("dealId", self._deal_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("buyerCreativeId", &self._buyer_creative_id);
+        params.push("dealId", &self._deal_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2760,7 +2760,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().get(-99, "buyerCreativeId")
+/// let result = hub.creatives().get(-16, "buyerCreativeId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2806,8 +2806,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("buyerCreativeId", self._buyer_creative_id);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("buyerCreativeId", &self._buyer_creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3300,12 +3300,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.creatives().list()
-///              .page_token("eos")
-///              .open_auction_status_filter("labore")
-///              .max_results(58)
-///              .deals_status_filter("duo")
-///              .add_buyer_creative_id("sed")
-///              .add_account_id(-61)
+///              .page_token("ipsum")
+///              .open_auction_status_filter(&Default::default())
+///              .max_results(51)
+///              .deals_status_filter(&Default::default())
+///              .add_buyer_creative_id("est")
+///              .add_account_id(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3314,9 +3314,9 @@ pub struct CreativeListCall<'a, S>
 
    pub(super) hub: &'a AdExchangeBuyer<S>,
    pub(super) _page_token: Option<String>,
-   pub(super) _open_auction_status_filter: Option<String>,
+   pub(super) _open_auction_status_filter: Option<CreativeOpenAuctionStatusFilterEnum>,
    pub(super) _max_results: Option<u32>,
-   pub(super) _deals_status_filter: Option<String>,
+   pub(super) _deals_status_filter: Option<CreativeDealsStatusFilterEnum>,
    pub(super) _buyer_creative_id: Vec<String>,
    pub(super) _account_id: Vec<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3484,8 +3484,8 @@ where
     /// When specified, only creatives having the given open auction status are returned.
     ///
     /// Sets the *open auction status filter* query property to the given value.
-    pub fn open_auction_status_filter(mut self, new_value: &str) -> CreativeListCall<'a, S> {
-        self._open_auction_status_filter = Some(new_value.to_string());
+    pub fn open_auction_status_filter(mut self, new_value: &CreativeOpenAuctionStatusFilterEnum) -> CreativeListCall<'a, S> {
+        self._open_auction_status_filter = Some(new_value.clone());
         self
     }
     /// Maximum number of entries returned on one result page. If not set, the default is 100. Optional.
@@ -3498,8 +3498,8 @@ where
     /// When specified, only creatives having the given deals status are returned.
     ///
     /// Sets the *deals status filter* query property to the given value.
-    pub fn deals_status_filter(mut self, new_value: &str) -> CreativeListCall<'a, S> {
-        self._deals_status_filter = Some(new_value.to_string());
+    pub fn deals_status_filter(mut self, new_value: &CreativeDealsStatusFilterEnum) -> CreativeListCall<'a, S> {
+        self._deals_status_filter = Some(new_value.clone());
         self
     }
     /// When specified, only creatives for the given buyer creative ids are returned.
@@ -3616,7 +3616,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().list_deals(-15, "buyerCreativeId")
+/// let result = hub.creatives().list_deals(-17, "buyerCreativeId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3662,8 +3662,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("buyerCreativeId", self._buyer_creative_id);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("buyerCreativeId", &self._buyer_creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3886,7 +3886,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.creatives().remove_deal(-24, "buyerCreativeId", -24)
+/// let result = hub.creatives().remove_deal(-56, "buyerCreativeId", -86)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3933,9 +3933,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("buyerCreativeId", self._buyer_creative_id);
-        params.push("dealId", self._deal_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("buyerCreativeId", &self._buyer_creative_id);
+        params.push("dealId", &self._deal_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4209,7 +4209,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4497,7 +4497,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4734,7 +4734,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.marketplacedeals().list("proposalId")
-///              .pql_query("sed")
+///              .pql_query("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4780,7 +4780,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
         if let Some(value) = self._pql_query.as_ref() {
             params.push("pqlQuery", value);
         }
@@ -5055,7 +5055,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5343,7 +5343,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5580,7 +5580,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.marketplacenotes().list("proposalId")
-///              .pql_query("voluptua.")
+///              .pql_query("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5626,7 +5626,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
         if let Some(value) = self._pql_query.as_ref() {
             params.push("pqlQuery", value);
         }
@@ -5901,7 +5901,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("privateAuctionId", self._private_auction_id);
+        params.push("privateAuctionId", &self._private_auction_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6126,9 +6126,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.performance_report().list(-96, "endDateTime", "startDateTime")
-///              .page_token("et")
-///              .max_results(79)
+/// let result = hub.performance_report().list(-68, "endDateTime", "startDateTime")
+///              .page_token("sed")
+///              .max_results(81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6177,9 +6177,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("endDateTime", self._end_date_time);
-        params.push("startDateTime", self._start_date_time);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("endDateTime", &self._end_date_time);
+        params.push("startDateTime", &self._start_date_time);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6425,7 +6425,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().delete(-95, -15)
+/// let result = hub.pretargeting_config().delete(-34, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6471,8 +6471,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6684,7 +6684,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().get(-99, -20)
+/// let result = hub.pretargeting_config().get(-28, -2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6730,8 +6730,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6960,7 +6960,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().insert(req, -76)
+/// let result = hub.pretargeting_config().insert(req, -96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7006,7 +7006,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -7242,7 +7242,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().list(-76)
+/// let result = hub.pretargeting_config().list(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7287,7 +7287,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -7506,7 +7506,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().patch(req, -88, -65)
+/// let result = hub.pretargeting_config().patch(req, -49, -18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7553,8 +7553,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -7806,7 +7806,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().update(req, -76, -44)
+/// let result = hub.pretargeting_config().update(req, -22, -95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7853,8 +7853,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8145,7 +8145,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("productId", self._product_id);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8359,7 +8359,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().search()
-///              .pql_query("diam")
+///              .pql_query("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8654,7 +8654,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9142,7 +9142,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.proposals().patch(req, "proposalId", -23, "updateAction")
+/// let result = hub.proposals().patch(req, "proposalId", -76, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -9153,7 +9153,7 @@ pub struct ProposalPatchCall<'a, S>
    pub(super) _request: Proposal,
    pub(super) _proposal_id: String,
    pub(super) _revision_number: i64,
-   pub(super) _update_action: String,
+   pub(super) _update_action: ProposalUpdateActionEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -9190,9 +9190,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
-        params.push("revisionNumber", self._revision_number.to_string());
-        params.push("updateAction", self._update_action);
+        params.push("proposalId", &self._proposal_id);
+        params.push("revisionNumber", &self._revision_number.to_string());
+        params.push("updateAction", &self._update_action);
 
         params.extend(self._additional_params.iter());
 
@@ -9346,8 +9346,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn update_action(mut self, new_value: &str) -> ProposalPatchCall<'a, S> {
-        self._update_action = new_value.to_string();
+    pub fn update_action(mut self, new_value: &ProposalUpdateActionEnum) -> ProposalPatchCall<'a, S> {
+        self._update_action = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9449,7 +9449,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.proposals().search()
-///              .pql_query("consetetur")
+///              .pql_query("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9744,7 +9744,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9952,7 +9952,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.proposals().update(req, "proposalId", -31, "updateAction")
+/// let result = hub.proposals().update(req, "proposalId", -44, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -9963,7 +9963,7 @@ pub struct ProposalUpdateCall<'a, S>
    pub(super) _request: Proposal,
    pub(super) _proposal_id: String,
    pub(super) _revision_number: i64,
-   pub(super) _update_action: String,
+   pub(super) _update_action: ProposalUpdateActionEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10000,9 +10000,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("proposalId", self._proposal_id);
-        params.push("revisionNumber", self._revision_number.to_string());
-        params.push("updateAction", self._update_action);
+        params.push("proposalId", &self._proposal_id);
+        params.push("revisionNumber", &self._revision_number.to_string());
+        params.push("updateAction", &self._update_action);
 
         params.extend(self._additional_params.iter());
 
@@ -10156,8 +10156,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn update_action(mut self, new_value: &str) -> ProposalUpdateCall<'a, S> {
-        self._update_action = new_value.to_string();
+    pub fn update_action(mut self, new_value: &ProposalUpdateActionEnum) -> ProposalUpdateCall<'a, S> {
+        self._update_action = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10258,7 +10258,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pubprofiles().list(-2)
+/// let result = hub.pubprofiles().list(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10303,7 +10303,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 

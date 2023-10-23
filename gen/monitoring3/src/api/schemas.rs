@@ -14,7 +14,7 @@ pub struct Aggregation {
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     #[serde(rename="crossSeriesReducer")]
     
-    pub cross_series_reducer: Option<String>,
+    pub cross_series_reducer: Option<AggregationCrossSeriesReducerEnum>,
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
     #[serde(rename="groupByFields")]
     
@@ -22,7 +22,7 @@ pub struct Aggregation {
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     #[serde(rename="perSeriesAligner")]
     
-    pub per_series_aligner: Option<String>,
+    pub per_series_aligner: Option<AggregationPerSeriesAlignerEnum>,
 }
 
 impl client::Part for Aggregation {}
@@ -47,7 +47,7 @@ pub struct AlertPolicy {
     pub alert_strategy: Option<AlertStrategy>,
     /// How to combine the results of multiple conditions to determine if an incident should be opened. If condition_time_series_query_language is present, this must be COMBINE_UNSPECIFIED.
     
-    pub combiner: Option<String>,
+    pub combiner: Option<AlertPolicyCombinerEnum>,
     /// A list of conditions for the policy. The conditions are combined by AND or OR according to the combiner field. If the combined conditions evaluate to true, then an incident is created. A policy can have from one to six conditions. If condition_time_series_query_language is present, it must be the only condition.
     
     pub conditions: Option<Vec<Condition>>,
@@ -364,7 +364,7 @@ pub struct CollectdValue {
     /// The type of measurement.
     #[serde(rename="dataSourceType")]
     
-    pub data_source_type: Option<String>,
+    pub data_source_type: Option<CollectdValueDataSourceTypeEnum>,
     /// The measurement value.
     
     pub value: Option<TypedValue>,
@@ -442,7 +442,7 @@ pub struct ContentMatcher {
     pub json_path_matcher: Option<JsonPathMatcher>,
     /// The type of content matcher that will be applied to the server output, compared to the content string when the check is run.
     
-    pub matcher: Option<String>,
+    pub matcher: Option<ContentMatcherMatcherEnum>,
 }
 
 impl client::Part for ContentMatcher {}
@@ -976,7 +976,7 @@ pub struct HttpCheck {
     /// The content type header to use for the check. The following configurations result in errors: 1. Content type is specified in both the headers field and the content_type field. 2. Request method is GET and content_type is not TYPE_UNSPECIFIED 3. Request method is POST and content_type is TYPE_UNSPECIFIED. 4. Request method is POST and a "Content-Type" header is provided via headers field. The content_type field should be used instead.
     #[serde(rename="contentType")]
     
-    pub content_type: Option<String>,
+    pub content_type: Option<HttpCheckContentTypeEnum>,
     /// The list of headers to send as part of the Uptime check request. If two headers have the same key and different values, they should be entered as a single header, with the value being a comma-separated list of all the desired values as described at https://www.w3.org/Protocols/rfc2616/rfc2616.txt (page 31). Entering two separate headers with the same key in a Create call will cause the first to be overwritten by the second. The maximum number of headers allowed is 100.
     
     pub headers: Option<HashMap<String, String>>,
@@ -997,7 +997,7 @@ pub struct HttpCheck {
     /// The HTTP request method to use for the check. If set to METHOD_UNSPECIFIED then request_method defaults to GET.
     #[serde(rename="requestMethod")]
     
-    pub request_method: Option<String>,
+    pub request_method: Option<HttpCheckRequestMethodEnum>,
     /// If true, use HTTPS instead of HTTP to run the check.
     #[serde(rename="useSsl")]
     
@@ -1038,7 +1038,7 @@ pub struct InternalChecker {
     pub peer_project_id: Option<String>,
     /// The current operational state of the internal checker.
     
-    pub state: Option<String>,
+    pub state: Option<InternalCheckerStateEnum>,
 }
 
 impl client::Part for InternalChecker {}
@@ -1078,7 +1078,7 @@ pub struct JsonPathMatcher {
     /// The type of JSONPath match that will be applied to the JSON output (ContentMatcher.content)
     #[serde(rename="jsonMatcher")]
     
-    pub json_matcher: Option<String>,
+    pub json_matcher: Option<JsonPathMatcherJsonMatcherEnum>,
     /// JSONPath within the response output pointing to the expected ContentMatcher::content to match against.
     #[serde(rename="jsonPath")]
     
@@ -1104,7 +1104,7 @@ pub struct LabelDescriptor {
     /// The type of data that can be assigned to the label.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<LabelDescriptorValueTypeEnum>,
 }
 
 impl client::Part for LabelDescriptor {}
@@ -1618,14 +1618,14 @@ pub struct MetricDescriptor {
     /// Optional. The launch stage of the metric definition.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MetricDescriptorLaunchStageEnum>,
     /// Optional. Metadata which can be used to guide usage of the metric.
     
     pub metadata: Option<MetricDescriptorMetadata>,
     /// Whether the metric records instantaneous values, changes to a value, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="metricKind")]
     
-    pub metric_kind: Option<String>,
+    pub metric_kind: Option<MetricDescriptorMetricKindEnum>,
     /// Read-only. If present, then a time series, which is identified partially by a metric type and a MonitoredResourceDescriptor, that is associated with this metric type can only be associated with one of the monitored resource types listed here.
     #[serde(rename="monitoredResourceTypes")]
     
@@ -1643,7 +1643,7 @@ pub struct MetricDescriptor {
     /// Whether the measurement is an integer, a floating-point number, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<MetricDescriptorValueTypeEnum>,
 }
 
 impl client::RequestValue for MetricDescriptor {}
@@ -1665,7 +1665,7 @@ pub struct MetricDescriptorMetadata {
     /// Deprecated. Must use the MetricDescriptor.launch_stage instead.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MetricDescriptorMetadataLaunchStageEnum>,
     /// The sampling period of metric data points. For metrics which are written periodically, consecutive data points are stored at this time interval, excluding data loss due to errors. Metrics with a higher granularity have a smaller sampling period.
     #[serde(rename="samplePeriod")]
     
@@ -1707,7 +1707,7 @@ pub struct MetricThreshold {
     pub aggregations: Option<Vec<Aggregation>>,
     /// The comparison to apply between the time series (indicated by filter and aggregation) and the threshold (indicated by threshold_value). The comparison is applied on each time series, with the time series on the left-hand side and the threshold on the right-hand side.Only COMPARISON_LT and COMPARISON_GT are supported currently.
     
-    pub comparison: Option<String>,
+    pub comparison: Option<MetricThresholdComparisonEnum>,
     /// Specifies the alignment of data points in individual time series selected by denominatorFilter as well as how to combine the retrieved time series together (such as when aggregating multiple streams on each resource to a single stream for each resource or when aggregating streams across all members of a group of resources).When computing ratios, the aggregations and denominator_aggregations fields must use the same alignment period and produce time series that have the same periodicity and labels.
     #[serde(rename="denominatorAggregations")]
     
@@ -1723,7 +1723,7 @@ pub struct MetricThreshold {
     /// A condition control that determines how metric-threshold conditions are evaluated when data stops arriving.
     #[serde(rename="evaluationMissingData")]
     
-    pub evaluation_missing_data: Option<String>,
+    pub evaluation_missing_data: Option<MetricThresholdEvaluationMissingDataEnum>,
     /// Required. A filter (https://cloud.google.com/monitoring/api/v3/filters) that identifies which time series should be compared with the threshold.The filter is similar to the one that is specified in the ListTimeSeries request (https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.timeSeries/list) (that call is useful to verify the time series that will be retrieved / processed). The filter must specify the metric type and the resource type. Optionally, it can specify resource labels and metric labels. This field must not exceed 2048 Unicode characters in length.
     
     pub filter: Option<String>,
@@ -1786,7 +1786,7 @@ pub struct MonitoredResourceDescriptor {
     /// Optional. The launch stage of the monitored resource definition.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MonitoredResourceDescriptorLaunchStageEnum>,
     /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
     
     pub name: Option<String>,
@@ -1833,7 +1833,7 @@ pub struct MonitoringQueryLanguageCondition {
     /// A condition control that determines how metric-threshold conditions are evaluated when data stops arriving.
     #[serde(rename="evaluationMissingData")]
     
-    pub evaluation_missing_data: Option<String>,
+    pub evaluation_missing_data: Option<MonitoringQueryLanguageConditionEvaluationMissingDataEnum>,
     /// Monitoring Query Language (https://cloud.google.com/monitoring/mql) query that outputs a boolean stream.
     
     pub query: Option<String>,
@@ -1914,7 +1914,7 @@ pub struct NotificationChannel {
     /// Indicates whether this channel has been verified or not. On a ListNotificationChannels or GetNotificationChannel operation, this field is expected to be populated.If the value is UNVERIFIED, then it indicates that the channel is non-functioning (it both requires verification and lacks verification); otherwise, it is assumed that the channel works.If the channel is neither VERIFIED nor UNVERIFIED, it implies that the channel is of a type that does not require verification or that this specific channel has been exempted from verification because it was created prior to verification being required for channels of this type.This field cannot be modified using a standard UpdateNotificationChannel operation. To change the value of this field, you must call VerifyNotificationChannel.
     #[serde(rename="verificationStatus")]
     
-    pub verification_status: Option<String>,
+    pub verification_status: Option<NotificationChannelVerificationStatusEnum>,
 }
 
 impl client::RequestValue for NotificationChannel {}
@@ -1945,14 +1945,14 @@ pub struct NotificationChannelDescriptor {
     /// The product launch stage for channels of this type.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<NotificationChannelDescriptorLaunchStageEnum>,
     /// The full REST resource name for this descriptor. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannelDescriptors/[TYPE] In the above, [TYPE] is the value of the type field.
     
     pub name: Option<String>,
     /// The tiers that support this notification channel; the project service tier must be one of the supported_tiers.
     #[serde(rename="supportedTiers")]
     
-    pub supported_tiers: Option<Vec<String>>,
+    pub supported_tiers: Option<Vec<NotificationChannelDescriptorSupportedTiersEnum>>,
     /// The type of notification channel, such as "email" and "sms". To view the full list of channels, see Channel descriptors (https://cloud.google.com/monitoring/alerts/using-channels-api#ncd). Notification channel types are globally unique.
     #[serde(rename="type")]
     
@@ -2164,7 +2164,7 @@ pub struct ResourceGroup {
     /// The resource type of the group members.
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<String>,
+    pub resource_type: Option<ResourceGroupResourceTypeEnum>,
 }
 
 impl client::Part for ResourceGroup {}
@@ -2180,7 +2180,7 @@ pub struct ResponseStatusCode {
     /// A class of status codes to accept.
     #[serde(rename="statusClass")]
     
-    pub status_class: Option<String>,
+    pub status_class: Option<ResponseStatusCodeStatusClassEnum>,
     /// A status code to accept.
     #[serde(rename="statusValue")]
     
@@ -2329,7 +2329,7 @@ pub struct ServiceLevelObjective {
     /// A calendar period, semantically "since the start of the current ". At this time, only DAY, WEEK, FORTNIGHT, and MONTH are supported.
     #[serde(rename="calendarPeriod")]
     
-    pub calendar_period: Option<String>,
+    pub calendar_period: Option<ServiceLevelObjectiveCalendarPeriodEnum>,
     /// Name used for UI elements listing this SLO.
     #[serde(rename="displayName")]
     
@@ -2483,7 +2483,7 @@ pub struct TimeSeries {
     /// The metric kind of the time series. When listing time series, this metric kind might be different from the metric kind of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the metric kind of the associated metric. If the associated metric's descriptor must be auto-created, then this field specifies the metric kind of the new descriptor and must be either GAUGE (the default) or CUMULATIVE.
     #[serde(rename="metricKind")]
     
-    pub metric_kind: Option<String>,
+    pub metric_kind: Option<TimeSeryMetricKindEnum>,
     /// The data points of this time series. When listing time series, points are returned in reverse time order.When creating a time series, this field must contain exactly one point and the point's type must be the same as the value type of the associated metric. If the associated metric's descriptor must be auto-created, then the value type of the descriptor is determined by the point's type, which must be BOOL, INT64, DOUBLE, or DISTRIBUTION.
     
     pub points: Option<Vec<Point>>,
@@ -2496,7 +2496,7 @@ pub struct TimeSeries {
     /// The value type of the time series. When listing time series, this value type might be different from the value type of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the type of the data in the points field.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<TimeSeryValueTypeEnum>,
 }
 
 impl client::Part for TimeSeries {}
@@ -2633,7 +2633,7 @@ pub struct UptimeCheckConfig {
     /// The type of checkers to use to execute the Uptime check.
     #[serde(rename="checkerType")]
     
-    pub checker_type: Option<String>,
+    pub checker_type: Option<UptimeCheckConfigCheckerTypeEnum>,
     /// The content that is expected to appear in the data returned by the target server against which the check is run. Currently, only the first entry in the content_matchers list is supported, and additional entries will be ignored. This field is optional and should only be specified if a content match is required as part of the/ Uptime check.
     #[serde(rename="contentMatchers")]
     
@@ -2672,7 +2672,7 @@ pub struct UptimeCheckConfig {
     /// The list of regions from which the check will be run. Some regions contain one location, and others contain more than one. If this field is specified, enough regions must be provided to include a minimum of 3 locations. Not specifying this field will result in Uptime checks running from all available regions.
     #[serde(rename="selectedRegions")]
     
-    pub selected_regions: Option<Vec<String>>,
+    pub selected_regions: Option<Vec<UptimeCheckConfigSelectedRegionsEnum>>,
     /// Contains information needed to make a TCP check.
     #[serde(rename="tcpCheck")]
     
@@ -2711,7 +2711,7 @@ pub struct UptimeCheckIp {
     pub location: Option<String>,
     /// A broad region category in which the IP address is located.
     
-    pub region: Option<String>,
+    pub region: Option<UptimeCheckIpRegionEnum>,
 }
 
 impl client::Resource for UptimeCheckIp {}
@@ -2730,14 +2730,14 @@ pub struct ValueDescriptor {
     /// The value stream kind.
     #[serde(rename="metricKind")]
     
-    pub metric_kind: Option<String>,
+    pub metric_kind: Option<ValueDescriptorMetricKindEnum>,
     /// The unit in which time_series point values are reported. unit follows the UCUM format for units as seen in https://unitsofmeasure.org/ucum.html. unit is only valid if value_type is INTEGER, DOUBLE, DISTRIBUTION.
     
     pub unit: Option<String>,
     /// The value type.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<ValueDescriptorValueTypeEnum>,
 }
 
 impl client::Part for ValueDescriptor {}

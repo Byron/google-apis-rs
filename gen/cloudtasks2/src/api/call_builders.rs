@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -580,7 +580,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_queues_tasks_get("name")
-///              .response_view("sanctus")
+///              .response_view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -589,7 +589,7 @@ pub struct ProjectLocationQueueTaskGetCall<'a, S>
 
    pub(super) hub: &'a CloudTasks<S>,
    pub(super) _name: String,
-   pub(super) _response_view: Option<String>,
+   pub(super) _response_view: Option<ProjectResponseViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -626,7 +626,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._response_view.as_ref() {
             params.push("responseView", value);
         }
@@ -747,8 +747,8 @@ where
     /// The response_view specifies which subset of the Task will be returned. By default response_view is BASIC; not all information is retrieved by default because some data, such as payloads, might be desirable to return only when needed because of its large size or because of the sensitivity of data that it contains. Authorization for FULL requires `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/) permission on the Task resource.
     ///
     /// Sets the *response view* query property to the given value.
-    pub fn response_view(mut self, new_value: &str) -> ProjectLocationQueueTaskGetCall<'a, S> {
-        self._response_view = Some(new_value.to_string());
+    pub fn response_view(mut self, new_value: &ProjectResponseViewEnum) -> ProjectLocationQueueTaskGetCall<'a, S> {
+        self._response_view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -854,9 +854,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_queues_tasks_list("parent")
-///              .response_view("amet.")
-///              .page_token("takimata")
-///              .page_size(-52)
+///              .response_view(&Default::default())
+///              .page_token("sed")
+///              .page_size(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -865,7 +865,7 @@ pub struct ProjectLocationQueueTaskListCall<'a, S>
 
    pub(super) hub: &'a CloudTasks<S>,
    pub(super) _parent: String,
-   pub(super) _response_view: Option<String>,
+   pub(super) _response_view: Option<ProjectResponseViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -904,7 +904,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._response_view.as_ref() {
             params.push("responseView", value);
         }
@@ -1031,8 +1031,8 @@ where
     /// The response_view specifies which subset of the Task will be returned. By default response_view is BASIC; not all information is retrieved by default because some data, such as payloads, might be desirable to return only when needed because of its large size or because of the sensitivity of data that it contains. Authorization for FULL requires `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/) permission on the Task resource.
     ///
     /// Sets the *response view* query property to the given value.
-    pub fn response_view(mut self, new_value: &str) -> ProjectLocationQueueTaskListCall<'a, S> {
-        self._response_view = Some(new_value.to_string());
+    pub fn response_view(mut self, new_value: &ProjectResponseViewEnum) -> ProjectLocationQueueTaskListCall<'a, S> {
+        self._response_view = Some(new_value.clone());
         self
     }
     /// A token identifying the page of results to return. To request the first page results, page_token must be empty. To request the next page of results, page_token must be the value of next_page_token returned from the previous call to ListTasks method. The page token is valid for only 2 hours.
@@ -1203,7 +1203,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1495,7 +1495,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1780,7 +1780,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2042,7 +2042,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2311,7 +2311,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -2552,9 +2552,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_queues_list("parent")
-///              .page_token("dolor")
-///              .page_size(-17)
-///              .filter("ipsum")
+///              .page_token("gubergren")
+///              .page_size(-75)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2602,7 +2602,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2903,7 +2903,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3205,7 +3205,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3497,7 +3497,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3789,7 +3789,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4081,7 +4081,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4373,7 +4373,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4658,7 +4658,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4876,9 +4876,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("est")
-///              .page_size(-50)
-///              .filter("ipsum")
+///              .page_token("gubergren")
+///              .page_size(-16)
+///              .filter("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4926,7 +4926,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

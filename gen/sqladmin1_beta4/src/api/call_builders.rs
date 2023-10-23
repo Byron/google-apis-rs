@@ -72,9 +72,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("id", self._id.to_string());
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -358,9 +358,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("id", self._id.to_string());
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -650,8 +650,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -951,8 +951,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1252,8 +1252,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -1551,8 +1551,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
         if let Some(value) = self._read_time.as_ref() {
             params.push("readTime", ::client::serde::datetime_to_string(&value));
         }
@@ -1836,9 +1836,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("database", self._database);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -2122,9 +2122,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("database", self._database);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -2414,8 +2414,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -2711,8 +2711,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -2993,9 +2993,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("database", self._database);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -3309,9 +3309,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("database", self._database);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("database", &self._database);
 
         params.extend(self._additional_params.iter());
 
@@ -3872,8 +3872,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -4153,8 +4153,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -4450,8 +4450,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -4731,8 +4731,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -5035,8 +5035,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -5339,8 +5339,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -5636,8 +5636,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -5917,8 +5917,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -6220,7 +6220,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
 
         params.extend(self._additional_params.iter());
 
@@ -6511,7 +6511,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6804,8 +6804,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -7085,8 +7085,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -7382,8 +7382,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -7656,8 +7656,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -7930,8 +7930,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -8211,8 +8211,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -8515,8 +8515,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -8812,8 +8812,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -9086,8 +9086,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -9367,8 +9367,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -9671,8 +9671,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -9968,8 +9968,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("operation", &self._operation);
 
         params.extend(self._additional_params.iter());
 
@@ -10247,7 +10247,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10547,8 +10547,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -10851,8 +10851,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -11155,8 +11155,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -11459,8 +11459,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -11757,9 +11757,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("sha1Fingerprint", self._sha1_fingerprint);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("sha1Fingerprint", &self._sha1_fingerprint);
 
         params.extend(self._additional_params.iter());
 
@@ -12043,9 +12043,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("sha1Fingerprint", self._sha1_fingerprint);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("sha1Fingerprint", &self._sha1_fingerprint);
 
         params.extend(self._additional_params.iter());
 
@@ -12335,8 +12335,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -12632,8 +12632,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -12905,7 +12905,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
 
         params.extend(self._additional_params.iter());
 
@@ -13172,8 +13172,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -13469,9 +13469,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
-        params.push("name", self._name);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
+        params.push("name", &self._name);
         if let Some(value) = self._host.as_ref() {
             params.push("host", value);
         }
@@ -13771,8 +13771,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -14068,8 +14068,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
 
         params.extend(self._additional_params.iter());
 
@@ -14353,8 +14353,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("instance", self._instance);
+        params.push("project", &self._project);
+        params.push("instance", &self._instance);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }

@@ -53,26 +53,26 @@ pub struct Account {
     /// Output only. Specifies the permission level the user has for this account.
     #[serde(rename="permissionLevel")]
     
-    pub permission_level: Option<String>,
+    pub permission_level: Option<AccountPermissionLevelEnum>,
     /// Required. Input only. The resource name of the account which will be the primary owner of the account being created. It should be of the form `accounts/{account_id}`.
     #[serde(rename="primaryOwner")]
     
     pub primary_owner: Option<String>,
     /// Output only. Specifies the AccountRole of this account.
     
-    pub role: Option<String>,
+    pub role: Option<AccountRoleEnum>,
     /// Required. Contains the type of account. Accounts of type PERSONAL and ORGANIZATION cannot be created using this API.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AccountTypeEnum>,
     /// Output only. If verified, future locations that are created are automatically connected to Google Maps, and have Google+ pages created, without requiring moderation.
     #[serde(rename="verificationState")]
     
-    pub verification_state: Option<String>,
+    pub verification_state: Option<AccountVerificationStateEnum>,
     /// Output only. Indicates whether the account is vetted by Google. A vetted account is able to verify locations via the VETTED_PARTNER method.
     #[serde(rename="vettedState")]
     
-    pub vetted_state: Option<String>,
+    pub vetted_state: Option<AccountVettedStateEnum>,
 }
 
 impl client::RequestValue for Account {}
@@ -109,7 +109,7 @@ pub struct Admin {
     pub pending_invitation: Option<bool>,
     /// Required. Specifies the role that this admin uses with the specified Account or Location.
     
-    pub role: Option<String>,
+    pub role: Option<AdminRoleEnum>,
 }
 
 impl client::RequestValue for Admin {}
@@ -162,7 +162,7 @@ pub struct Invitation {
     pub name: Option<String>,
     /// Output only. The invited role on the account.
     
-    pub role: Option<String>,
+    pub role: Option<InvitationRoleEnum>,
     /// The sparsely populated account this invitation is for.
     #[serde(rename="targetAccount")]
     
@@ -174,7 +174,7 @@ pub struct Invitation {
     /// Output only. Specifies which target types should appear in the response.
     #[serde(rename="targetType")]
     
-    pub target_type: Option<String>,
+    pub target_type: Option<InvitationTargetTypeEnum>,
 }
 
 impl client::Part for Invitation {}

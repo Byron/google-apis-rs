@@ -104,8 +104,8 @@ let mut req = SshPublicKey::default();
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.users().import_ssh_public_key(req, "parent")
-             .view("magna")
-             .project_id("no")
+             .view(&Default::default())
+             .project_id("magna")
              .doit().await;
 
 match result {

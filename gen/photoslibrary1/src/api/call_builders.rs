@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("albumId", self._album_id);
+        params.push("albumId", &self._album_id);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("albumId", self._album_id);
+        params.push("albumId", &self._album_id);
 
         params.extend(self._additional_params.iter());
 
@@ -661,7 +661,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("albumId", self._album_id);
+        params.push("albumId", &self._album_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1219,7 +1219,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("albumId", self._album_id);
+        params.push("albumId", &self._album_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1769,7 +1769,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2071,7 +2071,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("albumId", self._album_id);
+        params.push("albumId", &self._album_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2363,7 +2363,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("albumId", self._album_id);
+        params.push("albumId", &self._album_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3179,7 +3179,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("mediaItemId", self._media_item_id);
+        params.push("mediaItemId", &self._media_item_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3717,7 +3717,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("id", self._id);
+        params.push("id", &self._id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4285,7 +4285,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("shareToken", self._share_token);
+        params.push("shareToken", &self._share_token);
 
         params.extend(self._additional_params.iter());
 

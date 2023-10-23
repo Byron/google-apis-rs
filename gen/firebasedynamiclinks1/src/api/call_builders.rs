@@ -620,7 +620,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("dynamicLink", self._dynamic_link);
+        params.push("dynamicLink", &self._dynamic_link);
         if let Some(value) = self._sdk_version.as_ref() {
             params.push("sdkVersion", value);
         }

@@ -9,7 +9,7 @@ pub struct AccountActivity {
     /// Required. Indicates the activity level of the account.
     #[serde(rename="activityLevel")]
     
-    pub activity_level: Option<String>,
+    pub activity_level: Option<AccountActivityActivityLevelEnum>,
 }
 
 impl client::Part for AccountActivity {}
@@ -29,7 +29,7 @@ pub struct AccountDetails {
     /// Required. Details about the licensing status of the user for the app in the scope.
     #[serde(rename="appLicensingVerdict")]
     
-    pub app_licensing_verdict: Option<String>,
+    pub app_licensing_verdict: Option<AccountDetailAppLicensingVerdictEnum>,
 }
 
 impl client::Part for AccountDetails {}
@@ -45,7 +45,7 @@ pub struct AppIntegrity {
     /// Required. Details about the app recognition verdict
     #[serde(rename="appRecognitionVerdict")]
     
-    pub app_recognition_verdict: Option<String>,
+    pub app_recognition_verdict: Option<AppIntegrityAppRecognitionVerdictEnum>,
     /// The SHA256 hash of the requesting app's signing certificates (base64 web-safe encoded). Set iff app_recognition_verdict != UNEVALUATED.
     #[serde(rename="certificateSha256Digest")]
     
@@ -114,7 +114,7 @@ pub struct DeviceIntegrity {
     /// Details about the integrity of the device the app is running on
     #[serde(rename="deviceRecognitionVerdict")]
     
-    pub device_recognition_verdict: Option<Vec<String>>,
+    pub device_recognition_verdict: Option<Vec<DeviceIntegrityDeviceRecognitionVerdictEnum>>,
 }
 
 impl client::Part for DeviceIntegrity {}

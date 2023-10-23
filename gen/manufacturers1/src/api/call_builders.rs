@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("name", self._name);
+        params.push("parent", &self._parent);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -300,7 +300,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().products_get("parent", "name")
-///              .add_include("amet.")
+///              .add_include(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -310,7 +310,7 @@ pub struct AccountProductGetCall<'a, S>
    pub(super) hub: &'a ManufacturerCenter<S>,
    pub(super) _parent: String,
    pub(super) _name: String,
-   pub(super) _include: Vec<String>,
+   pub(super) _include: Option<AccountIncludeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -347,8 +347,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("name", self._name);
+        params.push("parent", &self._parent);
+        params.push("name", &self._name);
         if self._include.len() > 0 {
             for f in self._include.iter() {
                 params.push("include", f);
@@ -482,8 +482,8 @@ where
     ///
     /// Append the given value to the *include* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_include(mut self, new_value: &str) -> AccountProductGetCall<'a, S> {
-        self._include.push(new_value.to_string());
+    pub fn add_include(mut self, new_value: &AccountIncludeEnum) -> AccountProductGetCall<'a, S> {
+        self._include.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -589,9 +589,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().products_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-62)
-///              .add_include("Lorem")
+///              .page_token("duo")
+///              .page_size(-55)
+///              .add_include(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -602,7 +602,7 @@ pub struct AccountProductListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _include: Vec<String>,
+   pub(super) _include: Option<AccountIncludeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -639,7 +639,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -783,8 +783,8 @@ where
     ///
     /// Append the given value to the *include* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_include(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
-        self._include.push(new_value.to_string());
+    pub fn add_include(mut self, new_value: &AccountIncludeEnum) -> AccountProductListCall<'a, S> {
+        self._include.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -942,8 +942,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("name", self._name);
+        params.push("parent", &self._parent);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

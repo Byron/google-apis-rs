@@ -146,13 +146,13 @@ pub struct Case {
     pub name: Option<String>,
     /// The priority of this case. If this is set, do not set severity.
     
-    pub priority: Option<String>,
+    pub priority: Option<CasePriorityEnum>,
     /// The severity of this case. Deprecated. Use priority instead.
     
-    pub severity: Option<String>,
+    pub severity: Option<CaseSeverityEnum>,
     /// Output only. The current status of the support case.
     
-    pub state: Option<String>,
+    pub state: Option<CaseStateEnum>,
     /// The email addresses to receive updates on this case.
     #[serde(rename="subscriberEmailAddresses")]
     
@@ -296,7 +296,7 @@ pub struct CompositeMedia {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="referenceType")]
     
-    pub reference_type: Option<String>,
+    pub reference_type: Option<CompositeMediaReferenceTypeEnum>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="sha1Hash")]
     
@@ -525,7 +525,7 @@ pub struct Escalation {
     pub justification: Option<String>,
     /// Required. The reason why the Case is being escalated.
     
-    pub reason: Option<String>,
+    pub reason: Option<EscalationReasonEnum>,
 }
 
 impl client::Part for Escalation {}
@@ -715,7 +715,7 @@ pub struct Media {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="referenceType")]
     
-    pub reference_type: Option<String>,
+    pub reference_type: Option<MediaReferenceTypeEnum>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="sha1Hash")]
     

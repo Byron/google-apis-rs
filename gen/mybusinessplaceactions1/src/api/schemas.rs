@@ -93,11 +93,11 @@ pub struct PlaceActionLink {
     /// Required. The type of place action that can be performed using this link.
     #[serde(rename="placeActionType")]
     
-    pub place_action_type: Option<String>,
+    pub place_action_type: Option<PlaceActionLinkPlaceActionTypeEnum>,
     /// Output only. Specifies the provider type.
     #[serde(rename="providerType")]
     
-    pub provider_type: Option<String>,
+    pub provider_type: Option<PlaceActionLinkProviderTypeEnum>,
     /// Output only. The time when the place action link was last modified.
     #[serde(rename="updateTime")]
     
@@ -125,7 +125,7 @@ pub struct PlaceActionTypeMetadata {
     /// The place action type.
     #[serde(rename="placeActionType")]
     
-    pub place_action_type: Option<String>,
+    pub place_action_type: Option<PlaceActionTypeMetadataPlaceActionTypeEnum>,
 }
 
 impl client::Part for PlaceActionTypeMetadata {}

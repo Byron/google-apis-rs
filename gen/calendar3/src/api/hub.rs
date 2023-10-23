@@ -50,10 +50,10 @@ use super::*;
 ///              .q("erat")
 ///              .add_private_extended_property("sed")
 ///              .page_token("duo")
-///              .order_by("dolore")
-///              .max_results(-22)
-///              .max_attendees(-28)
-///              .i_cal_uid("amet.")
+///              .order_by(&Default::default())
+///              .max_results(-34)
+///              .max_attendees(-22)
+///              .i_cal_uid("voluptua.")
 ///              .always_include_email(false)
 ///              .doit().await;
 /// 

@@ -32,7 +32,7 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().assets_upload(req, -47)
+/// let result = hub.advertisers().assets_upload(req, -17)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -79,7 +79,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -349,7 +349,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_get(-20, -50, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_get(-55, -88, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -359,7 +359,7 @@ pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, S>
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _campaign_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -397,10 +397,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -531,8 +531,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. An identifier unique to the targeting type in this campaign that identifies the assigned targeting option being requested.
@@ -647,11 +647,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-12, -16, "targetingType")
-///              .page_token("ipsum")
-///              .page_size(-50)
-///              .order_by("est")
-///              .filter("gubergren")
+/// let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-20, -50, &Default::default())
+///              .page_token("sed")
+///              .page_size(-37)
+///              .order_by("gubergren")
+///              .filter("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -661,7 +661,7 @@ pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, S>
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _campaign_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -702,9 +702,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
+        params.push("targetingType", &self._targeting_type);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -847,8 +847,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCampaignAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
@@ -981,11 +981,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_bulk_list_campaign_assigned_targeting_options(-17, -99)
-///              .page_token("Lorem")
-///              .page_size(-25)
-///              .order_by("labore")
-///              .filter("sed")
+/// let result = hub.advertisers().campaigns_bulk_list_campaign_assigned_targeting_options(-57, -50)
+///              .page_token("ipsum")
+///              .page_size(-7)
+///              .order_by("gubergren")
+///              .filter("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1035,8 +1035,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1309,7 +1309,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_create(req, -70)
+/// let result = hub.advertisers().campaigns_create(req, -99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1355,7 +1355,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1595,7 +1595,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_delete(-80, -61)
+/// let result = hub.advertisers().campaigns_delete(-56, -25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1641,8 +1641,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1869,7 +1869,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_get(-15, -13)
+/// let result = hub.advertisers().campaigns_get(-86, -43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1915,8 +1915,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2143,11 +2143,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_list(-24)
+/// let result = hub.advertisers().campaigns_list(-70)
 ///              .page_token("sed")
-///              .page_size(-24)
-///              .order_by("et")
-///              .filter("vero")
+///              .page_size(-61)
+///              .order_by("Stet")
+///              .filter("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2196,7 +2196,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2459,7 +2459,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_patch(req, -31, -93)
+/// let result = hub.advertisers().campaigns_patch(req, -24, -43)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -2508,8 +2508,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("campaignId", self._campaign_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("campaignId", &self._campaign_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2775,7 +2775,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_bulk_edit(req, -20, -34)
+/// let result = hub.advertisers().channels_sites_bulk_edit(req, -24, -68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2822,8 +2822,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3079,8 +3079,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_create(req, -22, -28)
-///              .partner_id(-2)
+/// let result = hub.advertisers().channels_sites_create(req, -76, -31)
+///              .partner_id(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3128,8 +3128,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -3389,8 +3389,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_delete(-96, -92, "urlOrAppId")
-///              .partner_id(-18)
+/// let result = hub.advertisers().channels_sites_delete(-20, -34, "urlOrAppId")
+///              .partner_id(-28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3438,9 +3438,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
-        params.push("urlOrAppId", self._url_or_app_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
+        params.push("urlOrAppId", &self._url_or_app_id);
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -3687,12 +3687,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_list(-22, -95)
-///              .partner_id(-15)
+/// let result = hub.advertisers().channels_sites_list(-2, -96)
+///              .partner_id(-92)
 ///              .page_token("dolor")
-///              .page_size(-20)
-///              .order_by("vero")
-///              .filter("vero")
+///              .page_size(-18)
+///              .order_by("et")
+///              .filter("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3743,8 +3743,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -4027,7 +4027,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_replace(req, -88, -65)
+/// let result = hub.advertisers().channels_sites_replace(req, -15, -99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4074,8 +4074,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4331,8 +4331,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_create(req, -76)
-///              .partner_id(-44)
+/// let result = hub.advertisers().channels_create(req, -20)
+///              .partner_id(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4379,7 +4379,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -4629,8 +4629,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_get(-6, -29)
-///              .partner_id(-61)
+/// let result = hub.advertisers().channels_get(-76, -88)
+///              .partner_id(-65)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4677,8 +4677,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -4915,12 +4915,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_list(-100)
-///              .partner_id(-23)
-///              .page_token("takimata")
-///              .page_size(-46)
-///              .order_by("voluptua.")
-///              .filter("et")
+/// let result = hub.advertisers().channels_list(-76)
+///              .partner_id(-44)
+///              .page_token("Lorem")
+///              .page_size(-29)
+///              .order_by("no")
+///              .filter("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4970,7 +4970,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -5243,9 +5243,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_patch(req, -31, -96)
+/// let result = hub.advertisers().channels_patch(req, -23, -59)
 ///              .update_mask(&Default::default())
-///              .partner_id(-2)
+///              .partner_id(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5294,8 +5294,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -5571,7 +5571,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_create(req, -30)
+/// let result = hub.advertisers().creatives_create(req, -28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5617,7 +5617,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -5857,7 +5857,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_delete(-9, -19)
+/// let result = hub.advertisers().creatives_delete(-72, -31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5903,8 +5903,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("creativeId", self._creative_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("creativeId", &self._creative_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6131,7 +6131,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_get(-62, -74)
+/// let result = hub.advertisers().creatives_get(-96, -2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6177,8 +6177,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("creativeId", self._creative_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("creativeId", &self._creative_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -6405,11 +6405,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_list(-23)
-///              .page_token("voluptua.")
-///              .page_size(-34)
-///              .order_by("dolore")
-///              .filter("dolore")
+/// let result = hub.advertisers().creatives_list(-30)
+///              .page_token("takimata")
+///              .page_size(-19)
+///              .order_by("gubergren")
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6458,7 +6458,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6721,7 +6721,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_patch(req, -78, -2)
+/// let result = hub.advertisers().creatives_patch(req, -23, -78)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -6770,8 +6770,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("creativeId", self._creative_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("creativeId", &self._creative_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -7031,7 +7031,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_get(-17, -95, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_get(-34, -34, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7041,7 +7041,7 @@ pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _insertion_order_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -7079,10 +7079,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("insertionOrderId", self._insertion_order_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("insertionOrderId", &self._insertion_order_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7213,8 +7213,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. An identifier unique to the targeting type in this insertion order that identifies the assigned targeting option being requested.
@@ -7329,11 +7329,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_list(-11, -7, "targetingType")
-///              .page_token("sed")
-///              .page_size(-98)
-///              .order_by("et")
-///              .filter("tempor")
+/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_list(-78, -2, &Default::default())
+///              .page_token("ea")
+///              .page_size(-95)
+///              .order_by("Lorem")
+///              .filter("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7343,7 +7343,7 @@ pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _insertion_order_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -7384,9 +7384,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("insertionOrderId", self._insertion_order_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("insertionOrderId", &self._insertion_order_id.to_string());
+        params.push("targetingType", &self._targeting_type);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7529,8 +7529,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListInsertionOrderAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
@@ -7663,11 +7663,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_bulk_list_insertion_order_assigned_targeting_options(-32, -5)
-///              .page_token("et")
-///              .page_size(-8)
-///              .order_by("Lorem")
-///              .filter("est")
+/// let result = hub.advertisers().insertion_orders_bulk_list_insertion_order_assigned_targeting_options(-11, -7)
+///              .page_token("At")
+///              .page_size(-43)
+///              .order_by("sit")
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7717,8 +7717,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("insertionOrderId", &self._insertion_order_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7991,7 +7991,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_create(req, -30)
+/// let result = hub.advertisers().insertion_orders_create(req, -39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8037,7 +8037,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8277,7 +8277,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_delete(-29, -19)
+/// let result = hub.advertisers().insertion_orders_delete(-32, -5)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8323,8 +8323,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("insertionOrderId", &self._insertion_order_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8551,7 +8551,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_get(-69, -68)
+/// let result = hub.advertisers().insertion_orders_get(-18, -8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8597,8 +8597,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("insertionOrderId", &self._insertion_order_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8825,11 +8825,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_list(-93)
-///              .page_token("no")
-///              .page_size(-85)
-///              .order_by("elitr")
-///              .filter("sed")
+/// let result = hub.advertisers().insertion_orders_list(-56)
+///              .page_token("est")
+///              .page_size(-30)
+///              .order_by("diam")
+///              .filter("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8878,7 +8878,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9141,7 +9141,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_patch(req, -61, -91)
+/// let result = hub.advertisers().insertion_orders_patch(req, -69, -68)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -9190,8 +9190,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("insertionOrderId", &self._insertion_order_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -9451,11 +9451,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().invoices_list(-77)
-///              .page_token("sadipscing")
-///              .page_size(-32)
-///              .loi_sapin_invoice_type("dolores")
-///              .issue_month("sadipscing")
+/// let result = hub.advertisers().invoices_list(-93)
+///              .page_token("no")
+///              .page_size(-85)
+///              .loi_sapin_invoice_type(&Default::default())
+///              .issue_month("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9466,7 +9466,7 @@ pub struct AdvertiserInvoiceListCall<'a, S>
    pub(super) _advertiser_id: i64,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _loi_sapin_invoice_type: Option<String>,
+   pub(super) _loi_sapin_invoice_type: Option<AdvertiserLoiSapinInvoiceTypeEnum>,
    pub(super) _issue_month: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -9504,7 +9504,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9648,8 +9648,8 @@ where
     /// Select type of invoice to retrieve for Loi Sapin advertisers. Only applicable to Loi Sapin advertisers. Will be ignored otherwise.
     ///
     /// Sets the *loi sapin invoice type* query property to the given value.
-    pub fn loi_sapin_invoice_type(mut self, new_value: &str) -> AdvertiserInvoiceListCall<'a, S> {
-        self._loi_sapin_invoice_type = Some(new_value.to_string());
+    pub fn loi_sapin_invoice_type(mut self, new_value: &AdvertiserLoiSapinInvoiceTypeEnum) -> AdvertiserInvoiceListCall<'a, S> {
+        self._loi_sapin_invoice_type = Some(new_value.clone());
         self
     }
     /// The month to list the invoices for. If not set, the request will retrieve invoices for the previous month. Must be in the format YYYYMM.
@@ -9761,8 +9761,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().invoices_lookup_invoice_currency(-31)
-///              .invoice_month("aliquyam")
+/// let result = hub.advertisers().invoices_lookup_invoice_currency(-80)
+///              .invoice_month("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9808,7 +9808,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._invoice_month.as_ref() {
             params.push("invoiceMonth", value);
         }
@@ -10041,7 +10041,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_create(req, -47, -57, "targetingType")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_create(req, -91, -77, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -10052,7 +10052,7 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, 
    pub(super) _request: AssignedTargetingOption,
    pub(super) _advertiser_id: i64,
    pub(super) _line_item_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10089,9 +10089,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
+        params.push("targetingType", &self._targeting_type);
 
         params.extend(self._additional_params.iter());
 
@@ -10245,8 +10245,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10351,7 +10351,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_delete(-10, -96, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_delete(-45, -32, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10361,7 +10361,7 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _line_item_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -10399,10 +10399,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10533,8 +10533,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. The ID of the assigned targeting option to delete.
@@ -10649,7 +10649,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_get(-7, -82, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_get(-95, -31, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10659,7 +10659,7 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, S>
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _line_item_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -10697,10 +10697,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10831,8 +10831,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. An identifier unique to the targeting type in this line item that identifies the assigned targeting option being requested.
@@ -10947,11 +10947,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_list(-42, -57, "targetingType")
-///              .page_token("sed")
-///              .page_size(-75)
-///              .order_by("Lorem")
-///              .filter("ea")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_list(-47, -57, &Default::default())
+///              .page_token("et")
+///              .page_size(-10)
+///              .order_by("consetetur")
+///              .filter("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10961,7 +10961,7 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, S>
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
    pub(super) _line_item_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -11002,9 +11002,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
+        params.push("targetingType", &self._targeting_type);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11147,8 +11147,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListLineItemAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
@@ -11287,7 +11287,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_bulk_edit_line_item_assigned_targeting_options(req, -15, -19)
+/// let result = hub.advertisers().line_items_bulk_edit_line_item_assigned_targeting_options(req, -65, -7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11334,8 +11334,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -11585,11 +11585,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_bulk_list_line_item_assigned_targeting_options(-25, -68)
-///              .page_token("sea")
-///              .page_size(-74)
-///              .order_by("At")
-///              .filter("dolore")
+/// let result = hub.advertisers().line_items_bulk_list_line_item_assigned_targeting_options(-82, -94)
+///              .page_token("duo")
+///              .page_size(-42)
+///              .order_by("est")
+///              .filter("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11639,8 +11639,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11913,7 +11913,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_create(req, -40)
+/// let result = hub.advertisers().line_items_create(req, -93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11959,7 +11959,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -12199,7 +12199,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_delete(-51, -23)
+/// let result = hub.advertisers().line_items_delete(-75, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12245,8 +12245,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -12479,7 +12479,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_generate_default(req, -47)
+/// let result = hub.advertisers().line_items_generate_default(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12525,7 +12525,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -12765,7 +12765,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_get(-31, -69)
+/// let result = hub.advertisers().line_items_get(-15, -19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12811,8 +12811,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -13039,11 +13039,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_list(-81)
-///              .page_token("accusam")
+/// let result = hub.advertisers().line_items_list(-25)
+///              .page_token("et")
 ///              .page_size(-10)
-///              .order_by("takimata")
-///              .filter("Lorem")
+///              .order_by("et")
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13092,7 +13092,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13355,7 +13355,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_patch(req, -22, -77)
+/// let result = hub.advertisers().line_items_patch(req, -84, -40)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -13404,8 +13404,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("lineItemId", self._line_item_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("lineItemId", &self._line_item_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -13671,7 +13671,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_bulk_edit(req, -4, -22)
+/// let result = hub.advertisers().location_lists_assigned_locations_bulk_edit(req, -51, -23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13718,8 +13718,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("locationListId", self._location_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("locationListId", &self._location_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -13975,7 +13975,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_create(req, -48, -81)
+/// let result = hub.advertisers().location_lists_assigned_locations_create(req, -47, -31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14022,8 +14022,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("locationListId", self._location_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("locationListId", &self._location_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14273,7 +14273,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_delete(-10, -41, -22)
+/// let result = hub.advertisers().location_lists_assigned_locations_delete(-69, -81, -73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14320,9 +14320,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("locationListId", self._location_list_id.to_string());
-        params.push("assignedLocationId", self._assigned_location_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("locationListId", &self._location_list_id.to_string());
+        params.push("assignedLocationId", &self._assigned_location_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14559,11 +14559,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_list(-12, -21)
-///              .page_token("sea")
-///              .page_size(-96)
-///              .order_by("sit")
-///              .filter("aliquyam")
+/// let result = hub.advertisers().location_lists_assigned_locations_list(-10, -59)
+///              .page_token("Lorem")
+///              .page_size(-22)
+///              .order_by("At")
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14613,8 +14613,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("locationListId", self._location_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("locationListId", &self._location_list_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -14887,7 +14887,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_create(req, -25)
+/// let result = hub.advertisers().location_lists_create(req, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14933,7 +14933,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -15173,7 +15173,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_get(-77, -19)
+/// let result = hub.advertisers().location_lists_get(-48, -81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15219,8 +15219,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("locationListId", self._location_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("locationListId", &self._location_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -15447,11 +15447,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_list(-46)
-///              .page_token("gubergren")
-///              .page_size(-4)
-///              .order_by("aliquyam")
-///              .filter("no")
+/// let result = hub.advertisers().location_lists_list(-10)
+///              .page_token("nonumy")
+///              .page_size(-22)
+///              .order_by("gubergren")
+///              .filter("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15500,7 +15500,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15763,7 +15763,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_patch(req, -2, -50)
+/// let result = hub.advertisers().location_lists_patch(req, -60, -96)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -15812,8 +15812,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("locationListId", self._location_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("locationListId", &self._location_list_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -16079,7 +16079,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_activate(req, -56, -73)
+/// let result = hub.advertisers().manual_triggers_activate(req, -98, -32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16126,8 +16126,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("triggerId", self._trigger_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("triggerId", &self._trigger_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -16383,7 +16383,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_create(req, -62)
+/// let result = hub.advertisers().manual_triggers_create(req, -25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16429,7 +16429,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -16675,7 +16675,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_deactivate(req, -45, -27)
+/// let result = hub.advertisers().manual_triggers_deactivate(req, -77, -19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16722,8 +16722,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("triggerId", self._trigger_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("triggerId", &self._trigger_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -16973,7 +16973,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_get(-53, -20)
+/// let result = hub.advertisers().manual_triggers_get(-46, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17019,8 +17019,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("triggerId", self._trigger_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("triggerId", &self._trigger_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -17247,11 +17247,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_list(-53)
-///              .page_token("magna")
-///              .page_size(-22)
-///              .order_by("rebum.")
-///              .filter("dolor")
+/// let result = hub.advertisers().manual_triggers_list(-4)
+///              .page_token("aliquyam")
+///              .page_size(-61)
+///              .order_by("amet.")
+///              .filter("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17300,7 +17300,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17563,7 +17563,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_patch(req, -6, -71)
+/// let result = hub.advertisers().manual_triggers_patch(req, -56, -73)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -17612,8 +17612,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("triggerId", self._trigger_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("triggerId", &self._trigger_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -17879,7 +17879,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_bulk_edit(req, -52, -11)
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_bulk_edit(req, -62, -45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17926,8 +17926,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -18183,7 +18183,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_create(req, -91, -43)
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_create(req, -27, -53)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18230,8 +18230,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -18481,7 +18481,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_delete(-13, -101, "keywordValue")
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_delete(-20, -53, "keywordValue")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18528,9 +18528,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
-        params.push("keywordValue", self._keyword_value);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
+        params.push("keywordValue", &self._keyword_value);
 
         params.extend(self._additional_params.iter());
 
@@ -18767,10 +18767,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_list(-91, -66)
-///              .page_token("tempor")
-///              .page_size(-34)
-///              .order_by("eos")
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_list(-22, -66)
+///              .page_token("dolor")
+///              .page_size(-6)
+///              .order_by("justo")
 ///              .filter("amet.")
 ///              .doit().await;
 /// # }
@@ -18821,8 +18821,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -19095,7 +19095,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_replace(req, -84, -97)
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_replace(req, -11, -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19142,8 +19142,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -19399,7 +19399,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_create(req, -37)
+/// let result = hub.advertisers().negative_keyword_lists_create(req, -43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19445,7 +19445,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -19685,7 +19685,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_delete(-27, -53)
+/// let result = hub.advertisers().negative_keyword_lists_delete(-13, -101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19731,8 +19731,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -19959,7 +19959,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_get(-76, -20)
+/// let result = hub.advertisers().negative_keyword_lists_get(-58, -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20005,8 +20005,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -20233,9 +20233,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_list(-45)
-///              .page_token("ut")
-///              .page_size(-16)
+/// let result = hub.advertisers().negative_keyword_lists_list(-66)
+///              .page_token("tempor")
+///              .page_size(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20282,7 +20282,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -20525,7 +20525,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_patch(req, -70, -63)
+/// let result = hub.advertisers().negative_keyword_lists_patch(req, -25, -52)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -20574,8 +20574,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("negativeKeywordListId", self._negative_keyword_list_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("negativeKeywordListId", &self._negative_keyword_list_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -20841,7 +20841,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_create(req, -95, "targetingType")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_create(req, -84, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -20851,7 +20851,7 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, S>
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _request: AssignedTargetingOption,
    pub(super) _advertiser_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -20888,8 +20888,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("targetingType", &self._targeting_type);
 
         params.extend(self._additional_params.iter());
 
@@ -21033,8 +21033,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -21139,7 +21139,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_delete(-10, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_delete(-97, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21148,7 +21148,7 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -21186,9 +21186,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21309,8 +21309,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. The ID of the assigned targeting option to delete.
@@ -21425,7 +21425,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_get(-33, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_get(-27, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21434,7 +21434,7 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -21472,9 +21472,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21595,8 +21595,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. An identifier unique to the targeting type in this advertiser that identifies the assigned targeting option being requested.
@@ -21711,11 +21711,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_list(-27, "targetingType")
-///              .page_token("clita")
-///              .page_size(-15)
-///              .order_by("aliquyam")
-///              .filter("ut")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_list(-76, &Default::default())
+///              .page_token("duo")
+///              .page_size(-45)
+///              .order_by("ut")
+///              .filter("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21724,7 +21724,7 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _advertiser_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: AdvertiserTargetingTypeEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -21765,8 +21765,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("advertiserId", &self._advertiser_id.to_string());
+        params.push("targetingType", &self._targeting_type);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21899,8 +21899,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &AdvertiserTargetingTypeEnum) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListAdvertiserAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
@@ -22033,7 +22033,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().audit(-3)
+/// let result = hub.advertisers().audit(-70)
 ///              .read_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -22080,7 +22080,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -22313,7 +22313,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().bulk_edit_advertiser_assigned_targeting_options(req, -26)
+/// let result = hub.advertisers().bulk_edit_advertiser_assigned_targeting_options(req, -63)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22359,7 +22359,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -22599,11 +22599,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().bulk_list_advertiser_assigned_targeting_options(-16)
-///              .page_token("dolores")
-///              .page_size(-96)
-///              .order_by("dolores")
-///              .filter("sed")
+/// let result = hub.advertisers().bulk_list_advertiser_assigned_targeting_options(-95)
+///              .page_token("tempor")
+///              .page_size(-10)
+///              .order_by("et")
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22652,7 +22652,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -23182,7 +23182,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().delete(-38)
+/// let result = hub.advertisers().delete(-33)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23227,7 +23227,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -23444,7 +23444,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().get(-64)
+/// let result = hub.advertisers().get(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23489,7 +23489,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -23707,11 +23707,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.advertisers().list()
-///              .partner_id(-99)
-///              .page_token("aliquyam")
-///              .page_size(-83)
-///              .order_by("diam")
-///              .filter("nonumy")
+///              .partner_id(-66)
+///              .page_token("At")
+///              .page_size(-88)
+///              .order_by("clita")
+///              .filter("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24015,7 +24015,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().patch(req, -18)
+/// let result = hub.advertisers().patch(req, -82)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -24063,7 +24063,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("advertiserId", &self._advertiser_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -24313,9 +24313,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.combined_audiences().get(-8)
-///              .partner_id(-23)
-///              .advertiser_id(-39)
+/// let result = hub.combined_audiences().get(-37)
+///              .partner_id(-3)
+///              .advertiser_id(-26)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24362,7 +24362,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("combinedAudienceId", self._combined_audience_id.to_string());
+        params.push("combinedAudienceId", &self._combined_audience_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -24600,12 +24600,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.combined_audiences().list()
-///              .partner_id(-43)
-///              .page_token("est")
-///              .page_size(-9)
-///              .order_by("dolor")
-///              .filter("diam")
-///              .advertiser_id(-77)
+///              .partner_id(-16)
+///              .page_token("dolores")
+///              .page_size(-96)
+///              .order_by("dolores")
+///              .filter("sed")
+///              .advertiser_id(-38)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24920,9 +24920,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().scripts_create(req, -81)
-///              .partner_id(-71)
-///              .advertiser_id(-5)
+/// let result = hub.custom_bidding_algorithms().scripts_create(req, -64)
+///              .partner_id(-99)
+///              .advertiser_id(-82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24970,7 +24970,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("customBiddingAlgorithmId", self._custom_bidding_algorithm_id.to_string());
+        params.push("customBiddingAlgorithmId", &self._custom_bidding_algorithm_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -25230,9 +25230,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().scripts_get(-73, -19)
-///              .partner_id(-96)
-///              .advertiser_id(-11)
+/// let result = hub.custom_bidding_algorithms().scripts_get(-83, -42)
+///              .partner_id(-91)
+///              .advertiser_id(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25280,8 +25280,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("customBiddingAlgorithmId", self._custom_bidding_algorithm_id.to_string());
-        params.push("customBiddingScriptId", self._custom_bidding_script_id.to_string());
+        params.push("customBiddingAlgorithmId", &self._custom_bidding_algorithm_id.to_string());
+        params.push("customBiddingScriptId", &self._custom_bidding_script_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -25528,12 +25528,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().scripts_list(-21)
-///              .partner_id(-45)
-///              .page_token("diam")
-///              .page_size(-10)
-///              .order_by("ipsum")
-///              .advertiser_id(-15)
+/// let result = hub.custom_bidding_algorithms().scripts_list(-8)
+///              .partner_id(-23)
+///              .page_token("tempor")
+///              .page_size(-43)
+///              .order_by("est")
+///              .advertiser_id(-9)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25583,7 +25583,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("customBiddingAlgorithmId", self._custom_bidding_algorithm_id.to_string());
+        params.push("customBiddingAlgorithmId", &self._custom_bidding_algorithm_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -26123,9 +26123,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().get(-62)
-///              .partner_id(-5)
-///              .advertiser_id(-61)
+/// let result = hub.custom_bidding_algorithms().get(-99)
+///              .partner_id(-79)
+///              .advertiser_id(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26172,7 +26172,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customBiddingAlgorithmId", self._custom_bidding_algorithm_id.to_string());
+        params.push("customBiddingAlgorithmId", &self._custom_bidding_algorithm_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -26410,12 +26410,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.custom_bidding_algorithms().list()
-///              .partner_id(-98)
-///              .page_token("kasd")
-///              .page_size(-47)
-///              .order_by("Lorem")
-///              .filter("justo")
-///              .advertiser_id(-88)
+///              .partner_id(-81)
+///              .page_token("justo")
+///              .page_size(-5)
+///              .order_by("accusam")
+///              .filter("dolores")
+///              .advertiser_id(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26730,7 +26730,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().patch(req, -1)
+/// let result = hub.custom_bidding_algorithms().patch(req, -11)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -26778,7 +26778,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customBiddingAlgorithmId", self._custom_bidding_algorithm_id.to_string());
+        params.push("customBiddingAlgorithmId", &self._custom_bidding_algorithm_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -27028,9 +27028,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().upload_script(-80)
-///              .partner_id(-91)
-///              .advertiser_id(-10)
+/// let result = hub.custom_bidding_algorithms().upload_script(-21)
+///              .partner_id(-45)
+///              .advertiser_id(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27077,7 +27077,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customBiddingAlgorithmId", self._custom_bidding_algorithm_id.to_string());
+        params.push("customBiddingAlgorithmId", &self._custom_bidding_algorithm_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -27314,8 +27314,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_lists().get(-100)
-///              .advertiser_id(-63)
+/// let result = hub.custom_lists().get(-10)
+///              .advertiser_id(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27361,7 +27361,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customListId", self._custom_list_id.to_string());
+        params.push("customListId", &self._custom_list_id.to_string());
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value.to_string());
         }
@@ -27589,11 +27589,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.custom_lists().list()
-///              .page_token("justo")
-///              .page_size(-17)
-///              .order_by("At")
-///              .filter("erat")
-///              .advertiser_id(-14)
+///              .page_token("Stet")
+///              .page_size(-62)
+///              .order_by("ipsum")
+///              .filter("no")
+///              .advertiser_id(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27898,7 +27898,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.first_and_third_party_audiences().create(req)
-///              .advertiser_id(-76)
+///              .advertiser_id(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28182,7 +28182,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().edit_customer_match_members(req, -88)
+/// let result = hub.first_and_third_party_audiences().edit_customer_match_members(req, -47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28228,7 +28228,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("firstAndThirdPartyAudienceId", self._first_and_third_party_audience_id.to_string());
+        params.push("firstAndThirdPartyAudienceId", &self._first_and_third_party_audience_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -28468,9 +28468,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().get(-91)
-///              .partner_id(-81)
-///              .advertiser_id(-31)
+/// let result = hub.first_and_third_party_audiences().get(-56)
+///              .partner_id(-21)
+///              .advertiser_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28517,7 +28517,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("firstAndThirdPartyAudienceId", self._first_and_third_party_audience_id.to_string());
+        params.push("firstAndThirdPartyAudienceId", &self._first_and_third_party_audience_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -28755,12 +28755,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.first_and_third_party_audiences().list()
-///              .partner_id(-19)
-///              .page_token("ipsum")
-///              .page_size(-28)
-///              .order_by("eos")
-///              .filter("duo")
-///              .advertiser_id(-94)
+///              .partner_id(-1)
+///              .page_token("sed")
+///              .page_size(-91)
+///              .order_by("sea")
+///              .filter("ipsum")
+///              .advertiser_id(-63)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29075,9 +29075,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().patch(req, -46)
+/// let result = hub.first_and_third_party_audiences().patch(req, -21)
 ///              .update_mask(&Default::default())
-///              .advertiser_id(-72)
+///              .advertiser_id(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29125,7 +29125,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("firstAndThirdPartyAudienceId", self._first_and_third_party_audience_id.to_string());
+        params.push("firstAndThirdPartyAudienceId", &self._first_and_third_party_audience_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -29385,8 +29385,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_groups().get(-14)
-///              .partner_id(-1)
+/// let result = hub.floodlight_groups().get(-77)
+///              .partner_id(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29432,7 +29432,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("floodlightGroupId", self._floodlight_group_id.to_string());
+        params.push("floodlightGroupId", &self._floodlight_group_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -29665,9 +29665,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_groups().patch(req, -48)
+/// let result = hub.floodlight_groups().patch(req, -14)
 ///              .update_mask(&Default::default())
-///              .partner_id(-59)
+///              .partner_id(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29715,7 +29715,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("floodlightGroupId", self._floodlight_group_id.to_string());
+        params.push("floodlightGroupId", &self._floodlight_group_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -29975,9 +29975,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.google_audiences().get(-31)
-///              .partner_id(-42)
-///              .advertiser_id(-41)
+/// let result = hub.google_audiences().get(-88)
+///              .partner_id(-91)
+///              .advertiser_id(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30024,7 +30024,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("googleAudienceId", self._google_audience_id.to_string());
+        params.push("googleAudienceId", &self._google_audience_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -30262,12 +30262,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.google_audiences().list()
-///              .partner_id(-6)
-///              .page_token("At")
-///              .page_size(-92)
-///              .order_by("diam")
-///              .filter("sed")
-///              .advertiser_id(-18)
+///              .partner_id(-31)
+///              .page_token("dolores")
+///              .page_size(-50)
+///              .order_by("voluptua.")
+///              .filter("eos")
+///              .advertiser_id(-70)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30583,8 +30583,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().create(req)
-///              .partner_id(-17)
-///              .advertiser_id(-84)
+///              .partner_id(-94)
+///              .advertiser_id(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30925,7 +30925,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("guaranteedOrderId", self._guaranteed_order_id);
+        params.push("guaranteedOrderId", &self._guaranteed_order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -31166,8 +31166,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().get("guaranteedOrderId")
-///              .partner_id(-27)
-///              .advertiser_id(-53)
+///              .partner_id(-1)
+///              .advertiser_id(-48)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31214,7 +31214,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("guaranteedOrderId", self._guaranteed_order_id);
+        params.push("guaranteedOrderId", &self._guaranteed_order_id);
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -31452,12 +31452,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().list()
-///              .partner_id(-98)
-///              .page_token("Lorem")
-///              .page_size(-15)
-///              .order_by("duo")
-///              .filter("elitr")
-///              .advertiser_id(-32)
+///              .partner_id(-59)
+///              .page_token("erat")
+///              .page_size(-42)
+///              .order_by("nonumy")
+///              .filter("Lorem")
+///              .advertiser_id(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31774,8 +31774,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().patch(req, "guaranteedOrderId")
 ///              .update_mask(&Default::default())
-///              .partner_id(-87)
-///              .advertiser_id(-18)
+///              .partner_id(-92)
+///              .advertiser_id(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31824,7 +31824,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("guaranteedOrderId", self._guaranteed_order_id);
+        params.push("guaranteedOrderId", &self._guaranteed_order_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -32100,7 +32100,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_bulk_edit(req, -51)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_bulk_edit(req, -18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32146,7 +32146,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -32392,9 +32392,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_create(req, -66)
-///              .partner_id(-35)
-///              .advertiser_id(-30)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_create(req, -17)
+///              .partner_id(-84)
+///              .advertiser_id(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32442,7 +32442,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -32702,9 +32702,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_delete(-65, -82)
-///              .partner_id(-13)
-///              .advertiser_id(-101)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_delete(-67, -27)
+///              .partner_id(-53)
+///              .advertiser_id(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32752,8 +32752,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
-        params.push("assignedInventorySourceId", self._assigned_inventory_source_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
+        params.push("assignedInventorySourceId", &self._assigned_inventory_source_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -33000,13 +33000,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_list(-48)
-///              .partner_id(-63)
-///              .page_token("tempor")
-///              .page_size(-54)
-///              .order_by("amet")
-///              .filter("sit")
-///              .advertiser_id(-16)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_list(-101)
+///              .partner_id(-15)
+///              .page_token("duo")
+///              .page_size(-94)
+///              .order_by("aliquyam")
+///              .filter("erat")
+///              .advertiser_id(-87)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33057,7 +33057,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -33341,8 +33341,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_source_groups().create(req)
-///              .partner_id(-60)
-///              .advertiser_id(-100)
+///              .partner_id(-18)
+///              .advertiser_id(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33631,9 +33631,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().delete(-5)
-///              .partner_id(-24)
-///              .advertiser_id(-94)
+/// let result = hub.inventory_source_groups().delete(-66)
+///              .partner_id(-35)
+///              .advertiser_id(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33680,7 +33680,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -33917,9 +33917,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().get(-90)
-///              .partner_id(-4)
-///              .advertiser_id(-95)
+/// let result = hub.inventory_source_groups().get(-65)
+///              .partner_id(-82)
+///              .advertiser_id(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33966,7 +33966,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -34204,12 +34204,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_source_groups().list()
-///              .partner_id(-4)
-///              .page_token("dolor")
-///              .page_size(-46)
-///              .order_by("et")
-///              .filter("sit")
-///              .advertiser_id(-51)
+///              .partner_id(-101)
+///              .page_token("sit")
+///              .page_size(-63)
+///              .order_by("tempor")
+///              .filter("dolor")
+///              .advertiser_id(-97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34524,10 +34524,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().patch(req, -41)
+/// let result = hub.inventory_source_groups().patch(req, -3)
 ///              .update_mask(&Default::default())
-///              .partner_id(-79)
-///              .advertiser_id(-100)
+///              .partner_id(-16)
+///              .advertiser_id(-60)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34576,7 +34576,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("inventorySourceGroupId", self._inventory_source_group_id.to_string());
+        params.push("inventorySourceGroupId", &self._inventory_source_group_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -34853,8 +34853,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_sources().create(req)
-///              .partner_id(-38)
-///              .advertiser_id(-15)
+///              .partner_id(-100)
+///              .advertiser_id(-5)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35149,7 +35149,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_sources().edit_inventory_source_read_write_accessors(req, -78)
+/// let result = hub.inventory_sources().edit_inventory_source_read_write_accessors(req, -24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35195,7 +35195,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("inventorySourceId", self._inventory_source_id.to_string());
+        params.push("inventorySourceId", &self._inventory_source_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -35435,8 +35435,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_sources().get(-77)
-///              .partner_id(-92)
+/// let result = hub.inventory_sources().get(-94)
+///              .partner_id(-90)
 ///              .doit().await;
 /// # }
 /// ```
@@ -35482,7 +35482,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("inventorySourceId", self._inventory_source_id.to_string());
+        params.push("inventorySourceId", &self._inventory_source_id.to_string());
         if let Some(value) = self._partner_id.as_ref() {
             params.push("partnerId", value.to_string());
         }
@@ -35710,12 +35710,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_sources().list()
-///              .partner_id(-47)
-///              .page_token("At")
-///              .page_size(-90)
-///              .order_by("erat")
-///              .filter("duo")
-///              .advertiser_id(-35)
+///              .partner_id(-4)
+///              .page_token("sadipscing")
+///              .page_size(-4)
+///              .order_by("dolor")
+///              .filter("consetetur")
+///              .advertiser_id(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36030,10 +36030,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_sources().patch(req, -1)
+/// let result = hub.inventory_sources().patch(req, -48)
 ///              .update_mask(&Default::default())
-///              .partner_id(-81)
-///              .advertiser_id(-48)
+///              .partner_id(-51)
+///              .advertiser_id(-41)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36082,7 +36082,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("inventorySourceId", self._inventory_source_id.to_string());
+        params.push("inventorySourceId", &self._inventory_source_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -36402,7 +36402,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 
@@ -36682,7 +36682,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 
@@ -36958,7 +36958,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_bulk_edit(req, -91, -73)
+/// let result = hub.partners().channels_sites_bulk_edit(req, -38, -15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37005,8 +37005,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -37262,8 +37262,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_create(req, -37, -78)
-///              .advertiser_id(-46)
+/// let result = hub.partners().channels_sites_create(req, -78, -77)
+///              .advertiser_id(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37311,8 +37311,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value.to_string());
         }
@@ -37572,8 +37572,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_delete(-99, -47, "urlOrAppId")
-///              .advertiser_id(-32)
+/// let result = hub.partners().channels_sites_delete(-47, -77, "urlOrAppId")
+///              .advertiser_id(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37621,9 +37621,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
-        params.push("urlOrAppId", self._url_or_app_id);
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
+        params.push("urlOrAppId", &self._url_or_app_id);
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value.to_string());
         }
@@ -37870,12 +37870,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_list(-5, -62)
-///              .page_token("invidunt")
-///              .page_size(-10)
-///              .order_by("duo")
-///              .filter("sea")
-///              .advertiser_id(-65)
+/// let result = hub.partners().channels_sites_list(-20, -35)
+///              .page_token("erat")
+///              .page_size(-48)
+///              .order_by("accusam")
+///              .filter("et")
+///              .advertiser_id(-91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37926,8 +37926,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -38210,7 +38210,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_replace(req, -95, -11)
+/// let result = hub.partners().channels_sites_replace(req, -73, -37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38257,8 +38257,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -38514,8 +38514,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_create(req, -39)
-///              .advertiser_id(-55)
+/// let result = hub.partners().channels_create(req, -78)
+///              .advertiser_id(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38562,7 +38562,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value.to_string());
         }
@@ -38812,8 +38812,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_get(-60, -98)
-///              .advertiser_id(-2)
+/// let result = hub.partners().channels_get(-99, -47)
+///              .advertiser_id(-35)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38860,8 +38860,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value.to_string());
         }
@@ -39098,12 +39098,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_list(-55)
-///              .page_token("At")
-///              .page_size(-26)
-///              .order_by("takimata")
-///              .filter("gubergren")
-///              .advertiser_id(-74)
+/// let result = hub.partners().channels_list(-32)
+///              .page_token("ipsum")
+///              .page_size(-62)
+///              .order_by("invidunt")
+///              .filter("sea")
+///              .advertiser_id(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39153,7 +39153,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -39426,9 +39426,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_patch(req, -88, -33)
+/// let result = hub.partners().channels_patch(req, -60, -65)
 ///              .update_mask(&Default::default())
-///              .advertiser_id(-98)
+///              .advertiser_id(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39477,8 +39477,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("channelId", self._channel_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("channelId", &self._channel_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -39754,7 +39754,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_create(req, -12, "targetingType")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_create(req, -11, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -39764,7 +39764,7 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, S>
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _request: AssignedTargetingOption,
    pub(super) _partner_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: PartnerTargetingTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -39801,8 +39801,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("targetingType", &self._targeting_type);
 
         params.extend(self._additional_params.iter());
 
@@ -39946,8 +39946,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &PartnerTargetingTypeEnum) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -40052,7 +40052,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_delete(-50, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_delete(-39, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -40061,7 +40061,7 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _partner_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: PartnerTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -40099,9 +40099,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -40222,8 +40222,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &PartnerTargetingTypeEnum) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. The ID of the assigned targeting option to delete.
@@ -40338,7 +40338,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_get(-51, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_get(-60, &Default::default(), "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -40347,7 +40347,7 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _partner_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: PartnerTargetingTypeEnum,
    pub(super) _assigned_targeting_option_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -40385,9 +40385,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("targetingType", self._targeting_type);
-        params.push("assignedTargetingOptionId", self._assigned_targeting_option_id);
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("targetingType", &self._targeting_type);
+        params.push("assignedTargetingOptionId", &self._assigned_targeting_option_id);
 
         params.extend(self._additional_params.iter());
 
@@ -40508,8 +40508,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &PartnerTargetingTypeEnum) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. An identifier unique to the targeting type in this partner that identifies the assigned targeting option being requested.
@@ -40624,11 +40624,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_list(-101, "targetingType")
-///              .page_token("consetetur")
-///              .page_size(-15)
-///              .order_by("accusam")
-///              .filter("consetetur")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_list(-2, &Default::default())
+///              .page_token("ipsum")
+///              .page_size(-27)
+///              .order_by("vero")
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -40637,7 +40637,7 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionListCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _partner_id: i64,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: PartnerTargetingTypeEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -40678,8 +40678,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
-        params.push("targetingType", self._targeting_type);
+        params.push("partnerId", &self._partner_id.to_string());
+        params.push("targetingType", &self._targeting_type);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -40812,8 +40812,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &PartnerTargetingTypeEnum) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListPartnerAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
@@ -40952,7 +40952,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().bulk_edit_partner_assigned_targeting_options(req, -9)
+/// let result = hub.partners().bulk_edit_partner_assigned_targeting_options(req, -12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40998,7 +40998,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -41238,7 +41238,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().get(-43)
+/// let result = hub.partners().get(-74)
 ///              .doit().await;
 /// # }
 /// ```
@@ -41283,7 +41283,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("partnerId", self._partner_id.to_string());
+        params.push("partnerId", &self._partner_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -41501,10 +41501,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.partners().list()
-///              .page_token("nonumy")
-///              .page_size(-60)
-///              .order_by("eos")
-///              .filter("dolore")
+///              .page_token("invidunt")
+///              .page_size(-33)
+///              .order_by("sit")
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -41836,7 +41836,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -42326,8 +42326,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_types().targeting_options_get("targetingType", "targetingOptionId")
-///              .advertiser_id(-36)
+/// let result = hub.targeting_types().targeting_options_get(&Default::default(), "targetingOptionId")
+///              .advertiser_id(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42335,7 +42335,7 @@ pub struct TargetingTypeTargetingOptionGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a DisplayVideo<S>,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: TargetingTypeTargetingTypeEnum,
    pub(super) _targeting_option_id: String,
    pub(super) _advertiser_id: Option<i64>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -42374,8 +42374,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("targetingType", self._targeting_type);
-        params.push("targetingOptionId", self._targeting_option_id);
+        params.push("targetingType", &self._targeting_type);
+        params.push("targetingOptionId", &self._targeting_option_id);
         if let Some(value) = self._advertiser_id.as_ref() {
             params.push("advertiserId", value.to_string());
         }
@@ -42489,8 +42489,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &TargetingTypeTargetingTypeEnum) -> TargetingTypeTargetingOptionGetCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// Required. The ID of the of targeting option to retrieve.
@@ -42612,12 +42612,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_types().targeting_options_list("targetingType")
-///              .page_token("eirmod")
-///              .page_size(-43)
-///              .order_by("At")
-///              .filter("Stet")
-///              .advertiser_id(-3)
+/// let result = hub.targeting_types().targeting_options_list(&Default::default())
+///              .page_token("dolore")
+///              .page_size(-51)
+///              .order_by("amet")
+///              .filter("ipsum")
+///              .advertiser_id(-101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42625,7 +42625,7 @@ pub struct TargetingTypeTargetingOptionListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a DisplayVideo<S>,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: TargetingTypeTargetingTypeEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -42667,7 +42667,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("targetingType", self._targeting_type);
+        params.push("targetingType", &self._targeting_type);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -42793,8 +42793,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &TargetingTypeTargetingTypeEnum) -> TargetingTypeTargetingOptionListCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListTargetingOptions` method. If not specified, the first page of results will be returned.
@@ -42940,7 +42940,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.targeting_types().targeting_options_search(req, "targetingType")
+/// let result = hub.targeting_types().targeting_options_search(req, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -42949,7 +42949,7 @@ pub struct TargetingTypeTargetingOptionSearchCall<'a, S>
 
    pub(super) hub: &'a DisplayVideo<S>,
    pub(super) _request: SearchTargetingOptionsRequest,
-   pub(super) _targeting_type: String,
+   pub(super) _targeting_type: TargetingTypeTargetingTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -42986,7 +42986,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("targetingType", self._targeting_type);
+        params.push("targetingType", &self._targeting_type);
 
         params.extend(self._additional_params.iter());
 
@@ -43120,8 +43120,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionSearchCall<'a, S> {
-        self._targeting_type = new_value.to_string();
+    pub fn targeting_type(mut self, new_value: &TargetingTypeTargetingTypeEnum) -> TargetingTypeTargetingOptionSearchCall<'a, S> {
+        self._targeting_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -43232,7 +43232,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().bulk_edit_assigned_user_roles(req, -6)
+/// let result = hub.users().bulk_edit_assigned_user_roles(req, -19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43278,7 +43278,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id.to_string());
+        params.push("userId", &self._user_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -43791,7 +43791,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().delete(-54)
+/// let result = hub.users().delete(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43836,7 +43836,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id.to_string());
+        params.push("userId", &self._user_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -44053,7 +44053,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().get(-97)
+/// let result = hub.users().get(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -44098,7 +44098,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id.to_string());
+        params.push("userId", &self._user_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -44316,10 +44316,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().list()
-///              .page_token("magna")
-///              .page_size(-83)
-///              .order_by("invidunt")
-///              .filter("et")
+///              .page_token("accusam")
+///              .page_size(-46)
+///              .order_by("takimata")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -44612,7 +44612,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().patch(req, -22)
+/// let result = hub.users().patch(req, -91)
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -44660,7 +44660,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id.to_string());
+        params.push("userId", &self._user_id.to_string());
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }

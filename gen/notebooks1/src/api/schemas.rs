@@ -13,7 +13,7 @@ pub struct AcceleratorConfig {
     /// Type of this accelerator.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AcceleratorConfigTypeEnum>,
 }
 
 impl client::Part for AcceleratorConfig {}
@@ -319,7 +319,7 @@ pub struct Event {
     /// Event type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<EventTypeEnum>,
 }
 
 impl client::Part for Event {}
@@ -365,7 +365,7 @@ pub struct Execution {
     pub output_notebook_file: Option<String>,
     /// Output only. State of the underlying AI Platform job.
     
-    pub state: Option<String>,
+    pub state: Option<ExecutionStateEnum>,
     /// Output only. Time the Execution was last updated.
     #[serde(rename="updateTime")]
     
@@ -402,7 +402,7 @@ pub struct ExecutionTemplate {
     /// The type of Job to be used on this execution.
     #[serde(rename="jobType")]
     
-    pub job_type: Option<String>,
+    pub job_type: Option<ExecutionTemplateJobTypeEnum>,
     /// Name of the kernel spec to use. This must be specified if the kernel spec name on the execution target does not match the name in the input notebook file.
     #[serde(rename="kernelSpec")]
     
@@ -428,7 +428,7 @@ pub struct ExecutionTemplate {
     /// Required. Scale tier of the hardware used for notebook execution. DEPRECATED Will be discontinued. As right now only CUSTOM is supported.
     #[serde(rename="scaleTier")]
     
-    pub scale_tier: Option<String>,
+    pub scale_tier: Option<ExecutionTemplateScaleTierEnum>,
     /// The email address of a service account to use when running the execution. You must have the `iam.serviceAccounts.actAs` permission for the specified service account.
     #[serde(rename="serviceAccount")]
     
@@ -487,7 +487,7 @@ pub struct GetInstanceHealthResponse {
     /// Output only. Runtime health_state.
     #[serde(rename="healthState")]
     
-    pub health_state: Option<String>,
+    pub health_state: Option<GetInstanceHealthResponseHealthStateEnum>,
 }
 
 impl client::ResponseResult for GetInstanceHealthResponse {}
@@ -533,7 +533,7 @@ pub struct Instance {
     /// Input only. The type of the boot disk attached to this instance, defaults to standard persistent disk (`PD_STANDARD`).
     #[serde(rename="bootDiskType")]
     
-    pub boot_disk_type: Option<String>,
+    pub boot_disk_type: Option<InstanceBootDiskTypeEnum>,
     /// Optional. Flag to enable ip forwarding or not, default false/off. https://cloud.google.com/vpc/docs/using-routes#canipforward
     #[serde(rename="canIpForward")]
     
@@ -561,11 +561,11 @@ pub struct Instance {
     /// Input only. The type of the data disk attached to this instance, defaults to standard persistent disk (`PD_STANDARD`).
     #[serde(rename="dataDiskType")]
     
-    pub data_disk_type: Option<String>,
+    pub data_disk_type: Option<InstanceDataDiskTypeEnum>,
     /// Input only. Disk encryption method used on the boot and data disks, defaults to GMEK.
     #[serde(rename="diskEncryption")]
     
-    pub disk_encryption: Option<String>,
+    pub disk_encryption: Option<InstanceDiskEncryptionEnum>,
     /// Output only. Attached disks to notebook instance.
     
     pub disks: Option<Vec<Disk>>,
@@ -600,7 +600,7 @@ pub struct Instance {
     /// Optional. The type of vNIC to be used on this interface. This may be gVNIC or VirtioNet.
     #[serde(rename="nicType")]
     
-    pub nic_type: Option<String>,
+    pub nic_type: Option<InstanceNicTypeEnum>,
     /// If true, the notebook instance will not register with the proxy.
     #[serde(rename="noProxyAccess")]
     
@@ -639,7 +639,7 @@ pub struct Instance {
     pub shielded_instance_config: Option<ShieldedInstanceConfig>,
     /// Output only. The state of this instance.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// The name of the subnet that this instance is in. Format: `projects/{project_id}/regions/{region}/subnetworks/{subnetwork_id}`
     
     pub subnet: Option<String>,
@@ -966,7 +966,7 @@ pub struct LocalDiskInitializeParams {
     /// Input only. The type of the boot disk attached to this instance, defaults to standard persistent disk (`PD_STANDARD`).
     #[serde(rename="diskType")]
     
-    pub disk_type: Option<String>,
+    pub disk_type: Option<LocalDiskInitializeParamDiskTypeEnum>,
     /// Optional. Labels to apply to this disk. These can be later modified by the disks.setLabels method. This field is only applicable for persistent disks.
     
     pub labels: Option<HashMap<String, String>>,
@@ -1221,7 +1221,7 @@ pub struct ReservationAffinity {
     /// Optional. Type of reservation to consume
     #[serde(rename="consumeReservationType")]
     
-    pub consume_reservation_type: Option<String>,
+    pub consume_reservation_type: Option<ReservationAffinityConsumeReservationTypeEnum>,
     /// Optional. Corresponds to the label key of reservation resource.
     
     pub key: Option<String>,
@@ -1312,7 +1312,7 @@ pub struct Runtime {
     /// Output only. Runtime health_state.
     #[serde(rename="healthState")]
     
-    pub health_state: Option<String>,
+    pub health_state: Option<RuntimeHealthStateEnum>,
     /// Output only. Contains Runtime daemon metrics such as Service status and JupyterLab stats.
     
     pub metrics: Option<RuntimeMetrics>,
@@ -1325,7 +1325,7 @@ pub struct Runtime {
     pub software_config: Option<RuntimeSoftwareConfig>,
     /// Output only. Runtime state.
     
-    pub state: Option<String>,
+    pub state: Option<RuntimeStateEnum>,
     /// Output only. Runtime update time.
     #[serde(rename="updateTime")]
     
@@ -1355,7 +1355,7 @@ pub struct RuntimeAcceleratorConfig {
     /// Accelerator model.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RuntimeAcceleratorConfigTypeEnum>,
 }
 
 impl client::Part for RuntimeAcceleratorConfig {}
@@ -1371,7 +1371,7 @@ pub struct RuntimeAccessConfig {
     /// The type of access mode this instance.
     #[serde(rename="accessType")]
     
-    pub access_type: Option<String>,
+    pub access_type: Option<RuntimeAccessConfigAccessTypeEnum>,
     /// Output only. The proxy endpoint that is used to access the runtime.
     #[serde(rename="proxyUri")]
     
@@ -1486,7 +1486,7 @@ pub struct RuntimeSoftwareConfig {
     /// Behavior for the post startup script.
     #[serde(rename="postStartupScriptBehavior")]
     
-    pub post_startup_script_behavior: Option<String>,
+    pub post_startup_script_behavior: Option<RuntimeSoftwareConfigPostStartupScriptBehaviorEnum>,
     /// Output only. Bool indicating whether an newer image is available in an image family.
     
     pub upgradeable: Option<bool>,
@@ -1538,7 +1538,7 @@ pub struct Schedule {
     pub recent_executions: Option<Vec<Execution>>,
     /// no description provided
     
-    pub state: Option<String>,
+    pub state: Option<ScheduleStateEnum>,
     /// Timezone on which the cron_schedule. The value of this field must be a time zone name from the tz database. TZ Database: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones Note that some time zones include a provision for daylight savings time. The rules for daylight saving time are determined by the chosen tz. For UTC use the string "utc". If a time zone is not specified, the default will be in UTC (also known as GMT).
     #[serde(rename="timeZone")]
     
@@ -1568,7 +1568,7 @@ pub struct SchedulerAcceleratorConfig {
     /// Type of this accelerator.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SchedulerAcceleratorConfigTypeEnum>,
 }
 
 impl client::Part for SchedulerAcceleratorConfig {}
@@ -1613,7 +1613,7 @@ pub struct SetInstanceAcceleratorRequest {
     /// Required. Type of this accelerator.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SetInstanceAcceleratorRequestTypeEnum>,
 }
 
 impl client::RequestValue for SetInstanceAcceleratorRequest {}
@@ -1942,7 +1942,7 @@ impl client::RequestValue for UpdateShieldedInstanceConfigRequest {}
 pub struct UpgradeHistoryEntry {
     /// Action. Rolloback or Upgrade.
     
-    pub action: Option<String>,
+    pub action: Option<UpgradeHistoryEntryActionEnum>,
     /// The container image before this instance upgrade.
     #[serde(rename="containerImage")]
     
@@ -1959,7 +1959,7 @@ pub struct UpgradeHistoryEntry {
     pub snapshot: Option<String>,
     /// The state of this instance upgrade history entry.
     
-    pub state: Option<String>,
+    pub state: Option<UpgradeHistoryEntryStateEnum>,
     /// Target VM Image. Format: ainotebooks-vm/project/image-name/name.
     #[serde(rename="targetImage")]
     
@@ -1994,7 +1994,7 @@ pub struct UpgradeInstanceInternalRequest {
     /// Optional. The optional UpgradeType. Setting this field will search for additional compute images to upgrade this instance.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<UpgradeInstanceInternalRequestTypeEnum>,
     /// Required. The VM hardware token for authenticating the VM. https://cloud.google.com/compute/docs/instances/verifying-instance-identity
     #[serde(rename="vmId")]
     
@@ -2018,7 +2018,7 @@ pub struct UpgradeInstanceRequest {
     /// Optional. The optional UpgradeType. Setting this field will search for additional compute images to upgrade this instance.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<UpgradeInstanceRequestTypeEnum>,
 }
 
 impl client::RequestValue for UpgradeInstanceRequest {}
@@ -2137,7 +2137,7 @@ pub struct VirtualMachineConfig {
     /// Optional. The type of vNIC to be used on this interface. This may be gVNIC or VirtioNet.
     #[serde(rename="nicType")]
     
-    pub nic_type: Option<String>,
+    pub nic_type: Option<VirtualMachineConfigNicTypeEnum>,
     /// Optional. Reserved IP Range name is used for VPC Peering. The subnetwork allocation will use the range *name* if it's assigned. Example: managed-notebooks-range-c PEERING_RANGE_NAME_3=managed-notebooks-range-c gcloud compute addresses create $PEERING_RANGE_NAME_3 \ --global \ --prefix-length=24 \ --description="Google Cloud Managed Notebooks Range 24 c" \ --network=$NETWORK \ --addresses=192.168.0.0 \ --purpose=VPC_PEERING Field value will be: `managed-notebooks-range-c`
     #[serde(rename="reservedIpRange")]
     

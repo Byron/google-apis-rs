@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -492,7 +492,7 @@ pub struct Operation {
     pub start_time: Option<String>,
     /// [Output Only] The status of the operation, which can be one of the following: `PENDING`, `RUNNING`, or `DONE`.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
     
@@ -671,7 +671,7 @@ pub struct ResourceUpdate {
     pub final_properties: Option<String>,
     /// Output only. The intent of the resource: `PREVIEW`, `UPDATE`, or `CANCEL`.
     
-    pub intent: Option<String>,
+    pub intent: Option<ResourceUpdateIntentEnum>,
     /// Output only. URL of the manifest representing the update configuration of this resource.
     
     pub manifest: Option<String>,
@@ -680,7 +680,7 @@ pub struct ResourceUpdate {
     pub properties: Option<String>,
     /// Output only. The state of the resource.
     
-    pub state: Option<String>,
+    pub state: Option<ResourceUpdateStateEnum>,
     /// Output only. If warning messages are generated during processing of this resource, this field will be populated.
     
     pub warnings: Option<Vec<ResourceUpdateWarnings>>,
@@ -872,7 +872,7 @@ impl client::Part for OperationErrorErrors {}
 pub struct OperationWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<OperationWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<OperationWarningsData>>,
@@ -913,7 +913,7 @@ impl client::Part for OperationWarningsData {}
 pub struct ResourceWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ResourceWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ResourceWarningsData>>,
@@ -992,7 +992,7 @@ impl client::Part for ResourceUpdateErrorErrors {}
 pub struct ResourceUpdateWarnings {
     /// [Output Only] A warning code, if applicable. For example, Compute Engine returns NO_RESULTS_ON_PAGE if there are no results in the response.
     
-    pub code: Option<String>,
+    pub code: Option<ResourceUpdateWarningCodeEnum>,
     /// [Output Only] Metadata about this warning in key: value format. For example: "data": [ { "key": "scope", "value": "zones/us-east1-d" } 
     
     pub data: Option<Vec<ResourceUpdateWarningsData>>,

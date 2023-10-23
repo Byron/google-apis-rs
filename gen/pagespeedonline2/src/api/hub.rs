@@ -32,10 +32,10 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pagespeedapi().runpagespeed("url")
-///              .strategy("gubergren")
-///              .screenshot(false)
-///              .add_rule("dolor")
-///              .locale("ea")
+///              .strategy(&Default::default())
+///              .screenshot(true)
+///              .add_rule("gubergren")
+///              .locale("eos")
 ///              .filter_third_party_resources(true)
 ///              .doit().await;
 /// 

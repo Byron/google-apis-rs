@@ -60,7 +60,7 @@ pub struct Account {
     pub premium: Option<bool>,
     /// Output only. State of the account.
     
-    pub state: Option<String>,
+    pub state: Option<AccountStateEnum>,
     /// The account time zone, as used by reporting. For more information, see [changing the time zone of your reports](https://support.google.com/adsense/answer/9830725).
     #[serde(rename="timeZone")]
     
@@ -118,7 +118,7 @@ pub struct AdClient {
     pub reporting_dimension_id: Option<String>,
     /// Output only. State of the ad client.
     
-    pub state: Option<String>,
+    pub state: Option<AdClientStateEnum>,
 }
 
 impl client::ResponseResult for AdClient {}
@@ -182,7 +182,7 @@ pub struct AdUnit {
     pub reporting_dimension_id: Option<String>,
     /// State of the ad unit.
     
-    pub state: Option<String>,
+    pub state: Option<AdUnitStateEnum>,
 }
 
 impl client::RequestValue for AdUnit {}
@@ -224,7 +224,7 @@ pub struct Alert {
     pub name: Option<String>,
     /// Output only. Severity of this alert.
     
-    pub severity: Option<String>,
+    pub severity: Option<AlertSeverityEnum>,
     /// Output only. Type of alert. This identifies the broad type of this alert, and provides a stable machine-readable identifier that will not be translated. For example, "payment-hold".
     #[serde(rename="type")]
     
@@ -262,7 +262,7 @@ pub struct ContentAdsSettings {
     /// Required. Type of the ad unit.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ContentAdsSettingTypeEnum>,
 }
 
 impl client::Part for ContentAdsSettings {}
@@ -354,7 +354,7 @@ pub struct Header {
     /// Required. Type of the header.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<HeaderTypeEnum>,
 }
 
 impl client::Part for Header {}
@@ -793,7 +793,7 @@ pub struct Site {
     pub reporting_dimension_id: Option<String>,
     /// Output only. State of a site.
     
-    pub state: Option<String>,
+    pub state: Option<SiteStateEnum>,
 }
 
 impl client::ResponseResult for Site {}

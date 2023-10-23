@@ -269,8 +269,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().attachments_batch_delete("beaconName")
-///              .project_id("eos")
-///              .namespaced_type("dolor")
+///              .project_id("gubergren")
+///              .namespaced_type("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -317,7 +317,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -591,7 +591,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().attachments_create(req, "beaconName")
-///              .project_id("ipsum")
+///              .project_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -638,7 +638,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -907,7 +907,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().attachments_delete("attachmentName")
-///              .project_id("amet")
+///              .project_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -953,7 +953,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("attachmentName", self._attachment_name);
+        params.push("attachmentName", &self._attachment_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -1199,8 +1199,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().attachments_list("beaconName")
-///              .project_id("ipsum")
-///              .namespaced_type("sed")
+///              .project_id("invidunt")
+///              .namespaced_type("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1247,7 +1247,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -1505,10 +1505,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().diagnostics_list("beaconName")
-///              .project_id("gubergren")
-///              .page_token("rebum.")
-///              .page_size(-57)
-///              .alert_filter("ipsum")
+///              .project_id("ipsum")
+///              .page_token("sed")
+///              .page_size(-37)
+///              .alert_filter(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1520,7 +1520,7 @@ pub struct BeaconDiagnosticListCall<'a, S>
    pub(super) _project_id: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _alert_filter: Option<String>,
+   pub(super) _alert_filter: Option<BeaconAlertFilterEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1557,7 +1557,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -1713,8 +1713,8 @@ where
     /// beacons that have low batteries use `alert_filter=LOW_BATTERY`.
     ///
     /// Sets the *alert filter* query property to the given value.
-    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
-        self._alert_filter = Some(new_value.to_string());
+    pub fn alert_filter(mut self, new_value: &BeaconAlertFilterEnum) -> BeaconDiagnosticListCall<'a, S> {
+        self._alert_filter = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1828,7 +1828,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().activate("beaconName")
-///              .project_id("est")
+///              .project_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1874,7 +1874,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -2119,7 +2119,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().deactivate("beaconName")
-///              .project_id("ea")
+///              .project_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2165,7 +2165,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -2410,7 +2410,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().decommission("beaconName")
-///              .project_id("Lorem")
+///              .project_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2456,7 +2456,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -2700,7 +2700,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().delete("beaconName")
-///              .project_id("labore")
+///              .project_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2746,7 +2746,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -2993,7 +2993,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().get("beaconName")
-///              .project_id("duo")
+///              .project_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3039,7 +3039,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -3283,10 +3283,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().list()
-///              .q("sed")
-///              .project_id("no")
-///              .page_token("Stet")
-///              .page_size(-13)
+///              .q("eos")
+///              .project_id("labore")
+///              .page_token("sed")
+///              .page_size(-70)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3655,7 +3655,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().register(req)
-///              .project_id("et")
+///              .project_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3954,7 +3954,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.beacons().update(req, "beaconName")
-///              .project_id("et")
+///              .project_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4001,7 +4001,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("beaconName", self._beacon_name);
+        params.push("beaconName", &self._beacon_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -4268,7 +4268,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.namespaces().list()
-///              .project_id("et")
+///              .project_id("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4531,7 +4531,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.namespaces().update(req, "namespaceName")
-///              .project_id("erat")
+///              .project_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4578,7 +4578,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("namespaceName", self._namespace_name);
+        params.push("namespaceName", &self._namespace_name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }

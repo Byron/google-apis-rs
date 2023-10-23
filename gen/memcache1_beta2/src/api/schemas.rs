@@ -160,7 +160,7 @@ pub struct Instance {
     /// The major version of Memcached software. If not provided, latest supported version will be used. Currently the latest supported major version is `MEMCACHE_1_5`. The minor version will be automatically determined by our system based on the latest supported minor version.
     #[serde(rename="memcacheVersion")]
     
-    pub memcache_version: Option<String>,
+    pub memcache_version: Option<InstanceMemcacheVersionEnum>,
     /// Required. Unique name of the resource in this scope including project and location using the form: `projects/{project_id}/locations/{location_id}/instances/{instance_id}` Note: Memcached instances are managed and addressed at the regional level so `location_id` here refers to a Google Cloud region; however, users may choose which zones Memcached nodes should be provisioned in within an instance. Refer to zones field for more details.
     
     pub name: Option<String>,
@@ -177,7 +177,7 @@ pub struct Instance {
     pub parameters: Option<MemcacheParameters>,
     /// Output only. The state of this Memcached instance.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// Output only. Returns true if there is an update waiting to be applied
     #[serde(rename="updateAvailable")]
     
@@ -204,7 +204,7 @@ impl client::ResponseResult for Instance {}
 pub struct InstanceMessage {
     /// A code that correspond to one type of user-facing message.
     
-    pub code: Option<String>,
+    pub code: Option<InstanceMessageCodeEnum>,
     /// Message on memcached instance which will be exposed to users.
     
     pub message: Option<String>,
@@ -382,7 +382,7 @@ pub struct Node {
     pub port: Option<i32>,
     /// Output only. Current state of the Memcached node.
     
-    pub state: Option<String>,
+    pub state: Option<NodeStateEnum>,
     /// Output only. Returns true if there is an update waiting to be applied
     #[serde(rename="updateAvailable")]
     
@@ -467,7 +467,7 @@ pub struct RescheduleMaintenanceRequest {
     /// Required. If reschedule type is SPECIFIC_TIME, must set up schedule_time as well.
     #[serde(rename="rescheduleType")]
     
-    pub reschedule_type: Option<String>,
+    pub reschedule_type: Option<RescheduleMaintenanceRequestRescheduleTypeEnum>,
     /// Timestamp when the maintenance shall be rescheduled to if reschedule_type=SPECIFIC_TIME, in RFC 3339 format, for example `2012-11-15T16:19:00.094Z`.
     #[serde(rename="scheduleTime")]
     
@@ -554,7 +554,7 @@ impl client::RequestValue for UpdateParametersRequest {}
 pub struct WeeklyMaintenanceWindow {
     /// Required. Allows to define schedule that runs specified day of the week.
     
-    pub day: Option<String>,
+    pub day: Option<WeeklyMaintenanceWindowDayEnum>,
     /// Required. Duration of the time window.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]

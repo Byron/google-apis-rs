@@ -105,8 +105,8 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().import_ssh_public_key(req, "parent")
-//!              .view("voluptua.")
-//!              .project_id("At")
+//!              .view(&Default::default())
+//!              .project_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {

@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
+        params.push("customerId", &self._customer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -616,7 +616,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
+        params.push("customerId", &self._customer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -904,7 +904,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
+        params.push("customerId", &self._customer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1186,8 +1186,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1463,8 +1463,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1763,8 +1763,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2063,8 +2063,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2310,7 +2310,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subscriptions().delete("customerId", "subscriptionId", "deletionType")
+/// let result = hub.subscriptions().delete("customerId", "subscriptionId", &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2320,7 +2320,7 @@ pub struct SubscriptionDeleteCall<'a, S>
    pub(super) hub: &'a Reseller<S>,
    pub(super) _customer_id: String,
    pub(super) _subscription_id: String,
-   pub(super) _deletion_type: String,
+   pub(super) _deletion_type: SubscriptionDeletionTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2357,9 +2357,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("deletionType", self._deletion_type);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("deletionType", &self._deletion_type);
 
         params.extend(self._additional_params.iter());
 
@@ -2479,8 +2479,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, S> {
-        self._deletion_type = new_value.to_string();
+    pub fn deletion_type(mut self, new_value: &SubscriptionDeletionTypeEnum) -> SubscriptionDeleteCall<'a, S> {
+        self._deletion_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2627,8 +2627,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2858,7 +2858,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().insert(req, "customerId")
-///              .customer_auth_token("ea")
+///              .customer_auth_token("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2905,7 +2905,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
+        params.push("customerId", &self._customer_id);
         if let Some(value) = self._customer_auth_token.as_ref() {
             params.push("customerAuthToken", value);
         }
@@ -3152,11 +3152,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list()
-///              .page_token("dolor")
-///              .max_results(45)
-///              .customer_name_prefix("eos")
-///              .customer_id("labore")
-///              .customer_auth_token("sed")
+///              .page_token("ea")
+///              .max_results(2)
+///              .customer_name_prefix("Lorem")
+///              .customer_id("eos")
+///              .customer_auth_token("labore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3496,8 +3496,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3766,8 +3766,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customerId", self._customer_id);
-        params.push("subscriptionId", self._subscription_id);
+        params.push("customerId", &self._customer_id);
+        params.push("subscriptionId", &self._subscription_id);
 
         params.extend(self._additional_params.iter());
 

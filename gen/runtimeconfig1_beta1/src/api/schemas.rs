@@ -350,7 +350,7 @@ pub struct Variable {
     pub name: Option<String>,
     /// Output only. The current state of the variable. The variable state indicates the outcome of the `variables().watch` call and is visible through the `get` and `list` calls.
     
-    pub state: Option<String>,
+    pub state: Option<VariableStateEnum>,
     /// The string value of the variable. The length of the value must be less than 4096 bytes. Empty values are also accepted. For example, `text: "my text value"`. The string must be valid UTF-8.
     
     pub text: Option<String>,

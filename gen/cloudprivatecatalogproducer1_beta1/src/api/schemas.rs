@@ -638,7 +638,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

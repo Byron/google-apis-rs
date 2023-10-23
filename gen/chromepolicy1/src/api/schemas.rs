@@ -16,7 +16,7 @@ pub struct ChromeCrosDpanelAutosettingsProtoPolicyApiLifecycle {
     /// Indicate current life cycle stage of the policy API.
     #[serde(rename="policyApiLifecycleStage")]
     
-    pub policy_api_lifecycle_stage: Option<String>,
+    pub policy_api_lifecycle_stage: Option<ChromeCrosDpanelAutosettingsProtoPolicyApiLifecyclePolicyApiLifecycleStageEnum>,
 }
 
 impl client::Part for ChromeCrosDpanelAutosettingsProtoPolicyApiLifecycle {}
@@ -505,7 +505,7 @@ pub struct GoogleChromePolicyVersionsV1PolicySchema {
     /// Output only. Information about applicable target resources for the policy.
     #[serde(rename="validTargetResources")]
     
-    pub valid_target_resources: Option<Vec<String>>,
+    pub valid_target_resources: Option<Vec<GoogleChromePolicyVersionsV1PolicySchemaValidTargetResourcesEnum>>,
 }
 
 impl client::ResponseResult for GoogleChromePolicyVersionsV1PolicySchema {}
@@ -1040,7 +1040,7 @@ pub struct Proto2FieldDescriptorProto {
     pub json_name: Option<String>,
     /// no description provided
     
-    pub label: Option<String>,
+    pub label: Option<Proto2FieldDescriptorProtoLabelEnum>,
     /// no description provided
     
     pub name: Option<String>,
@@ -1058,7 +1058,7 @@ pub struct Proto2FieldDescriptorProto {
     /// If type_name is set, this need not be set. If both this and type_name are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<Proto2FieldDescriptorProtoTypeEnum>,
     /// For message and enum types, this is the name of the type. If the name starts with a '.', it is fully-qualified. Otherwise, C++-like scoping rules are used to find the type (i.e. first the nested types within this message are searched, then within the parent, on up to the root namespace).
     #[serde(rename="typeName")]
     

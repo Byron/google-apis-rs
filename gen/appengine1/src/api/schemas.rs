@@ -9,17 +9,17 @@ pub struct ApiConfigHandler {
     /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     
-    pub auth_fail_action: Option<String>,
+    pub auth_fail_action: Option<ApiConfigHandlerAuthFailActionEnum>,
     /// Level of login required to access this resource. Defaults to optional.
     
-    pub login: Option<String>,
+    pub login: Option<ApiConfigHandlerLoginEnum>,
     /// Path to the script from the application root directory.
     
     pub script: Option<String>,
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     
-    pub security_level: Option<String>,
+    pub security_level: Option<ApiConfigHandlerSecurityLevelEnum>,
     /// URL to serve the endpoint at.
     
     pub url: Option<String>,
@@ -69,7 +69,7 @@ pub struct Application {
     /// The type of the Cloud Firestore or Cloud Datastore database associated with this application.
     #[serde(rename="databaseType")]
     
-    pub database_type: Option<String>,
+    pub database_type: Option<ApplicationDatabaseTypeEnum>,
     /// Google Cloud Storage bucket that can be used by this application to store content.@OutputOnly
     #[serde(rename="defaultBucket")]
     
@@ -115,7 +115,7 @@ pub struct Application {
     /// Serving status of this application.
     #[serde(rename="servingStatus")]
     
-    pub serving_status: Option<String>,
+    pub serving_status: Option<ApplicationServingStatusEnum>,
 }
 
 impl client::RequestValue for Application {}
@@ -541,7 +541,7 @@ pub struct EndpointsApiService {
     /// Endpoints rollout strategy. If FIXED, config_id must be specified. If MANAGED, config_id must be omitted.
     #[serde(rename="rolloutStrategy")]
     
-    pub rollout_strategy: Option<String>,
+    pub rollout_strategy: Option<EndpointsApiServiceRolloutStrategyEnum>,
 }
 
 impl client::Part for EndpointsApiService {}
@@ -572,7 +572,7 @@ pub struct ErrorHandler {
     /// Error condition this handler applies to.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<ErrorHandlerErrorCodeEnum>,
     /// MIME type of file. Defaults to text/html.
     #[serde(rename="mimeType")]
     
@@ -645,7 +645,7 @@ impl client::Part for FileInfo {}
 pub struct FirewallRule {
     /// The action to take on matched requests.
     
-    pub action: Option<String>,
+    pub action: Option<FirewallRuleActionEnum>,
     /// An optional string description of this rule. This field has a maximum length of 400 characters.
     
     pub description: Option<String>,
@@ -746,7 +746,7 @@ pub struct Instance {
     pub app_engine_release: Option<String>,
     /// Output only. Availability of the instance.
     
-    pub availability: Option<String>,
+    pub availability: Option<InstanceAvailabilityEnum>,
     /// Output only. Average latency (ms) over the last minute.
     #[serde(rename="averageLatency")]
     
@@ -790,7 +790,7 @@ pub struct Instance {
     /// Output only. The liveness health check of this instance. Only applicable for instances in App Engine flexible environment.
     #[serde(rename="vmLiveness")]
     
-    pub vm_liveness: Option<String>,
+    pub vm_liveness: Option<InstanceVmLivenessEnum>,
     /// Output only. Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.
     #[serde(rename="vmName")]
     
@@ -1121,7 +1121,7 @@ pub struct ManagedCertificate {
     pub last_renewal_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Status of certificate management. Refers to the most recent certificate acquisition or renewal attempt.@OutputOnly
     
-    pub status: Option<String>,
+    pub status: Option<ManagedCertificateStatusEnum>,
 }
 
 impl client::Part for ManagedCertificate {}
@@ -1156,7 +1156,7 @@ pub struct Network {
     /// The IP mode for instances. Only applicable in the App Engine flexible environment.
     #[serde(rename="instanceIpMode")]
     
-    pub instance_ip_mode: Option<String>,
+    pub instance_ip_mode: Option<NetworkInstanceIpModeEnum>,
     /// Tag to apply to the instance during creation. Only applicable in the App Engine flexible environment.
     #[serde(rename="instanceTag")]
     
@@ -1187,7 +1187,7 @@ pub struct NetworkSettings {
     /// The ingress settings for version or service.
     #[serde(rename="ingressTrafficAllowed")]
     
-    pub ingress_traffic_allowed: Option<String>,
+    pub ingress_traffic_allowed: Option<NetworkSettingIngressTrafficAllowedEnum>,
 }
 
 impl client::Part for NetworkSettings {}
@@ -1356,7 +1356,7 @@ pub struct ResourceRecord {
     /// Resource record type. Example: AAAA.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ResourceRecordTypeEnum>,
 }
 
 impl client::Part for ResourceRecord {}
@@ -1460,7 +1460,7 @@ pub struct SslSettings {
     /// SSL management type for this domain. If AUTOMATIC, a managed certificate is automatically provisioned. If MANUAL, certificate_id must be manually specified in order to configure SSL for this domain.
     #[serde(rename="sslManagementType")]
     
-    pub ssl_management_type: Option<String>,
+    pub ssl_management_type: Option<SslSettingSslManagementTypeEnum>,
 }
 
 impl client::Part for SslSettings {}
@@ -1567,7 +1567,7 @@ pub struct TrafficSplit {
     /// Mechanism used to determine which version a request is sent to. The traffic selection algorithm will be stable for either type until allocations are changed.
     #[serde(rename="shardBy")]
     
-    pub shard_by: Option<String>,
+    pub shard_by: Option<TrafficSplitShardByEnum>,
 }
 
 impl client::Part for TrafficSplit {}
@@ -1608,21 +1608,21 @@ pub struct UrlMap {
     /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     
-    pub auth_fail_action: Option<String>,
+    pub auth_fail_action: Option<UrlMapAuthFailActionEnum>,
     /// Level of login required to access this resource. Not supported for Node.js in the App Engine standard environment.
     
-    pub login: Option<String>,
+    pub login: Option<UrlMapLoginEnum>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     
-    pub redirect_http_response_code: Option<String>,
+    pub redirect_http_response_code: Option<UrlMapRedirectHttpResponseCodeEnum>,
     /// Executes a script to handle the requests that match this URL pattern. Only the auto value is supported for Node.js in the App Engine standard environment, for example "script": "auto".
     
     pub script: Option<ScriptHandler>,
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     
-    pub security_level: Option<String>,
+    pub security_level: Option<UrlMapSecurityLevelEnum>,
     /// Returns the contents of a file, such as an image, as the response.
     #[serde(rename="staticFiles")]
     
@@ -1725,7 +1725,7 @@ pub struct Version {
     /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
     #[serde(rename="inboundServices")]
     
-    pub inbound_services: Option<Vec<String>>,
+    pub inbound_services: Option<Vec<VersionInboundServicesEnum>>,
     /// Instance class that is used to run this version. Valid values are: AutomaticScaling: F1, F2, F4, F4_1G ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
     #[serde(rename="instanceClass")]
     
@@ -1780,7 +1780,7 @@ pub struct Version {
     /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
     #[serde(rename="servingStatus")]
     
-    pub serving_status: Option<String>,
+    pub serving_status: Option<VersionServingStatusEnum>,
     /// Whether multiple requests can be dispatched to this version at once.
     
     pub threadsafe: Option<bool>,
@@ -1837,7 +1837,7 @@ pub struct VpcAccessConnector {
     /// The egress setting for the connector, controlling what traffic is diverted through it.
     #[serde(rename="egressSetting")]
     
-    pub egress_setting: Option<String>,
+    pub egress_setting: Option<VpcAccessConnectorEgressSettingEnum>,
     /// Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.
     
     pub name: Option<String>,

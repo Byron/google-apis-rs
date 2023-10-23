@@ -56,7 +56,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -95,7 +95,7 @@ pub struct BackendMetastore {
     /// The type of the backend metastore.
     #[serde(rename="metastoreType")]
     
-    pub metastore_type: Option<String>,
+    pub metastore_type: Option<BackendMetastoreMetastoreTypeEnum>,
     /// The relative resource name of the metastore that is being federated. The formats of the relative resource names for the currently supported metastores are listed below: BigQuery projects/{project_id} Dataproc Metastore projects/{project_id}/locations/{location}/services/{service_id}
     
     pub name: Option<String>,
@@ -140,7 +140,7 @@ pub struct Backup {
     pub service_revision: Option<Service>,
     /// Output only. The current state of the backup.
     
-    pub state: Option<String>,
+    pub state: Option<BackupStateEnum>,
 }
 
 impl client::RequestValue for Backup {}
@@ -212,7 +212,7 @@ pub struct DatabaseDump {
     /// The type of the database.
     #[serde(rename="databaseType")]
     
-    pub database_type: Option<String>,
+    pub database_type: Option<DatabaseDumpDatabaseTypeEnum>,
     /// A Cloud Storage object or folder URI that specifies the source from which to import metadata. It must begin with gs://.
     #[serde(rename="gcsUri")]
     
@@ -224,7 +224,7 @@ pub struct DatabaseDump {
     /// Optional. The type of the database dump. If unspecified, defaults to MYSQL.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DatabaseDumpTypeEnum>,
 }
 
 impl client::Part for DatabaseDump {}
@@ -291,7 +291,7 @@ pub struct ExportMetadataRequest {
     /// Optional. The type of the database dump. If unspecified, defaults to MYSQL.
     #[serde(rename="databaseDumpType")]
     
-    pub database_dump_type: Option<String>,
+    pub database_dump_type: Option<ExportMetadataRequestDatabaseDumpTypeEnum>,
     /// A Cloud Storage URI of a folder, in the format gs:///. A sub-folder containing exported files will be created below it.
     #[serde(rename="destinationGcsFolder")]
     
@@ -362,7 +362,7 @@ pub struct Federation {
     pub name: Option<String>,
     /// Output only. The current state of the federation.
     
-    pub state: Option<String>,
+    pub state: Option<FederationStateEnum>,
     /// Output only. Additional information about the current state of the metastore federation, if available.
     #[serde(rename="stateMessage")]
     
@@ -401,7 +401,7 @@ pub struct HiveMetastoreConfig {
     /// The protocol to use for the metastore service endpoint. If unspecified, defaults to THRIFT.
     #[serde(rename="endpointProtocol")]
     
-    pub endpoint_protocol: Option<String>,
+    pub endpoint_protocol: Option<HiveMetastoreConfigEndpointProtocolEnum>,
     /// Information used to configure the Hive metastore service as a service principal in a Kerberos realm. To disable Kerberos, use the UpdateService method and specify this field's path (hive_metastore_config.kerberos_config) in the request's update_mask while omitting this field from the request's service.
     #[serde(rename="kerberosConfig")]
     
@@ -645,7 +645,7 @@ pub struct MaintenanceWindow {
     /// The day of week, when the window starts.
     #[serde(rename="dayOfWeek")]
     
-    pub day_of_week: Option<String>,
+    pub day_of_week: Option<MaintenanceWindowDayOfWeekEnum>,
     /// The hour of day (0-23) when the window starts.
     #[serde(rename="hourOfDay")]
     
@@ -665,7 +665,7 @@ pub struct MetadataExport {
     /// Output only. The type of the database dump.
     #[serde(rename="databaseDumpType")]
     
-    pub database_dump_type: Option<String>,
+    pub database_dump_type: Option<MetadataExportDatabaseDumpTypeEnum>,
     /// Output only. A Cloud Storage URI of a folder that metadata are exported to, in the form of gs:////, where is automatically generated.
     #[serde(rename="destinationGcsUri")]
     
@@ -680,7 +680,7 @@ pub struct MetadataExport {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of the export.
     
-    pub state: Option<String>,
+    pub state: Option<MetadataExportStateEnum>,
 }
 
 impl client::Part for MetadataExport {}
@@ -719,7 +719,7 @@ pub struct MetadataImport {
     pub name: Option<String>,
     /// Output only. The current state of the metadata import.
     
-    pub state: Option<String>,
+    pub state: Option<MetadataImportStateEnum>,
     /// Output only. The time when the metadata import was last updated.
     #[serde(rename="updateTime")]
     
@@ -977,11 +977,11 @@ pub struct Restore {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of the restore.
     
-    pub state: Option<String>,
+    pub state: Option<RestoreStateEnum>,
     /// Output only. The type of restore.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RestoreTypeEnum>,
 }
 
 impl client::Part for Restore {}
@@ -1008,7 +1008,7 @@ pub struct RestoreServiceRequest {
     /// Optional. The type of restore. If unspecified, defaults to METADATA_ONLY.
     #[serde(rename="restoreType")]
     
-    pub restore_type: Option<String>,
+    pub restore_type: Option<RestoreServiceRequestRestoreTypeEnum>,
 }
 
 impl client::RequestValue for RestoreServiceRequest {}
@@ -1054,7 +1054,7 @@ pub struct Service {
     /// Immutable. The database type that the Metastore service stores its data.
     #[serde(rename="databaseType")]
     
-    pub database_type: Option<String>,
+    pub database_type: Option<ServiceDatabaseTypeEnum>,
     /// Immutable. Information used to configure the Dataproc Metastore service to encrypt customer data at rest. Cannot be updated.
     #[serde(rename="encryptionConfig")]
     
@@ -1098,10 +1098,10 @@ pub struct Service {
     /// Immutable. The release channel of the service. If unspecified, defaults to STABLE.
     #[serde(rename="releaseChannel")]
     
-    pub release_channel: Option<String>,
+    pub release_channel: Option<ServiceReleaseChannelEnum>,
     /// Output only. The current state of the metastore service.
     
-    pub state: Option<String>,
+    pub state: Option<ServiceStateEnum>,
     /// Output only. Additional information about the current state of the metastore service, if available.
     #[serde(rename="stateMessage")]
     
@@ -1112,7 +1112,7 @@ pub struct Service {
     pub telemetry_config: Option<TelemetryConfig>,
     /// The tier of the service.
     
-    pub tier: Option<String>,
+    pub tier: Option<ServiceTierEnum>,
     /// Output only. The globally unique resource identifier of the metastore service.
     
     pub uid: Option<String>,
@@ -1184,7 +1184,7 @@ pub struct TelemetryConfig {
     /// The output format of the Dataproc Metastore service's logs.
     #[serde(rename="logFormat")]
     
-    pub log_format: Option<String>,
+    pub log_format: Option<TelemetryConfigLogFormatEnum>,
 }
 
 impl client::Part for TelemetryConfig {}

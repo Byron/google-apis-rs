@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -624,7 +624,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -892,7 +892,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1191,7 +1191,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1483,7 +1483,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1768,7 +1768,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2030,7 +2030,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2299,7 +2299,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2590,7 +2590,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2891,7 +2891,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3193,7 +3193,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3434,7 +3434,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().channel_partner_links_get("name")
-///              .view("duo")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3443,7 +3443,7 @@ pub struct AccountChannelPartnerLinkGetCall<'a, S>
 
    pub(super) hub: &'a Cloudchannel<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<AccountViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3480,7 +3480,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3601,8 +3601,8 @@ where
     /// Optional. The level of granularity the ChannelPartnerLink will display.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AccountChannelPartnerLinkGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &AccountViewEnum) -> AccountChannelPartnerLinkGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3708,9 +3708,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().channel_partner_links_list("parent")
-///              .view("sed")
-///              .page_token("ut")
-///              .page_size(-12)
+///              .view(&Default::default())
+///              .page_token("ipsum")
+///              .page_size(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3719,7 +3719,7 @@ pub struct AccountChannelPartnerLinkListCall<'a, S>
 
    pub(super) hub: &'a Cloudchannel<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<AccountViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3758,7 +3758,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3885,8 +3885,8 @@ where
     /// Optional. The level of granularity the ChannelPartnerLink will display.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &AccountViewEnum) -> AccountChannelPartnerLinkListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Optional. A token for a page of results other than the first page. Obtained using ListChannelPartnerLinksResponse.next_page_token of the previous CloudChannelService.ListChannelPartnerLinks call.
@@ -4057,7 +4057,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4349,7 +4349,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4634,7 +4634,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4896,7 +4896,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5114,9 +5114,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().customers_customer_repricing_configs_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-17)
-///              .filter("dolor")
+///              .page_token("ipsum")
+///              .page_size(-7)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5164,7 +5164,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5463,7 +5463,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5755,7 +5755,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6047,7 +6047,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6339,7 +6339,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6631,7 +6631,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6923,7 +6923,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7215,7 +7215,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -7500,7 +7500,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7718,8 +7718,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().customers_entitlements_list("parent")
-///              .page_token("et")
-///              .page_size(-43)
+///              .page_token("Stet")
+///              .page_size(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7766,7 +7766,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8048,7 +8048,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("entitlement", self._entitlement);
+        params.push("entitlement", &self._entitlement);
 
         params.extend(self._additional_params.iter());
 
@@ -8317,7 +8317,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8609,7 +8609,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8901,7 +8901,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -9186,7 +9186,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9448,7 +9448,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9717,7 +9717,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -9958,9 +9958,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().customers_list("parent")
-///              .page_token("voluptua.")
-///              .page_size(-2)
-///              .filter("consetetur")
+///              .page_token("dolore")
+///              .page_size(-22)
+///              .filter("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10008,7 +10008,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10256,12 +10256,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().customers_list_purchasable_offers("customer")
-///              .page_token("dolor")
-///              .page_size(-18)
-///              .language_code("et")
-///              .create_entitlement_purchase_sku("sadipscing")
-///              .change_offer_purchase_new_sku("Stet")
-///              .change_offer_purchase_entitlement("dolor")
+///              .page_token("consetetur")
+///              .page_size(-92)
+///              .language_code("dolor")
+///              .create_entitlement_purchase_sku("et")
+///              .change_offer_purchase_new_sku("et")
+///              .change_offer_purchase_entitlement("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10312,7 +10312,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10590,12 +10590,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().customers_list_purchasable_skus("customer")
-///              .page_token("vero")
-///              .page_size(-76)
-///              .language_code("invidunt")
-///              .create_entitlement_purchase_product("Stet")
-///              .change_offer_purchase_entitlement("vero")
-///              .change_offer_purchase_change_type("elitr")
+///              .page_token("dolor")
+///              .page_size(-20)
+///              .language_code("vero")
+///              .create_entitlement_purchase_product("vero")
+///              .change_offer_purchase_entitlement("invidunt")
+///              .change_offer_purchase_change_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -10609,7 +10609,7 @@ pub struct AccountCustomerListPurchasableSkuCall<'a, S>
    pub(super) _language_code: Option<String>,
    pub(super) _create_entitlement_purchase_product: Option<String>,
    pub(super) _change_offer_purchase_entitlement: Option<String>,
-   pub(super) _change_offer_purchase_change_type: Option<String>,
+   pub(super) _change_offer_purchase_change_type: Option<AccountChangeOfferPurchaseChangeTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10646,7 +10646,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10817,8 +10817,8 @@ where
     /// Required. Change Type for the entitlement.
     ///
     /// Sets the *change offer purchase.change type* query property to the given value.
-    pub fn change_offer_purchase_change_type(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
-        self._change_offer_purchase_change_type = Some(new_value.to_string());
+    pub fn change_offer_purchase_change_type(mut self, new_value: &AccountChangeOfferPurchaseChangeTypeEnum) -> AccountCustomerListPurchasableSkuCall<'a, S> {
+        self._change_offer_purchase_change_type = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10977,7 +10977,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -11279,7 +11279,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
 
         params.extend(self._additional_params.iter());
 
@@ -11571,7 +11571,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -11863,7 +11863,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -12104,10 +12104,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().offers_list("parent")
-///              .page_token("takimata")
-///              .page_size(-46)
-///              .language_code("voluptua.")
-///              .filter("et")
+///              .page_token("no")
+///              .page_size(-100)
+///              .language_code("accusam")
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12156,7 +12156,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12465,7 +12465,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("reportJob", self._report_job);
+        params.push("reportJob", &self._report_job);
 
         params.extend(self._additional_params.iter());
 
@@ -12706,9 +12706,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_list("parent")
-///              .page_token("amet.")
-///              .page_size(-30)
-///              .language_code("takimata")
+///              .page_token("et")
+///              .page_size(-31)
+///              .language_code("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12756,7 +12756,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13055,7 +13055,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13347,7 +13347,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -13588,8 +13588,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list_subscribers("account")
-///              .page_token("accusam")
-///              .page_size(-78)
+///              .page_token("dolores")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13636,7 +13636,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("account", self._account);
+        params.push("account", &self._account);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13925,7 +13925,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -14217,7 +14217,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -14509,7 +14509,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("account", self._account);
+        params.push("account", &self._account);
 
         params.extend(self._additional_params.iter());
 
@@ -14801,7 +14801,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("account", self._account);
+        params.push("account", &self._account);
 
         params.extend(self._additional_params.iter());
 
@@ -15093,7 +15093,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15378,7 +15378,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15640,7 +15640,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15858,9 +15858,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list("name")
-///              .page_token("invidunt")
-///              .page_size(-11)
-///              .filter("est")
+///              .page_token("ea")
+///              .page_size(-95)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15908,7 +15908,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -16156,10 +16156,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().skus_list("parent")
-///              .page_token("sed")
-///              .page_size(-98)
-///              .language_code("et")
-///              .account("tempor")
+///              .page_token("no")
+///              .page_size(-7)
+///              .language_code("At")
+///              .account("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16208,7 +16208,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -16466,10 +16466,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list()
-///              .page_token("aliquyam")
-///              .page_size(-5)
-///              .language_code("et")
-///              .account("sanctus")
+///              .page_token("sit")
+///              .page_size(-35)
+///              .language_code("tempor")
+///              .account("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```

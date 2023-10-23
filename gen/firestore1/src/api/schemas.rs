@@ -275,7 +275,7 @@ pub struct CompositeFilter {
     pub filters: Option<Vec<Filter>>,
     /// The operator for combining multiple filters.
     
-    pub op: Option<String>,
+    pub op: Option<CompositeFilterOpEnum>,
 }
 
 impl client::Part for CompositeFilter {}
@@ -518,7 +518,7 @@ pub struct FieldFilter {
     pub field: Option<FieldReference>,
     /// The operator to filter by.
     
-    pub op: Option<String>,
+    pub op: Option<FieldFilterOpEnum>,
     /// The value to compare to.
     
     pub value: Option<Value>,
@@ -574,7 +574,7 @@ pub struct FieldTransform {
     /// Sets the field to the given server value.
     #[serde(rename="setToServerValue")]
     
-    pub set_to_server_value: Option<String>,
+    pub set_to_server_value: Option<FieldTransformSetToServerValueEnum>,
 }
 
 impl client::Part for FieldTransform {}
@@ -620,11 +620,11 @@ pub struct GoogleFirestoreAdminV1Database {
     /// The App Engine integration mode to use for this database.
     #[serde(rename="appEngineIntegrationMode")]
     
-    pub app_engine_integration_mode: Option<String>,
+    pub app_engine_integration_mode: Option<GoogleFirestoreAdminV1DatabaseAppEngineIntegrationModeEnum>,
     /// The concurrency control mode to use for this database.
     #[serde(rename="concurrencyMode")]
     
-    pub concurrency_mode: Option<String>,
+    pub concurrency_mode: Option<GoogleFirestoreAdminV1DatabaseConcurrencyModeEnum>,
     /// This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
     
     pub etag: Option<String>,
@@ -642,7 +642,7 @@ pub struct GoogleFirestoreAdminV1Database {
     /// The type of the database. See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleFirestoreAdminV1DatabaseTypeEnum>,
 }
 
 impl client::RequestValue for GoogleFirestoreAdminV1Database {}
@@ -749,7 +749,7 @@ pub struct GoogleFirestoreAdminV1Index {
     /// The API scope supported by this index.
     #[serde(rename="apiScope")]
     
-    pub api_scope: Option<String>,
+    pub api_scope: Option<GoogleFirestoreAdminV1IndexApiScopeEnum>,
     /// The fields supported by this index. For composite indexes, this requires a minimum of 2 and a maximum of 100 fields. The last field entry is always for the field path `__name__`. If, on creation, `__name__` was not specified as the last field, it will be added automatically with the same direction as that of the last field defined. If the final field in a composite index is not directional, the `__name__` will be ordered ASCENDING (unless explicitly specified). For single field indexes, this will always be exactly one entry with a field path equal to the field path of the associated field.
     
     pub fields: Option<Vec<GoogleFirestoreAdminV1IndexField>>,
@@ -759,10 +759,10 @@ pub struct GoogleFirestoreAdminV1Index {
     /// Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id. Indexes with a collection group query scope specified allow queries against all collections descended from a specific document, specified at query time, and that have the same collection id as this index.
     #[serde(rename="queryScope")]
     
-    pub query_scope: Option<String>,
+    pub query_scope: Option<GoogleFirestoreAdminV1IndexQueryScopeEnum>,
     /// Output only. The serving state of the index.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleFirestoreAdminV1IndexStateEnum>,
 }
 
 impl client::RequestValue for GoogleFirestoreAdminV1Index {}
@@ -805,14 +805,14 @@ pub struct GoogleFirestoreAdminV1IndexField {
     /// Indicates that this field supports operations on `array_value`s.
     #[serde(rename="arrayConfig")]
     
-    pub array_config: Option<String>,
+    pub array_config: Option<GoogleFirestoreAdminV1IndexFieldArrayConfigEnum>,
     /// Can be __name__. For single field indexes, this must match the name of the field or may be omitted.
     #[serde(rename="fieldPath")]
     
     pub field_path: Option<String>,
     /// Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
     
-    pub order: Option<String>,
+    pub order: Option<GoogleFirestoreAdminV1IndexFieldOrderEnum>,
 }
 
 impl client::Part for GoogleFirestoreAdminV1IndexField {}
@@ -892,7 +892,7 @@ impl client::ResponseResult for GoogleFirestoreAdminV1ListIndexesResponse {}
 pub struct GoogleFirestoreAdminV1TtlConfig {
     /// Output only. The state of the TTL configuration.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleFirestoreAdminV1TtlConfigStateEnum>,
 }
 
 impl client::Part for GoogleFirestoreAdminV1TtlConfig {}
@@ -1210,7 +1210,7 @@ impl client::Part for MapValue {}
 pub struct Order {
     /// The direction to order by. Defaults to `ASCENDING`.
     
-    pub direction: Option<String>,
+    pub direction: Option<OrderDirectionEnum>,
     /// The field to order by.
     
     pub field: Option<FieldReference>,
@@ -1646,7 +1646,7 @@ pub struct TargetChange {
     /// The type of change that occurred.
     #[serde(rename="targetChangeType")]
     
-    pub target_change_type: Option<String>,
+    pub target_change_type: Option<TargetChangeTargetChangeTypeEnum>,
     /// The target IDs of targets that have changed. If empty, the change applies to all targets. The order of the target IDs is not defined.
     #[serde(rename="targetIds")]
     
@@ -1688,7 +1688,7 @@ pub struct UnaryFilter {
     pub field: Option<FieldReference>,
     /// The unary operator to apply.
     
-    pub op: Option<String>,
+    pub op: Option<UnaryFilterOpEnum>,
 }
 
 impl client::Part for UnaryFilter {}
@@ -1734,7 +1734,7 @@ pub struct Value {
     /// A null value.
     #[serde(rename="nullValue")]
     
-    pub null_value: Option<String>,
+    pub null_value: Option<ValueNullValueEnum>,
     /// A reference to a document. For example: `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     #[serde(rename="referenceValue")]
     

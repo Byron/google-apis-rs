@@ -32,12 +32,12 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.creatives().list()
-///              .page_token("ipsum")
-///              .open_auction_status_filter("gubergren")
-///              .max_results(50)
-///              .deals_status_filter("gubergren")
-///              .add_buyer_creative_id("eos")
-///              .add_account_id(-4)
+///              .page_token("amet.")
+///              .open_auction_status_filter(&Default::default())
+///              .max_results(42)
+///              .deals_status_filter(&Default::default())
+///              .add_buyer_creative_id("amet.")
+///              .add_account_id(-20)
 ///              .doit().await;
 /// 
 /// match result {

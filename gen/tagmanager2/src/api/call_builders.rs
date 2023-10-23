@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -336,7 +336,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._destination_id.as_ref() {
             params.push("destinationId", value);
         }
@@ -618,7 +618,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -887,7 +887,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1172,7 +1172,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -1423,7 +1423,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -1687,7 +1687,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1966,7 +1966,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -2260,7 +2260,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -2555,7 +2555,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2821,7 +2821,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3103,7 +3103,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -3356,7 +3356,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._container_version_id.as_ref() {
             params.push("containerVersionId", value);
         }
@@ -3628,7 +3628,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3892,7 +3892,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -4164,7 +4164,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -4426,7 +4426,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -4697,7 +4697,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -4948,7 +4948,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_built_in_variables_create("parent")
-///              .add_type("et")
+///              .add_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -4957,7 +4957,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableCreateCall<'a, S>
 
    pub(super) hub: &'a TagManager<S>,
    pub(super) _parent: String,
-   pub(super) _type_: Vec<String>,
+   pub(super) _type_: Option<AccountTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -4994,7 +4994,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if self._type_.len() > 0 {
             for f in self._type_.iter() {
                 params.push("type", f);
@@ -5118,8 +5118,8 @@ where
     ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_type(mut self, new_value: &str) -> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, S> {
-        self._type_.push(new_value.to_string());
+    pub fn add_type(mut self, new_value: &AccountTypeEnum) -> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, S> {
+        self._type_.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5225,7 +5225,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_built_in_variables_delete("path")
-///              .add_type("sadipscing")
+///              .add_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5234,7 +5234,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, S>
 
    pub(super) hub: &'a TagManager<S>,
    pub(super) _path: String,
-   pub(super) _type_: Vec<String>,
+   pub(super) _type_: Option<AccountTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5271,7 +5271,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if self._type_.len() > 0 {
             for f in self._type_.iter() {
                 params.push("type", f);
@@ -5384,8 +5384,8 @@ where
     ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_type(mut self, new_value: &str) -> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, S> {
-        self._type_.push(new_value.to_string());
+    pub fn add_type(mut self, new_value: &AccountTypeEnum) -> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, S> {
+        self._type_.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5491,7 +5491,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_built_in_variables_list("parent")
-///              .page_token("dolor")
+///              .page_token("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5537,7 +5537,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5765,7 +5765,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_built_in_variables_revert("path")
-///              .type_("vero")
+///              .type_(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5774,7 +5774,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableRevertCall<'a, S>
 
    pub(super) hub: &'a TagManager<S>,
    pub(super) _path: String,
-   pub(super) _type_: Option<String>,
+   pub(super) _type_: Option<AccountTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5811,7 +5811,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -5932,8 +5932,8 @@ where
     /// The type of built-in variable to revert.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &AccountTypeEnum) -> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6090,7 +6090,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6375,7 +6375,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -6626,7 +6626,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -6844,7 +6844,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_clients_list("parent")
-///              .page_token("elitr")
+///              .page_token("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6890,7 +6890,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7118,7 +7118,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_clients_revert("path")
-///              .fingerprint("diam")
+///              .fingerprint("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7164,7 +7164,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -7398,7 +7398,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_clients_update(req, "path")
-///              .fingerprint("ipsum")
+///              .fingerprint("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7445,7 +7445,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -7747,7 +7747,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -8032,7 +8032,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -8239,7 +8239,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_folders_entities("path")
-///              .page_token("voluptua.")
+///              .page_token("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8285,7 +8285,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8557,7 +8557,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -8775,7 +8775,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_folders_list("parent")
-///              .page_token("consetetur")
+///              .page_token("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8821,7 +8821,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9055,9 +9055,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_folders_move_entities_to_folder(req, "path")
-///              .add_variable_id("sed")
-///              .add_trigger_id("takimata")
-///              .add_tag_id("dolores")
+///              .add_variable_id("erat")
+///              .add_trigger_id("consetetur")
+///              .add_tag_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9106,7 +9106,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if self._variable_id.len() > 0 {
             for f in self._variable_id.iter() {
                 params.push("variableId", f);
@@ -9375,7 +9375,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_folders_revert("path")
-///              .fingerprint("et")
+///              .fingerprint("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9421,7 +9421,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -9655,7 +9655,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_folders_update(req, "path")
-///              .fingerprint("voluptua.")
+///              .fingerprint("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9702,7 +9702,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -10004,7 +10004,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -10289,7 +10289,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -10540,7 +10540,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -10758,7 +10758,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_gtag_config_list("parent")
-///              .page_token("amet.")
+///              .page_token("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10804,7 +10804,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11038,7 +11038,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_gtag_config_update(req, "path")
-///              .fingerprint("sadipscing")
+///              .fingerprint("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11085,7 +11085,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -11387,7 +11387,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -11672,7 +11672,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -11923,7 +11923,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -12141,7 +12141,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_tags_list("parent")
-///              .page_token("At")
+///              .page_token("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12187,7 +12187,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12415,7 +12415,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_tags_revert("path")
-///              .fingerprint("sit")
+///              .fingerprint("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12461,7 +12461,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -12695,7 +12695,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_tags_update(req, "path")
-///              .fingerprint("tempor")
+///              .fingerprint("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12742,7 +12742,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -13044,7 +13044,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -13329,7 +13329,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -13580,7 +13580,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -13798,7 +13798,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_templates_list("parent")
-///              .page_token("Lorem")
+///              .page_token("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13844,7 +13844,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -14072,7 +14072,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_templates_revert("path")
-///              .fingerprint("sed")
+///              .fingerprint("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14118,7 +14118,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -14352,7 +14352,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_templates_update(req, "path")
-///              .fingerprint("dolores")
+///              .fingerprint("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14399,7 +14399,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -14701,7 +14701,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -14986,7 +14986,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -15237,7 +15237,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -15501,7 +15501,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15729,7 +15729,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_revert("path")
-///              .fingerprint("sed")
+///              .fingerprint("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15775,7 +15775,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -16009,7 +16009,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_update(req, "path")
-///              .fingerprint("nonumy")
+///              .fingerprint("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16056,7 +16056,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -16358,7 +16358,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -16643,7 +16643,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -16894,7 +16894,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -17158,7 +17158,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17386,7 +17386,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_revert("path")
-///              .fingerprint("aliquyam")
+///              .fingerprint("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17432,7 +17432,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -17666,7 +17666,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_update(req, "path")
-///              .fingerprint("est")
+///              .fingerprint("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17713,7 +17713,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -18015,7 +18015,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -18300,7 +18300,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -18551,7 +18551,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -18769,7 +18769,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_list("parent")
-///              .page_token("Stet")
+///              .page_token("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18815,7 +18815,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -19043,7 +19043,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_revert("path")
-///              .fingerprint("aliquyam")
+///              .fingerprint("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19089,7 +19089,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -19323,7 +19323,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_update(req, "path")
-///              .fingerprint("duo")
+///              .fingerprint("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19370,7 +19370,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -19672,7 +19672,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -19964,7 +19964,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -20249,7 +20249,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -20500,7 +20500,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -20762,7 +20762,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -20980,7 +20980,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_list("parent")
-///              .page_token("ea")
+///              .page_token("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21026,7 +21026,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21298,7 +21298,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -21522,7 +21522,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_resolve_conflict(req, "path")
-///              .fingerprint("eos")
+///              .fingerprint("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21569,7 +21569,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -21853,7 +21853,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -22077,7 +22077,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_update(req, "path")
-///              .fingerprint("et")
+///              .fingerprint("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22124,7 +22124,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -22375,9 +22375,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_combine("path")
-///              .setting_source("dolore")
-///              .container_id("eirmod")
-///              .allow_user_permission_feature_update(true)
+///              .setting_source(&Default::default())
+///              .container_id("sea")
+///              .allow_user_permission_feature_update(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22386,7 +22386,7 @@ pub struct AccountContainerCombineCall<'a, S>
 
    pub(super) hub: &'a TagManager<S>,
    pub(super) _path: String,
-   pub(super) _setting_source: Option<String>,
+   pub(super) _setting_source: Option<AccountSettingSourceEnum>,
    pub(super) _container_id: Option<String>,
    pub(super) _allow_user_permission_feature_update: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22425,7 +22425,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._setting_source.as_ref() {
             params.push("settingSource", value);
         }
@@ -22552,8 +22552,8 @@ where
     /// Specify the source of config setting after combine
     ///
     /// Sets the *setting source* query property to the given value.
-    pub fn setting_source(mut self, new_value: &str) -> AccountContainerCombineCall<'a, S> {
-        self._setting_source = Some(new_value.to_string());
+    pub fn setting_source(mut self, new_value: &AccountSettingSourceEnum) -> AccountContainerCombineCall<'a, S> {
+        self._setting_source = Some(new_value.clone());
         self
     }
     /// ID of container that will be merged into the current container.
@@ -22724,7 +22724,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -23009,7 +23009,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -23260,7 +23260,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -23478,7 +23478,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_list("parent")
-///              .page_token("erat")
+///              .page_token("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23524,7 +23524,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -23752,7 +23752,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_lookup()
-///              .destination_id("accusam")
+///              .destination_id("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24007,12 +24007,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_move_tag_id("path")
-///              .tag_name("takimata")
-///              .tag_id("Lorem")
+///              .tag_name("dolores")
+///              .tag_id("erat")
 ///              .copy_users(false)
 ///              .copy_terms_of_service(true)
-///              .copy_settings(false)
-///              .allow_user_permission_feature_update(true)
+///              .copy_settings(true)
+///              .allow_user_permission_feature_update(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24063,7 +24063,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._tag_name.as_ref() {
             params.push("tagName", value);
         }
@@ -24385,7 +24385,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -24609,7 +24609,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_update(req, "path")
-///              .fingerprint("justo")
+///              .fingerprint("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24656,7 +24656,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }
@@ -24958,7 +24958,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -25243,7 +25243,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -25494,7 +25494,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -25712,7 +25712,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().user_permissions_list("parent")
-///              .page_token("eos")
+///              .page_token("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25758,7 +25758,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -26037,7 +26037,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -26322,7 +26322,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
 
         params.extend(self._additional_params.iter());
 
@@ -26541,7 +26541,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list()
 ///              .page_token("consetetur")
-///              .include_google_tags(true)
+///              .include_google_tags(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26813,7 +26813,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().update(req, "path")
-///              .fingerprint("aliquyam")
+///              .fingerprint("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26860,7 +26860,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("path", self._path);
+        params.push("path", &self._path);
         if let Some(value) = self._fingerprint.as_ref() {
             params.push("fingerprint", value);
         }

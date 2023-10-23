@@ -31,12 +31,12 @@ use super::*;
 /// let result = hub.accounts().orders_list("accountId")
 ///              .add_video_ids("sed")
 ///              .add_studio_names("amet.")
-///              .add_status("takimata")
-///              .add_pph_names("amet.")
-///              .page_token("duo")
-///              .page_size(-55)
-///              .name("gubergren")
-///              .custom_id("Lorem")
+///              .add_status(&Default::default())
+///              .add_pph_names("takimata")
+///              .page_token("amet.")
+///              .page_size(-20)
+///              .name("ipsum")
+///              .custom_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -47,7 +47,7 @@ pub struct AccountOrderListCall<'a, S>
    pub(super) _account_id: String,
    pub(super) _video_ids: Vec<String>,
    pub(super) _studio_names: Vec<String>,
-   pub(super) _status: Vec<String>,
+   pub(super) _status: Option<AccountStatusEnum>,
    pub(super) _pph_names: Vec<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -89,7 +89,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
                 params.push("videoIds", f);
@@ -256,8 +256,8 @@ where
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
-        self._status.push(new_value.to_string());
+    pub fn add_status(mut self, new_value: &AccountStatusEnum) -> AccountOrderListCall<'a, S> {
+        self._status.push(new_value.clone());
         self
     }
     /// See _List methods rules_ for info about this field.
@@ -450,8 +450,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("orderId", self._order_id);
+        params.push("accountId", &self._account_id);
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -684,15 +684,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().avails_list("accountId")
-///              .add_video_ids("ea")
-///              .title("ipsum")
-///              .add_territories("invidunt")
-///              .add_studio_names("amet")
-///              .add_pph_names("duo")
-///              .page_token("ipsum")
-///              .page_size(-93)
-///              .add_alt_ids("ut")
-///              .alt_id("gubergren")
+///              .add_video_ids("dolor")
+///              .title("ea")
+///              .add_territories("ipsum")
+///              .add_studio_names("invidunt")
+///              .add_pph_names("amet")
+///              .page_token("duo")
+///              .page_size(-50)
+///              .add_alt_ids("sed")
+///              .alt_id("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -746,7 +746,7 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
                 params.push("videoIds", f);
@@ -1122,8 +1122,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("availId", self._avail_id);
+        params.push("accountId", &self._account_id);
+        params.push("availId", &self._avail_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1402,9 +1402,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("videoId", self._video_id);
-        params.push("country", self._country);
+        params.push("accountId", &self._account_id);
+        params.push("videoId", &self._video_id);
+        params.push("country", &self._country);
 
         params.extend(self._additional_params.iter());
 
@@ -1647,16 +1647,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().store_infos_list("accountId")
-///              .add_video_ids("ea")
-///              .video_id("dolor")
-///              .add_studio_names("Lorem")
-///              .add_season_ids("eos")
-///              .add_pph_names("labore")
-///              .page_token("sed")
-///              .page_size(-70)
-///              .name("sed")
-///              .add_mids("no")
-///              .add_countries("Stet")
+///              .add_video_ids("gubergren")
+///              .video_id("ea")
+///              .add_studio_names("dolor")
+///              .add_season_ids("Lorem")
+///              .add_pph_names("eos")
+///              .page_token("labore")
+///              .page_size(-43)
+///              .name("duo")
+///              .add_mids("sed")
+///              .add_countries("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1711,7 +1711,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
                 params.push("videoIds", f);

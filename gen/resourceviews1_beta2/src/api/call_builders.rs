@@ -72,9 +72,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("operation", &self._operation);
 
         params.extend(self._additional_params.iter());
 
@@ -359,8 +359,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -667,9 +667,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
 
         params.extend(self._additional_params.iter());
 
@@ -972,9 +972,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
 
         params.extend(self._additional_params.iter());
 
@@ -1254,9 +1254,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
 
         params.extend(self._additional_params.iter());
 
@@ -1538,9 +1538,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
         if let Some(value) = self._resource_name.as_ref() {
             params.push("resourceName", value);
         }
@@ -1836,8 +1836,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
 
         params.extend(self._additional_params.iter());
 
@@ -2133,8 +2133,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2381,8 +2381,8 @@ where
 ///              .service_name("duo")
 ///              .page_token("sed")
 ///              .max_results(-61)
-///              .list_state("Stet")
-///              .format("kasd")
+///              .list_state(&Default::default())
+///              .format(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2396,8 +2396,8 @@ pub struct ZoneViewListResourceCall<'a, S>
    pub(super) _service_name: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
-   pub(super) _list_state: Option<String>,
-   pub(super) _format: Option<String>,
+   pub(super) _list_state: Option<ZoneViewListStateEnum>,
+   pub(super) _format: Option<ZoneViewFormatEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2434,9 +2434,9 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
         if let Some(value) = self._service_name.as_ref() {
             params.push("serviceName", value);
         }
@@ -2610,15 +2610,15 @@ where
     /// The state of the instance to list. By default, it lists all instances.
     ///
     /// Sets the *list state* query property to the given value.
-    pub fn list_state(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
-        self._list_state = Some(new_value.to_string());
+    pub fn list_state(mut self, new_value: &ZoneViewListStateEnum) -> ZoneViewListResourceCall<'a, S> {
+        self._list_state = Some(new_value.clone());
         self
     }
     /// The requested format of the return value. It can be URL or URL_PORT. A JSON object will be included in the response based on the format. The default format is NONE, which results in no JSON in the response.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
-        self._format = Some(new_value.to_string());
+    pub fn format(mut self, new_value: &ZoneViewFormatEnum) -> ZoneViewListResourceCall<'a, S> {
+        self._format = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2773,9 +2773,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
 
         params.extend(self._additional_params.iter());
 
@@ -3085,9 +3085,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("zone", self._zone);
-        params.push("resourceView", self._resource_view);
+        params.push("project", &self._project);
+        params.push("zone", &self._zone);
+        params.push("resourceView", &self._resource_view);
 
         params.extend(self._additional_params.iter());
 

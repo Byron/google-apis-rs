@@ -242,12 +242,12 @@ impl<'a, S> SubscriptionMethods<'a, S> {
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     /// * `deletionType` - Whether the subscription is to be fully cancelled or downgraded
-    pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &str) -> SubscriptionDeleteCall<'a, S> {
+    pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &SubscriptionDeletionTypeEnum) -> SubscriptionDeleteCall<'a, S> {
         SubscriptionDeleteCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
             _subscription_id: subscription_id.to_string(),
-            _deletion_type: deletion_type.to_string(),
+            _deletion_type: deletion_type.clone(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),

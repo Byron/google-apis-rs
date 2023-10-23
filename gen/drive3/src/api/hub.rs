@@ -32,7 +32,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("eos")
+///              .team_drive_id("Lorem")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
 ///              .spaces("duo")
@@ -45,8 +45,8 @@ use super::*;
 ///              .include_labels("et")
 ///              .include_items_from_all_drives(false)
 ///              .drive_id("erat")
-///              .corpus("sed")
-///              .corpora("duo")
+///              .corpus(&Default::default())
+///              .corpora("sed")
 ///              .doit().await;
 /// 
 /// match result {

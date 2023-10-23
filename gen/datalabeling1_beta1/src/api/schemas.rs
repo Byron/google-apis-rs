@@ -13,11 +13,11 @@ pub struct GoogleCloudDatalabelingV1beta1AnnotatedDataset {
     /// Output only. Source of the annotation.
     #[serde(rename="annotationSource")]
     
-    pub annotation_source: Option<String>,
+    pub annotation_source: Option<GoogleCloudDatalabelingV1beta1AnnotatedDatasetAnnotationSourceEnum>,
     /// Output only. Type of the annotation. It is specified when starting labeling task.
     #[serde(rename="annotationType")]
     
-    pub annotation_type: Option<String>,
+    pub annotation_type: Option<GoogleCloudDatalabelingV1beta1AnnotatedDatasetAnnotationTypeEnum>,
     /// Output only. The names of any related resources that are blocking changes to the annotated dataset.
     #[serde(rename="blockingResources")]
     
@@ -128,11 +128,11 @@ pub struct GoogleCloudDatalabelingV1beta1Annotation {
     /// Output only. Sentiment for this annotation.
     #[serde(rename="annotationSentiment")]
     
-    pub annotation_sentiment: Option<String>,
+    pub annotation_sentiment: Option<GoogleCloudDatalabelingV1beta1AnnotationAnnotationSentimentEnum>,
     /// Output only. The source of the annotation.
     #[serde(rename="annotationSource")]
     
-    pub annotation_source: Option<String>,
+    pub annotation_source: Option<GoogleCloudDatalabelingV1beta1AnnotationAnnotationSourceEnum>,
     /// Output only. This is the actual annotation value, e.g classification, bounding box values are stored here.
     #[serde(rename="annotationValue")]
     
@@ -681,7 +681,7 @@ pub struct GoogleCloudDatalabelingV1beta1Evaluation {
     /// Output only. Type of task that the model version being evaluated performs, as defined in the evaluationJobConfig.inputConfig.annotationType field of the evaluation job that created this evaluation.
     #[serde(rename="annotationType")]
     
-    pub annotation_type: Option<String>,
+    pub annotation_type: Option<GoogleCloudDatalabelingV1beta1EvaluationAnnotationTypeEnum>,
     /// Output only. Options used in the evaluation job that created this evaluation.
     
     pub config: Option<GoogleCloudDatalabelingV1beta1EvaluationConfig>,
@@ -773,7 +773,7 @@ pub struct GoogleCloudDatalabelingV1beta1EvaluationJob {
     pub schedule: Option<String>,
     /// Output only. Describes the current state of the job.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDatalabelingV1beta1EvaluationJobStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDatalabelingV1beta1EvaluationJob {}
@@ -1060,7 +1060,7 @@ pub struct GoogleCloudDatalabelingV1beta1FeedbackThreadMetadata {
     pub last_update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// no description provided
     
-    pub status: Option<String>,
+    pub status: Option<GoogleCloudDatalabelingV1beta1FeedbackThreadMetadataStatusEnum>,
     /// An image thumbnail of this thread.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -1232,7 +1232,7 @@ pub struct GoogleCloudDatalabelingV1beta1ImageClassificationConfig {
     /// Optional. The type of how to aggregate answers.
     #[serde(rename="answerAggregationType")]
     
-    pub answer_aggregation_type: Option<String>,
+    pub answer_aggregation_type: Option<GoogleCloudDatalabelingV1beta1ImageClassificationConfigAnswerAggregationTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatalabelingV1beta1ImageClassificationConfig {}
@@ -1349,7 +1349,7 @@ pub struct GoogleCloudDatalabelingV1beta1InputConfig {
     /// Optional. The type of annotation to be performed on this data. You must specify this field if you are using this InputConfig in an EvaluationJob.
     #[serde(rename="annotationType")]
     
-    pub annotation_type: Option<String>,
+    pub annotation_type: Option<GoogleCloudDatalabelingV1beta1InputConfigAnnotationTypeEnum>,
     /// Source located in BigQuery. You must specify this field if you are using this InputConfig in an EvaluationJob.
     #[serde(rename="bigquerySource")]
     
@@ -1361,7 +1361,7 @@ pub struct GoogleCloudDatalabelingV1beta1InputConfig {
     /// Required. Data type must be specifed when user tries to import data.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<GoogleCloudDatalabelingV1beta1InputConfigDataTypeEnum>,
     /// Source located in Cloud Storage.
     #[serde(rename="gcsSource")]
     
@@ -1401,7 +1401,7 @@ pub struct GoogleCloudDatalabelingV1beta1Instruction {
     /// Required. The data type of this instruction.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<GoogleCloudDatalabelingV1beta1InstructionDataTypeEnum>,
     /// Optional. User-provided description of the instruction. The description can be up to 10000 characters long.
     
     pub description: Option<String>,
@@ -1446,7 +1446,7 @@ pub struct GoogleCloudDatalabelingV1beta1LabelImageRequest {
     pub bounding_poly_config: Option<GoogleCloudDatalabelingV1beta1BoundingPolyConfig>,
     /// Required. The type of image labeling task.
     
-    pub feature: Option<String>,
+    pub feature: Option<GoogleCloudDatalabelingV1beta1LabelImageRequestFeatureEnum>,
     /// Configuration for image classification task. One of image_classification_config, bounding_poly_config, polyline_config and segmentation_config are required.
     #[serde(rename="imageClassificationConfig")]
     
@@ -1498,7 +1498,7 @@ pub struct GoogleCloudDatalabelingV1beta1LabelTextRequest {
     pub basic_config: Option<GoogleCloudDatalabelingV1beta1HumanAnnotationConfig>,
     /// Required. The type of text labeling task.
     
-    pub feature: Option<String>,
+    pub feature: Option<GoogleCloudDatalabelingV1beta1LabelTextRequestFeatureEnum>,
     /// Configuration for text classification task. One of text_classification_config and text_entity_extraction_config is required.
     #[serde(rename="textClassificationConfig")]
     
@@ -1533,7 +1533,7 @@ pub struct GoogleCloudDatalabelingV1beta1LabelVideoRequest {
     pub event_config: Option<GoogleCloudDatalabelingV1beta1EventConfig>,
     /// Required. The type of video labeling task.
     
-    pub feature: Option<String>,
+    pub feature: Option<GoogleCloudDatalabelingV1beta1LabelVideoRequestFeatureEnum>,
     /// Configuration for video object detection task. One of video_classification_config, object_detection_config, object_tracking_config and event_config is required.
     #[serde(rename="objectDetectionConfig")]
     

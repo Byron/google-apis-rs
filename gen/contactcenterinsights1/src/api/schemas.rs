@@ -169,7 +169,7 @@ pub struct GoogleCloudContactcenterinsightsV1AnswerFeedback {
     /// The correctness level of an answer.
     #[serde(rename="correctnessLevel")]
     
-    pub correctness_level: Option<String>,
+    pub correctness_level: Option<GoogleCloudContactcenterinsightsV1AnswerFeedbackCorrectnessLevelEnum>,
     /// Indicates whether an answer or item was displayed to the human agent in the agent desktop UI.
     
     pub displayed: Option<bool>,
@@ -459,7 +459,7 @@ pub struct GoogleCloudContactcenterinsightsV1Conversation {
     pub latest_analysis: Option<GoogleCloudContactcenterinsightsV1Analysis>,
     /// Immutable. The conversation medium, if unspecified will default to PHONE_CALL.
     
-    pub medium: Option<String>,
+    pub medium: Option<GoogleCloudContactcenterinsightsV1ConversationMediumEnum>,
     /// Immutable. The resource name of the conversation. Format: projects/{project}/locations/{location}/conversations/{conversation}
     
     pub name: Option<String>,
@@ -577,7 +577,7 @@ pub struct GoogleCloudContactcenterinsightsV1ConversationParticipant {
     pub obfuscated_external_user_id: Option<String>,
     /// The role of the participant.
     
-    pub role: Option<String>,
+    pub role: Option<GoogleCloudContactcenterinsightsV1ConversationParticipantRoleEnum>,
     /// A user-specified ID representing the participant.
     #[serde(rename="userId")]
     
@@ -788,7 +788,7 @@ pub struct GoogleCloudContactcenterinsightsV1Entity {
     /// The entity type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudContactcenterinsightsV1EntityTypeEnum>,
 }
 
 impl client::Part for GoogleCloudContactcenterinsightsV1Entity {}
@@ -811,7 +811,7 @@ pub struct GoogleCloudContactcenterinsightsV1EntityMentionData {
     /// The type of the entity mention.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudContactcenterinsightsV1EntityMentionDataTypeEnum>,
 }
 
 impl client::Part for GoogleCloudContactcenterinsightsV1EntityMentionData {}
@@ -861,7 +861,7 @@ pub struct GoogleCloudContactcenterinsightsV1ExportInsightsDataRequest {
     /// Options for what to do if the destination table already exists.
     #[serde(rename="writeDisposition")]
     
-    pub write_disposition: Option<String>,
+    pub write_disposition: Option<GoogleCloudContactcenterinsightsV1ExportInsightsDataRequestWriteDispositionEnum>,
 }
 
 impl client::RequestValue for GoogleCloudContactcenterinsightsV1ExportInsightsDataRequest {}
@@ -1024,7 +1024,7 @@ impl client::Part for GoogleCloudContactcenterinsightsV1IngestConversationsReque
 pub struct GoogleCloudContactcenterinsightsV1IngestConversationsRequestTranscriptObjectConfig {
     /// Required. The medium transcript objects represent.
     
-    pub medium: Option<String>,
+    pub medium: Option<GoogleCloudContactcenterinsightsV1IngestConversationsRequestTranscriptObjectConfigMediumEnum>,
 }
 
 impl client::Part for GoogleCloudContactcenterinsightsV1IngestConversationsRequestTranscriptObjectConfig {}
@@ -1186,7 +1186,7 @@ pub struct GoogleCloudContactcenterinsightsV1IssueModel {
     pub name: Option<String>,
     /// Output only. State of the model.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudContactcenterinsightsV1IssueModelStateEnum>,
     /// Output only. Immutable. The issue model's label statistics on its training data.
     #[serde(rename="trainingStats")]
     
@@ -1213,7 +1213,7 @@ pub struct GoogleCloudContactcenterinsightsV1IssueModelInputDataConfig {
     pub filter: Option<String>,
     /// Medium of conversations used in training data. This field is being deprecated. To specify the medium to be used in training a new issue model, set the `medium` field on `filter`.
     
-    pub medium: Option<String>,
+    pub medium: Option<GoogleCloudContactcenterinsightsV1IssueModelInputDataConfigMediumEnum>,
     /// Output only. Number of conversations used in training. Output only.
     #[serde(rename="trainingConversationsCount")]
     
@@ -1496,7 +1496,7 @@ pub struct GoogleCloudContactcenterinsightsV1PhraseMatchRuleGroup {
     /// Required. The type of this phrase match rule group.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudContactcenterinsightsV1PhraseMatchRuleGroupTypeEnum>,
 }
 
 impl client::Part for GoogleCloudContactcenterinsightsV1PhraseMatchRuleGroup {}
@@ -1544,11 +1544,11 @@ pub struct GoogleCloudContactcenterinsightsV1PhraseMatcher {
     /// The role whose utterances the phrase matcher should be matched against. If the role is ROLE_UNSPECIFIED it will be matched against any utterances in the transcript.
     #[serde(rename="roleMatch")]
     
-    pub role_match: Option<String>,
+    pub role_match: Option<GoogleCloudContactcenterinsightsV1PhraseMatcherRoleMatchEnum>,
     /// Required. The type of this phrase matcher.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudContactcenterinsightsV1PhraseMatcherTypeEnum>,
     /// Output only. The most recent time at which the phrase matcher was updated.
     #[serde(rename="updateTime")]
     

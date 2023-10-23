@@ -73,8 +73,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -298,7 +298,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().get("bucket", "entity")
-///              .user_project("Stet")
+///              .user_project("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -345,8 +345,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -587,7 +587,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().insert(req, "bucket")
-///              .user_project("duo")
+///              .user_project("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -634,7 +634,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -882,7 +882,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().list("bucket")
-///              .user_project("vero")
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -928,7 +928,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -1159,7 +1159,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().patch(req, "bucket", "entity")
-///              .user_project("vero")
+///              .user_project("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1207,8 +1207,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -1472,7 +1472,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().update(req, "bucket", "entity")
-///              .user_project("diam")
+///              .user_project("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1520,8 +1520,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -1779,9 +1779,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().delete("bucket")
-///              .user_project("ipsum")
-///              .if_metageneration_not_match(-23)
-///              .if_metageneration_match(-59)
+///              .user_project("Stet")
+///              .if_metageneration_not_match(-76)
+///              .if_metageneration_match(-44)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1829,7 +1829,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -2063,10 +2063,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get("bucket")
-///              .user_project("voluptua.")
-///              .projection("et")
-///              .if_metageneration_not_match(-31)
-///              .if_metageneration_match(-96)
+///              .user_project("diam")
+///              .projection(&Default::default())
+///              .if_metageneration_not_match(-61)
+///              .if_metageneration_match(-100)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2076,7 +2076,7 @@ pub struct BucketGetCall<'a, S>
    pub(super) hub: &'a Storage<S>,
    pub(super) _bucket: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<BucketProjectionEnum>,
    pub(super) _if_metageneration_not_match: Option<i64>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2115,7 +2115,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -2252,8 +2252,8 @@ where
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &BucketProjectionEnum) -> BucketGetCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
@@ -2370,8 +2370,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get_iam_policy("bucket")
-///              .user_project("sed")
-///              .options_requested_policy_version(-9)
+///              .user_project("takimata")
+///              .options_requested_policy_version(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2418,7 +2418,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -2659,10 +2659,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(req, "project")
-///              .user_project("gubergren")
-///              .projection("et")
-///              .predefined_default_object_acl("accusam")
-///              .predefined_acl("voluptua.")
+///              .user_project("et")
+///              .projection(&Default::default())
+///              .predefined_default_object_acl(&Default::default())
+///              .predefined_acl(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2673,9 +2673,9 @@ pub struct BucketInsertCall<'a, S>
    pub(super) _request: Bucket,
    pub(super) _project: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
-   pub(super) _predefined_default_object_acl: Option<String>,
-   pub(super) _predefined_acl: Option<String>,
+   pub(super) _projection: Option<BucketProjectionEnum>,
+   pub(super) _predefined_default_object_acl: Option<BucketPredefinedDefaultObjectAclEnum>,
+   pub(super) _predefined_acl: Option<BucketPredefinedAclEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2712,7 +2712,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -2865,22 +2865,22 @@ where
     /// Set of properties to return. Defaults to noAcl, unless the bucket resource specifies acl or defaultObjectAcl properties, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &BucketProjectionEnum) -> BucketInsertCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of default object access controls to this bucket.
     ///
     /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
-        self._predefined_default_object_acl = Some(new_value.to_string());
+    pub fn predefined_default_object_acl(mut self, new_value: &BucketPredefinedDefaultObjectAclEnum) -> BucketInsertCall<'a, S> {
+        self._predefined_default_object_acl = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of access controls to this bucket.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
-        self._predefined_acl = Some(new_value.to_string());
+    pub fn predefined_acl(mut self, new_value: &BucketPredefinedAclEnum) -> BucketInsertCall<'a, S> {
+        self._predefined_acl = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2983,11 +2983,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
-///              .user_project("dolore")
-///              .projection("dolore")
-///              .prefix("voluptua.")
-///              .page_token("amet.")
-///              .max_results(84)
+///              .user_project("consetetur")
+///              .projection(&Default::default())
+///              .prefix("amet.")
+///              .page_token("sed")
+///              .max_results(92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2997,7 +2997,7 @@ pub struct BucketListCall<'a, S>
    pub(super) hub: &'a Storage<S>,
    pub(super) _project: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<BucketProjectionEnum>,
    pub(super) _prefix: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
@@ -3037,7 +3037,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -3170,8 +3170,8 @@ where
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &BucketProjectionEnum) -> BucketListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Filter results to buckets whose names begin with this prefix.
@@ -3294,8 +3294,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().lock_retention_policy("bucket", -6)
-///              .user_project("invidunt")
+/// let result = hub.buckets().lock_retention_policy("bucket", -62)
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3342,8 +3342,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("ifMetagenerationMatch", self._if_metageneration_match.to_string());
+        params.push("bucket", &self._bucket);
+        params.push("ifMetagenerationMatch", &self._if_metageneration_match.to_string());
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -3584,12 +3584,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().patch(req, "bucket")
-///              .user_project("est")
-///              .projection("At")
-///              .predefined_default_object_acl("sed")
-///              .predefined_acl("sit")
-///              .if_metageneration_not_match(-35)
-///              .if_metageneration_match(-39)
+///              .user_project("voluptua.")
+///              .projection(&Default::default())
+///              .predefined_default_object_acl(&Default::default())
+///              .predefined_acl(&Default::default())
+///              .if_metageneration_not_match(-34)
+///              .if_metageneration_match(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3600,9 +3600,9 @@ pub struct BucketPatchCall<'a, S>
    pub(super) _request: Bucket,
    pub(super) _bucket: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
-   pub(super) _predefined_default_object_acl: Option<String>,
-   pub(super) _predefined_acl: Option<String>,
+   pub(super) _projection: Option<BucketProjectionEnum>,
+   pub(super) _predefined_default_object_acl: Option<BucketPredefinedDefaultObjectAclEnum>,
+   pub(super) _predefined_acl: Option<BucketPredefinedAclEnum>,
    pub(super) _if_metageneration_not_match: Option<i64>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3641,7 +3641,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -3807,22 +3807,22 @@ where
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &BucketProjectionEnum) -> BucketPatchCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of default object access controls to this bucket.
     ///
     /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
-        self._predefined_default_object_acl = Some(new_value.to_string());
+    pub fn predefined_default_object_acl(mut self, new_value: &BucketPredefinedDefaultObjectAclEnum) -> BucketPatchCall<'a, S> {
+        self._predefined_default_object_acl = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of access controls to this bucket.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
-        self._predefined_acl = Some(new_value.to_string());
+    pub fn predefined_acl(mut self, new_value: &BucketPredefinedAclEnum) -> BucketPatchCall<'a, S> {
+        self._predefined_acl = Some(new_value.clone());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
@@ -3945,7 +3945,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().set_iam_policy(req, "bucket")
-///              .user_project("ipsum")
+///              .user_project("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3992,7 +3992,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -4239,8 +4239,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().test_iam_permissions("bucket", &vec!["sanctus".into()])
-///              .user_project("Lorem")
+/// let result = hub.buckets().test_iam_permissions("bucket", &vec!["ea".into()])
+///              .user_project("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4287,7 +4287,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if self._permissions.len() > 0 {
             for f in self._permissions.iter() {
                 params.push("permissions", f);
@@ -4534,12 +4534,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(req, "bucket")
-///              .user_project("sed")
-///              .projection("diam")
-///              .predefined_default_object_acl("dolores")
-///              .predefined_acl("dolores")
-///              .if_metageneration_not_match(-68)
-///              .if_metageneration_match(-93)
+///              .user_project("invidunt")
+///              .projection(&Default::default())
+///              .predefined_default_object_acl(&Default::default())
+///              .predefined_acl(&Default::default())
+///              .if_metageneration_not_match(-11)
+///              .if_metageneration_match(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4550,9 +4550,9 @@ pub struct BucketUpdateCall<'a, S>
    pub(super) _request: Bucket,
    pub(super) _bucket: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
-   pub(super) _predefined_default_object_acl: Option<String>,
-   pub(super) _predefined_acl: Option<String>,
+   pub(super) _projection: Option<BucketProjectionEnum>,
+   pub(super) _predefined_default_object_acl: Option<BucketPredefinedDefaultObjectAclEnum>,
+   pub(super) _predefined_acl: Option<BucketPredefinedAclEnum>,
    pub(super) _if_metageneration_not_match: Option<i64>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4591,7 +4591,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -4757,22 +4757,22 @@ where
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &BucketProjectionEnum) -> BucketUpdateCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of default object access controls to this bucket.
     ///
     /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
-        self._predefined_default_object_acl = Some(new_value.to_string());
+    pub fn predefined_default_object_acl(mut self, new_value: &BucketPredefinedDefaultObjectAclEnum) -> BucketUpdateCall<'a, S> {
+        self._predefined_default_object_acl = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of access controls to this bucket.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
-        self._predefined_acl = Some(new_value.to_string());
+    pub fn predefined_acl(mut self, new_value: &BucketPredefinedAclEnum) -> BucketUpdateCall<'a, S> {
+        self._predefined_acl = Some(new_value.clone());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
@@ -5148,7 +5148,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().delete("bucket", "entity")
-///              .user_project("elitr")
+///              .user_project("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5195,8 +5195,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -5420,7 +5420,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().get("bucket", "entity")
-///              .user_project("nonumy")
+///              .user_project("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5467,8 +5467,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -5709,7 +5709,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().insert(req, "bucket")
-///              .user_project("sadipscing")
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5756,7 +5756,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -6004,9 +6004,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().list("bucket")
-///              .user_project("dolores")
-///              .if_metageneration_not_match(-95)
-///              .if_metageneration_match(-31)
+///              .user_project("Lorem")
+///              .if_metageneration_not_match(-7)
+///              .if_metageneration_match(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6054,7 +6054,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -6305,7 +6305,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().patch(req, "bucket", "entity")
-///              .user_project("est")
+///              .user_project("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6353,8 +6353,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -6618,7 +6618,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().update(req, "bucket", "entity")
-///              .user_project("consetetur")
+///              .user_project("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6666,8 +6666,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -6925,7 +6925,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().delete("bucket", "notification")
-///              .user_project("est")
+///              .user_project("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6972,8 +6972,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("notification", self._notification);
+        params.push("bucket", &self._bucket);
+        params.push("notification", &self._notification);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -7197,7 +7197,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().get("bucket", "notification")
-///              .user_project("duo")
+///              .user_project("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7244,8 +7244,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("notification", self._notification);
+        params.push("bucket", &self._bucket);
+        params.push("notification", &self._notification);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -7486,7 +7486,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().insert(req, "bucket")
-///              .user_project("est")
+///              .user_project("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7533,7 +7533,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -7781,7 +7781,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().list("bucket")
-///              .user_project("sed")
+///              .user_project("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7827,7 +7827,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -8052,8 +8052,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .user_project("Stet")
-///              .generation(-19)
+///              .user_project("est")
+///              .generation(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8102,9 +8102,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -8348,8 +8348,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .user_project("et")
-///              .generation(-77)
+///              .user_project("Stet")
+///              .generation(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8398,9 +8398,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -8661,8 +8661,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().insert(req, "bucket", "object")
-///              .user_project("Lorem")
-///              .generation(-23)
+///              .user_project("duo")
+///              .generation(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8711,8 +8711,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -8980,8 +8980,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .user_project("dolores")
-///              .generation(-81)
+///              .user_project("sed")
+///              .generation(-75)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9029,8 +9029,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -9281,8 +9281,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(req, "bucket", "object", "entity")
-///              .user_project("Lorem")
-///              .generation(-22)
+///              .user_project("dolores")
+///              .generation(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9332,9 +9332,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -9618,8 +9618,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(req, "bucket", "object", "entity")
-///              .user_project("sit")
-///              .generation(-81)
+///              .user_project("At")
+///              .generation(-84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9669,9 +9669,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
-        params.push("entity", self._entity);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
+        params.push("entity", &self._entity);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -9955,11 +9955,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(req, "destinationBucket", "destinationObject")
-///              .user_project("et")
-///              .kms_key_name("gubergren")
-///              .if_metageneration_match(-21)
-///              .if_generation_match(-60)
-///              .destination_predefined_acl("consetetur")
+///              .user_project("accusam")
+///              .kms_key_name("amet")
+///              .if_metageneration_match(-31)
+///              .if_generation_match(-69)
+///              .destination_predefined_acl(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -9974,7 +9974,7 @@ pub struct ObjectComposeCall<'a, S>
    pub(super) _kms_key_name: Option<String>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _if_generation_match: Option<i64>,
-   pub(super) _destination_predefined_acl: Option<String>,
+   pub(super) _destination_predefined_acl: Option<ObjectDestinationPredefinedAclEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10011,8 +10011,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("destinationBucket", self._destination_bucket);
-        params.push("destinationObject", self._destination_object);
+        params.push("destinationBucket", &self._destination_bucket);
+        params.push("destinationObject", &self._destination_object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -10206,8 +10206,8 @@ where
     /// Apply a predefined set of access controls to the destination object.
     ///
     /// Sets the *destination predefined acl* query property to the given value.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
-        self._destination_predefined_acl = Some(new_value.to_string());
+    pub fn destination_predefined_acl(mut self, new_value: &ObjectDestinationPredefinedAclEnum) -> ObjectComposeCall<'a, S> {
+        self._destination_predefined_acl = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10316,19 +10316,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("dolores")
-///              .source_generation(-46)
-///              .projection("gubergren")
-///              .if_source_metageneration_not_match(-4)
-///              .if_source_metageneration_match(-32)
-///              .if_source_generation_not_match(-61)
-///              .if_source_generation_match(-2)
-///              .if_metageneration_not_match(-50)
-///              .if_metageneration_match(-56)
-///              .if_generation_not_match(-73)
-///              .if_generation_match(-62)
-///              .destination_predefined_acl("sadipscing")
-///              .destination_kms_key_name("At")
+///              .user_project("Lorem")
+///              .source_generation(-22)
+///              .projection(&Default::default())
+///              .if_source_metageneration_not_match(-77)
+///              .if_source_metageneration_match(-4)
+///              .if_source_generation_not_match(-22)
+///              .if_source_generation_match(-48)
+///              .if_metageneration_not_match(-81)
+///              .if_metageneration_match(-10)
+///              .if_generation_not_match(-41)
+///              .if_generation_match(-22)
+///              .destination_predefined_acl(&Default::default())
+///              .destination_kms_key_name("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10343,7 +10343,7 @@ pub struct ObjectCopyCall<'a, S>
    pub(super) _destination_object: String,
    pub(super) _user_project: Option<String>,
    pub(super) _source_generation: Option<i64>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
    pub(super) _if_source_metageneration_not_match: Option<i64>,
    pub(super) _if_source_metageneration_match: Option<i64>,
    pub(super) _if_source_generation_not_match: Option<i64>,
@@ -10352,7 +10352,7 @@ pub struct ObjectCopyCall<'a, S>
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _if_generation_not_match: Option<i64>,
    pub(super) _if_generation_match: Option<i64>,
-   pub(super) _destination_predefined_acl: Option<String>,
+   pub(super) _destination_predefined_acl: Option<ObjectDestinationPredefinedAclEnum>,
    pub(super) _destination_kms_key_name: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -10390,10 +10390,10 @@ where
         }
 
         let mut params = Params::with_capacity(20 + self._additional_params.len());
-        params.push("sourceBucket", self._source_bucket);
-        params.push("sourceObject", self._source_object);
-        params.push("destinationBucket", self._destination_bucket);
-        params.push("destinationObject", self._destination_object);
+        params.push("sourceBucket", &self._source_bucket);
+        params.push("sourceObject", &self._source_object);
+        params.push("destinationBucket", &self._destination_bucket);
+        params.push("destinationObject", &self._destination_object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -10617,8 +10617,8 @@ where
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectCopyCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.
@@ -10680,8 +10680,8 @@ where
     /// Apply a predefined set of access controls to the destination object.
     ///
     /// Sets the *destination predefined acl* query property to the given value.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
-        self._destination_predefined_acl = Some(new_value.to_string());
+    pub fn destination_predefined_acl(mut self, new_value: &ObjectDestinationPredefinedAclEnum) -> ObjectCopyCall<'a, S> {
+        self._destination_predefined_acl = Some(new_value.clone());
         self
     }
     /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
@@ -10791,12 +10791,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .user_project("sit")
-///              .if_metageneration_not_match(-83)
-///              .if_metageneration_match(-22)
-///              .if_generation_not_match(-66)
-///              .if_generation_match(-4)
-///              .generation(-6)
+///              .user_project("consetetur")
+///              .if_metageneration_not_match(-98)
+///              .if_metageneration_match(-32)
+///              .if_generation_not_match(-25)
+///              .if_generation_match(-77)
+///              .generation(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10848,8 +10848,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -11128,13 +11128,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get("bucket", "object")
-///              .user_project("no")
-///              .projection("nonumy")
-///              .if_metageneration_not_match(-43)
-///              .if_metageneration_match(-13)
-///              .if_generation_not_match(-101)
-///              .if_generation_match(-58)
-///              .generation(-91)
+///              .user_project("dolor")
+///              .projection(&Default::default())
+///              .if_metageneration_not_match(-32)
+///              .if_metageneration_match(-61)
+///              .if_generation_not_match(-2)
+///              .if_generation_match(-50)
+///              .generation(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11145,7 +11145,7 @@ pub struct ObjectGetCall<'a, S>
    pub(super) _bucket: String,
    pub(super) _object: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
    pub(super) _if_metageneration_not_match: Option<i64>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _if_generation_not_match: Option<i64>,
@@ -11187,8 +11187,8 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -11353,8 +11353,8 @@ where
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectGetCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
@@ -11492,8 +11492,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get_iam_policy("bucket", "object")
-///              .user_project("dolore")
-///              .generation(-25)
+///              .user_project("sadipscing")
+///              .generation(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11541,8 +11541,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -11794,16 +11794,16 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(req, "bucket")
-///              .user_project("dolore")
-///              .projection("amet")
-///              .predefined_acl("ut")
-///              .name("At")
-///              .kms_key_name("sit")
-///              .if_metageneration_not_match(-76)
-///              .if_metageneration_match(-20)
-///              .if_generation_not_match(-45)
-///              .if_generation_match(-87)
-///              .content_encoding("rebum.")
+///              .user_project("duo")
+///              .projection(&Default::default())
+///              .predefined_acl(&Default::default())
+///              .name("sit")
+///              .kms_key_name("magna")
+///              .if_metageneration_not_match(-22)
+///              .if_metageneration_match(-66)
+///              .if_generation_not_match(-4)
+///              .if_generation_match(-6)
+///              .content_encoding("justo")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -11814,8 +11814,8 @@ pub struct ObjectInsertCall<'a, S>
    pub(super) _request: Object,
    pub(super) _bucket: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
-   pub(super) _predefined_acl: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
+   pub(super) _predefined_acl: Option<ObjectPredefinedAclEnum>,
    pub(super) _name: Option<String>,
    pub(super) _kms_key_name: Option<String>,
    pub(super) _if_metageneration_not_match: Option<i64>,
@@ -11860,7 +11860,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -12146,15 +12146,15 @@ where
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectInsertCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of access controls to this object.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
-        self._predefined_acl = Some(new_value.to_string());
+    pub fn predefined_acl(mut self, new_value: &ObjectPredefinedAclEnum) -> ObjectInsertCall<'a, S> {
+        self._predefined_acl = Some(new_value.clone());
         self
     }
     /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
@@ -12306,16 +12306,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
-///              .versions(true)
-///              .user_project("sadipscing")
-///              .start_offset("tempor")
-///              .projection("sea")
-///              .prefix("et")
-///              .page_token("Lorem")
-///              .max_results(68)
+///              .versions(false)
+///              .user_project("sed")
+///              .start_offset("kasd")
+///              .projection(&Default::default())
+///              .prefix("Lorem")
+///              .page_token("sanctus")
+///              .max_results(10)
 ///              .include_trailing_delimiter(true)
-///              .end_offset("rebum.")
-///              .delimiter("At")
+///              .end_offset("tempor")
+///              .delimiter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12327,7 +12327,7 @@ pub struct ObjectListCall<'a, S>
    pub(super) _versions: Option<bool>,
    pub(super) _user_project: Option<String>,
    pub(super) _start_offset: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
    pub(super) _prefix: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
@@ -12370,7 +12370,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._versions.as_ref() {
             params.push("versions", value.to_string());
         }
@@ -12539,8 +12539,8 @@ where
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectListCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Filter results to objects whose names begin with this prefix.
@@ -12691,14 +12691,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(req, "bucket", "object")
-///              .user_project("Stet")
-///              .projection("aliquyam")
-///              .predefined_acl("ut")
-///              .if_metageneration_not_match(-3)
-///              .if_metageneration_match(-26)
-///              .if_generation_not_match(-16)
-///              .if_generation_match(-19)
-///              .generation(-96)
+///              .user_project("dolore")
+///              .projection(&Default::default())
+///              .predefined_acl(&Default::default())
+///              .if_metageneration_not_match(-97)
+///              .if_metageneration_match(-37)
+///              .if_generation_not_match(-27)
+///              .if_generation_match(-53)
+///              .generation(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12710,8 +12710,8 @@ pub struct ObjectPatchCall<'a, S>
    pub(super) _bucket: String,
    pub(super) _object: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
-   pub(super) _predefined_acl: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
+   pub(super) _predefined_acl: Option<ObjectPredefinedAclEnum>,
    pub(super) _if_metageneration_not_match: Option<i64>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _if_generation_not_match: Option<i64>,
@@ -12753,8 +12753,8 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -12936,15 +12936,15 @@ where
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectPatchCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of access controls to this object.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
-        self._predefined_acl = Some(new_value.to_string());
+    pub fn predefined_acl(mut self, new_value: &ObjectPredefinedAclEnum) -> ObjectPatchCall<'a, S> {
+        self._predefined_acl = Some(new_value.clone());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
@@ -13088,21 +13088,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("dolor")
-///              .source_generation(-82)
-///              .rewrite_token("magna")
-///              .projection("diam")
-///              .max_bytes_rewritten_per_call(-91)
-///              .if_source_metageneration_not_match(-18)
-///              .if_source_metageneration_match(-8)
-///              .if_source_generation_not_match(-23)
-///              .if_source_generation_match(-39)
-///              .if_metageneration_not_match(-43)
-///              .if_metageneration_match(-7)
-///              .if_generation_not_match(-9)
-///              .if_generation_match(-99)
-///              .destination_predefined_acl("diam")
-///              .destination_kms_key_name("At")
+///              .user_project("duo")
+///              .source_generation(-63)
+///              .rewrite_token("sadipscing")
+///              .projection(&Default::default())
+///              .max_bytes_rewritten_per_call(-39)
+///              .if_source_metageneration_not_match(-10)
+///              .if_source_metageneration_match(-74)
+///              .if_source_generation_not_match(-56)
+///              .if_source_generation_match(-33)
+///              .if_metageneration_not_match(-59)
+///              .if_metageneration_match(-66)
+///              .if_generation_not_match(-27)
+///              .if_generation_match(-88)
+///              .destination_predefined_acl(&Default::default())
+///              .destination_kms_key_name("clita")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13118,7 +13118,7 @@ pub struct ObjectRewriteCall<'a, S>
    pub(super) _user_project: Option<String>,
    pub(super) _source_generation: Option<i64>,
    pub(super) _rewrite_token: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
    pub(super) _max_bytes_rewritten_per_call: Option<i64>,
    pub(super) _if_source_metageneration_not_match: Option<i64>,
    pub(super) _if_source_metageneration_match: Option<i64>,
@@ -13128,7 +13128,7 @@ pub struct ObjectRewriteCall<'a, S>
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _if_generation_not_match: Option<i64>,
    pub(super) _if_generation_match: Option<i64>,
-   pub(super) _destination_predefined_acl: Option<String>,
+   pub(super) _destination_predefined_acl: Option<ObjectDestinationPredefinedAclEnum>,
    pub(super) _destination_kms_key_name: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -13166,10 +13166,10 @@ where
         }
 
         let mut params = Params::with_capacity(22 + self._additional_params.len());
-        params.push("sourceBucket", self._source_bucket);
-        params.push("sourceObject", self._source_object);
-        params.push("destinationBucket", self._destination_bucket);
-        params.push("destinationObject", self._destination_object);
+        params.push("sourceBucket", &self._source_bucket);
+        params.push("sourceObject", &self._source_object);
+        params.push("destinationBucket", &self._destination_bucket);
+        params.push("destinationObject", &self._destination_object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -13406,8 +13406,8 @@ where
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectRewriteCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// The maximum number of bytes that will be rewritten per rewrite request. Most callers shouldn't need to specify this parameter - it is primarily in place to support testing. If specified the value must be an integral multiple of 1 MiB (1048576). Also, this only applies to requests where the source and destination span locations and/or storage classes. Finally, this value must not change across rewrite calls else you'll get an error that the rewriteToken is invalid.
@@ -13476,8 +13476,8 @@ where
     /// Apply a predefined set of access controls to the destination object.
     ///
     /// Sets the *destination predefined acl* query property to the given value.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
-        self._destination_predefined_acl = Some(new_value.to_string());
+    pub fn destination_predefined_acl(mut self, new_value: &ObjectDestinationPredefinedAclEnum) -> ObjectRewriteCall<'a, S> {
+        self._destination_predefined_acl = Some(new_value.clone());
         self
     }
     /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
@@ -13593,8 +13593,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().set_iam_policy(req, "bucket", "object")
-///              .user_project("ipsum")
-///              .generation(-73)
+///              .user_project("ut")
+///              .generation(-3)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13643,8 +13643,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -13911,9 +13911,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().test_iam_permissions("bucket", "object", &vec!["no".into()])
-///              .user_project("justo")
-///              .generation(-45)
+/// let result = hub.objects().test_iam_permissions("bucket", "object", &vec!["dolores".into()])
+///              .user_project("consetetur")
+///              .generation(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13962,8 +13962,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if self._permissions.len() > 0 {
             for f in self._permissions.iter() {
                 params.push("permissions", f);
@@ -14230,14 +14230,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(req, "bucket", "object")
-///              .user_project("ipsum")
-///              .projection("Stet")
-///              .predefined_acl("gubergren")
-///              .if_metageneration_not_match(-5)
-///              .if_metageneration_match(-61)
-///              .if_generation_not_match(-98)
-///              .if_generation_match(-13)
-///              .generation(-47)
+///              .user_project("clita")
+///              .projection(&Default::default())
+///              .predefined_acl(&Default::default())
+///              .if_metageneration_not_match(-99)
+///              .if_metageneration_match(-82)
+///              .if_generation_not_match(-83)
+///              .if_generation_match(-42)
+///              .generation(-91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14249,8 +14249,8 @@ pub struct ObjectUpdateCall<'a, S>
    pub(super) _bucket: String,
    pub(super) _object: String,
    pub(super) _user_project: Option<String>,
-   pub(super) _projection: Option<String>,
-   pub(super) _predefined_acl: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
+   pub(super) _predefined_acl: Option<ObjectPredefinedAclEnum>,
    pub(super) _if_metageneration_not_match: Option<i64>,
    pub(super) _if_metageneration_match: Option<i64>,
    pub(super) _if_generation_not_match: Option<i64>,
@@ -14292,8 +14292,8 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("bucket", self._bucket);
-        params.push("object", self._object);
+        params.push("bucket", &self._bucket);
+        params.push("object", &self._object);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -14475,15 +14475,15 @@ where
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectUpdateCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Apply a predefined set of access controls to this object.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
-        self._predefined_acl = Some(new_value.to_string());
+    pub fn predefined_acl(mut self, new_value: &ObjectPredefinedAclEnum) -> ObjectUpdateCall<'a, S> {
+        self._predefined_acl = Some(new_value.clone());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
@@ -14627,16 +14627,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().watch_all(req, "bucket")
-///              .versions(false)
+///              .versions(true)
 ///              .user_project("sed")
-///              .start_offset("nonumy")
-///              .projection("sea")
-///              .prefix("ipsum")
-///              .page_token("kasd")
-///              .max_results(80)
+///              .start_offset("est")
+///              .projection(&Default::default())
+///              .prefix("takimata")
+///              .page_token("dolor")
+///              .max_results(22)
 ///              .include_trailing_delimiter(false)
 ///              .end_offset("erat")
-///              .delimiter("clita")
+///              .delimiter("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14649,7 +14649,7 @@ pub struct ObjectWatchAllCall<'a, S>
    pub(super) _versions: Option<bool>,
    pub(super) _user_project: Option<String>,
    pub(super) _start_offset: Option<String>,
-   pub(super) _projection: Option<String>,
+   pub(super) _projection: Option<ObjectProjectionEnum>,
    pub(super) _prefix: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
@@ -14692,7 +14692,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("bucket", self._bucket);
+        params.push("bucket", &self._bucket);
         if let Some(value) = self._versions.as_ref() {
             params.push("versions", value.to_string());
         }
@@ -14884,8 +14884,8 @@ where
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
-        self._projection = Some(new_value.to_string());
+    pub fn projection(mut self, new_value: &ObjectProjectionEnum) -> ObjectWatchAllCall<'a, S> {
+        self._projection = Some(new_value.clone());
         self
     }
     /// Filter results to objects whose names begin with this prefix.
@@ -15030,7 +15030,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_create("projectId", "serviceAccountEmail")
-///              .user_project("nonumy")
+///              .user_project("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15077,8 +15077,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("serviceAccountEmail", self._service_account_email);
+        params.push("projectId", &self._project_id);
+        params.push("serviceAccountEmail", &self._service_account_email);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -15313,7 +15313,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_delete("projectId", "accessId")
-///              .user_project("dolores")
+///              .user_project("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15360,8 +15360,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("accessId", self._access_id);
+        params.push("projectId", &self._project_id);
+        params.push("accessId", &self._access_id);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -15585,7 +15585,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_get("projectId", "accessId")
-///              .user_project("eos")
+///              .user_project("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15632,8 +15632,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("accessId", self._access_id);
+        params.push("projectId", &self._project_id);
+        params.push("accessId", &self._access_id);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -15868,11 +15868,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_list("projectId")
-///              .user_project("elitr")
+///              .user_project("Stet")
 ///              .show_deleted_keys(true)
-///              .service_account_email("et")
-///              .page_token("clita")
-///              .max_results(100)
+///              .service_account_email("ipsum")
+///              .page_token("no")
+///              .max_results(3)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15922,7 +15922,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -16193,7 +16193,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_update(req, "projectId", "accessId")
-///              .user_project("erat")
+///              .user_project("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16241,8 +16241,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("accessId", self._access_id);
+        params.push("projectId", &self._project_id);
+        params.push("accessId", &self._access_id);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -16500,7 +16500,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_account_get("projectId")
-///              .user_project("nonumy")
+///              .user_project("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16546,7 +16546,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }

@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -143,7 +143,7 @@ pub struct CloudFunction {
     /// Docker Registry to use for this deployment. If `docker_repository` field is specified, this field will be automatically set as `ARTIFACT_REGISTRY`. If unspecified, it currently defaults to `CONTAINER_REGISTRY`. This field may be overridden by the backend for eligible deployments.
     #[serde(rename="dockerRegistry")]
     
-    pub docker_registry: Option<String>,
+    pub docker_registry: Option<CloudFunctionDockerRegistryEnum>,
     /// User managed repository created in Artifact Registry optionally with a customer managed encryption key. If specified, deployments will use Artifact Registry. If unspecified and the deployment is eligible to use Artifact Registry, GCF will create and use a repository named 'gcf-artifacts' for every deployed region. This is the repository to which the function docker image will be pushed after it is built by Cloud Build. It must match the pattern `projects/{project}/locations/{location}/repositories/{repository}`. Cross-project repositories are not supported. Cross-location repositories are not supported. Repository format must be 'DOCKER'.
     #[serde(rename="dockerRepository")]
     
@@ -167,7 +167,7 @@ pub struct CloudFunction {
     /// The ingress settings for the function, controlling what traffic can reach it.
     #[serde(rename="ingressSettings")]
     
-    pub ingress_settings: Option<String>,
+    pub ingress_settings: Option<CloudFunctionIngressSettingsEnum>,
     /// Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources. It must match the pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`. If specified, you must also provide an artifact registry repository using the `docker_repository` field that was created with the same KMS crypto key. The following service accounts need to be granted the role 'Cloud KMS CryptoKey Encrypter/Decrypter (roles/cloudkms.cryptoKeyEncrypterDecrypter)' on the Key/KeyRing/Project/Organization (least access preferred). 1. Google Cloud Functions service account (service-{project_number}@gcf-admin-robot.iam.gserviceaccount.com) - Required to protect the function's image. 2. Google Storage service account (service-{project_number}@gs-project-accounts.iam.gserviceaccount.com) - Required to protect the function's source code. If this service account does not exist, deploying a function without a KMS key or retrieving the service agent name provisions it. For more information, see https://cloud.google.com/storage/docs/projects#service-agents and https://cloud.google.com/storage/docs/getting-service-agent#gsutil. Google Cloud Functions delegates access to service agents to protect function resources in internal projects that are not accessible by the end user.
     #[serde(rename="kmsKeyName")]
     
@@ -222,7 +222,7 @@ pub struct CloudFunction {
     pub source_upload_url: Option<String>,
     /// Output only. Status of the function deployment.
     
-    pub status: Option<String>,
+    pub status: Option<CloudFunctionStatusEnum>,
     /// The function execution timeout. Execution is considered failed and can be terminated if the function is not completed at the end of the timeout period. Defaults to 60 seconds.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -243,7 +243,7 @@ pub struct CloudFunction {
     /// The egress settings for the connector, controlling what traffic is diverted through it.
     #[serde(rename="vpcConnectorEgressSettings")]
     
-    pub vpc_connector_egress_settings: Option<String>,
+    pub vpc_connector_egress_settings: Option<CloudFunctionVpcConnectorEgressSettingsEnum>,
 }
 
 impl client::RequestValue for CloudFunction {}
@@ -406,7 +406,7 @@ pub struct HttpsTrigger {
     /// The security level for the function.
     #[serde(rename="securityLevel")]
     
-    pub security_level: Option<String>,
+    pub security_level: Option<HttpsTriggerSecurityLevelEnum>,
     /// Output only. The deployed url for the function.
     
     pub url: Option<String>,

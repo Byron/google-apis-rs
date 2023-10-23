@@ -61,7 +61,7 @@ pub struct GoogleSearchIdeahubV1betaIdeaActivity {
     /// The type of activity performed.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleSearchIdeahubV1betaIdeaActivityTypeEnum>,
     /// The uri the activity relates to.
     
     pub uri: Option<String>,

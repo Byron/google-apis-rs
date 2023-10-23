@@ -62,11 +62,11 @@ impl<'a, S> ActivityMethods<'a, S> {
     ///
     /// * `userId` - The ID of the user to get activities for. The special value "me" can be used to indicate the authenticated user.
     /// * `collection` - The collection of activities to list.
-    pub fn list(&self, user_id: &str, collection: &str) -> ActivityListCall<'a, S> {
+    pub fn list(&self, user_id: &str, collection: &ActivityCollectionEnum) -> ActivityListCall<'a, S> {
         ActivityListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
-            _collection: collection.to_string(),
+            _collection: collection.clone(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),
@@ -240,11 +240,11 @@ impl<'a, S> PersonMethods<'a, S> {
     ///
     /// * `userId` - Get the collection of people for the person identified. Use "me" to indicate the authenticated user.
     /// * `collection` - The collection of people to list.
-    pub fn list(&self, user_id: &str, collection: &str) -> PersonListCall<'a, S> {
+    pub fn list(&self, user_id: &str, collection: &PersonCollectionEnum) -> PersonListCall<'a, S> {
         PersonListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
-            _collection: collection.to_string(),
+            _collection: collection.clone(),
             _page_token: Default::default(),
             _order_by: Default::default(),
             _max_results: Default::default(),
@@ -262,11 +262,11 @@ impl<'a, S> PersonMethods<'a, S> {
     ///
     /// * `activityId` - The ID of the activity to get the list of people for.
     /// * `collection` - The collection of people to list.
-    pub fn list_by_activity(&self, activity_id: &str, collection: &str) -> PersonListByActivityCall<'a, S> {
+    pub fn list_by_activity(&self, activity_id: &str, collection: &PersonCollectionEnum) -> PersonListByActivityCall<'a, S> {
         PersonListByActivityCall {
             hub: self.hub,
             _activity_id: activity_id.to_string(),
-            _collection: collection.to_string(),
+            _collection: collection.clone(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),

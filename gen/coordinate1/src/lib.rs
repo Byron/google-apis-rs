@@ -115,17 +115,17 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.jobs().patch(req, "teamId", 89)
-//!              .title("eos")
-//!              .progress("dolor")
-//!              .note("ea")
-//!              .lng(0.8638300740145545)
-//!              .lat(0.36487300775415)
-//!              .customer_phone_number("amet")
-//!              .customer_name("duo")
-//!              .add_custom_field("ipsum")
-//!              .assignee("sed")
-//!              .address("ut")
+//! let result = hub.jobs().patch(req, "teamId", 50)
+//!              .title("gubergren")
+//!              .progress(&Default::default())
+//!              .note("eos")
+//!              .lng(0.7615363125225725)
+//!              .lat(0.8638300740145545)
+//!              .customer_phone_number("ipsum")
+//!              .customer_name("invidunt")
+//!              .add_custom_field("amet")
+//!              .assignee("duo")
+//!              .address("ipsum")
 //!              .doit().await;
 //! 
 //! match result {

@@ -32,8 +32,8 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get("applicationId")
-///              .platform_type("sed")
-///              .language("amet.")
+///              .platform_type(&Default::default())
+///              .language("At")
 ///              .doit().await;
 /// 
 /// match result {

@@ -29,7 +29,7 @@ pub struct Event {
     /// Additional event types. Some events may have multiple types when multiple actions are part of a single event. For example, creating a document, renaming it, and sharing it may be part of a single file-creation event.
     #[serde(rename="additionalEventTypes")]
     
-    pub additional_event_types: Option<Vec<String>>,
+    pub additional_event_types: Option<Vec<EventAdditionalEventTypesEnum>>,
     /// The time at which the event occurred formatted as Unix time in milliseconds.
     #[serde(rename="eventTimeMillis")]
     
@@ -50,7 +50,7 @@ pub struct Event {
     /// The main type of event that occurred.
     #[serde(rename="primaryEventType")]
     
-    pub primary_event_type: Option<String>,
+    pub primary_event_type: Option<EventPrimaryEventTypeEnum>,
     /// Extra information for rename type events, such as the old and new names.
     
     pub rename: Option<Rename>,
@@ -146,11 +146,11 @@ pub struct Permission {
     pub permission_id: Option<String>,
     /// Indicates the Google Drive permissions role. The role determines a user's ability to read, write, or comment on the file.
     
-    pub role: Option<String>,
+    pub role: Option<PermissionRoleEnum>,
     /// Indicates how widely permissions are granted.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<PermissionTypeEnum>,
     /// The user's information if the type is USER.
     
     pub user: Option<User>,

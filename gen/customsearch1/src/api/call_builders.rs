@@ -26,37 +26,37 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().siterestrict_list()
-///              .start(23)
-///              .sort("amet.")
-///              .site_search_filter("ea")
-///              .site_search("sadipscing")
-///              .search_type("Lorem")
-///              .safe("invidunt")
-///              .rights("no")
-///              .related_site("est")
-///              .q("At")
-///              .or_terms("sed")
-///              .num(-98)
-///              .lr("et")
-///              .low_range("tempor")
-///              .link_site("aliquyam")
-///              .img_type("ipsum")
-///              .img_size("et")
-///              .img_dominant_color("sanctus")
-///              .img_color_type("Lorem")
-///              .hq("est")
-///              .hl("sed")
-///              .high_range("diam")
-///              .googlehost("dolores")
-///              .gl("dolores")
-///              .filter("et")
-///              .file_type("sed")
-///              .exclude_terms("no")
-///              .exact_terms("et")
-///              .date_restrict("elitr")
-///              .cx("sed")
-///              .cr("no")
-///              .c2coff("nonumy")
+///              .start(72)
+///              .sort("no")
+///              .site_search_filter(&Default::default())
+///              .site_search("ipsum")
+///              .search_type(&Default::default())
+///              .safe(&Default::default())
+///              .rights("accusam")
+///              .related_site("takimata")
+///              .q("consetetur")
+///              .or_terms("voluptua.")
+///              .num(-72)
+///              .lr("erat")
+///              .low_range("consetetur")
+///              .link_site("amet.")
+///              .img_type(&Default::default())
+///              .img_size(&Default::default())
+///              .img_dominant_color(&Default::default())
+///              .img_color_type(&Default::default())
+///              .hq("sed")
+///              .hl("takimata")
+///              .high_range("dolores")
+///              .googlehost("gubergren")
+///              .gl("et")
+///              .filter("accusam")
+///              .file_type("voluptua.")
+///              .exclude_terms("dolore")
+///              .exact_terms("dolore")
+///              .date_restrict("dolore")
+///              .cx("voluptua.")
+///              .cr("amet.")
+///              .c2coff("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -66,10 +66,10 @@ pub struct CseSiterestrictListCall<'a, S>
    pub(super) hub: &'a CustomSearchAPI<S>,
    pub(super) _start: Option<u32>,
    pub(super) _sort: Option<String>,
-   pub(super) _site_search_filter: Option<String>,
+   pub(super) _site_search_filter: Option<CseSiteSearchFilterEnum>,
    pub(super) _site_search: Option<String>,
-   pub(super) _search_type: Option<String>,
-   pub(super) _safe: Option<String>,
+   pub(super) _search_type: Option<CseSearchTypeEnum>,
+   pub(super) _safe: Option<CseSafeEnum>,
    pub(super) _rights: Option<String>,
    pub(super) _related_site: Option<String>,
    pub(super) _q: Option<String>,
@@ -78,10 +78,10 @@ pub struct CseSiterestrictListCall<'a, S>
    pub(super) _lr: Option<String>,
    pub(super) _low_range: Option<String>,
    pub(super) _link_site: Option<String>,
-   pub(super) _img_type: Option<String>,
-   pub(super) _img_size: Option<String>,
-   pub(super) _img_dominant_color: Option<String>,
-   pub(super) _img_color_type: Option<String>,
+   pub(super) _img_type: Option<CseImgTypeEnum>,
+   pub(super) _img_size: Option<CseImgSizeEnum>,
+   pub(super) _img_dominant_color: Option<CseImgDominantColorEnum>,
+   pub(super) _img_color_type: Option<CseImgColorTypeEnum>,
    pub(super) _hq: Option<String>,
    pub(super) _hl: Option<String>,
    pub(super) _high_range: Option<String>,
@@ -327,8 +327,8 @@ where
     /// Controls whether to include or exclude results from the site named in the `siteSearch` parameter. Acceptable values are: * `"e"`: exclude * `"i"`: include
     ///
     /// Sets the *site search filter* query property to the given value.
-    pub fn site_search_filter(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._site_search_filter = Some(new_value.to_string());
+    pub fn site_search_filter(mut self, new_value: &CseSiteSearchFilterEnum) -> CseSiterestrictListCall<'a, S> {
+        self._site_search_filter = Some(new_value.clone());
         self
     }
     /// Specifies a given site which should always be included or excluded from results (see `siteSearchFilter` parameter, below).
@@ -341,15 +341,15 @@ where
     /// Specifies the search type: `image`. If unspecified, results are limited to webpages. Acceptable values are: * `"image"`: custom image search.
     ///
     /// Sets the *search type* query property to the given value.
-    pub fn search_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._search_type = Some(new_value.to_string());
+    pub fn search_type(mut self, new_value: &CseSearchTypeEnum) -> CseSiterestrictListCall<'a, S> {
+        self._search_type = Some(new_value.clone());
         self
     }
     /// Search safety level. Acceptable values are: * `"active"`: Enables SafeSearch filtering. * `"off"`: Disables SafeSearch filtering. (default)
     ///
     /// Sets the *safe* query property to the given value.
-    pub fn safe(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._safe = Some(new_value.to_string());
+    pub fn safe(mut self, new_value: &CseSafeEnum) -> CseSiterestrictListCall<'a, S> {
+        self._safe = Some(new_value.clone());
         self
     }
     /// Filters based on licensing. Supported values include: `cc_publicdomain`, `cc_attribute`, `cc_sharealike`, `cc_noncommercial`, `cc_nonderived` and combinations of these. See [typical combinations](https://wiki.creativecommons.org/wiki/CC_Search_integration).
@@ -411,29 +411,29 @@ where
     /// Returns images of a type. Acceptable values are: * `"clipart"` * `"face"` * `"lineart"` * `"stock"` * `"photo"` * `"animated"`
     ///
     /// Sets the *img type* query property to the given value.
-    pub fn img_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._img_type = Some(new_value.to_string());
+    pub fn img_type(mut self, new_value: &CseImgTypeEnum) -> CseSiterestrictListCall<'a, S> {
+        self._img_type = Some(new_value.clone());
         self
     }
     /// Returns images of a specified size. Acceptable values are: * `"huge"` * `"icon"` * `"large"` * `"medium"` * `"small"` * `"xlarge"` * `"xxlarge"`
     ///
     /// Sets the *img size* query property to the given value.
-    pub fn img_size(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._img_size = Some(new_value.to_string());
+    pub fn img_size(mut self, new_value: &CseImgSizeEnum) -> CseSiterestrictListCall<'a, S> {
+        self._img_size = Some(new_value.clone());
         self
     }
     /// Returns images of a specific dominant color. Acceptable values are: * `"black"` * `"blue"` * `"brown"` * `"gray"` * `"green"` * `"orange"` * `"pink"` * `"purple"` * `"red"` * `"teal"` * `"white"` * `"yellow"`
     ///
     /// Sets the *img dominant color* query property to the given value.
-    pub fn img_dominant_color(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._img_dominant_color = Some(new_value.to_string());
+    pub fn img_dominant_color(mut self, new_value: &CseImgDominantColorEnum) -> CseSiterestrictListCall<'a, S> {
+        self._img_dominant_color = Some(new_value.clone());
         self
     }
     /// Returns black and white, grayscale, transparent, or color images. Acceptable values are: * `"color"` * `"gray"` * `"mono"`: black and white * `"trans"`: transparent background
     ///
     /// Sets the *img color type* query property to the given value.
-    pub fn img_color_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
-        self._img_color_type = Some(new_value.to_string());
+    pub fn img_color_type(mut self, new_value: &CseImgColorTypeEnum) -> CseSiterestrictListCall<'a, S> {
+        self._img_color_type = Some(new_value.clone());
         self
     }
     /// Appends the specified query terms to the query, as if they were combined with a logical AND operator.
@@ -596,36 +596,36 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().list()
-///              .start(24)
-///              .sort("sadipscing")
-///              .site_search_filter("aliquyam")
-///              .site_search("dolores")
-///              .search_type("sadipscing")
-///              .safe("erat")
-///              .rights("aliquyam")
-///              .related_site("amet")
-///              .q("est")
-///              .or_terms("et")
-///              .num(-10)
-///              .lr("consetetur")
-///              .low_range("consetetur")
-///              .link_site("Stet")
-///              .img_type("est")
-///              .img_size("aliquyam")
-///              .img_dominant_color("elitr")
-///              .img_color_type("duo")
-///              .hq("diam")
-///              .hl("est")
-///              .high_range("sit")
-///              .googlehost("sed")
-///              .gl("eos")
-///              .filter("Lorem")
-///              .file_type("ea")
-///              .exclude_terms("Stet")
+///              .start(6)
+///              .sort("Lorem")
+///              .site_search_filter(&Default::default())
+///              .site_search("invidunt")
+///              .search_type(&Default::default())
+///              .safe(&Default::default())
+///              .rights("no")
+///              .related_site("est")
+///              .q("At")
+///              .or_terms("sed")
+///              .num(-98)
+///              .lr("et")
+///              .low_range("tempor")
+///              .link_site("aliquyam")
+///              .img_type(&Default::default())
+///              .img_size(&Default::default())
+///              .img_dominant_color(&Default::default())
+///              .img_color_type(&Default::default())
+///              .hq("ipsum")
+///              .hl("et")
+///              .high_range("sanctus")
+///              .googlehost("Lorem")
+///              .gl("est")
+///              .filter("sed")
+///              .file_type("diam")
+///              .exclude_terms("dolores")
 ///              .exact_terms("dolores")
-///              .date_restrict("eos")
-///              .cx("et")
-///              .cr("sea")
+///              .date_restrict("et")
+///              .cx("sed")
+///              .cr("no")
 ///              .c2coff("et")
 ///              .doit().await;
 /// # }
@@ -636,10 +636,10 @@ pub struct CseListCall<'a, S>
    pub(super) hub: &'a CustomSearchAPI<S>,
    pub(super) _start: Option<u32>,
    pub(super) _sort: Option<String>,
-   pub(super) _site_search_filter: Option<String>,
+   pub(super) _site_search_filter: Option<CseSiteSearchFilterEnum>,
    pub(super) _site_search: Option<String>,
-   pub(super) _search_type: Option<String>,
-   pub(super) _safe: Option<String>,
+   pub(super) _search_type: Option<CseSearchTypeEnum>,
+   pub(super) _safe: Option<CseSafeEnum>,
    pub(super) _rights: Option<String>,
    pub(super) _related_site: Option<String>,
    pub(super) _q: Option<String>,
@@ -648,10 +648,10 @@ pub struct CseListCall<'a, S>
    pub(super) _lr: Option<String>,
    pub(super) _low_range: Option<String>,
    pub(super) _link_site: Option<String>,
-   pub(super) _img_type: Option<String>,
-   pub(super) _img_size: Option<String>,
-   pub(super) _img_dominant_color: Option<String>,
-   pub(super) _img_color_type: Option<String>,
+   pub(super) _img_type: Option<CseImgTypeEnum>,
+   pub(super) _img_size: Option<CseImgSizeEnum>,
+   pub(super) _img_dominant_color: Option<CseImgDominantColorEnum>,
+   pub(super) _img_color_type: Option<CseImgColorTypeEnum>,
    pub(super) _hq: Option<String>,
    pub(super) _hl: Option<String>,
    pub(super) _high_range: Option<String>,
@@ -897,8 +897,8 @@ where
     /// Controls whether to include or exclude results from the site named in the `siteSearch` parameter. Acceptable values are: * `"e"`: exclude * `"i"`: include
     ///
     /// Sets the *site search filter* query property to the given value.
-    pub fn site_search_filter(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._site_search_filter = Some(new_value.to_string());
+    pub fn site_search_filter(mut self, new_value: &CseSiteSearchFilterEnum) -> CseListCall<'a, S> {
+        self._site_search_filter = Some(new_value.clone());
         self
     }
     /// Specifies a given site which should always be included or excluded from results (see `siteSearchFilter` parameter, below).
@@ -911,15 +911,15 @@ where
     /// Specifies the search type: `image`. If unspecified, results are limited to webpages. Acceptable values are: * `"image"`: custom image search.
     ///
     /// Sets the *search type* query property to the given value.
-    pub fn search_type(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._search_type = Some(new_value.to_string());
+    pub fn search_type(mut self, new_value: &CseSearchTypeEnum) -> CseListCall<'a, S> {
+        self._search_type = Some(new_value.clone());
         self
     }
     /// Search safety level. Acceptable values are: * `"active"`: Enables SafeSearch filtering. * `"off"`: Disables SafeSearch filtering. (default)
     ///
     /// Sets the *safe* query property to the given value.
-    pub fn safe(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._safe = Some(new_value.to_string());
+    pub fn safe(mut self, new_value: &CseSafeEnum) -> CseListCall<'a, S> {
+        self._safe = Some(new_value.clone());
         self
     }
     /// Filters based on licensing. Supported values include: `cc_publicdomain`, `cc_attribute`, `cc_sharealike`, `cc_noncommercial`, `cc_nonderived` and combinations of these. See [typical combinations](https://wiki.creativecommons.org/wiki/CC_Search_integration).
@@ -981,29 +981,29 @@ where
     /// Returns images of a type. Acceptable values are: * `"clipart"` * `"face"` * `"lineart"` * `"stock"` * `"photo"` * `"animated"`
     ///
     /// Sets the *img type* query property to the given value.
-    pub fn img_type(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._img_type = Some(new_value.to_string());
+    pub fn img_type(mut self, new_value: &CseImgTypeEnum) -> CseListCall<'a, S> {
+        self._img_type = Some(new_value.clone());
         self
     }
     /// Returns images of a specified size. Acceptable values are: * `"huge"` * `"icon"` * `"large"` * `"medium"` * `"small"` * `"xlarge"` * `"xxlarge"`
     ///
     /// Sets the *img size* query property to the given value.
-    pub fn img_size(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._img_size = Some(new_value.to_string());
+    pub fn img_size(mut self, new_value: &CseImgSizeEnum) -> CseListCall<'a, S> {
+        self._img_size = Some(new_value.clone());
         self
     }
     /// Returns images of a specific dominant color. Acceptable values are: * `"black"` * `"blue"` * `"brown"` * `"gray"` * `"green"` * `"orange"` * `"pink"` * `"purple"` * `"red"` * `"teal"` * `"white"` * `"yellow"`
     ///
     /// Sets the *img dominant color* query property to the given value.
-    pub fn img_dominant_color(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._img_dominant_color = Some(new_value.to_string());
+    pub fn img_dominant_color(mut self, new_value: &CseImgDominantColorEnum) -> CseListCall<'a, S> {
+        self._img_dominant_color = Some(new_value.clone());
         self
     }
     /// Returns black and white, grayscale, transparent, or color images. Acceptable values are: * `"color"` * `"gray"` * `"mono"`: black and white * `"trans"`: transparent background
     ///
     /// Sets the *img color type* query property to the given value.
-    pub fn img_color_type(mut self, new_value: &str) -> CseListCall<'a, S> {
-        self._img_color_type = Some(new_value.to_string());
+    pub fn img_color_type(mut self, new_value: &CseImgColorTypeEnum) -> CseListCall<'a, S> {
+        self._img_color_type = Some(new_value.clone());
         self
     }
     /// Appends the specified query terms to the query, as if they were combined with a logical AND operator.

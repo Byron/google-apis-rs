@@ -26,9 +26,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.controller().debuggees_breakpoints_list("debuggeeId")
-///              .wait_token("amet.")
+///              .wait_token("sed")
 ///              .success_on_timeout(true)
-///              .agent_id("gubergren")
+///              .agent_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -76,7 +76,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("debuggeeId", self._debuggee_id);
+        params.push("debuggeeId", &self._debuggee_id);
         if let Some(value) = self._wait_token.as_ref() {
             params.push("waitToken", value);
         }
@@ -376,8 +376,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("debuggeeId", self._debuggee_id);
-        params.push("id", self._id);
+        params.push("debuggeeId", &self._debuggee_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -901,7 +901,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_delete("debuggeeId", "breakpointId")
-///              .client_version("ea")
+///              .client_version("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -948,8 +948,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("debuggeeId", self._debuggee_id);
-        params.push("breakpointId", self._breakpoint_id);
+        params.push("debuggeeId", &self._debuggee_id);
+        params.push("breakpointId", &self._breakpoint_id);
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }
@@ -1187,7 +1187,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_get("debuggeeId", "breakpointId")
-///              .client_version("amet")
+///              .client_version("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1234,8 +1234,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("debuggeeId", self._debuggee_id);
-        params.push("breakpointId", self._breakpoint_id);
+        params.push("debuggeeId", &self._debuggee_id);
+        params.push("breakpointId", &self._breakpoint_id);
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }
@@ -1473,12 +1473,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_list("debuggeeId")
-///              .wait_token("ipsum")
-///              .strip_results(false)
+///              .wait_token("invidunt")
+///              .strip_results(true)
 ///              .include_inactive(true)
-///              .include_all_users(true)
-///              .client_version("ipsum")
-///              .action_value("est")
+///              .include_all_users(false)
+///              .client_version("ut")
+///              .action_value(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1492,7 +1492,7 @@ pub struct DebuggerDebuggeeBreakpointListCall<'a, S>
    pub(super) _include_inactive: Option<bool>,
    pub(super) _include_all_users: Option<bool>,
    pub(super) _client_version: Option<String>,
-   pub(super) _action_value: Option<String>,
+   pub(super) _action_value: Option<DebuggerActionValueEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1529,7 +1529,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("debuggeeId", self._debuggee_id);
+        params.push("debuggeeId", &self._debuggee_id);
         if let Some(value) = self._wait_token.as_ref() {
             params.push("waitToken", value);
         }
@@ -1700,8 +1700,8 @@ where
     /// Only breakpoints with the specified action will pass the filter.
     ///
     /// Sets the *action.value* query property to the given value.
-    pub fn action_value(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, S> {
-        self._action_value = Some(new_value.to_string());
+    pub fn action_value(mut self, new_value: &DebuggerActionValueEnum) -> DebuggerDebuggeeBreakpointListCall<'a, S> {
+        self._action_value = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1813,8 +1813,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
-///              .client_version("ea")
-///              .canary_option("dolor")
+///              .client_version("rebum.")
+///              .canary_option(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1825,7 +1825,7 @@ pub struct DebuggerDebuggeeBreakpointSetCall<'a, S>
    pub(super) _request: Breakpoint,
    pub(super) _debuggee_id: String,
    pub(super) _client_version: Option<String>,
-   pub(super) _canary_option: Option<String>,
+   pub(super) _canary_option: Option<DebuggerCanaryOptionEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1862,7 +1862,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("debuggeeId", self._debuggee_id);
+        params.push("debuggeeId", &self._debuggee_id);
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }
@@ -2016,8 +2016,8 @@ where
     /// The canary option set by the user upon setting breakpoint.
     ///
     /// Sets the *canary option* query property to the given value.
-    pub fn canary_option(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, S> {
-        self._canary_option = Some(new_value.to_string());
+    pub fn canary_option(mut self, new_value: &DebuggerCanaryOptionEnum) -> DebuggerDebuggeeBreakpointSetCall<'a, S> {
+        self._canary_option = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2123,9 +2123,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_list()
-///              .project("Lorem")
-///              .include_inactive(false)
-///              .client_version("sed")
+///              .project("est")
+///              .include_inactive(true)
+///              .client_version("ipsum")
 ///              .doit().await;
 /// # }
 /// ```

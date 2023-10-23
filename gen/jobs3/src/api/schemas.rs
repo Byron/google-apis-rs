@@ -129,7 +129,7 @@ pub struct CommuteFilter {
     /// Required. The method of transportation for which to calculate the commute time.
     #[serde(rename="commuteMethod")]
     
-    pub commute_method: Option<String>,
+    pub commute_method: Option<CommuteFilterCommuteMethodEnum>,
     /// Optional. The departure time used to calculate traffic impact, represented as google.type.TimeOfDay in local time zone. Currently traffic model is restricted to hour level resolution.
     #[serde(rename="departureTime")]
     
@@ -137,7 +137,7 @@ pub struct CommuteFilter {
     /// Optional. Specifies the traffic density to use when calculating commute time.
     #[serde(rename="roadTraffic")]
     
-    pub road_traffic: Option<String>,
+    pub road_traffic: Option<CommuteFilterRoadTrafficEnum>,
     /// Required. The latitude and longitude of the location from which to calculate the commute time.
     #[serde(rename="startCoordinates")]
     
@@ -227,7 +227,7 @@ pub struct Company {
     pub name: Option<String>,
     /// Optional. The employer's company size.
     
-    pub size: Option<String>,
+    pub size: Option<CompanySizeEnum>,
     /// Output only. Indicates whether a company is flagged to be suspended from public availability by the service when job content appears suspicious, abusive, or spammy.
     
     pub suspended: Option<bool>,
@@ -279,10 +279,10 @@ pub struct CompensationEntry {
     /// Optional. Compensation type. Default is CompensationUnit.COMPENSATION_TYPE_UNSPECIFIED.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CompensationEntryTypeEnum>,
     /// Optional. Frequency of the specified amount. Default is CompensationUnit.COMPENSATION_UNIT_UNSPECIFIED.
     
-    pub unit: Option<String>,
+    pub unit: Option<CompensationEntryUnitEnum>,
 }
 
 impl client::Part for CompensationEntry {}
@@ -305,10 +305,10 @@ pub struct CompensationFilter {
     /// Required. Type of filter.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CompensationFilterTypeEnum>,
     /// Required. Specify desired `base compensation entry's` CompensationInfo.CompensationUnit.
     
-    pub units: Option<Vec<String>>,
+    pub units: Option<Vec<CompensationFilterUnitsEnum>>,
 }
 
 impl client::Part for CompensationFilter {}
@@ -328,7 +328,7 @@ pub struct CompensationHistogramRequest {
     /// Required. Type of the request, representing which field the histogramming should be performed over. A single request can only specify one histogram of each `CompensationHistogramRequestType`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CompensationHistogramRequestTypeEnum>,
 }
 
 impl client::Part for CompensationHistogramRequest {}
@@ -347,7 +347,7 @@ pub struct CompensationHistogramResult {
     /// Type of the request, corresponding to CompensationHistogramRequest.type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CompensationHistogramResultTypeEnum>,
 }
 
 impl client::Part for CompensationHistogramResult {}
@@ -436,7 +436,7 @@ pub struct CompletionResult {
     /// The completion topic.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CompletionResultTypeEnum>,
 }
 
 impl client::Part for CompletionResult {}
@@ -580,7 +580,7 @@ pub struct DeviceInfo {
     /// Optional. Type of the device.
     #[serde(rename="deviceType")]
     
-    pub device_type: Option<String>,
+    pub device_type: Option<DeviceInfoDeviceTypeEnum>,
     /// Optional. A device-specific ID. The ID must be a unique identifier that distinguishes the device from other devices.
     
     pub id: Option<String>,
@@ -624,7 +624,7 @@ pub struct HistogramFacets {
     /// Optional. Specifies the simple type of histogram facets, for example, `COMPANY_SIZE`, `EMPLOYMENT_TYPE` etc.
     #[serde(rename="simpleHistogramFacets")]
     
-    pub simple_histogram_facets: Option<Vec<String>>,
+    pub simple_histogram_facets: Option<Vec<HistogramFacetSimpleHistogramFacetsEnum>>,
 }
 
 impl client::Part for HistogramFacets {}
@@ -640,7 +640,7 @@ pub struct HistogramResult {
     /// The Histogram search filters.
     #[serde(rename="searchType")]
     
-    pub search_type: Option<String>,
+    pub search_type: Option<HistogramResultSearchTypeEnum>,
     /// A map from the values of field to the number of jobs with that value in this search result. Key: search type (filter names, such as the companyName). Values: the count of jobs that match the filter for this search.
     
     pub values: Option<HashMap<String, i32>>,
@@ -712,7 +712,7 @@ pub struct Job {
     /// Optional. The desired education degrees for the job, such as Bachelors, Masters.
     #[serde(rename="degreeTypes")]
     
-    pub degree_types: Option<Vec<String>>,
+    pub degree_types: Option<Vec<JobDegreeTypesEnum>>,
     /// Optional. The department or functional area within the company with the open position. The maximum number of allowed characters is 255.
     
     pub department: Option<String>,
@@ -726,14 +726,14 @@ pub struct Job {
     /// Optional. The employment type(s) of a job, for example, full time or part time.
     #[serde(rename="employmentTypes")]
     
-    pub employment_types: Option<Vec<String>>,
+    pub employment_types: Option<Vec<JobEmploymentTypesEnum>>,
     /// Optional. A description of bonus, commission, and other compensation incentives associated with the job not including salary or pay. The maximum number of allowed characters is 10,000.
     
     pub incentives: Option<String>,
     /// Optional. The benefits included with the job.
     #[serde(rename="jobBenefits")]
     
-    pub job_benefits: Option<Vec<String>>,
+    pub job_benefits: Option<Vec<JobJobBenefitsEnum>>,
     /// Optional. The end timestamp of the job. Typically this field is used for contracting engagements. Invalid timestamps are ignored.
     #[serde(rename="jobEndTime")]
     
@@ -741,7 +741,7 @@ pub struct Job {
     /// Optional. The experience level associated with the job, such as "Entry Level".
     #[serde(rename="jobLevel")]
     
-    pub job_level: Option<String>,
+    pub job_level: Option<JobJobLevelEnum>,
     /// Optional. The start timestamp of the job in UTC time zone. Typically this field is used for contracting engagements. Invalid timestamps are ignored.
     #[serde(rename="jobStartTime")]
     
@@ -768,7 +768,7 @@ pub struct Job {
     /// Optional. The job PostingRegion (for example, state, country) throughout which the job is available. If this field is set, a LocationFilter in a search query within the job region finds this job posting if an exact location match isn't specified. If this field is set to PostingRegion.NATION or PostingRegion.ADMINISTRATIVE_AREA, setting job Job.addresses to the same location level as this field is strongly recommended.
     #[serde(rename="postingRegion")]
     
-    pub posting_region: Option<String>,
+    pub posting_region: Option<JobPostingRegionEnum>,
     /// Output only. The timestamp when this job posting was last updated.
     #[serde(rename="postingUpdateTime")]
     
@@ -796,7 +796,7 @@ pub struct Job {
     pub title: Option<String>,
     /// Deprecated. The job is only visible to the owner. The visibility of the job. Defaults to Visibility.ACCOUNT_ONLY if not specified.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<JobVisibilityEnum>,
 }
 
 impl client::ResponseResult for Job {}
@@ -812,7 +812,7 @@ pub struct JobDerivedInfo {
     /// Job categories derived from Job.title and Job.description.
     #[serde(rename="jobCategories")]
     
-    pub job_categories: Option<Vec<String>>,
+    pub job_categories: Option<Vec<JobDerivedInfoJobCategoriesEnum>>,
     /// Structured locations of the job, resolved from Job.addresses. locations are exactly matched to Job.addresses in the same order.
     
     pub locations: Option<Vec<Location>>,
@@ -834,7 +834,7 @@ pub struct JobEvent {
     /// Required. The type of the event (see JobEventType).
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<JobEventTypeEnum>,
 }
 
 impl client::Part for JobEvent {}
@@ -874,11 +874,11 @@ pub struct JobQuery {
     /// Optional. The employment type filter specifies the employment type of jobs to search against, such as EmploymentType.FULL_TIME. If a value is not specified, jobs in the search results includes any employment type. If multiple values are specified, jobs in the search results include any of the specified employment types.
     #[serde(rename="employmentTypes")]
     
-    pub employment_types: Option<Vec<String>>,
+    pub employment_types: Option<Vec<JobQueryEmploymentTypesEnum>>,
     /// Optional. The category filter specifies the categories of jobs to search against. See Category for more information. If a value is not specified, jobs from any category are searched against. If multiple values are specified, jobs from any of the specified categories are searched against.
     #[serde(rename="jobCategories")]
     
-    pub job_categories: Option<Vec<String>>,
+    pub job_categories: Option<Vec<JobQueryJobCategoriesEnum>>,
     /// Optional. This filter specifies the locale of jobs to search against, for example, "en-US". If a value isn't specified, the search results can contain jobs in any locale. Language codes should be in BCP-47 format, such as "en-US" or "sr-Latn". For more information, see [Tags for Identifying Languages](https://tools.ietf.org/html/bcp47). At most 10 language code filters are allowed.
     #[serde(rename="languageCodes")]
     
@@ -987,7 +987,7 @@ pub struct Location {
     /// The type of a location, which corresponds to the address lines field of PostalAddress. For example, "Downtown, Atlanta, GA, USA" has a type of LocationType#NEIGHBORHOOD, and "Kansas City, KS, USA" has a type of LocationType#LOCALITY.
     #[serde(rename="locationType")]
     
-    pub location_type: Option<String>,
+    pub location_type: Option<LocationLocationTypeEnum>,
     /// Postal address of the location that includes human readable information, such as postal delivery and payments addresses. Given a postal address, a postal service can deliver items to a premises, P.O. Box, or other delivery location.
     #[serde(rename="postalAddress")]
     
@@ -1026,7 +1026,7 @@ pub struct LocationFilter {
     /// Optional. Allows the client to return jobs without a set location, specifically, telecommuting jobs (telecommuting is considered by the service as a special location). Job.posting_region indicates if a job permits telecommuting. If this field is set to TelecommutePreference.TELECOMMUTE_ALLOWED, telecommuting jobs are searched, and address and lat_lng are ignored. If not set or set to TelecommutePreference.TELECOMMUTE_EXCLUDED, the telecommute status of the jobs is ignored. Jobs that have PostingRegion.TELECOMMUTE and have additional Job.addresses may still be matched based on other location filters using address or latlng. This filter can be used by itself to search exclusively for telecommuting jobs, or it can be combined with another location filter to search for a combination of job locations, such as "Mountain View" or "telecommuting" jobs. However, when used in combination with other location filters, telecommuting jobs can be treated as less relevant than other jobs in the search response.
     #[serde(rename="telecommutePreference")]
     
-    pub telecommute_preference: Option<String>,
+    pub telecommute_preference: Option<LocationFilterTelecommutePreferenceEnum>,
 }
 
 impl client::Part for LocationFilter {}
@@ -1194,7 +1194,7 @@ pub struct ProcessingOptions {
     /// Optional. Option for job HTML content sanitization. Applied fields are: * description * applicationInfo.instruction * incentives * qualifications * responsibilities HTML tags in these fields may be stripped if sanitiazation is not disabled. Defaults to HtmlSanitization.SIMPLE_FORMATTING_ONLY.
     #[serde(rename="htmlSanitization")]
     
-    pub html_sanitization: Option<String>,
+    pub html_sanitization: Option<ProcessingOptionHtmlSanitizationEnum>,
 }
 
 impl client::Part for ProcessingOptions {}
@@ -1262,7 +1262,7 @@ pub struct SearchJobsRequest {
     /// Optional. Controls whether highly similar jobs are returned next to each other in the search results. Jobs are identified as highly similar based on their titles, job categories, and locations. Highly similar results are clustered so that only one representative job of the cluster is displayed to the job seeker higher up in the results, with the other jobs being displayed lower down in the results. Defaults to DiversificationLevel.SIMPLE if no value is specified.
     #[serde(rename="diversificationLevel")]
     
-    pub diversification_level: Option<String>,
+    pub diversification_level: Option<SearchJobsRequestDiversificationLevelEnum>,
     /// Optional. Controls whether to broaden the search when it produces sparse results. Broadened queries append results to the end of the matching results list. Defaults to false.
     #[serde(rename="enableBroadening")]
     
@@ -1278,7 +1278,7 @@ pub struct SearchJobsRequest {
     /// Optional. The desired job attributes returned for jobs in the search response. Defaults to JobView.SMALL if no value is specified.
     #[serde(rename="jobView")]
     
-    pub job_view: Option<String>,
+    pub job_view: Option<SearchJobsRequestJobViewEnum>,
     /// Optional. An integer that specifies the current offset (that is, starting result location, amongst the jobs deemed by the API as relevant) in search results. This field is only considered if page_token is unset. The maximum allowed value is 5000. Otherwise an error is thrown. For example, 0 means to return results starting from the first matching job, and 10 means to return from the 11th job. This can be used for pagination, (for example, pageSize = 10 and offset = 10 means to return from the second page).
     
     pub offset: Option<i32>,
@@ -1305,7 +1305,7 @@ pub struct SearchJobsRequest {
     /// Optional. Mode of a search. Defaults to SearchMode.JOB_SEARCH.
     #[serde(rename="searchMode")]
     
-    pub search_mode: Option<String>,
+    pub search_mode: Option<SearchJobsRequestSearchModeEnum>,
 }
 
 impl client::RequestValue for SearchJobsRequest {}

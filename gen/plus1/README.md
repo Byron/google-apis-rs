@@ -100,10 +100,10 @@ let mut hub = Plus::new(hyper::Client::builder().build(hyper_rustls::HttpsConnec
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.people().list("userId", "collection")
-             .page_token("no")
-             .order_by("ipsum")
-             .max_results(73)
+let result = hub.people().list("userId", &Default::default())
+             .page_token("magna")
+             .order_by(&Default::default())
+             .max_results(90)
              .doit().await;
 
 match result {

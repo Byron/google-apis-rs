@@ -147,11 +147,11 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-//!              .user_id("takimata")
-//!              .add_states("amet.")
-//!              .page_token("duo")
-//!              .page_size(-55)
-//!              .late("gubergren")
+//!              .user_id("sed")
+//!              .add_states(&Default::default())
+//!              .page_token("amet.")
+//!              .page_size(-59)
+//!              .late(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

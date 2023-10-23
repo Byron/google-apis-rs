@@ -26,21 +26,21 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().time_series_list("name")
-///              .view("eos")
-///              .secondary_aggregation_per_series_aligner("dolor")
-///              .add_secondary_aggregation_group_by_fields("ea")
-///              .secondary_aggregation_cross_series_reducer("ipsum")
-///              .secondary_aggregation_alignment_period(chrono::Duration::seconds(1833555))
-///              .page_token("amet")
-///              .page_size(-20)
-///              .order_by("ipsum")
+///              .view(&Default::default())
+///              .secondary_aggregation_per_series_aligner(&Default::default())
+///              .add_secondary_aggregation_group_by_fields("gubergren")
+///              .secondary_aggregation_cross_series_reducer(&Default::default())
+///              .secondary_aggregation_alignment_period(chrono::Duration::seconds(6569141))
+///              .page_token("gubergren")
+///              .page_size(-75)
+///              .order_by("dolor")
 ///              .interval_start_time(chrono::Utc::now())
 ///              .interval_end_time(chrono::Utc::now())
-///              .filter("sed")
-///              .aggregation_per_series_aligner("ut")
-///              .add_aggregation_group_by_fields("gubergren")
-///              .aggregation_cross_series_reducer("rebum.")
-///              .aggregation_alignment_period(chrono::Duration::seconds(5840181))
+///              .filter("ea")
+///              .aggregation_per_series_aligner(&Default::default())
+///              .add_aggregation_group_by_fields("ipsum")
+///              .aggregation_cross_series_reducer(&Default::default())
+///              .aggregation_alignment_period(chrono::Duration::seconds(1833555))
 ///              .doit().await;
 /// # }
 /// ```
@@ -49,10 +49,10 @@ pub struct FolderTimeSeryListCall<'a, S>
 
    pub(super) hub: &'a Monitoring<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
-   pub(super) _secondary_aggregation_per_series_aligner: Option<String>,
+   pub(super) _view: Option<FolderViewEnum>,
+   pub(super) _secondary_aggregation_per_series_aligner: Option<FolderSecondaryAggregationPerSeriesAlignerEnum>,
    pub(super) _secondary_aggregation_group_by_fields: Vec<String>,
-   pub(super) _secondary_aggregation_cross_series_reducer: Option<String>,
+   pub(super) _secondary_aggregation_cross_series_reducer: Option<FolderSecondaryAggregationCrossSeriesReducerEnum>,
    pub(super) _secondary_aggregation_alignment_period: Option<client::chrono::Duration>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -60,9 +60,9 @@ pub struct FolderTimeSeryListCall<'a, S>
    pub(super) _interval_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _interval_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _filter: Option<String>,
-   pub(super) _aggregation_per_series_aligner: Option<String>,
+   pub(super) _aggregation_per_series_aligner: Option<FolderAggregationPerSeriesAlignerEnum>,
    pub(super) _aggregation_group_by_fields: Vec<String>,
-   pub(super) _aggregation_cross_series_reducer: Option<String>,
+   pub(super) _aggregation_cross_series_reducer: Option<FolderAggregationCrossSeriesReducerEnum>,
    pub(super) _aggregation_alignment_period: Option<client::chrono::Duration>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -100,7 +100,7 @@ where
         }
 
         let mut params = Params::with_capacity(18 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -267,15 +267,15 @@ where
     /// Required. Specifies which information is returned about the time series.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> FolderTimeSeryListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &FolderViewEnum) -> FolderTimeSeryListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     ///
     /// Sets the *secondary aggregation.per series aligner* query property to the given value.
-    pub fn secondary_aggregation_per_series_aligner(mut self, new_value: &str) -> FolderTimeSeryListCall<'a, S> {
-        self._secondary_aggregation_per_series_aligner = Some(new_value.to_string());
+    pub fn secondary_aggregation_per_series_aligner(mut self, new_value: &FolderSecondaryAggregationPerSeriesAlignerEnum) -> FolderTimeSeryListCall<'a, S> {
+        self._secondary_aggregation_per_series_aligner = Some(new_value.clone());
         self
     }
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
@@ -289,8 +289,8 @@ where
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     ///
     /// Sets the *secondary aggregation.cross series reducer* query property to the given value.
-    pub fn secondary_aggregation_cross_series_reducer(mut self, new_value: &str) -> FolderTimeSeryListCall<'a, S> {
-        self._secondary_aggregation_cross_series_reducer = Some(new_value.to_string());
+    pub fn secondary_aggregation_cross_series_reducer(mut self, new_value: &FolderSecondaryAggregationCrossSeriesReducerEnum) -> FolderTimeSeryListCall<'a, S> {
+        self._secondary_aggregation_cross_series_reducer = Some(new_value.clone());
         self
     }
     /// The alignment_period specifies a time interval, in seconds, that is used to divide the data in all the time series into consistent blocks of time. This will be done before the per-series aligner can be applied to the data.The value must be at least 60 seconds. If a per-series aligner other than ALIGN_NONE is specified, this field is required or an error is returned. If no per-series aligner is specified, or the aligner ALIGN_NONE is specified, then this field is ignored.The maximum value of the alignment_period is 104 weeks (2 years) for charts, and 90,000 seconds (25 hours) for alerting policies.
@@ -345,8 +345,8 @@ where
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     ///
     /// Sets the *aggregation.per series aligner* query property to the given value.
-    pub fn aggregation_per_series_aligner(mut self, new_value: &str) -> FolderTimeSeryListCall<'a, S> {
-        self._aggregation_per_series_aligner = Some(new_value.to_string());
+    pub fn aggregation_per_series_aligner(mut self, new_value: &FolderAggregationPerSeriesAlignerEnum) -> FolderTimeSeryListCall<'a, S> {
+        self._aggregation_per_series_aligner = Some(new_value.clone());
         self
     }
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
@@ -360,8 +360,8 @@ where
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     ///
     /// Sets the *aggregation.cross series reducer* query property to the given value.
-    pub fn aggregation_cross_series_reducer(mut self, new_value: &str) -> FolderTimeSeryListCall<'a, S> {
-        self._aggregation_cross_series_reducer = Some(new_value.to_string());
+    pub fn aggregation_cross_series_reducer(mut self, new_value: &FolderAggregationCrossSeriesReducerEnum) -> FolderTimeSeryListCall<'a, S> {
+        self._aggregation_cross_series_reducer = Some(new_value.clone());
         self
     }
     /// The alignment_period specifies a time interval, in seconds, that is used to divide the data in all the time series into consistent blocks of time. This will be done before the per-series aligner can be applied to the data.The value must be at least 60 seconds. If a per-series aligner other than ALIGN_NONE is specified, this field is required or an error is returned. If no per-series aligner is specified, or the aligner ALIGN_NONE is specified, then this field is ignored.The maximum value of the alignment_period is 104 weeks (2 years) for charts, and 90,000 seconds (25 hours) for alerting policies.
@@ -474,21 +474,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().time_series_list("name")
-///              .view("ipsum")
-///              .secondary_aggregation_per_series_aligner("est")
-///              .add_secondary_aggregation_group_by_fields("gubergren")
-///              .secondary_aggregation_cross_series_reducer("ea")
-///              .secondary_aggregation_alignment_period(chrono::Duration::seconds(299065))
-///              .page_token("Lorem")
-///              .page_size(-25)
-///              .order_by("labore")
+///              .view(&Default::default())
+///              .secondary_aggregation_per_series_aligner(&Default::default())
+///              .add_secondary_aggregation_group_by_fields("duo")
+///              .secondary_aggregation_cross_series_reducer(&Default::default())
+///              .secondary_aggregation_alignment_period(chrono::Duration::seconds(6689731))
+///              .page_token("sed")
+///              .page_size(-37)
+///              .order_by("gubergren")
 ///              .interval_start_time(chrono::Utc::now())
 ///              .interval_end_time(chrono::Utc::now())
-///              .filter("sed")
-///              .aggregation_per_series_aligner("duo")
-///              .add_aggregation_group_by_fields("sed")
-///              .aggregation_cross_series_reducer("no")
-///              .aggregation_alignment_period(chrono::Duration::seconds(7669831))
+///              .filter("rebum.")
+///              .aggregation_per_series_aligner(&Default::default())
+///              .add_aggregation_group_by_fields("est")
+///              .aggregation_cross_series_reducer(&Default::default())
+///              .aggregation_alignment_period(chrono::Duration::seconds(6771075))
 ///              .doit().await;
 /// # }
 /// ```
@@ -497,10 +497,10 @@ pub struct OrganizationTimeSeryListCall<'a, S>
 
    pub(super) hub: &'a Monitoring<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
-   pub(super) _secondary_aggregation_per_series_aligner: Option<String>,
+   pub(super) _view: Option<OrganizationViewEnum>,
+   pub(super) _secondary_aggregation_per_series_aligner: Option<OrganizationSecondaryAggregationPerSeriesAlignerEnum>,
    pub(super) _secondary_aggregation_group_by_fields: Vec<String>,
-   pub(super) _secondary_aggregation_cross_series_reducer: Option<String>,
+   pub(super) _secondary_aggregation_cross_series_reducer: Option<OrganizationSecondaryAggregationCrossSeriesReducerEnum>,
    pub(super) _secondary_aggregation_alignment_period: Option<client::chrono::Duration>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -508,9 +508,9 @@ pub struct OrganizationTimeSeryListCall<'a, S>
    pub(super) _interval_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _interval_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _filter: Option<String>,
-   pub(super) _aggregation_per_series_aligner: Option<String>,
+   pub(super) _aggregation_per_series_aligner: Option<OrganizationAggregationPerSeriesAlignerEnum>,
    pub(super) _aggregation_group_by_fields: Vec<String>,
-   pub(super) _aggregation_cross_series_reducer: Option<String>,
+   pub(super) _aggregation_cross_series_reducer: Option<OrganizationAggregationCrossSeriesReducerEnum>,
    pub(super) _aggregation_alignment_period: Option<client::chrono::Duration>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -548,7 +548,7 @@ where
         }
 
         let mut params = Params::with_capacity(18 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -715,15 +715,15 @@ where
     /// Required. Specifies which information is returned about the time series.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> OrganizationTimeSeryListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &OrganizationViewEnum) -> OrganizationTimeSeryListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     ///
     /// Sets the *secondary aggregation.per series aligner* query property to the given value.
-    pub fn secondary_aggregation_per_series_aligner(mut self, new_value: &str) -> OrganizationTimeSeryListCall<'a, S> {
-        self._secondary_aggregation_per_series_aligner = Some(new_value.to_string());
+    pub fn secondary_aggregation_per_series_aligner(mut self, new_value: &OrganizationSecondaryAggregationPerSeriesAlignerEnum) -> OrganizationTimeSeryListCall<'a, S> {
+        self._secondary_aggregation_per_series_aligner = Some(new_value.clone());
         self
     }
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
@@ -737,8 +737,8 @@ where
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     ///
     /// Sets the *secondary aggregation.cross series reducer* query property to the given value.
-    pub fn secondary_aggregation_cross_series_reducer(mut self, new_value: &str) -> OrganizationTimeSeryListCall<'a, S> {
-        self._secondary_aggregation_cross_series_reducer = Some(new_value.to_string());
+    pub fn secondary_aggregation_cross_series_reducer(mut self, new_value: &OrganizationSecondaryAggregationCrossSeriesReducerEnum) -> OrganizationTimeSeryListCall<'a, S> {
+        self._secondary_aggregation_cross_series_reducer = Some(new_value.clone());
         self
     }
     /// The alignment_period specifies a time interval, in seconds, that is used to divide the data in all the time series into consistent blocks of time. This will be done before the per-series aligner can be applied to the data.The value must be at least 60 seconds. If a per-series aligner other than ALIGN_NONE is specified, this field is required or an error is returned. If no per-series aligner is specified, or the aligner ALIGN_NONE is specified, then this field is ignored.The maximum value of the alignment_period is 104 weeks (2 years) for charts, and 90,000 seconds (25 hours) for alerting policies.
@@ -793,8 +793,8 @@ where
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     ///
     /// Sets the *aggregation.per series aligner* query property to the given value.
-    pub fn aggregation_per_series_aligner(mut self, new_value: &str) -> OrganizationTimeSeryListCall<'a, S> {
-        self._aggregation_per_series_aligner = Some(new_value.to_string());
+    pub fn aggregation_per_series_aligner(mut self, new_value: &OrganizationAggregationPerSeriesAlignerEnum) -> OrganizationTimeSeryListCall<'a, S> {
+        self._aggregation_per_series_aligner = Some(new_value.clone());
         self
     }
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
@@ -808,8 +808,8 @@ where
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     ///
     /// Sets the *aggregation.cross series reducer* query property to the given value.
-    pub fn aggregation_cross_series_reducer(mut self, new_value: &str) -> OrganizationTimeSeryListCall<'a, S> {
-        self._aggregation_cross_series_reducer = Some(new_value.to_string());
+    pub fn aggregation_cross_series_reducer(mut self, new_value: &OrganizationAggregationCrossSeriesReducerEnum) -> OrganizationTimeSeryListCall<'a, S> {
+        self._aggregation_cross_series_reducer = Some(new_value.clone());
         self
     }
     /// The alignment_period specifies a time interval, in seconds, that is used to divide the data in all the time series into consistent blocks of time. This will be done before the per-series aligner can be applied to the data.The value must be at least 60 seconds. If a per-series aligner other than ALIGN_NONE is specified, this field is required or an error is returned. If no per-series aligner is specified, or the aligner ALIGN_NONE is specified, then this field is ignored.The maximum value of the alignment_period is 104 weeks (2 years) for charts, and 90,000 seconds (25 hours) for alerting policies.
@@ -973,7 +973,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1258,7 +1258,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1520,7 +1520,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1738,10 +1738,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().alert_policies_list("name")
-///              .page_token("sed")
-///              .page_size(-20)
-///              .order_by("dolore")
-///              .filter("et")
+///              .page_token("dolor")
+///              .page_size(-56)
+///              .order_by("eos")
+///              .filter("labore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1790,7 +1790,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2101,7 +2101,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2403,7 +2403,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2644,11 +2644,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_members_list("name")
-///              .page_token("diam")
-///              .page_size(-49)
+///              .page_token("no")
+///              .page_size(-15)
 ///              .interval_start_time(chrono::Utc::now())
 ///              .interval_end_time(chrono::Utc::now())
-///              .filter("et")
+///              .filter("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2698,7 +2698,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2972,7 +2972,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_create(req, "name")
-///              .validate_only(false)
+///              .validate_only(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3019,7 +3019,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -3270,7 +3270,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_delete("name")
-///              .recursive(false)
+///              .recursive(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3316,7 +3316,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._recursive.as_ref() {
             params.push("recursive", value.to_string());
         }
@@ -3588,7 +3588,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3806,11 +3806,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_list("name")
-///              .page_token("vero")
-///              .page_size(-88)
-///              .descendants_of_group("Stet")
-///              .children_of_group("vero")
-///              .ancestors_of_group("elitr")
+///              .page_token("sed")
+///              .page_size(-20)
+///              .descendants_of_group("dolore")
+///              .children_of_group("et")
+///              .ancestors_of_group("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3860,7 +3860,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4134,7 +4134,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_update(req, "name")
-///              .validate_only(true)
+///              .validate_only(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4181,7 +4181,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -4483,7 +4483,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4768,7 +4768,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5030,7 +5030,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5248,9 +5248,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().metric_descriptors_list("name")
-///              .page_token("voluptua.")
-///              .page_size(-72)
-///              .filter("erat")
+///              .page_token("sadipscing")
+///              .page_size(-15)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5298,7 +5298,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5590,7 +5590,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5808,9 +5808,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().monitored_resource_descriptors_list("name")
-///              .page_token("sed")
-///              .page_size(-9)
-///              .filter("dolores")
+///              .page_token("vero")
+///              .page_size(-88)
+///              .filter("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5858,7 +5858,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6150,7 +6150,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6368,8 +6368,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_channel_descriptors_list("name")
-///              .page_token("accusam")
-///              .page_size(-78)
+///              .page_token("Lorem")
+///              .page_size(-29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6416,7 +6416,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6705,7 +6705,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6946,7 +6946,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_channels_delete("name")
-///              .force(false)
+///              .force(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6992,7 +6992,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._force.as_ref() {
             params.push("force", value.to_string());
         }
@@ -7264,7 +7264,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7533,7 +7533,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7774,10 +7774,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_channels_list("name")
-///              .page_token("Lorem")
-///              .page_size(-38)
-///              .order_by("no")
-///              .filter("est")
+///              .page_token("erat")
+///              .page_size(-96)
+///              .order_by("amet.")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7826,7 +7826,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8137,7 +8137,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8439,7 +8439,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8731,7 +8731,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9023,7 +9023,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -9308,7 +9308,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9526,9 +9526,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snoozes_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-18)
-///              .filter("sanctus")
+///              .page_token("dolore")
+///              .page_size(-34)
+///              .filter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9576,7 +9576,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9877,7 +9877,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -10179,7 +10179,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10471,7 +10471,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10712,21 +10712,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().time_series_list("name")
-///              .view("dolores")
-///              .secondary_aggregation_per_series_aligner("dolores")
-///              .add_secondary_aggregation_group_by_fields("et")
-///              .secondary_aggregation_cross_series_reducer("sed")
-///              .secondary_aggregation_alignment_period(chrono::Duration::seconds(2189267))
-///              .page_token("elitr")
-///              .page_size(-80)
-///              .order_by("no")
+///              .view(&Default::default())
+///              .secondary_aggregation_per_series_aligner(&Default::default())
+///              .add_secondary_aggregation_group_by_fields("Lorem")
+///              .secondary_aggregation_cross_series_reducer(&Default::default())
+///              .secondary_aggregation_alignment_period(chrono::Duration::seconds(8299010))
+///              .page_token("no")
+///              .page_size(-7)
+///              .order_by("At")
 ///              .interval_start_time(chrono::Utc::now())
 ///              .interval_end_time(chrono::Utc::now())
-///              .filter("nonumy")
-///              .aggregation_per_series_aligner("At")
-///              .add_aggregation_group_by_fields("sadipscing")
-///              .aggregation_cross_series_reducer("aliquyam")
-///              .aggregation_alignment_period(chrono::Duration::seconds(4245441))
+///              .filter("sed")
+///              .aggregation_per_series_aligner(&Default::default())
+///              .add_aggregation_group_by_fields("sit")
+///              .aggregation_cross_series_reducer(&Default::default())
+///              .aggregation_alignment_period(chrono::Duration::seconds(8762728))
 ///              .doit().await;
 /// # }
 /// ```
@@ -10735,10 +10735,10 @@ pub struct ProjectTimeSeryListCall<'a, S>
 
    pub(super) hub: &'a Monitoring<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
-   pub(super) _secondary_aggregation_per_series_aligner: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
+   pub(super) _secondary_aggregation_per_series_aligner: Option<ProjectSecondaryAggregationPerSeriesAlignerEnum>,
    pub(super) _secondary_aggregation_group_by_fields: Vec<String>,
-   pub(super) _secondary_aggregation_cross_series_reducer: Option<String>,
+   pub(super) _secondary_aggregation_cross_series_reducer: Option<ProjectSecondaryAggregationCrossSeriesReducerEnum>,
    pub(super) _secondary_aggregation_alignment_period: Option<client::chrono::Duration>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -10746,9 +10746,9 @@ pub struct ProjectTimeSeryListCall<'a, S>
    pub(super) _interval_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _interval_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
    pub(super) _filter: Option<String>,
-   pub(super) _aggregation_per_series_aligner: Option<String>,
+   pub(super) _aggregation_per_series_aligner: Option<ProjectAggregationPerSeriesAlignerEnum>,
    pub(super) _aggregation_group_by_fields: Vec<String>,
-   pub(super) _aggregation_cross_series_reducer: Option<String>,
+   pub(super) _aggregation_cross_series_reducer: Option<ProjectAggregationCrossSeriesReducerEnum>,
    pub(super) _aggregation_alignment_period: Option<client::chrono::Duration>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -10786,7 +10786,7 @@ where
         }
 
         let mut params = Params::with_capacity(18 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -10953,15 +10953,15 @@ where
     /// Required. Specifies which information is returned about the time series.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectTimeSeryListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     ///
     /// Sets the *secondary aggregation.per series aligner* query property to the given value.
-    pub fn secondary_aggregation_per_series_aligner(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, S> {
-        self._secondary_aggregation_per_series_aligner = Some(new_value.to_string());
+    pub fn secondary_aggregation_per_series_aligner(mut self, new_value: &ProjectSecondaryAggregationPerSeriesAlignerEnum) -> ProjectTimeSeryListCall<'a, S> {
+        self._secondary_aggregation_per_series_aligner = Some(new_value.clone());
         self
     }
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
@@ -10975,8 +10975,8 @@ where
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     ///
     /// Sets the *secondary aggregation.cross series reducer* query property to the given value.
-    pub fn secondary_aggregation_cross_series_reducer(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, S> {
-        self._secondary_aggregation_cross_series_reducer = Some(new_value.to_string());
+    pub fn secondary_aggregation_cross_series_reducer(mut self, new_value: &ProjectSecondaryAggregationCrossSeriesReducerEnum) -> ProjectTimeSeryListCall<'a, S> {
+        self._secondary_aggregation_cross_series_reducer = Some(new_value.clone());
         self
     }
     /// The alignment_period specifies a time interval, in seconds, that is used to divide the data in all the time series into consistent blocks of time. This will be done before the per-series aligner can be applied to the data.The value must be at least 60 seconds. If a per-series aligner other than ALIGN_NONE is specified, this field is required or an error is returned. If no per-series aligner is specified, or the aligner ALIGN_NONE is specified, then this field is ignored.The maximum value of the alignment_period is 104 weeks (2 years) for charts, and 90,000 seconds (25 hours) for alerting policies.
@@ -11031,8 +11031,8 @@ where
     /// An Aligner describes how to bring the data points in a single time series into temporal alignment. Except for ALIGN_NONE, all alignments cause all the data points in an alignment_period to be mathematically grouped together, resulting in a single data point for each alignment_period with end timestamp at the end of the period.Not all alignment operations may be applied to all time series. The valid choices depend on the metric_kind and value_type of the original time series. Alignment can change the metric_kind or the value_type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified and not equal to ALIGN_NONE and alignment_period must be specified; otherwise, an error is returned.
     ///
     /// Sets the *aggregation.per series aligner* query property to the given value.
-    pub fn aggregation_per_series_aligner(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, S> {
-        self._aggregation_per_series_aligner = Some(new_value.to_string());
+    pub fn aggregation_per_series_aligner(mut self, new_value: &ProjectAggregationPerSeriesAlignerEnum) -> ProjectTimeSeryListCall<'a, S> {
+        self._aggregation_per_series_aligner = Some(new_value.clone());
         self
     }
     /// The set of fields to preserve when cross_series_reducer is specified. The group_by_fields determine how the time series are partitioned into subsets prior to applying the aggregation operation. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The cross_series_reducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in group_by_fields are aggregated away. If group_by_fields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If cross_series_reducer is not defined, this field is ignored.
@@ -11046,8 +11046,8 @@ where
     /// The reduction operation to be used to combine time series into a single time series, where the value of each data point in the resulting series is a function of all the already aligned values in the input time series.Not all reducer operations can be applied to all time series. The valid choices depend on the metric_kind and the value_type of the original time series. Reduction can yield a time series with a different metric_kind or value_type than the input time series.Time series data must first be aligned (see per_series_aligner) in order to perform cross-time series reduction. If cross_series_reducer is specified, then per_series_aligner must be specified, and must not be ALIGN_NONE. An alignment_period must also be specified; otherwise, an error is returned.
     ///
     /// Sets the *aggregation.cross series reducer* query property to the given value.
-    pub fn aggregation_cross_series_reducer(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, S> {
-        self._aggregation_cross_series_reducer = Some(new_value.to_string());
+    pub fn aggregation_cross_series_reducer(mut self, new_value: &ProjectAggregationCrossSeriesReducerEnum) -> ProjectTimeSeryListCall<'a, S> {
+        self._aggregation_cross_series_reducer = Some(new_value.clone());
         self
     }
     /// The alignment_period specifies a time interval, in seconds, that is used to divide the data in all the time series into consistent blocks of time. This will be done before the per-series aligner can be applied to the data.The value must be at least 60 seconds. If a per-series aligner other than ALIGN_NONE is specified, this field is required or an error is returned. If no per-series aligner is specified, or the aligner ALIGN_NONE is specified, then this field is ignored.The maximum value of the alignment_period is 104 weeks (2 years) for charts, and 90,000 seconds (25 hours) for alerting policies.
@@ -11211,7 +11211,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11503,7 +11503,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -11788,7 +11788,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12050,7 +12050,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12268,9 +12268,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().uptime_check_configs_list("parent")
-///              .page_token("et")
-///              .page_size(-10)
-///              .filter("consetetur")
+///              .page_token("Lorem")
+///              .page_size(-7)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12318,7 +12318,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12619,7 +12619,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -12876,7 +12876,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.services().service_level_objectives_create(req, "parent")
-///              .service_level_objective_id("est")
+///              .service_level_objective_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12923,7 +12923,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._service_level_objective_id.as_ref() {
             params.push("serviceLevelObjectiveId", value);
         }
@@ -13218,7 +13218,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13436,7 +13436,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.services().service_level_objectives_get("name")
-///              .view("duo")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -13445,7 +13445,7 @@ pub struct ServiceServiceLevelObjectiveGetCall<'a, S>
 
    pub(super) hub: &'a Monitoring<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ServiceViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -13482,7 +13482,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -13603,8 +13603,8 @@ where
     /// View of the ServiceLevelObjective to return. If DEFAULT, return the ServiceLevelObjective as originally defined. If EXPLICIT and the ServiceLevelObjective is defined in terms of a BasicSli, replace the BasicSli with a RequestBasedSli spelling out how the SLI is computed.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ServiceServiceLevelObjectiveGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ServiceViewEnum) -> ServiceServiceLevelObjectiveGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13710,10 +13710,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.services().service_level_objectives_list("parent")
-///              .view("est")
-///              .page_token("sit")
-///              .page_size(-93)
-///              .filter("eos")
+///              .view(&Default::default())
+///              .page_token("et")
+///              .page_size(-94)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13722,7 +13722,7 @@ pub struct ServiceServiceLevelObjectiveListCall<'a, S>
 
    pub(super) hub: &'a Monitoring<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ServiceViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _filter: Option<String>,
@@ -13762,7 +13762,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -13892,8 +13892,8 @@ where
     /// View of the ServiceLevelObjectives to return. If DEFAULT, return each ServiceLevelObjective as originally defined. If EXPLICIT and the ServiceLevelObjective is defined in terms of a BasicSli, replace the BasicSli with a RequestBasedSli spelling out how the SLI is computed.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ServiceServiceLevelObjectiveListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ServiceViewEnum) -> ServiceServiceLevelObjectiveListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// If this field is not empty then it must contain the nextPageToken value returned by a previous call to this method. Using this field causes the method to return additional results from the previous method call.
@@ -14073,7 +14073,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -14330,7 +14330,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.services().create(req, "parent")
-///              .service_id("Stet")
+///              .service_id("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14377,7 +14377,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._service_id.as_ref() {
             params.push("serviceId", value);
         }
@@ -14672,7 +14672,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14934,7 +14934,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15152,9 +15152,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.services().list("parent")
-///              .page_token("sea")
-///              .page_size(-74)
-///              .filter("At")
+///              .page_token("sadipscing")
+///              .page_size(-31)
+///              .filter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15202,7 +15202,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15503,7 +15503,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -15754,8 +15754,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.uptime_check_ips().list()
-///              .page_token("eirmod")
-///              .page_size(-51)
+///              .page_token("est")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```

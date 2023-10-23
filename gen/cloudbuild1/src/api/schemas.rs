@@ -35,7 +35,7 @@ pub struct ApprovalResult {
     pub comment: Option<String>,
     /// Required. The decision of this manual approval.
     
-    pub decision: Option<String>,
+    pub decision: Option<ApprovalResultDecisionEnum>,
     /// Optional. An optional URL tied to this manual approval result. This field is essentially the same as comment, except that it will be rendered by the UI differently. An example use case is a link to an external job that approved this Build.
     
     pub url: Option<String>,
@@ -434,7 +434,7 @@ pub struct Build {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Status of the build.
     
-    pub status: Option<String>,
+    pub status: Option<BuildStatusEnum>,
     /// Output only. Customer-readable message about the current status.
     #[serde(rename="statusDetail")]
     
@@ -479,7 +479,7 @@ pub struct BuildApproval {
     pub result: Option<ApprovalResult>,
     /// Output only. The state of this build's approval.
     
-    pub state: Option<String>,
+    pub state: Option<BuildApprovalStateEnum>,
 }
 
 impl client::Part for BuildApproval {}
@@ -507,21 +507,21 @@ pub struct BuildOptions {
     /// Option to define build log streaming behavior to Google Cloud Storage.
     #[serde(rename="logStreamingOption")]
     
-    pub log_streaming_option: Option<String>,
+    pub log_streaming_option: Option<BuildOptionLogStreamingOptionEnum>,
     /// Option to specify the logging mode, which determines if and where build logs are stored.
     
-    pub logging: Option<String>,
+    pub logging: Option<BuildOptionLoggingEnum>,
     /// Compute Engine machine type on which to run the build.
     #[serde(rename="machineType")]
     
-    pub machine_type: Option<String>,
+    pub machine_type: Option<BuildOptionMachineTypeEnum>,
     /// Optional. Specification for execution on a `WorkerPool`. See [running builds in a private pool](https://cloud.google.com/build/docs/private-pools/run-builds-in-private-pool) for more information.
     
     pub pool: Option<PoolOption>,
     /// Requested verifiability options.
     #[serde(rename="requestedVerifyOption")]
     
-    pub requested_verify_option: Option<String>,
+    pub requested_verify_option: Option<BuildOptionRequestedVerifyOptionEnum>,
     /// A list of global environment variables, which are encrypted using a Cloud Key Management Service crypto key. These values must be specified in the build's `Secret`. These variables will be available to all build steps in this build.
     #[serde(rename="secretEnv")]
     
@@ -529,11 +529,11 @@ pub struct BuildOptions {
     /// Requested hash for SourceProvenance.
     #[serde(rename="sourceProvenanceHash")]
     
-    pub source_provenance_hash: Option<Vec<String>>,
+    pub source_provenance_hash: Option<Vec<BuildOptionSourceProvenanceHashEnum>>,
     /// Option to specify behavior when there is an error in the substitution checks. NOTE: this is always set to ALLOW_LOOSE for triggered builds and cannot be overridden in the build configuration file.
     #[serde(rename="substitutionOption")]
     
-    pub substitution_option: Option<String>,
+    pub substitution_option: Option<BuildOptionSubstitutionOptionEnum>,
     /// Global list of volumes to mount for ALL build steps Each volume is created as an empty volume prior to starting the build process. Upon completion of the build, volumes and their contents are discarded. Global volume names and paths cannot conflict with the volumes defined a build step. Using a global volume in a build with only one step is not valid as it is indicative of a build request with an incorrect configuration.
     
     pub volumes: Option<Vec<Volume>>,
@@ -596,7 +596,7 @@ pub struct BuildStep {
     pub secret_env: Option<Vec<String>>,
     /// Output only. Status of the build step. At this time, build step status is only updated on build completion; step status is not updated in real-time as the build progresses.
     
-    pub status: Option<String>,
+    pub status: Option<BuildStepStatusEnum>,
     /// Time limit for executing this build step. If not defined, the step has no time limit and will be allowed to continue to run until either it completes or the build itself times out.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -659,7 +659,7 @@ pub struct BuildTrigger {
     /// EventType allows the user to explicitly set the type of event to which this BuildTrigger should respond. This field will be validated against the rest of the configuration if it is set.
     #[serde(rename="eventType")]
     
-    pub event_type: Option<String>,
+    pub event_type: Option<BuildTriggerEventTypeEnum>,
     /// Path, from the source root, to the build configuration file (i.e. cloudbuild.yaml).
     
     pub filename: Option<String>,
@@ -687,7 +687,7 @@ pub struct BuildTrigger {
     /// If set to INCLUDE_BUILD_LOGS_WITH_STATUS, log url will be shown on GitHub page when build status is final. Setting this field to INCLUDE_BUILD_LOGS_WITH_STATUS for non GitHub triggers results in INVALID_ARGUMENT error.
     #[serde(rename="includeBuildLogs")]
     
-    pub include_build_logs: Option<String>,
+    pub include_build_logs: Option<BuildTriggerIncludeBuildLogsEnum>,
     /// If any of the files altered in the commit pass the ignored_files filter and included_files is empty, then as far as this filter is concerned, we should trigger the build. If any of the files altered in the commit pass the ignored_files filter and included_files is not empty, then we make sure that at least one of those files matches a included_files glob. If not, then we do not trigger a build.
     #[serde(rename="includedFiles")]
     
@@ -874,7 +874,7 @@ pub struct FailureInfo {
     /// The name of the failure.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FailureInfoTypeEnum>,
 }
 
 impl client::Part for FailureInfo {}
@@ -917,7 +917,7 @@ pub struct GitFileSource {
     /// See RepoType above.
     #[serde(rename="repoType")]
     
-    pub repo_type: Option<String>,
+    pub repo_type: Option<GitFileSourceRepoTypeEnum>,
     /// The branch, tag, arbitrary ref, or SHA version of the repo to use when resolving the filename (optional). This field respects the same syntax/resolution as described here: https://git-scm.com/docs/gitrevisions If unspecified, the revision from which the trigger invocation originated is assumed to be the revision from which to read the specified path.
     
     pub revision: Option<String>,
@@ -1283,7 +1283,7 @@ pub struct GitRepoSource {
     /// See RepoType below.
     #[serde(rename="repoType")]
     
-    pub repo_type: Option<String>,
+    pub repo_type: Option<GitRepoSourceRepoTypeEnum>,
     /// The URI of the repo. Either uri or repository can be specified and is required.
     
     pub uri: Option<String>,
@@ -1302,7 +1302,7 @@ pub struct Hash {
     /// The type of hash that was performed.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<HashTypeEnum>,
     /// The hash value.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -1591,7 +1591,7 @@ pub struct NetworkConfig {
     /// Option to configure network egress for the workers.
     #[serde(rename="egressOption")]
     
-    pub egress_option: Option<String>,
+    pub egress_option: Option<NetworkConfigEgressOptionEnum>,
     /// Required. Immutable. The network definition that the workers are peered to. If this section is left empty, the workers will be peered to `WorkerPool.project_id` on the service producer network. Must be in the format `projects/{project}/global/networks/{network}`, where `{project}` is a project number, such as `12345`, and `{network}` is the name of a VPC network in the project. See [Understanding network configuration options](https://cloud.google.com/build/docs/private-pools/set-up-private-pool-environment)
     #[serde(rename="peeredNetwork")]
     
@@ -1712,7 +1712,7 @@ pub struct PubsubConfig {
     pub service_account_email: Option<String>,
     /// Potential issues with the underlying Pub/Sub subscription configuration. Only populated on get requests.
     
-    pub state: Option<String>,
+    pub state: Option<PubsubConfigStateEnum>,
     /// Output only. Name of the subscription. Format is `projects/{project}/subscriptions/{subscription}`.
     
     pub subscription: Option<String>,
@@ -1737,7 +1737,7 @@ pub struct PullRequestFilter {
     /// Configure builds to run whether a repository owner or collaborator need to comment `/gcbrun`.
     #[serde(rename="commentControl")]
     
-    pub comment_control: Option<String>,
+    pub comment_control: Option<PullRequestFilterCommentControlEnum>,
     /// If true, branches that do NOT match the git_ref will trigger a build.
     #[serde(rename="invertRegex")]
     
@@ -1909,7 +1909,7 @@ pub struct RepositoryEventConfig {
     /// Output only. The type of the SCM vendor the repository points to.
     #[serde(rename="repositoryType")]
     
-    pub repository_type: Option<String>,
+    pub repository_type: Option<RepositoryEventConfigRepositoryTypeEnum>,
 }
 
 impl client::Part for RepositoryEventConfig {}
@@ -2298,7 +2298,7 @@ impl client::Part for Volume {}
 pub struct Warning {
     /// The priority for this warning.
     
-    pub priority: Option<String>,
+    pub priority: Option<WarningPriorityEnum>,
     /// Explanation of the warning generated.
     
     pub text: Option<String>,
@@ -2319,7 +2319,7 @@ pub struct WebhookConfig {
     pub secret: Option<String>,
     /// Potential issues with the underlying Pub/Sub subscription configuration. Only populated on get requests.
     
-    pub state: Option<String>,
+    pub state: Option<WebhookConfigStateEnum>,
 }
 
 impl client::Part for WebhookConfig {}
@@ -2386,7 +2386,7 @@ pub struct WorkerPool {
     pub private_pool_v1_config: Option<PrivatePoolV1Config>,
     /// Output only. `WorkerPool` state.
     
-    pub state: Option<String>,
+    pub state: Option<WorkerPoolStateEnum>,
     /// Output only. A unique identifier for the `WorkerPool`.
     
     pub uid: Option<String>,

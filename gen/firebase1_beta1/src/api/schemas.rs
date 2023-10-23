@@ -171,7 +171,7 @@ pub struct AndroidApp {
     pub sha256_hashes: Option<Vec<String>>,
     /// Output only. The lifecycle state of the App.
     
-    pub state: Option<String>,
+    pub state: Option<AndroidAppStateEnum>,
 }
 
 impl client::RequestValue for AndroidApp {}
@@ -294,10 +294,10 @@ pub struct FirebaseAppInfo {
     pub namespace: Option<String>,
     /// The platform of the Firebase App.
     
-    pub platform: Option<String>,
+    pub platform: Option<FirebaseAppInfoPlatformEnum>,
     /// Output only. The lifecycle state of the App.
     
-    pub state: Option<String>,
+    pub state: Option<FirebaseAppInfoStateEnum>,
 }
 
 impl client::Part for FirebaseAppInfo {}
@@ -342,7 +342,7 @@ pub struct FirebaseProject {
     pub resources: Option<DefaultResources>,
     /// Output only. The lifecycle state of the Project.
     
-    pub state: Option<String>,
+    pub state: Option<FirebaseProjectStateEnum>,
 }
 
 impl client::RequestValue for FirebaseProject {}
@@ -394,7 +394,7 @@ pub struct IosApp {
     pub project_id: Option<String>,
     /// Output only. The lifecycle state of the App.
     
-    pub state: Option<String>,
+    pub state: Option<IosAppStateEnum>,
     /// The Apple Developer Team ID associated with the App in the App Store.
     #[serde(rename="teamId")]
     
@@ -597,7 +597,7 @@ impl client::ResponseResult for ListWebAppsResponse {}
 pub struct Location {
     /// Products and services that are available in the GCP resource location.
     
-    pub features: Option<Vec<String>>,
+    pub features: Option<Vec<LocationFeaturesEnum>>,
     /// The ID of the GCP resource location. It will be one of the available [GCP resource locations](https://firebase.google.com/docs/projects/locations#types).
     #[serde(rename="locationId")]
     
@@ -605,7 +605,7 @@ pub struct Location {
     /// Indicates whether the GCP resource location is a [regional or multi-regional location](https://firebase.google.com/docs/projects/locations#types) for data replication.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LocationTypeEnum>,
 }
 
 impl client::Part for Location {}
@@ -825,7 +825,7 @@ pub struct ShaCertificate {
     /// The type of SHA certificate encoded in the hash.
     #[serde(rename="certType")]
     
-    pub cert_type: Option<String>,
+    pub cert_type: Option<ShaCertificateCertTypeEnum>,
     /// The resource name of the ShaCertificate for the AndroidApp, in the format: projects/PROJECT_IDENTIFIER/androidApps/APP_ID/sha/SHA_HASH * PROJECT_IDENTIFIER: the parent Project’s [`ProjectNumber`](https://firebase.google.com/../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](https://firebase.google.com/../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google’s [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](https://firebase.google.com/../projects.androidApps#AndroidApp.FIELDS.app_id)). * SHA_HASH: the certificate hash for the App (see [`shaHash`](https://firebase.google.com/../projects.androidApps.sha#ShaCertificate.FIELDS.sha_hash)).
     
     pub name: Option<String>,
@@ -994,7 +994,7 @@ pub struct WebApp {
     pub project_id: Option<String>,
     /// Output only. The lifecycle state of the App.
     
-    pub state: Option<String>,
+    pub state: Option<WebAppStateEnum>,
     /// Output only. Immutable. A unique, Firebase-assigned identifier for the `WebApp`. This identifier is only used to populate the `namespace` value for the `WebApp`. For most use cases, use `appId` to identify or reference the App. The `webId` value is only unique within a `FirebaseProject` and its associated Apps.
     #[serde(rename="webId")]
     

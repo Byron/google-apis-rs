@@ -153,7 +153,7 @@ pub struct CreateRowRequest {
     pub row: Option<Row>,
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     
-    pub view: Option<String>,
+    pub view: Option<CreateRowRequestViewEnum>,
 }
 
 impl client::Part for CreateRowRequest {}
@@ -433,7 +433,7 @@ pub struct UpdateRowRequest {
     pub update_mask: Option<client::FieldMask>,
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     
-    pub view: Option<String>,
+    pub view: Option<UpdateRowRequestViewEnum>,
 }
 
 impl client::Part for UpdateRowRequest {}

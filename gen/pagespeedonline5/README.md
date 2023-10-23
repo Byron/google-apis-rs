@@ -97,10 +97,10 @@ let mut hub = PagespeedInsights::new(hyper::Client::builder().build(hyper_rustls
 let result = hub.pagespeedapi().runpagespeed("url")
              .utm_source("magna")
              .utm_campaign("no")
-             .strategy("ipsum")
-             .locale("voluptua.")
-             .add_category("At")
-             .captcha_token("sanctus")
+             .strategy(&Default::default())
+             .locale("ipsum")
+             .add_category(&Default::default())
+             .captcha_token("voluptua.")
              .doit().await;
 
 match result {

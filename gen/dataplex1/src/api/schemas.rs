@@ -32,7 +32,7 @@ pub struct GoogleCloudDataplexV1Action {
     pub asset: Option<String>,
     /// The category of issue associated with the action.
     
-    pub category: Option<String>,
+    pub category: Option<GoogleCloudDataplexV1ActionCategoryEnum>,
     /// The list of data locations associated with this action. Cloud Storage locations are represented as URI paths(E.g. gs://bucket/table1/year=2020/month=Jan/). BigQuery locations refer to resource names(E.g. bigquery.googleapis.com/projects/project-id/datasets/dataset-id).
     #[serde(rename="dataLocations")]
     
@@ -127,7 +127,7 @@ pub struct GoogleCloudDataplexV1ActionIncompatibleDataSchema {
     /// Whether the action relates to a schema that is incompatible or modified.
     #[serde(rename="schemaChange")]
     
-    pub schema_change: Option<String>,
+    pub schema_change: Option<GoogleCloudDataplexV1ActionIncompatibleDataSchemaSchemaChangeEnum>,
     /// The name of the table containing invalid data.
     
     pub table: Option<String>,
@@ -181,7 +181,7 @@ pub struct GoogleCloudDataplexV1ActionInvalidDataPartition {
     /// The issue type of InvalidDataPartition.
     #[serde(rename="expectedStructure")]
     
-    pub expected_structure: Option<String>,
+    pub expected_structure: Option<GoogleCloudDataplexV1ActionInvalidDataPartitionExpectedStructureEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1ActionInvalidDataPartition {}
@@ -272,7 +272,7 @@ pub struct GoogleCloudDataplexV1Asset {
     pub security_status: Option<GoogleCloudDataplexV1AssetSecurityStatus>,
     /// Output only. Current state of the asset.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1AssetStateEnum>,
     /// Output only. System generated globally unique ID for the asset. This ID will be different if the asset is deleted and re-created with the same name.
     
     pub uid: Option<String>,
@@ -386,7 +386,7 @@ pub struct GoogleCloudDataplexV1AssetDiscoveryStatus {
     pub message: Option<String>,
     /// The current status of the discovery feature.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1AssetDiscoveryStatuStateEnum>,
     /// Data Stats of the asset reported by discovery.
     
     pub stats: Option<GoogleCloudDataplexV1AssetDiscoveryStatusStats>,
@@ -442,11 +442,11 @@ pub struct GoogleCloudDataplexV1AssetResourceSpec {
     /// Optional. Determines how read permissions are handled for each asset and their associated tables. Only available to storage buckets assets.
     #[serde(rename="readAccessMode")]
     
-    pub read_access_mode: Option<String>,
+    pub read_access_mode: Option<GoogleCloudDataplexV1AssetResourceSpecReadAccessModeEnum>,
     /// Required. Immutable. Type of resource.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1AssetResourceSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1AssetResourceSpec {}
@@ -464,7 +464,7 @@ pub struct GoogleCloudDataplexV1AssetResourceStatus {
     pub message: Option<String>,
     /// The current state of the managed resource.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1AssetResourceStatuStateEnum>,
     /// Last update time of the status.
     #[serde(rename="updateTime")]
     
@@ -486,7 +486,7 @@ pub struct GoogleCloudDataplexV1AssetSecurityStatus {
     pub message: Option<String>,
     /// The current state of the security policy applied to the attached resource.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1AssetSecurityStatuStateEnum>,
     /// Last update time of the status.
     #[serde(rename="updateTime")]
     
@@ -601,7 +601,7 @@ pub struct GoogleCloudDataplexV1ContentNotebook {
     /// Required. Kernel Type of the notebook.
     #[serde(rename="kernelType")]
     
-    pub kernel_type: Option<String>,
+    pub kernel_type: Option<GoogleCloudDataplexV1ContentNotebookKernelTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1ContentNotebook {}
@@ -616,7 +616,7 @@ impl client::Part for GoogleCloudDataplexV1ContentNotebook {}
 pub struct GoogleCloudDataplexV1ContentSqlScript {
     /// Required. Query Engine to be used for the Sql Query.
     
-    pub engine: Option<String>,
+    pub engine: Option<GoogleCloudDataplexV1ContentSqlScriptEngineEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1ContentSqlScript {}
@@ -1232,7 +1232,7 @@ pub struct GoogleCloudDataplexV1DataQualityRuleStatisticRangeExpectation {
     pub min_value: Option<String>,
     /// no description provided
     
-    pub statistic: Option<String>,
+    pub statistic: Option<GoogleCloudDataplexV1DataQualityRuleStatisticRangeExpectationStatisticEnum>,
     /// Whether column statistic needs to be strictly lesser than ('<') the maximum, or if equality is allowed.Only relevant if a max_value has been defined. Default = false.
     #[serde(rename="strictMaxEnabled")]
     
@@ -1347,11 +1347,11 @@ pub struct GoogleCloudDataplexV1DataScan {
     pub name: Option<String>,
     /// Output only. Current state of the DataScan.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1DataScanStateEnum>,
     /// Output only. The type of DataScan.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1DataScanTypeEnum>,
     /// Output only. System generated globally unique ID for the scan. This ID will be different if the scan is deleted and re-created with the same name.
     
     pub uid: Option<String>,
@@ -1446,11 +1446,11 @@ pub struct GoogleCloudDataplexV1DataScanJob {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Execution state for the DataScanJob.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1DataScanJobStateEnum>,
     /// Output only. The type of the parent DataScan.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1DataScanJobTypeEnum>,
     /// Output only. System generated globally unique ID for the DataScanJob.
     
     pub uid: Option<String>,
@@ -1586,11 +1586,11 @@ pub struct GoogleCloudDataplexV1Entity {
     pub schema: Option<GoogleCloudDataplexV1Schema>,
     /// Required. Immutable. Identifies the storage system of the entity data.
     
-    pub system: Option<String>,
+    pub system: Option<GoogleCloudDataplexV1EntitySystemEnum>,
     /// Required. Immutable. The type of entity.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1EntityTypeEnum>,
     /// Output only. System generated unique ID for the Entity. This ID will be different if the Entity is deleted and re-created with the same name.
     
     pub uid: Option<String>,
@@ -1688,7 +1688,7 @@ pub struct GoogleCloudDataplexV1Environment {
     pub session_status: Option<GoogleCloudDataplexV1EnvironmentSessionStatus>,
     /// Output only. Current state of the environment.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1EnvironmentStateEnum>,
     /// Output only. System generated globally unique ID for the environment. This ID will be different if the environment is deleted and re-created with the same name.
     
     pub uid: Option<String>,
@@ -1853,7 +1853,7 @@ pub struct GoogleCloudDataplexV1Job {
     pub retry_count: Option<u32>,
     /// Output only. The underlying service running a job.
     
-    pub service: Option<String>,
+    pub service: Option<GoogleCloudDataplexV1JobServiceEnum>,
     /// Output only. The full resource name for the job run under a particular service.
     #[serde(rename="serviceJob")]
     
@@ -1864,7 +1864,7 @@ pub struct GoogleCloudDataplexV1Job {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. Execution state for the job.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1JobStateEnum>,
     /// Output only. System generated globally unique ID for the job.
     
     pub uid: Option<String>,
@@ -1920,7 +1920,7 @@ pub struct GoogleCloudDataplexV1Lake {
     pub service_account: Option<String>,
     /// Output only. Current state of the lake.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1LakeStateEnum>,
     /// Output only. System generated globally unique ID for the lake. This ID will be different if the lake is deleted and re-created with the same name.
     
     pub uid: Option<String>,
@@ -1964,7 +1964,7 @@ pub struct GoogleCloudDataplexV1LakeMetastoreStatus {
     pub message: Option<String>,
     /// Current state of association.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1LakeMetastoreStatuStateEnum>,
     /// Last update time of the metastore status of the lake.
     #[serde(rename="updateTime")]
     
@@ -2546,7 +2546,7 @@ pub struct GoogleCloudDataplexV1Schema {
     /// Optional. The structure of paths containing partition data within the entity.
     #[serde(rename="partitionStyle")]
     
-    pub partition_style: Option<String>,
+    pub partition_style: Option<GoogleCloudDataplexV1SchemaPartitionStyleEnum>,
     /// Required. Set to true if user-managed or false if managed by Dataplex. The default is false (managed by Dataplex). Set to falseto enable Dataplex discovery to update the schema. including new data discovery, schema inference, and schema evolution. Users retain the ability to input and edit the schema. Dataplex treats schema input by the user as though produced by a previous Dataplex discovery operation, and it will evolve the schema and take action based on that treatment. Set to true to fully manage the entity schema. This setting guarantees that Dataplex will not change schema fields.
     #[serde(rename="userManaged")]
     
@@ -2569,7 +2569,7 @@ pub struct GoogleCloudDataplexV1SchemaPartitionField {
     /// Required. Immutable. The type of field.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1SchemaPartitionFieldTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1SchemaPartitionField {}
@@ -2590,14 +2590,14 @@ pub struct GoogleCloudDataplexV1SchemaSchemaField {
     pub fields: Option<Vec<GoogleCloudDataplexV1SchemaSchemaField>>,
     /// Required. Additional field semantics.
     
-    pub mode: Option<String>,
+    pub mode: Option<GoogleCloudDataplexV1SchemaSchemaFieldModeEnum>,
     /// Required. The name of the field. Must contain only letters, numbers and underscores, with a maximum length of 767 characters, and must begin with a letter or underscore.
     
     pub name: Option<String>,
     /// Required. The type of field.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1SchemaSchemaFieldTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1SchemaSchemaField {}
@@ -2619,7 +2619,7 @@ pub struct GoogleCloudDataplexV1Session {
     pub name: Option<String>,
     /// no description provided
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1SessionStateEnum>,
     /// Output only. Email of user running the session.
     #[serde(rename="userId")]
     
@@ -2638,7 +2638,7 @@ impl client::Part for GoogleCloudDataplexV1Session {}
 pub struct GoogleCloudDataplexV1StorageAccess {
     /// Output only. Describes the read access mechanism of the data. Not user settable.
     
-    pub read: Option<String>,
+    pub read: Option<GoogleCloudDataplexV1StorageAccesReadEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1StorageAccess {}
@@ -2654,13 +2654,13 @@ pub struct GoogleCloudDataplexV1StorageFormat {
     /// Optional. The compression type associated with the stored data. If unspecified, the data is uncompressed.
     #[serde(rename="compressionFormat")]
     
-    pub compression_format: Option<String>,
+    pub compression_format: Option<GoogleCloudDataplexV1StorageFormatCompressionFormatEnum>,
     /// Optional. Additional information about CSV formatted data.
     
     pub csv: Option<GoogleCloudDataplexV1StorageFormatCsvOptions>,
     /// Output only. The data format associated with the stored data, which represents content type values. The value is inferred from mime type.
     
-    pub format: Option<String>,
+    pub format: Option<GoogleCloudDataplexV1StorageFormatFormatEnum>,
     /// Optional. Additional information about iceberg tables.
     
     pub iceberg: Option<GoogleCloudDataplexV1StorageFormatIcebergOptions>,
@@ -2778,7 +2778,7 @@ pub struct GoogleCloudDataplexV1Task {
     pub spark: Option<GoogleCloudDataplexV1TaskSparkTaskConfig>,
     /// Output only. Current state of the task.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1TaskStateEnum>,
     /// Required. Spec related to how often and when a task should be triggered.
     #[serde(rename="triggerSpec")]
     
@@ -3034,7 +3034,7 @@ pub struct GoogleCloudDataplexV1TaskTriggerSpec {
     /// Required. Immutable. Trigger type of the user-specified Task.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1TaskTriggerSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1TaskTriggerSpec {}
@@ -3129,11 +3129,11 @@ pub struct GoogleCloudDataplexV1Zone {
     pub resource_spec: Option<GoogleCloudDataplexV1ZoneResourceSpec>,
     /// Output only. Current state of the zone.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDataplexV1ZoneStateEnum>,
     /// Required. Immutable. The type of the zone.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDataplexV1ZoneTypeEnum>,
     /// Output only. System generated globally unique ID for the zone. This ID will be different if the zone is deleted and re-created with the same name.
     
     pub uid: Option<String>,
@@ -3236,7 +3236,7 @@ pub struct GoogleCloudDataplexV1ZoneResourceSpec {
     /// Required. Immutable. The location type of the resources that are allowed to be attached to the assets within this zone.
     #[serde(rename="locationType")]
     
-    pub location_type: Option<String>,
+    pub location_type: Option<GoogleCloudDataplexV1ZoneResourceSpecLocationTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDataplexV1ZoneResourceSpec {}
@@ -3331,7 +3331,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

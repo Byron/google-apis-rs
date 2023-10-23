@@ -150,7 +150,7 @@ pub struct ApplicationReference {
     /// The reference type corresponding to this event.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ApplicationReferenceTypeEnum>,
 }
 
 impl client::Part for ApplicationReference {}
@@ -190,7 +190,7 @@ pub struct AppliedLabelChangeDetail {
     pub title: Option<String>,
     /// The types of changes made to the Label on the Target.
     
-    pub types: Option<Vec<String>>,
+    pub types: Option<Vec<AppliedLabelChangeDetailTypesEnum>>,
 }
 
 impl client::Part for AppliedLabelChangeDetail {}
@@ -209,7 +209,7 @@ pub struct Assignment {
     pub assigned_user: Option<User>,
     /// The sub-type of this event.
     
-    pub subtype: Option<String>,
+    pub subtype: Option<AssignmentSubtypeEnum>,
 }
 
 impl client::Part for Assignment {}
@@ -305,7 +305,7 @@ pub struct DataLeakPreventionChange {
     /// The type of Data Leak Prevention (DLP) change.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DataLeakPreventionChangeTypeEnum>,
 }
 
 impl client::Part for DataLeakPreventionChange {}
@@ -336,7 +336,7 @@ pub struct Delete {
     /// The type of delete action taken.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DeleteTypeEnum>,
 }
 
 impl client::Part for Delete {}
@@ -446,7 +446,7 @@ pub struct DriveFolder {
     /// The type of Drive folder.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DriveFolderTypeEnum>,
 }
 
 impl client::Part for DriveFolder {}
@@ -667,7 +667,7 @@ pub struct Folder {
     /// This field is deprecated; please see `DriveFolder.type` instead.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<FolderTypeEnum>,
 }
 
 impl client::Part for Folder {}
@@ -843,7 +843,7 @@ pub struct Permission {
     pub group: Option<Group>,
     /// Indicates the [Google Drive permissions role](https://developers.google.com/drive/web/manage-sharing#roles). The role determines a user's ability to read, write, and comment on items.
     
-    pub role: Option<String>,
+    pub role: Option<PermissionRoleEnum>,
     /// The user to whom this permission applies.
     
     pub user: Option<User>,
@@ -881,7 +881,7 @@ impl client::Part for PermissionChange {}
 pub struct Post {
     /// The sub-type of this event.
     
-    pub subtype: Option<String>,
+    pub subtype: Option<PostSubtypeEnum>,
 }
 
 impl client::Part for Post {}
@@ -979,7 +979,7 @@ pub struct Restore {
     /// The type of restore action taken.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RestoreTypeEnum>,
 }
 
 impl client::Part for Restore {}
@@ -994,11 +994,11 @@ impl client::Part for Restore {}
 pub struct RestrictionChange {
     /// The feature which had a change in restriction policy.
     
-    pub feature: Option<String>,
+    pub feature: Option<RestrictionChangeFeatureEnum>,
     /// The restriction in place after the change.
     #[serde(rename="newRestriction")]
     
-    pub new_restriction: Option<String>,
+    pub new_restriction: Option<RestrictionChangeNewRestrictionEnum>,
 }
 
 impl client::Part for RestrictionChange {}
@@ -1078,7 +1078,7 @@ impl client::Part for SingleUser {}
 pub struct Suggestion {
     /// The sub-type of this event.
     
-    pub subtype: Option<String>,
+    pub subtype: Option<SuggestionSubtypeEnum>,
 }
 
 impl client::Part for Suggestion {}
@@ -1094,7 +1094,7 @@ pub struct SystemEvent {
     /// The type of the system event that may triggered activity.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SystemEventTypeEnum>,
 }
 
 impl client::Part for SystemEvent {}

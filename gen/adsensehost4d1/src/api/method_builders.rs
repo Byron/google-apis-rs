@@ -409,7 +409,7 @@ impl<'a, S> AssociationsessionMethods<'a, S> {
     ///
     /// * `productCode` - Products to associate with the user.
     /// * `websiteUrl` - The URL of the user's hosted website.
-    pub fn start(&self, product_code: &Vec<String>, website_url: &str) -> AssociationsessionStartCall<'a, S> {
+    pub fn start(&self, product_code: &AssociationsessionProductCodeEnum, website_url: &str) -> AssociationsessionStartCall<'a, S> {
         AssociationsessionStartCall {
             hub: self.hub,
             _product_code: product_code.clone(),

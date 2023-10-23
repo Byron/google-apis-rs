@@ -392,7 +392,7 @@ impl client::RequestValue for GoogleAnalyticsAdminV1alphaCancelDisplayVideo360Ad
 pub struct GoogleAnalyticsAdminV1alphaChangeHistoryChange {
     /// The type of action that changed this resource.
     
-    pub action: Option<String>,
+    pub action: Option<GoogleAnalyticsAdminV1alphaChangeHistoryChangeActionEnum>,
     /// Resource name of the resource whose changes are described by this entry.
     
     pub resource: Option<String>,
@@ -481,7 +481,7 @@ pub struct GoogleAnalyticsAdminV1alphaChangeHistoryEvent {
     /// The type of actor that made this change.
     #[serde(rename="actorType")]
     
-    pub actor_type: Option<String>,
+    pub actor_type: Option<GoogleAnalyticsAdminV1alphaChangeHistoryEventActorTypeEnum>,
     /// Time when change was made.
     #[serde(rename="changeTime")]
     
@@ -596,7 +596,7 @@ pub struct GoogleAnalyticsAdminV1alphaCustomDimension {
     pub parameter_name: Option<String>,
     /// Required. Immutable. The scope of this dimension.
     
-    pub scope: Option<String>,
+    pub scope: Option<GoogleAnalyticsAdminV1alphaCustomDimensionScopeEnum>,
 }
 
 impl client::RequestValue for GoogleAnalyticsAdminV1alphaCustomDimension {}
@@ -626,7 +626,7 @@ pub struct GoogleAnalyticsAdminV1alphaCustomMetric {
     /// Required. The type for the custom metric's value.
     #[serde(rename="measurementUnit")]
     
-    pub measurement_unit: Option<String>,
+    pub measurement_unit: Option<GoogleAnalyticsAdminV1alphaCustomMetricMeasurementUnitEnum>,
     /// Output only. Resource name for this CustomMetric resource. Format: properties/{property}/customMetrics/{customMetric}
     
     pub name: Option<String>,
@@ -637,10 +637,10 @@ pub struct GoogleAnalyticsAdminV1alphaCustomMetric {
     /// Optional. Types of restricted data that this metric may contain. Required for metrics with CURRENCY measurement unit. Must be empty for metrics with a non-CURRENCY measurement unit.
     #[serde(rename="restrictedMetricType")]
     
-    pub restricted_metric_type: Option<Vec<String>>,
+    pub restricted_metric_type: Option<Vec<GoogleAnalyticsAdminV1alphaCustomMetricRestrictedMetricTypeEnum>>,
     /// Required. Immutable. The scope of this custom metric.
     
-    pub scope: Option<String>,
+    pub scope: Option<GoogleAnalyticsAdminV1alphaCustomMetricScopeEnum>,
 }
 
 impl client::RequestValue for GoogleAnalyticsAdminV1alphaCustomMetric {}
@@ -662,7 +662,7 @@ pub struct GoogleAnalyticsAdminV1alphaDataRetentionSettings {
     /// The length of time that event-level data is retained.
     #[serde(rename="eventDataRetention")]
     
-    pub event_data_retention: Option<String>,
+    pub event_data_retention: Option<GoogleAnalyticsAdminV1alphaDataRetentionSettingEventDataRetentionEnum>,
     /// Output only. Resource name for this DataRetentionSetting resource. Format: properties/{property}/dataRetentionSettings
     
     pub name: Option<String>,
@@ -750,7 +750,7 @@ pub struct GoogleAnalyticsAdminV1alphaDataStream {
     /// Required. Immutable. The type of this DataStream resource.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleAnalyticsAdminV1alphaDataStreamTypeEnum>,
     /// Output only. Time when stream payload fields were last updated.
     #[serde(rename="updateTime")]
     
@@ -1044,13 +1044,13 @@ impl client::ResponseResult for GoogleAnalyticsAdminV1alphaGoogleAdsLink {}
 pub struct GoogleAnalyticsAdminV1alphaGoogleSignalsSettings {
     /// Output only. Terms of Service acceptance.
     
-    pub consent: Option<String>,
+    pub consent: Option<GoogleAnalyticsAdminV1alphaGoogleSignalsSettingConsentEnum>,
     /// Output only. Resource name of this setting. Format: properties/{property_id}/googleSignalsSettings Example: "properties/1000/googleSignalsSettings"
     
     pub name: Option<String>,
     /// Status of this setting.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleAnalyticsAdminV1alphaGoogleSignalsSettingStateEnum>,
 }
 
 impl client::RequestValue for GoogleAnalyticsAdminV1alphaGoogleSignalsSettings {}
@@ -1067,11 +1067,11 @@ pub struct GoogleAnalyticsAdminV1alphaLinkProposalStatusDetails {
     /// Output only. The source of this proposal.
     #[serde(rename="linkProposalInitiatingProduct")]
     
-    pub link_proposal_initiating_product: Option<String>,
+    pub link_proposal_initiating_product: Option<GoogleAnalyticsAdminV1alphaLinkProposalStatusDetailLinkProposalInitiatingProductEnum>,
     /// Output only. The state of this proposal.
     #[serde(rename="linkProposalState")]
     
-    pub link_proposal_state: Option<String>,
+    pub link_proposal_state: Option<GoogleAnalyticsAdminV1alphaLinkProposalStatusDetailLinkProposalStateEnum>,
     /// Output only. The email address of the user that proposed this linkage.
     #[serde(rename="requestorEmail")]
     
@@ -1462,7 +1462,7 @@ pub struct GoogleAnalyticsAdminV1alphaProperty {
     /// Industry associated with this property Example: AUTOMOTIVE, FOOD_AND_DRINK
     #[serde(rename="industryCategory")]
     
-    pub industry_category: Option<String>,
+    pub industry_category: Option<GoogleAnalyticsAdminV1alphaPropertyIndustryCategoryEnum>,
     /// Output only. Resource name of this property. Format: properties/{property_id} Example: "properties/1000"
     
     pub name: Option<String>,
@@ -1472,7 +1472,7 @@ pub struct GoogleAnalyticsAdminV1alphaProperty {
     /// Output only. The Google Analytics service level that applies to this property.
     #[serde(rename="serviceLevel")]
     
-    pub service_level: Option<String>,
+    pub service_level: Option<GoogleAnalyticsAdminV1alphaPropertyServiceLevelEnum>,
     /// Required. Reporting Time Zone, used as the day boundary for reports, regardless of where the data originates. If the time zone honors DST, Analytics will automatically adjust for the changes. NOTE: Changing the time zone only affects data going forward, and is not applied retroactively. Format: https://www.iana.org/time-zones Example: "America/Los_Angeles"
     #[serde(rename="timeZone")]
     
@@ -1562,7 +1562,7 @@ impl client::ResponseResult for GoogleAnalyticsAdminV1alphaProvisionAccountTicke
 pub struct GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest {
     /// Optional. If set, only return changes that match one or more of these types of actions.
     
-    pub action: Option<Vec<String>>,
+    pub action: Option<Vec<GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequestActionEnum>>,
     /// Optional. If set, only return changes if they are made by a user in this list.
     #[serde(rename="actorEmail")]
     
@@ -1589,7 +1589,7 @@ pub struct GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest {
     /// Optional. If set, only return changes if they are for a resource that matches at least one of these types.
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<Vec<String>>,
+    pub resource_type: Option<Vec<GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequestResourceTypeEnum>>,
 }
 
 impl client::RequestValue for GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest {}

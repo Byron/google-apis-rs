@@ -79,7 +79,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -477,8 +477,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -695,7 +695,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().drafts_get("userId", "id")
-///              .format("ipsum")
+///              .format(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -705,7 +705,7 @@ pub struct UserDraftGetCall<'a, S>
    pub(super) hub: &'a Gmail<S>,
    pub(super) _user_id: String,
    pub(super) _id: String,
-   pub(super) _format: Option<String>,
+   pub(super) _format: Option<UserFormatEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -742,8 +742,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
         if let Some(value) = self._format.as_ref() {
             params.push("format", value);
         }
@@ -874,8 +874,8 @@ where
     /// The format to return the draft in.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a, S> {
-        self._format = Some(new_value.to_string());
+    pub fn format(mut self, new_value: &UserFormatEnum) -> UserDraftGetCall<'a, S> {
+        self._format = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -981,10 +981,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().drafts_list("userId")
-///              .q("est")
-///              .page_token("gubergren")
-///              .max_results(84)
-///              .include_spam_trash(false)
+///              .q("rebum.")
+///              .page_token("est")
+///              .max_results(51)
+///              .include_spam_trash(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1033,7 +1033,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._q.as_ref() {
             params.push("q", value);
         }
@@ -1344,7 +1344,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1751,8 +1751,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -2115,11 +2115,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().history_list("userId")
-///              .start_history_id(31)
-///              .page_token("sed")
-///              .max_results(40)
-///              .label_id("Stet")
-///              .add_history_types("kasd")
+///              .start_history_id(45)
+///              .page_token("eos")
+///              .max_results(15)
+///              .label_id("sed")
+///              .add_history_types(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2132,7 +2132,7 @@ pub struct UserHistoryListCall<'a, S>
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _label_id: Option<String>,
-   pub(super) _history_types: Vec<String>,
+   pub(super) _history_types: Option<UserHistoryTypesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2169,7 +2169,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._start_history_id.as_ref() {
             params.push("startHistoryId", value.to_string());
         }
@@ -2333,8 +2333,8 @@ where
     ///
     /// Append the given value to the *history types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_history_types(mut self, new_value: &str) -> UserHistoryListCall<'a, S> {
-        self._history_types.push(new_value.to_string());
+    pub fn add_history_types(mut self, new_value: &UserHistoryTypesEnum) -> UserHistoryListCall<'a, S> {
+        self._history_types.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2491,7 +2491,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2777,8 +2777,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -3040,8 +3040,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -3313,7 +3313,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3583,8 +3583,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -3887,8 +3887,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -4185,9 +4185,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("messageId", self._message_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("messageId", &self._message_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -4476,7 +4476,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4757,7 +4757,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5032,8 +5032,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -5251,7 +5251,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_get("userId", "id")
 ///              .add_metadata_headers("dolor")
-///              .format("duo")
+///              .format(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5262,7 +5262,7 @@ pub struct UserMessageGetCall<'a, S>
    pub(super) _user_id: String,
    pub(super) _id: String,
    pub(super) _metadata_headers: Vec<String>,
-   pub(super) _format: Option<String>,
+   pub(super) _format: Option<UserFormatEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5299,8 +5299,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
         if self._metadata_headers.len() > 0 {
             for f in self._metadata_headers.iter() {
                 params.push("metadataHeaders", f);
@@ -5444,8 +5444,8 @@ where
     /// The format to return the message in.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a, S> {
-        self._format = Some(new_value.to_string());
+    pub fn format(mut self, new_value: &UserFormatEnum) -> UserMessageGetCall<'a, S> {
+        self._format = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5560,7 +5560,7 @@ where
 /// let result = hub.users().messages_import(req, "userId")
 ///              .process_for_calendar(false)
 ///              .never_mark_spam(false)
-///              .internal_date_source("Stet")
+///              .internal_date_source(&Default::default())
 ///              .deleted(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
@@ -5573,7 +5573,7 @@ pub struct UserMessageImportCall<'a, S>
    pub(super) _user_id: String,
    pub(super) _process_for_calendar: Option<bool>,
    pub(super) _never_mark_spam: Option<bool>,
-   pub(super) _internal_date_source: Option<String>,
+   pub(super) _internal_date_source: Option<UserInternalDateSourceEnum>,
    pub(super) _deleted: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -5612,7 +5612,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._process_for_calendar.as_ref() {
             params.push("processForCalendar", value.to_string());
         }
@@ -5891,8 +5891,8 @@ where
     /// Source for Gmail's internal date of the message.
     ///
     /// Sets the *internal date source* query property to the given value.
-    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a, S> {
-        self._internal_date_source = Some(new_value.to_string());
+    pub fn internal_date_source(mut self, new_value: &UserInternalDateSourceEnum) -> UserMessageImportCall<'a, S> {
+        self._internal_date_source = Some(new_value.clone());
         self
     }
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.
@@ -6012,8 +6012,8 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_insert(req, "userId")
-///              .internal_date_source("Lorem")
-///              .deleted(true)
+///              .internal_date_source(&Default::default())
+///              .deleted(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -6023,7 +6023,7 @@ pub struct UserMessageInsertCall<'a, S>
    pub(super) hub: &'a Gmail<S>,
    pub(super) _request: Message,
    pub(super) _user_id: String,
-   pub(super) _internal_date_source: Option<String>,
+   pub(super) _internal_date_source: Option<UserInternalDateSourceEnum>,
    pub(super) _deleted: Option<bool>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -6062,7 +6062,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._internal_date_source.as_ref() {
             params.push("internalDateSource", value);
         }
@@ -6321,8 +6321,8 @@ where
     /// Source for Gmail's internal date of the message.
     ///
     /// Sets the *internal date source* query property to the given value.
-    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a, S> {
-        self._internal_date_source = Some(new_value.to_string());
+    pub fn internal_date_source(mut self, new_value: &UserInternalDateSourceEnum) -> UserMessageInsertCall<'a, S> {
+        self._internal_date_source = Some(new_value.clone());
         self
     }
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.
@@ -6435,11 +6435,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_list("userId")
-///              .q("accusam")
-///              .page_token("takimata")
-///              .max_results(55)
-///              .add_label_ids("voluptua.")
-///              .include_spam_trash(false)
+///              .q("vero")
+///              .page_token("elitr")
+///              .max_results(95)
+///              .add_label_ids("diam")
+///              .include_spam_trash(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6489,7 +6489,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._q.as_ref() {
             params.push("q", value);
         }
@@ -6812,8 +6812,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -7117,7 +7117,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7515,8 +7515,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -7789,8 +7789,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -8069,7 +8069,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8355,8 +8355,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("cseEmailAddress", self._cse_email_address);
+        params.push("userId", &self._user_id);
+        params.push("cseEmailAddress", &self._cse_email_address);
 
         params.extend(self._additional_params.iter());
 
@@ -8618,8 +8618,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("cseEmailAddress", self._cse_email_address);
+        params.push("userId", &self._user_id);
+        params.push("cseEmailAddress", &self._cse_email_address);
 
         params.extend(self._additional_params.iter());
 
@@ -8847,8 +8847,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().settings_cse_identities_list("userId")
-///              .page_token("voluptua.")
-///              .page_size(-2)
+///              .page_token("et")
+///              .page_size(-23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8895,7 +8895,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9185,8 +9185,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("emailAddress", self._email_address);
+        params.push("userId", &self._user_id);
+        params.push("emailAddress", &self._email_address);
 
         params.extend(self._additional_params.iter());
 
@@ -9488,7 +9488,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9781,8 +9781,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("keyPairId", self._key_pair_id);
+        params.push("userId", &self._user_id);
+        params.push("keyPairId", &self._key_pair_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10085,8 +10085,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("keyPairId", self._key_pair_id);
+        params.push("userId", &self._user_id);
+        params.push("keyPairId", &self._key_pair_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10382,8 +10382,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("keyPairId", self._key_pair_id);
+        params.push("userId", &self._user_id);
+        params.push("keyPairId", &self._key_pair_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10611,8 +10611,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().settings_cse_keypairs_list("userId")
-///              .page_token("tempor")
-///              .page_size(-32)
+///              .page_token("no")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10659,7 +10659,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10949,8 +10949,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("keyPairId", self._key_pair_id);
+        params.push("userId", &self._user_id);
+        params.push("keyPairId", &self._key_pair_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11241,7 +11241,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11527,8 +11527,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("delegateEmail", self._delegate_email);
+        params.push("userId", &self._user_id);
+        params.push("delegateEmail", &self._delegate_email);
 
         params.extend(self._additional_params.iter());
 
@@ -11790,8 +11790,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("delegateEmail", self._delegate_email);
+        params.push("userId", &self._user_id);
+        params.push("delegateEmail", &self._delegate_email);
 
         params.extend(self._additional_params.iter());
 
@@ -12063,7 +12063,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12332,7 +12332,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12618,8 +12618,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -12881,8 +12881,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -13154,7 +13154,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13423,7 +13423,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13709,8 +13709,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("forwardingEmail", self._forwarding_email);
+        params.push("userId", &self._user_id);
+        params.push("forwardingEmail", &self._forwarding_email);
 
         params.extend(self._additional_params.iter());
 
@@ -13972,8 +13972,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("forwardingEmail", self._forwarding_email);
+        params.push("userId", &self._user_id);
+        params.push("forwardingEmail", &self._forwarding_email);
 
         params.extend(self._additional_params.iter());
 
@@ -14245,7 +14245,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14509,9 +14509,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -14784,9 +14784,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -15076,8 +15076,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -15373,8 +15373,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -15648,9 +15648,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -15928,7 +15928,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16214,8 +16214,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -16477,8 +16477,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -16750,7 +16750,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17020,8 +17020,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -17324,8 +17324,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -17621,8 +17621,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("sendAsEmail", self._send_as_email);
+        params.push("userId", &self._user_id);
+        params.push("sendAsEmail", &self._send_as_email);
 
         params.extend(self._additional_params.iter());
 
@@ -17883,7 +17883,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18145,7 +18145,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18407,7 +18407,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18669,7 +18669,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18931,7 +18931,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19200,7 +19200,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19492,7 +19492,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19784,7 +19784,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20076,7 +20076,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20368,7 +20368,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20654,8 +20654,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -20872,8 +20872,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().threads_get("userId", "id")
-///              .add_metadata_headers("takimata")
-///              .format("Lorem")
+///              .add_metadata_headers("amet")
+///              .format(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -20884,7 +20884,7 @@ pub struct UserThreadGetCall<'a, S>
    pub(super) _user_id: String,
    pub(super) _id: String,
    pub(super) _metadata_headers: Vec<String>,
-   pub(super) _format: Option<String>,
+   pub(super) _format: Option<UserFormatEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -20921,8 +20921,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
         if self._metadata_headers.len() > 0 {
             for f in self._metadata_headers.iter() {
                 params.push("metadataHeaders", f);
@@ -21066,8 +21066,8 @@ where
     /// The format to return the messages in.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a, S> {
-        self._format = Some(new_value.to_string());
+    pub fn format(mut self, new_value: &UserFormatEnum) -> UserThreadGetCall<'a, S> {
+        self._format = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -21173,11 +21173,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().threads_list("userId")
-///              .q("At")
-///              .page_token("dolor")
-///              .max_results(79)
-///              .add_label_ids("sit")
-///              .include_spam_trash(false)
+///              .q("dolores")
+///              .page_token("erat")
+///              .max_results(28)
+///              .add_label_ids("sea")
+///              .include_spam_trash(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21227,7 +21227,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._q.as_ref() {
             params.push("q", value);
         }
@@ -21550,8 +21550,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -21847,8 +21847,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -22121,8 +22121,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("id", self._id);
+        params.push("userId", &self._user_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -22394,7 +22394,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22656,7 +22656,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22914,7 +22914,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 

@@ -121,7 +121,7 @@ pub struct AttributePropagationSettings {
     /// Which output credentials attributes selected by the CEL expression should be propagated in. All attributes will be fully duplicated in each selected output credential.
     #[serde(rename="outputCredentials")]
     
-    pub output_credentials: Option<Vec<String>>,
+    pub output_credentials: Option<Vec<AttributePropagationSettingOutputCredentialsEnum>>,
 }
 
 impl client::Part for AttributePropagationSettings {}
@@ -539,11 +539,11 @@ pub struct ReauthSettings {
     pub max_age: Option<client::chrono::Duration>,
     /// Reauth method requested.
     
-    pub method: Option<String>,
+    pub method: Option<ReauthSettingMethodEnum>,
     /// How IAP determines the effective policy in cases of hierarchial policies. Policies are merged from higher in the hierarchy to lower in the hierarchy.
     #[serde(rename="policyType")]
     
-    pub policy_type: Option<String>,
+    pub policy_type: Option<ReauthSettingPolicyTypeEnum>,
 }
 
 impl client::Part for ReauthSettings {}

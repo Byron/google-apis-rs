@@ -120,7 +120,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -142,15 +142,15 @@ pub struct AuthorizedOrgsDesc {
     /// The asset type of this authorized orgs desc. e.g. device, credential strength.
     #[serde(rename="assetType")]
     
-    pub asset_type: Option<String>,
+    pub asset_type: Option<AuthorizedOrgsDescAssetTypeEnum>,
     /// Authorization direction of this authorization relationship. i.e. Whether to allow specified orgs to evaluate this org's traffic, or allow specified orgs' traffic to be evaluated by this org. Orgs specified as `AUTHORIZATION_DIRECTION_TO` in this AuthorizedOrgsDesc[com.google.identity.accesscontextmanager.v1.AuthorizedOrgsDesc] must also specify this org as the `AUTHORIZATION_DIRECTION_FROM` in their own AuthorizedOrgsDesc in order for this relationship to take effect. Orgs specified as `AUTHORIZATION_DIRECTION_FROM` in this AuthorizedOrgsDesc[com.google.identity.accesscontextmanager.v1.AuthorizedOrgsDesc] must also specify this org as the `AUTHORIZATION_DIRECTION_TO` in their own AuthorizedOrgsDesc in order for this relationship to take effect.
     #[serde(rename="authorizationDirection")]
     
-    pub authorization_direction: Option<String>,
+    pub authorization_direction: Option<AuthorizedOrgsDescAuthorizationDirectionEnum>,
     /// The authorization type of this authorized orgs desc. e.g.authorization, troubleshooting or logging.
     #[serde(rename="authorizationType")]
     
-    pub authorization_type: Option<String>,
+    pub authorization_type: Option<AuthorizedOrgsDescAuthorizationTypeEnum>,
     /// Assigned by the server during creation. The last segment has an arbitrary length and has only URI unreserved characters (as defined by [RFC 3986 Section 2.3](https://tools.ietf.org/html/rfc3986#section-2.3)). Should not be specified by the client during creation. Example: "accessPolicies/122256/authorizedOrgs/b3-BhcX_Ud5N"
     
     pub name: Option<String>,
@@ -173,7 +173,7 @@ pub struct BasicLevel {
     /// How the `conditions` list should be combined to determine if a request is granted this `AccessLevel`. If AND is used, each `Condition` in `conditions` must be satisfied for the `AccessLevel` to be applied. If OR is used, at least one `Condition` in `conditions` must be satisfied for the `AccessLevel` to be applied. Default behavior is AND.
     #[serde(rename="combiningFunction")]
     
-    pub combining_function: Option<String>,
+    pub combining_function: Option<BasicLevelCombiningFunctionEnum>,
     /// Required. A list of requirements for the `AccessLevel` to be granted.
     
     pub conditions: Option<Vec<Condition>>,
@@ -295,11 +295,11 @@ pub struct DevicePolicy {
     /// Allowed device management levels, an empty list allows all management levels.
     #[serde(rename="allowedDeviceManagementLevels")]
     
-    pub allowed_device_management_levels: Option<Vec<String>>,
+    pub allowed_device_management_levels: Option<Vec<DevicePolicyAllowedDeviceManagementLevelsEnum>>,
     /// Allowed encryptions statuses, an empty list allows all statuses.
     #[serde(rename="allowedEncryptionStatuses")]
     
-    pub allowed_encryption_statuses: Option<Vec<String>>,
+    pub allowed_encryption_statuses: Option<Vec<DevicePolicyAllowedEncryptionStatusesEnum>>,
     /// Allowed OS versions, an empty list allows all types and all versions.
     #[serde(rename="osConstraints")]
     
@@ -334,7 +334,7 @@ pub struct EgressFrom {
     /// Specifies the type of identities that are allowed access to outside the perimeter. If left unspecified, then members of `identities` field will be allowed access.
     #[serde(rename="identityType")]
     
-    pub identity_type: Option<String>,
+    pub identity_type: Option<EgressFromIdentityTypeEnum>,
 }
 
 impl client::Part for EgressFrom {}
@@ -500,7 +500,7 @@ pub struct IngressFrom {
     /// Specifies the type of identities that are allowed access from outside the perimeter. If left unspecified, then members of `identities` field will be allowed access.
     #[serde(rename="identityType")]
     
-    pub identity_type: Option<String>,
+    pub identity_type: Option<IngressFromIdentityTypeEnum>,
     /// Sources that this IngressPolicy authorizes access from.
     
     pub sources: Option<Vec<IngressSource>>,
@@ -794,7 +794,7 @@ pub struct OsConstraint {
     /// Required. The allowed OS type.
     #[serde(rename="osType")]
     
-    pub os_type: Option<String>,
+    pub os_type: Option<OsConstraintOsTypeEnum>,
     /// Only allows requests from devices with a verified Chrome OS. Verifications includes requirements that the device is enterprise-managed, conformant to domain policies, and the caller has permission to call the API targeted by the request.
     #[serde(rename="requireVerifiedChromeOs")]
     
@@ -903,7 +903,7 @@ pub struct ServicePerimeter {
     /// Perimeter type indicator. A single project is allowed to be a member of single regular perimeter, but multiple service perimeter bridges. A project cannot be a included in a perimeter bridge without being included in regular perimeter. For perimeter bridges, the restricted service list as well as access level lists must be empty.
     #[serde(rename="perimeterType")]
     
-    pub perimeter_type: Option<String>,
+    pub perimeter_type: Option<ServicePerimeterPerimeterTypeEnum>,
     /// Proposed (or dry run) ServicePerimeter configuration. This configuration allows to specify and test ServicePerimeter configuration without enforcing actual access restrictions. Only allowed to be set when the "use_explicit_dry_run_spec" flag is set.
     
     pub spec: Option<ServicePerimeterConfig>,

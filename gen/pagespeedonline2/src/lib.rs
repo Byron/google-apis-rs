@@ -96,10 +96,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.pagespeedapi().runpagespeed("url")
-//!              .strategy("takimata")
+//!              .strategy(&Default::default())
 //!              .screenshot(true)
-//!              .add_rule("duo")
-//!              .locale("ipsum")
+//!              .add_rule("amet.")
+//!              .locale("duo")
 //!              .filter_third_party_resources(true)
 //!              .doit().await;
 //! 

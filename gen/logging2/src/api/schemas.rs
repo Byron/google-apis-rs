@@ -303,7 +303,7 @@ pub struct IndexConfig {
     /// Required. The type of data in this index.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<IndexConfigTypeEnum>,
 }
 
 impl client::Part for IndexConfig {}
@@ -325,7 +325,7 @@ pub struct LabelDescriptor {
     /// The type of data that can be assigned to the label.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<LabelDescriptorValueTypeEnum>,
 }
 
 impl client::Part for LabelDescriptor {}
@@ -752,7 +752,7 @@ pub struct LogBucket {
     /// Output only. The bucket lifecycle state.
     #[serde(rename="lifecycleState")]
     
-    pub lifecycle_state: Option<String>,
+    pub lifecycle_state: Option<LogBucketLifecycleStateEnum>,
     /// Whether the bucket is locked.The retention period on a locked bucket cannot be changed. Locked buckets may only be deleted if they are empty.
     
     pub locked: Option<bool>,
@@ -822,7 +822,7 @@ pub struct LogEntry {
     pub resource: Option<MonitoredResource>,
     /// Optional. The severity of the log entry. The default value is LogSeverity.DEFAULT.
     
-    pub severity: Option<String>,
+    pub severity: Option<LogEntrySeverityEnum>,
     /// Optional. Source code location information associated with the log entry, if any.
     #[serde(rename="sourceLocation")]
     
@@ -1005,7 +1005,7 @@ pub struct LogMetric {
     pub value_extractor: Option<String>,
     /// Deprecated. The API version that created or updated this metric. The v2 format is used by default and cannot be changed.
     
-    pub version: Option<String>,
+    pub version: Option<LogMetricVersionEnum>,
 }
 
 impl client::RequestValue for LogMetric {}
@@ -1074,7 +1074,7 @@ pub struct LogSink {
     /// Deprecated. This field is unused.
     #[serde(rename="outputVersionFormat")]
     
-    pub output_version_format: Option<String>,
+    pub output_version_format: Option<LogSinkOutputVersionFormatEnum>,
     /// Output only. The last update timestamp of the sink.This field may not be present for older sinks.
     #[serde(rename="updateTime")]
     
@@ -1179,14 +1179,14 @@ pub struct MetricDescriptor {
     /// Optional. The launch stage of the metric definition.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MetricDescriptorLaunchStageEnum>,
     /// Optional. Metadata which can be used to guide usage of the metric.
     
     pub metadata: Option<MetricDescriptorMetadata>,
     /// Whether the metric records instantaneous values, changes to a value, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="metricKind")]
     
-    pub metric_kind: Option<String>,
+    pub metric_kind: Option<MetricDescriptorMetricKindEnum>,
     /// Read-only. If present, then a time series, which is identified partially by a metric type and a MonitoredResourceDescriptor, that is associated with this metric type can only be associated with one of the monitored resource types listed here.
     #[serde(rename="monitoredResourceTypes")]
     
@@ -1204,7 +1204,7 @@ pub struct MetricDescriptor {
     /// Whether the measurement is an integer, a floating-point number, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<MetricDescriptorValueTypeEnum>,
 }
 
 impl client::Part for MetricDescriptor {}
@@ -1225,7 +1225,7 @@ pub struct MetricDescriptorMetadata {
     /// Deprecated. Must use the MetricDescriptor.launch_stage instead.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MetricDescriptorMetadataLaunchStageEnum>,
     /// The sampling period of metric data points. For metrics which are written periodically, consecutive data points are stored at this time interval, excluding data loss due to errors. Metrics with a higher granularity have a smaller sampling period.
     #[serde(rename="samplePeriod")]
     
@@ -1279,7 +1279,7 @@ pub struct MonitoredResourceDescriptor {
     /// Optional. The launch stage of the monitored resource definition.
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<MonitoredResourceDescriptorLaunchStageEnum>,
     /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
     
     pub name: Option<String>,
@@ -1421,7 +1421,7 @@ impl client::Part for Status {}
 pub struct SuppressionInfo {
     /// The reason that entries were omitted from the session.
     
-    pub reason: Option<String>,
+    pub reason: Option<SuppressionInfoReasonEnum>,
     /// A lower bound on the count of entries omitted due to reason.
     #[serde(rename="suppressedCount")]
     

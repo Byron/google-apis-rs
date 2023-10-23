@@ -89,7 +89,7 @@ pub struct AppliedLicense {
     /// The license type that was used in OS adaptation.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AppliedLicenseTypeEnum>,
 }
 
 impl client::Part for AppliedLicense {}
@@ -169,7 +169,7 @@ pub struct AwsSourceDetails {
     pub public_ip: Option<String>,
     /// Output only. State of the source as determined by the health check.
     
-    pub state: Option<String>,
+    pub state: Option<AwsSourceDetailStateEnum>,
 }
 
 impl client::Part for AwsSourceDetails {}
@@ -189,7 +189,7 @@ pub struct AwsSourceVmDetails {
     pub committed_storage_bytes: Option<i64>,
     /// The firmware type of the source VM.
     
-    pub firmware: Option<String>,
+    pub firmware: Option<AwsSourceVmDetailFirmwareEnum>,
 }
 
 impl client::Part for AwsSourceVmDetails {}
@@ -204,11 +204,11 @@ impl client::Part for AwsSourceVmDetails {}
 pub struct AwsVmDetails {
     /// The CPU architecture.
     
-    pub architecture: Option<String>,
+    pub architecture: Option<AwsVmDetailArchitectureEnum>,
     /// The VM Boot Option.
     #[serde(rename="bootOption")]
     
-    pub boot_option: Option<String>,
+    pub boot_option: Option<AwsVmDetailBootOptionEnum>,
     /// The total size of the storage allocated to the VM in MB.
     #[serde(rename="committedStorageMb")]
     
@@ -241,7 +241,7 @@ pub struct AwsVmDetails {
     /// Output only. The power state of the VM at the moment list was taken.
     #[serde(rename="powerState")]
     
-    pub power_state: Option<String>,
+    pub power_state: Option<AwsVmDetailPowerStateEnum>,
     /// The security groups the VM belongs to.
     #[serde(rename="securityGroups")]
     
@@ -260,7 +260,7 @@ pub struct AwsVmDetails {
     /// The virtualization type.
     #[serde(rename="virtualizationType")]
     
-    pub virtualization_type: Option<String>,
+    pub virtualization_type: Option<AwsVmDetailVirtualizationTypeEnum>,
     /// The VM ID in AWS.
     #[serde(rename="vmId")]
     
@@ -369,7 +369,7 @@ pub struct CloneJob {
     pub name: Option<String>,
     /// Output only. State of the clone job.
     
-    pub state: Option<String>,
+    pub state: Option<CloneJobStateEnum>,
     /// Output only. The time the state was last updated.
     #[serde(rename="stateTime")]
     
@@ -433,7 +433,7 @@ pub struct ComputeEngineTargetDefaults {
     /// Output only. The VM Boot Option, as set in the source vm.
     #[serde(rename="bootOption")]
     
-    pub boot_option: Option<String>,
+    pub boot_option: Option<ComputeEngineTargetDefaultBootOptionEnum>,
     /// Compute instance scheduling information (if empty default is used).
     #[serde(rename="computeScheduling")]
     
@@ -441,7 +441,7 @@ pub struct ComputeEngineTargetDefaults {
     /// The disk type to use in the VM.
     #[serde(rename="diskType")]
     
-    pub disk_type: Option<String>,
+    pub disk_type: Option<ComputeEngineTargetDefaultDiskTypeEnum>,
     /// The hostname to assign to the VM.
     
     pub hostname: Option<String>,
@@ -451,7 +451,7 @@ pub struct ComputeEngineTargetDefaults {
     /// The license type to use in OS adaptation.
     #[serde(rename="licenseType")]
     
-    pub license_type: Option<String>,
+    pub license_type: Option<ComputeEngineTargetDefaultLicenseTypeEnum>,
     /// The machine type to create the VM with.
     #[serde(rename="machineType")]
     
@@ -513,7 +513,7 @@ pub struct ComputeEngineTargetDetails {
     /// The VM Boot Option, as set in the source vm.
     #[serde(rename="bootOption")]
     
-    pub boot_option: Option<String>,
+    pub boot_option: Option<ComputeEngineTargetDetailBootOptionEnum>,
     /// Compute instance scheduling information (if empty default is used).
     #[serde(rename="computeScheduling")]
     
@@ -521,7 +521,7 @@ pub struct ComputeEngineTargetDetails {
     /// The disk type to use in the VM.
     #[serde(rename="diskType")]
     
-    pub disk_type: Option<String>,
+    pub disk_type: Option<ComputeEngineTargetDetailDiskTypeEnum>,
     /// The hostname to assign to the VM.
     
     pub hostname: Option<String>,
@@ -531,7 +531,7 @@ pub struct ComputeEngineTargetDetails {
     /// The license type to use in OS adaptation.
     #[serde(rename="licenseType")]
     
-    pub license_type: Option<String>,
+    pub license_type: Option<ComputeEngineTargetDetailLicenseTypeEnum>,
     /// The machine type to create the VM with.
     #[serde(rename="machineType")]
     
@@ -592,11 +592,11 @@ pub struct ComputeScheduling {
     /// How the instance should behave when the host machine undergoes maintenance that may temporarily impact instance performance.
     #[serde(rename="onHostMaintenance")]
     
-    pub on_host_maintenance: Option<String>,
+    pub on_host_maintenance: Option<ComputeSchedulingOnHostMaintenanceEnum>,
     /// Whether the Instance should be automatically restarted whenever it is terminated by Compute Engine (not terminated by user). This configuration is identical to `automaticRestart` field in Compute Engine create instance under scheduling. It was changed to an enum (instead of a boolean) to match the default value in Compute Engine which is automatic restart.
     #[serde(rename="restartType")]
     
-    pub restart_type: Option<String>,
+    pub restart_type: Option<ComputeSchedulingRestartTypeEnum>,
 }
 
 impl client::Part for ComputeScheduling {}
@@ -638,7 +638,7 @@ pub struct CutoverJob {
     pub progress_percent: Option<i32>,
     /// Output only. State of the cutover job.
     
-    pub state: Option<String>,
+    pub state: Option<CutoverJobStateEnum>,
     /// Output only. A message providing possible extra details about the current state.
     #[serde(rename="stateMessage")]
     
@@ -774,7 +774,7 @@ pub struct DatacenterConnector {
     pub service_account: Option<String>,
     /// Output only. State of the DatacenterConnector, as determined by the health checks.
     
-    pub state: Option<String>,
+    pub state: Option<DatacenterConnectorStateEnum>,
     /// Output only. The time the state was last set.
     #[serde(rename="stateTime")]
     
@@ -1307,7 +1307,7 @@ pub struct MigratingVm {
     pub source_vm_id: Option<String>,
     /// Output only. State of the MigratingVm.
     
-    pub state: Option<String>,
+    pub state: Option<MigratingVmStateEnum>,
     /// Output only. The last time the migrating VM state was updated.
     #[serde(rename="stateTime")]
     
@@ -1530,7 +1530,7 @@ pub struct ReplicationCycle {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// State of the ReplicationCycle.
     
-    pub state: Option<String>,
+    pub state: Option<ReplicationCycleStateEnum>,
     /// The cycle's steps list representing its progress.
     
     pub steps: Option<Vec<CycleStep>>,
@@ -1608,7 +1608,7 @@ pub struct SchedulingNodeAffinity {
     pub key: Option<String>,
     /// The operator to use for the node resources specified in the `values` parameter.
     
-    pub operator: Option<String>,
+    pub operator: Option<SchedulingNodeAffinityOperatorEnum>,
     /// Corresponds to the label values of Node resource.
     
     pub values: Option<Vec<String>>,
@@ -1800,7 +1800,7 @@ pub struct UpgradeStatus {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The state of the upgradeAppliance operation.
     
-    pub state: Option<String>,
+    pub state: Option<UpgradeStatuStateEnum>,
     /// The version to upgrade to.
     
     pub version: Option<String>,
@@ -1841,7 +1841,7 @@ pub struct UtilizationReport {
     pub name: Option<String>,
     /// Output only. Current state of the report.
     
-    pub state: Option<String>,
+    pub state: Option<UtilizationReportStateEnum>,
     /// Output only. The time the state was last set.
     #[serde(rename="stateTime")]
     
@@ -1849,7 +1849,7 @@ pub struct UtilizationReport {
     /// Time frame of the report.
     #[serde(rename="timeFrame")]
     
-    pub time_frame: Option<String>,
+    pub time_frame: Option<UtilizationReportTimeFrameEnum>,
     /// Output only. Total number of VMs included in the report.
     #[serde(rename="vmCount")]
     
@@ -1969,7 +1969,7 @@ pub struct VmwareVmDetails {
     /// Output only. The VM Boot Option.
     #[serde(rename="bootOption")]
     
-    pub boot_option: Option<String>,
+    pub boot_option: Option<VmwareVmDetailBootOptionEnum>,
     /// The total size of the storage allocated to the VM in MB.
     #[serde(rename="committedStorageMb")]
     
@@ -2006,7 +2006,7 @@ pub struct VmwareVmDetails {
     /// The power state of the VM at the moment list was taken.
     #[serde(rename="powerState")]
     
-    pub power_state: Option<String>,
+    pub power_state: Option<VmwareVmDetailPowerStateEnum>,
     /// The unique identifier of the VM in vCenter.
     
     pub uuid: Option<String>,

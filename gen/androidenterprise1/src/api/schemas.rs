@@ -53,7 +53,7 @@ pub struct AdministratorWebTokenSpec {
     pub parent: Option<String>,
     /// Deprecated. Use PlaySearch.approveApps.
     
-    pub permission: Option<Vec<String>>,
+    pub permission: Option<Vec<AdministratorWebTokenSpecPermissionEnum>>,
     /// Options for displaying the managed Play Search apps page.
     #[serde(rename="playSearch")]
     
@@ -242,7 +242,7 @@ pub struct AppRestrictionsSchemaRestriction {
     /// The type of the restriction.
     #[serde(rename="restrictionType")]
     
-    pub restriction_type: Option<String>,
+    pub restriction_type: Option<AppRestrictionsSchemaRestrictionRestrictionTypeEnum>,
     /// The name of the restriction.
     
     pub title: Option<String>,
@@ -261,7 +261,7 @@ pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
     /// The type of the value being provided.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AppRestrictionsSchemaRestrictionRestrictionValueTypeEnum>,
     /// The boolean value - this will only be present if type is bool.
     #[serde(rename="valueBool")]
     
@@ -332,7 +332,7 @@ pub struct AppVersion {
     pub is_production: Option<bool>,
     /// Deprecated, use trackId instead.
     
-    pub track: Option<String>,
+    pub track: Option<AppVersionTrackEnum>,
     /// Track ids that the app version is published in. Replaces the track field (deprecated), but doesn't include the production track (see isProduction instead).
     #[serde(rename="trackId")]
     
@@ -395,15 +395,15 @@ pub struct AutoInstallConstraint {
     /// Charging state constraint.
     #[serde(rename="chargingStateConstraint")]
     
-    pub charging_state_constraint: Option<String>,
+    pub charging_state_constraint: Option<AutoInstallConstraintChargingStateConstraintEnum>,
     /// Device idle state constraint.
     #[serde(rename="deviceIdleStateConstraint")]
     
-    pub device_idle_state_constraint: Option<String>,
+    pub device_idle_state_constraint: Option<AutoInstallConstraintDeviceIdleStateConstraintEnum>,
     /// Network type constraint.
     #[serde(rename="networkTypeConstraint")]
     
-    pub network_type_constraint: Option<String>,
+    pub network_type_constraint: Option<AutoInstallConstraintNetworkTypeConstraintEnum>,
 }
 
 impl client::Part for AutoInstallConstraint {}
@@ -423,7 +423,7 @@ pub struct AutoInstallPolicy {
     /// The auto-install mode. If unset defaults to "doNotAutoInstall".
     #[serde(rename="autoInstallMode")]
     
-    pub auto_install_mode: Option<String>,
+    pub auto_install_mode: Option<AutoInstallPolicyAutoInstallModeEnum>,
     /// The priority of the install, as an unsigned integer. A lower number means higher priority.
     #[serde(rename="autoInstallPriority")]
     
@@ -500,7 +500,7 @@ pub struct Device {
     /// Identifies the extent to which the device is controlled by a managed Google Play EMM in various deployment configurations. Possible values include: - "managedDevice", a device that has the EMM's device policy controller (DPC) as the device owner. - "managedProfile", a device that has a profile managed by the DPC (DPC is profile owner) in addition to a separate, personal profile that is unavailable to the DPC. - "containerApp", no longer used (deprecated). - "unmanagedProfile", a device that has been allowed (by the domain's admin, using the Admin Console to enable the privilege) to use managed Google Play, but the profile is itself not owned by a DPC. 
     #[serde(rename="managementType")]
     
-    pub management_type: Option<String>,
+    pub management_type: Option<DeviceManagementTypeEnum>,
     /// The policy enforced on the device.
     
     pub policy: Option<Policy>,
@@ -573,7 +573,7 @@ pub struct DeviceState {
     /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.
     #[serde(rename="accountState")]
     
-    pub account_state: Option<String>,
+    pub account_state: Option<DeviceStateAccountStateEnum>,
 }
 
 impl client::RequestValue for DeviceState {}
@@ -747,7 +747,7 @@ pub struct Entitlement {
     pub product_id: Option<String>,
     /// The reason for the entitlement. For example, "free" for free apps. This property is temporary: it will be replaced by the acquisition kind field of group licenses.
     
-    pub reason: Option<String>,
+    pub reason: Option<EntitlementReasonEnum>,
 }
 
 impl client::RequestValue for Entitlement {}
@@ -784,11 +784,11 @@ pub struct GoogleAuthenticationSettings {
     /// Whether dedicated devices are allowed.
     #[serde(rename="dedicatedDevicesAllowed")]
     
-    pub dedicated_devices_allowed: Option<String>,
+    pub dedicated_devices_allowed: Option<GoogleAuthenticationSettingDedicatedDevicesAllowedEnum>,
     /// Whether Google authentication is required.
     #[serde(rename="googleAuthenticationRequired")]
     
-    pub google_authentication_required: Option<String>,
+    pub google_authentication_required: Option<GoogleAuthenticationSettingGoogleAuthenticationRequiredEnum>,
 }
 
 impl client::Part for GoogleAuthenticationSettings {}
@@ -808,10 +808,10 @@ pub struct GroupLicense {
     /// How this group license was acquired. "bulkPurchase" means that this Grouplicenses resource was created because the enterprise purchased licenses for this product; otherwise, the value is "free" (for free products).
     #[serde(rename="acquisitionKind")]
     
-    pub acquisition_kind: Option<String>,
+    pub acquisition_kind: Option<GroupLicenseAcquisitionKindEnum>,
     /// Whether the product to which this group license relates is currently approved by the enterprise. Products are approved when a group license is first created, but this approval may be revoked by an enterprise admin via Google Play. Unapproved products will not be visible to end users in collections, and new entitlements to them should not normally be created.
     
-    pub approval: Option<String>,
+    pub approval: Option<GroupLicenseApprovalEnum>,
     /// The total number of provisioned licenses for this product. Returned by read operations, but ignored in write operations.
     #[serde(rename="numProvisioned")]
     
@@ -822,7 +822,7 @@ pub struct GroupLicense {
     pub num_purchased: Option<i32>,
     /// The permission approval status of the product. This field is only set if the product is approved. Possible states are: - "currentApproved", the current set of permissions is approved, but additional permissions will require the administrator to reapprove the product (If the product was approved without specifying the approved permissions setting, then this is the default behavior.), - "needsReapproval", the product has unapproved permissions. No additional product licenses can be assigned until the product is reapproved, - "allCurrentAndFutureApproved", the current permissions are approved and any future permission updates will be automatically approved without administrator review. 
     
-    pub permissions: Option<String>,
+    pub permissions: Option<GroupLicensePermissionsEnum>,
     /// The ID of the product that the license is for. For example, "app:com.google.android.gm".
     #[serde(rename="productId")]
     
@@ -889,7 +889,7 @@ pub struct Install {
     /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
     #[serde(rename="installState")]
     
-    pub install_state: Option<String>,
+    pub install_state: Option<InstallInstallStateEnum>,
     /// The ID of the product that the install is for. For example, "app:com.google.android.gm".
     #[serde(rename="productId")]
     
@@ -923,7 +923,7 @@ pub struct InstallFailureEvent {
     /// The reason for the installation failure. This field will always be present.
     #[serde(rename="failureReason")]
     
-    pub failure_reason: Option<String>,
+    pub failure_reason: Option<InstallFailureEventFailureReasonEnum>,
     /// The id of the product (e.g. "app:com.google.android.gm") for which the install failure event occured. This field will always be present.
     #[serde(rename="productId")]
     
@@ -974,7 +974,7 @@ pub struct KeyedAppState {
     pub message: Option<String>,
     /// Severity of the app state. This field will always be present.
     
-    pub severity: Option<String>,
+    pub severity: Option<KeyedAppStateSeverityEnum>,
     /// Timestamp of when the app set the state in milliseconds since epoch. This field will always be present.
     #[serde(rename="stateTimestampMillis")]
     
@@ -1217,7 +1217,7 @@ pub struct NewDeviceEvent {
     /// Identifies the extent to which the device is controlled by an Android EMM in various deployment configurations. Possible values include: - "managedDevice", a device where the DPC is set as device owner, - "managedProfile", a device where the DPC is set as profile owner. 
     #[serde(rename="managementType")]
     
-    pub management_type: Option<String>,
+    pub management_type: Option<NewDeviceEventManagementTypeEnum>,
     /// The ID of the user. This field will always be present.
     #[serde(rename="userId")]
     
@@ -1289,7 +1289,7 @@ pub struct Notification {
     /// Type of the notification.
     #[serde(rename="notificationType")]
     
-    pub notification_type: Option<String>,
+    pub notification_type: Option<NotificationNotificationTypeEnum>,
     /// Notifications about changes to a product's approval status.
     #[serde(rename="productApprovalEvent")]
     
@@ -1392,11 +1392,11 @@ pub struct Policy {
     /// Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency. When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect. "choiceToTheUser" allows the device's user to configure the app update policy. "always" enables auto updates. "never" disables auto updates. "wifiOnly" enables auto updates only when the device is connected to wifi.
     #[serde(rename="autoUpdatePolicy")]
     
-    pub auto_update_policy: Option<String>,
+    pub auto_update_policy: Option<PolicyAutoUpdatePolicyEnum>,
     /// Whether the device reports app states to the EMM. The default value is "deviceReportDisabled".
     #[serde(rename="deviceReportPolicy")]
     
-    pub device_report_policy: Option<String>,
+    pub device_report_policy: Option<PolicyDeviceReportPolicyEnum>,
     /// The maintenance window defining when apps running in the foreground should be updated.
     #[serde(rename="maintenanceWindow")]
     
@@ -1404,7 +1404,7 @@ pub struct Policy {
     /// The availability granted to the device for the specified products. "all" gives the device access to all products, regardless of approval status. "all" does not enable automatic visibility of "alpha" or "beta" tracks. "whitelist" grants the device access the products specified in productPolicy[]. Only products that are approved or products that were previously approved (products with revoked approval) by the enterprise can be whitelisted. If no value is provided, the availability set at the user level is applied by default.
     #[serde(rename="productAvailabilityPolicy")]
     
-    pub product_availability_policy: Option<String>,
+    pub product_availability_policy: Option<PolicyProductAvailabilityPolicyEnum>,
     /// The list of product policies. The productAvailabilityPolicy needs to be set to WHITELIST or ALL for the product policies to be applied.
     #[serde(rename="productPolicy")]
     
@@ -1454,14 +1454,14 @@ pub struct Product {
     /// Deprecated, use appTracks instead.
     #[serde(rename="availableTracks")]
     
-    pub available_tracks: Option<Vec<String>>,
+    pub available_tracks: Option<Vec<ProductAvailableTracksEnum>>,
     /// The app category (e.g. RACING, SOCIAL, etc.)
     
     pub category: Option<String>,
     /// The content rating for this app.
     #[serde(rename="contentRating")]
     
-    pub content_rating: Option<String>,
+    pub content_rating: Option<ProductContentRatingEnum>,
     /// The localized promotional description, if available.
     
     pub description: Option<String>,
@@ -1472,10 +1472,10 @@ pub struct Product {
     /// How and to whom the package is made available. The value publicGoogleHosted means that the package is available through the Play store and not restricted to a specific enterprise. The value privateGoogleHosted means that the package is a private app (restricted to an enterprise) but hosted by Google. The value privateSelfHosted means that the package is a private app (restricted to an enterprise) and is privately hosted.
     #[serde(rename="distributionChannel")]
     
-    pub distribution_channel: Option<String>,
+    pub distribution_channel: Option<ProductDistributionChannelEnum>,
     /// Noteworthy features (if any) of this product.
     
-    pub features: Option<Vec<String>>,
+    pub features: Option<Vec<ProductFeaturesEnum>>,
     /// A link to an image that can be used as an icon for the product. This image is suitable for use at up to 512px x 512px.
     #[serde(rename="iconUrl")]
     
@@ -1499,7 +1499,7 @@ pub struct Product {
     /// Whether this product is free, free with in-app purchases, or paid. If the pricing is unknown, this means the product is not generally available anymore (even though it might still be available to people who own it).
     #[serde(rename="productPricing")]
     
-    pub product_pricing: Option<String>,
+    pub product_pricing: Option<ProductProductPricingEnum>,
     /// A description of the recent changes made to the app.
     #[serde(rename="recentChanges")]
     
@@ -1542,7 +1542,7 @@ impl client::ResponseResult for Product {}
 pub struct ProductApprovalEvent {
     /// Whether the product was approved or unapproved. This field will always be present.
     
-    pub approved: Option<String>,
+    pub approved: Option<ProductApprovalEventApprovedEnum>,
     /// The id of the product (e.g. "app:com.google.android.gm") for which the approval status has changed. This field will always be present.
     #[serde(rename="productId")]
     
@@ -1562,7 +1562,7 @@ pub struct ProductAvailabilityChangeEvent {
     /// The new state of the product. This field will always be present.
     #[serde(rename="availabilityStatus")]
     
-    pub availability_status: Option<String>,
+    pub availability_status: Option<ProductAvailabilityChangeEventAvailabilityStatusEnum>,
     /// The id of the product (e.g. "app:com.google.android.gm") for which the product availability changed. This field will always be present.
     #[serde(rename="productId")]
     
@@ -1585,7 +1585,7 @@ pub struct ProductPermission {
     pub permission_id: Option<String>,
     /// Whether the permission has been accepted or not.
     
-    pub state: Option<String>,
+    pub state: Option<ProductPermissionStateEnum>,
 }
 
 impl client::Part for ProductPermission {}
@@ -1628,7 +1628,7 @@ pub struct ProductPolicy {
     /// The auto-update mode for the product.
     #[serde(rename="autoUpdateMode")]
     
-    pub auto_update_mode: Option<String>,
+    pub auto_update_mode: Option<ProductPolicyAutoUpdateModeEnum>,
     /// An authentication URL configuration for the authenticator app of an identity provider. This helps to launch the identity provider's authenticator app during the authentication happening in a private app using Android WebView. Authenticator app should already be the [default handler](https://developer.android.com/training/app-links/verify-site-associations) for the authentication url on the device.
     #[serde(rename="enterpriseAuthenticationAppLinkConfigs")]
     
@@ -1647,7 +1647,7 @@ pub struct ProductPolicy {
     pub track_ids: Option<Vec<String>>,
     /// Deprecated. Use trackIds instead.
     
-    pub tracks: Option<Vec<String>>,
+    pub tracks: Option<Vec<ProductPolicyTracksEnum>>,
 }
 
 impl client::Part for ProductPolicy {}
@@ -1672,7 +1672,7 @@ pub struct ProductSet {
     /// The interpretation of this product set. "unknown" should never be sent and is ignored if received. "whitelist" means that the user is entitled to access the product set. "includeAll" means that all products are accessible, including products that are approved, products with revoked approval, and products that have never been approved. "allApproved" means that the user is entitled to access all products that are approved for the enterprise. If the value is "allApproved" or "includeAll", the productId field is ignored. If no value is provided, it is interpreted as "whitelist" for backwards compatibility. Further "allApproved" or "includeAll" does not enable automatic visibility of "alpha" or "beta" tracks for Android app. Use ProductVisibility to enable "alpha" or "beta" tracks per user.
     #[serde(rename="productSetBehavior")]
     
-    pub product_set_behavior: Option<String>,
+    pub product_set_behavior: Option<ProductSetProductSetBehaviorEnum>,
     /// Additional list of product IDs making up the product set. Unlike the productID array, in this list It's possible to specify which tracks (alpha, beta, production) of a product are visible to the user. See ProductVisibility and its fields for more information. Specifying the same product ID both here and in the productId array is not allowed and it will result in an error.
     #[serde(rename="productVisibility")]
     
@@ -1720,7 +1720,7 @@ pub struct ProductVisibility {
     pub track_ids: Option<Vec<String>>,
     /// Deprecated. Use trackIds instead.
     
-    pub tracks: Option<Vec<String>>,
+    pub tracks: Option<Vec<ProductVisibilityTracksEnum>>,
 }
 
 impl client::Part for ProductVisibility {}
@@ -1744,7 +1744,7 @@ pub struct ProductsApproveRequest {
     /// Sets how new permission requests for the product are handled. "allPermissions" automatically approves all current and future permissions for the product. "currentPermissionsOnly" approves the current set of permissions for the product, but any future permissions added through updates will require manual reapproval. If not specified, only the current set of permissions will be approved.
     #[serde(rename="approvedPermissions")]
     
-    pub approved_permissions: Option<String>,
+    pub approved_permissions: Option<ProductsApproveRequestApprovedPermissionsEnum>,
 }
 
 impl client::RequestValue for ProductsApproveRequest {}
@@ -1842,7 +1842,7 @@ pub struct ServiceAccountKey {
     /// The file format of the generated key data.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ServiceAccountKeyTypeEnum>,
 }
 
 impl client::RequestValue for ServiceAccountKey {}
@@ -1948,7 +1948,7 @@ pub struct StoreLayout {
     /// The store layout type. By default, this value is set to "basic" if the homepageId field is not set, and to "custom" otherwise. If set to "basic", the layout will consist of all approved apps that have been whitelisted for the user.
     #[serde(rename="storeLayoutType")]
     
-    pub store_layout_type: Option<String>,
+    pub store_layout_type: Option<StoreLayoutStoreLayoutTypeEnum>,
 }
 
 impl client::RequestValue for StoreLayout {}
@@ -2087,7 +2087,7 @@ pub struct User {
     /// The type of account that this user represents. A userAccount can be installed on multiple devices, but a deviceAccount is specific to a single device. An EMM-managed user (emmManaged) can be either type (userAccount, deviceAccount), but a Google-managed user (googleManaged) is always a userAccount.
     #[serde(rename="accountType")]
     
-    pub account_type: Option<String>,
+    pub account_type: Option<UserAccountTypeEnum>,
     /// The name that will appear in user interfaces. Setting this property is optional when creating EMM-managed users. If you do set this property, use something generic about the organization (such as "Example, Inc.") or your name (as EMM). Not used for Google-managed user accounts. @mutable androidenterprise.users.update
     #[serde(rename="displayName")]
     
@@ -2098,7 +2098,7 @@ pub struct User {
     /// The entity that manages the user. With googleManaged users, the source of truth is Google so EMMs have to make sure a Google Account exists for the user. With emmManaged users, the EMM is in charge.
     #[serde(rename="managementType")]
     
-    pub management_type: Option<String>,
+    pub management_type: Option<UserManagementTypeEnum>,
     /// The user's primary email address, for example, "jsmith@example.com". Will always be set for Google managed users and not set for EMM managed users.
     #[serde(rename="primaryEmail")]
     
@@ -2164,7 +2164,7 @@ pub struct WebApp {
     /// The display mode of the web app. Possible values include: - "minimalUi", the device's status bar, navigation bar, the app's URL, and a refresh button are visible when the app is open. For HTTP URLs, you can only select this option. - "standalone", the device's status bar and navigation bar are visible when the app is open. - "fullScreen", the app opens in full screen mode, hiding the device's status and navigation bars. All browser UI elements, page URL, system status bar and back button are not visible, and the web app takes up the entirety of the available display area. 
     #[serde(rename="displayMode")]
     
-    pub display_mode: Option<String>,
+    pub display_mode: Option<WebAppDisplayModeEnum>,
     /// A list of icons representing this website. If absent, a default icon (for create) or the current icon (for update) will be used.
     
     pub icons: Option<Vec<WebAppIcon>>,

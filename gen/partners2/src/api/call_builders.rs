@@ -3066,7 +3066,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("companyId", self._company_id);
+        params.push("companyId", &self._company_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3263,17 +3263,17 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.companies().get("companyId")
-///              .view("dolore")
-///              .request_metadata_user_overrides_user_id("voluptua.")
-///              .request_metadata_user_overrides_ip_address("amet.")
-///              .request_metadata_traffic_source_traffic_sub_id("ea")
-///              .request_metadata_traffic_source_traffic_source_id("sadipscing")
-///              .request_metadata_partners_session_id("Lorem")
-///              .request_metadata_locale("invidunt")
-///              .add_request_metadata_experiment_ids("no")
-///              .order_by("est")
-///              .currency_code("At")
-///              .address("sed")
+///              .view(&Default::default())
+///              .request_metadata_user_overrides_user_id("dolore")
+///              .request_metadata_user_overrides_ip_address("voluptua.")
+///              .request_metadata_traffic_source_traffic_sub_id("amet.")
+///              .request_metadata_traffic_source_traffic_source_id("ea")
+///              .request_metadata_partners_session_id("sadipscing")
+///              .request_metadata_locale("Lorem")
+///              .add_request_metadata_experiment_ids("invidunt")
+///              .order_by("no")
+///              .currency_code("est")
+///              .address("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3282,7 +3282,7 @@ pub struct CompanyGetCall<'a, S>
 
    pub(super) hub: &'a Partners<S>,
    pub(super) _company_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<CompanyViewEnum>,
    pub(super) _request_metadata_user_overrides_user_id: Option<String>,
    pub(super) _request_metadata_user_overrides_ip_address: Option<String>,
    pub(super) _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -3328,7 +3328,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("companyId", self._company_id);
+        params.push("companyId", &self._company_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3472,8 +3472,8 @@ where
     /// `COMPANY_VIEW_UNSPECIFIED`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CompanyGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &CompanyViewEnum) -> CompanyGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
@@ -3626,31 +3626,31 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.companies().list()
-///              .website_url("sit")
-///              .view("et")
-///              .add_specializations("tempor")
-///              .add_services("aliquyam")
-///              .request_metadata_user_overrides_user_id("ipsum")
+///              .website_url("sed")
+///              .view(&Default::default())
+///              .add_specializations(&Default::default())
+///              .add_services(&Default::default())
+///              .request_metadata_user_overrides_user_id("sit")
 ///              .request_metadata_user_overrides_ip_address("et")
-///              .request_metadata_traffic_source_traffic_sub_id("sanctus")
-///              .request_metadata_traffic_source_traffic_source_id("Lorem")
-///              .request_metadata_partners_session_id("est")
-///              .request_metadata_locale("sed")
-///              .add_request_metadata_experiment_ids("diam")
-///              .page_token("dolores")
-///              .page_size(-69)
-///              .order_by("et")
-///              .min_monthly_budget_units(-93)
-///              .min_monthly_budget_nanos(-11)
-///              .min_monthly_budget_currency_code("et")
-///              .max_monthly_budget_units(-94)
-///              .max_monthly_budget_nanos(-80)
+///              .request_metadata_traffic_source_traffic_sub_id("tempor")
+///              .request_metadata_traffic_source_traffic_source_id("aliquyam")
+///              .request_metadata_partners_session_id("ipsum")
+///              .request_metadata_locale("et")
+///              .add_request_metadata_experiment_ids("sanctus")
+///              .page_token("Lorem")
+///              .page_size(-7)
+///              .order_by("sed")
+///              .min_monthly_budget_units(-29)
+///              .min_monthly_budget_nanos(-19)
+///              .min_monthly_budget_currency_code("dolores")
+///              .max_monthly_budget_units(-68)
+///              .max_monthly_budget_nanos(-93)
 ///              .max_monthly_budget_currency_code("no")
-///              .add_language_codes("nonumy")
-///              .add_industries("At")
-///              .add_gps_motivations("sadipscing")
-///              .company_name("aliquyam")
-///              .address("dolores")
+///              .add_language_codes("et")
+///              .add_industries(&Default::default())
+///              .add_gps_motivations(&Default::default())
+///              .company_name("elitr")
+///              .address("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3659,9 +3659,9 @@ pub struct CompanyListCall<'a, S>
 
    pub(super) hub: &'a Partners<S>,
    pub(super) _website_url: Option<String>,
-   pub(super) _view: Option<String>,
-   pub(super) _specializations: Vec<String>,
-   pub(super) _services: Vec<String>,
+   pub(super) _view: Option<CompanyViewEnum>,
+   pub(super) _specializations: Option<CompanySpecializationsEnum>,
+   pub(super) _services: Option<CompanyServicesEnum>,
    pub(super) _request_metadata_user_overrides_user_id: Option<String>,
    pub(super) _request_metadata_user_overrides_ip_address: Option<String>,
    pub(super) _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -3679,8 +3679,8 @@ pub struct CompanyListCall<'a, S>
    pub(super) _max_monthly_budget_nanos: Option<i32>,
    pub(super) _max_monthly_budget_currency_code: Option<String>,
    pub(super) _language_codes: Vec<String>,
-   pub(super) _industries: Vec<String>,
-   pub(super) _gps_motivations: Vec<String>,
+   pub(super) _industries: Option<CompanyIndustriesEnum>,
+   pub(super) _gps_motivations: Option<CompanyGpsMotivationsEnum>,
    pub(super) _company_name: Option<String>,
    pub(super) _address: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3904,8 +3904,8 @@ where
     /// `COMPANY_VIEW_UNSPECIFIED`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CompanyListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &CompanyViewEnum) -> CompanyListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// List of specializations that the returned agencies should provide. If this
@@ -3914,8 +3914,8 @@ where
     ///
     /// Append the given value to the *specializations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_specializations(mut self, new_value: &str) -> CompanyListCall<'a, S> {
-        self._specializations.push(new_value.to_string());
+    pub fn add_specializations(mut self, new_value: &CompanySpecializationsEnum) -> CompanyListCall<'a, S> {
+        self._specializations.push(new_value.clone());
         self
     }
     /// List of services that the returned agencies should provide. If this is
@@ -3924,8 +3924,8 @@ where
     ///
     /// Append the given value to the *services* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_services(mut self, new_value: &str) -> CompanyListCall<'a, S> {
-        self._services.push(new_value.to_string());
+    pub fn add_services(mut self, new_value: &CompanyServicesEnum) -> CompanyListCall<'a, S> {
+        self._services.push(new_value.clone());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
@@ -4079,16 +4079,16 @@ where
     ///
     /// Append the given value to the *industries* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_industries(mut self, new_value: &str) -> CompanyListCall<'a, S> {
-        self._industries.push(new_value.to_string());
+    pub fn add_industries(mut self, new_value: &CompanyIndustriesEnum) -> CompanyListCall<'a, S> {
+        self._industries.push(new_value.clone());
         self
     }
     /// List of reasons for using Google Partner Search to get companies.
     ///
     /// Append the given value to the *gps motivations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_gps_motivations(mut self, new_value: &str) -> CompanyListCall<'a, S> {
-        self._gps_motivations.push(new_value.to_string());
+    pub fn add_gps_motivations(mut self, new_value: &CompanyGpsMotivationsEnum) -> CompanyListCall<'a, S> {
+        self._gps_motivations.push(new_value.clone());
         self
     }
     /// Company name to search for.
@@ -4182,13 +4182,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().update_profile(req)
-///              .request_metadata_user_overrides_user_id("sadipscing")
-///              .request_metadata_user_overrides_ip_address("erat")
-///              .request_metadata_traffic_source_traffic_sub_id("aliquyam")
-///              .request_metadata_traffic_source_traffic_source_id("amet")
-///              .request_metadata_partners_session_id("est")
-///              .request_metadata_locale("et")
-///              .add_request_metadata_experiment_ids("sea")
+///              .request_metadata_user_overrides_user_id("no")
+///              .request_metadata_user_overrides_ip_address("nonumy")
+///              .request_metadata_traffic_source_traffic_sub_id("At")
+///              .request_metadata_traffic_source_traffic_source_id("sadipscing")
+///              .request_metadata_partners_session_id("aliquyam")
+///              .request_metadata_locale("dolores")
+///              .add_request_metadata_experiment_ids("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4501,13 +4501,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().create_company_relation(req, "userId")
-///              .request_metadata_user_overrides_user_id("consetetur")
-///              .request_metadata_user_overrides_ip_address("Stet")
+///              .request_metadata_user_overrides_user_id("aliquyam")
+///              .request_metadata_user_overrides_ip_address("amet")
 ///              .request_metadata_traffic_source_traffic_sub_id("est")
-///              .request_metadata_traffic_source_traffic_source_id("aliquyam")
-///              .request_metadata_partners_session_id("elitr")
-///              .request_metadata_locale("duo")
-///              .add_request_metadata_experiment_ids("diam")
+///              .request_metadata_traffic_source_traffic_source_id("et")
+///              .request_metadata_partners_session_id("sea")
+///              .request_metadata_locale("consetetur")
+///              .add_request_metadata_experiment_ids("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4559,7 +4559,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._request_metadata_user_overrides_user_id.as_ref() {
             params.push("requestMetadata.userOverrides.userId", value);
         }
@@ -4834,13 +4834,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().delete_company_relation("userId")
-///              .request_metadata_user_overrides_user_id("sit")
-///              .request_metadata_user_overrides_ip_address("sed")
-///              .request_metadata_traffic_source_traffic_sub_id("eos")
-///              .request_metadata_traffic_source_traffic_source_id("Lorem")
-///              .request_metadata_partners_session_id("ea")
-///              .request_metadata_locale("Stet")
-///              .add_request_metadata_experiment_ids("dolores")
+///              .request_metadata_user_overrides_user_id("est")
+///              .request_metadata_user_overrides_ip_address("aliquyam")
+///              .request_metadata_traffic_source_traffic_sub_id("elitr")
+///              .request_metadata_traffic_source_traffic_source_id("duo")
+///              .request_metadata_partners_session_id("diam")
+///              .request_metadata_locale("est")
+///              .add_request_metadata_experiment_ids("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4891,7 +4891,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._request_metadata_user_overrides_user_id.as_ref() {
             params.push("requestMetadata.userOverrides.userId", value);
         }
@@ -5143,14 +5143,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().get("userId")
-///              .user_view("et")
-///              .request_metadata_user_overrides_user_id("sea")
-///              .request_metadata_user_overrides_ip_address("et")
-///              .request_metadata_traffic_source_traffic_sub_id("At")
-///              .request_metadata_traffic_source_traffic_source_id("dolore")
-///              .request_metadata_partners_session_id("eirmod")
-///              .request_metadata_locale("Lorem")
-///              .add_request_metadata_experiment_ids("accusam")
+///              .user_view(&Default::default())
+///              .request_metadata_user_overrides_user_id("eos")
+///              .request_metadata_user_overrides_ip_address("Lorem")
+///              .request_metadata_traffic_source_traffic_sub_id("ea")
+///              .request_metadata_traffic_source_traffic_source_id("Stet")
+///              .request_metadata_partners_session_id("dolores")
+///              .request_metadata_locale("eos")
+///              .add_request_metadata_experiment_ids("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5159,7 +5159,7 @@ pub struct UserGetCall<'a, S>
 
    pub(super) hub: &'a Partners<S>,
    pub(super) _user_id: String,
-   pub(super) _user_view: Option<String>,
+   pub(super) _user_view: Option<UserUserViewEnum>,
    pub(super) _request_metadata_user_overrides_user_id: Option<String>,
    pub(super) _request_metadata_user_overrides_ip_address: Option<String>,
    pub(super) _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -5202,7 +5202,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
         if let Some(value) = self._user_view.as_ref() {
             params.push("userView", value);
         }
@@ -5337,8 +5337,8 @@ where
     /// Specifies what parts of the user information to return.
     ///
     /// Sets the *user view* query property to the given value.
-    pub fn user_view(mut self, new_value: &str) -> UserGetCall<'a, S> {
-        self._user_view = Some(new_value.to_string());
+    pub fn user_view(mut self, new_value: &UserUserViewEnum) -> UserGetCall<'a, S> {
+        self._user_view = Some(new_value.clone());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.

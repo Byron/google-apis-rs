@@ -97,7 +97,7 @@ pub struct GdataCompositeMedia {
     /// gdata
     #[serde(rename="referenceType")]
     
-    pub reference_type: Option<String>,
+    pub reference_type: Option<GdataCompositeMediaReferenceTypeEnum>,
     /// gdata
     #[serde(rename="sha1Hash")]
     
@@ -390,7 +390,7 @@ pub struct GdataMedia {
     /// gdata
     #[serde(rename="referenceType")]
     
-    pub reference_type: Option<String>,
+    pub reference_type: Option<GdataMediaReferenceTypeEnum>,
     /// gdata
     #[serde(rename="sha1Hash")]
     

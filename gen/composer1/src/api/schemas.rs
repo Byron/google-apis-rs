@@ -133,7 +133,7 @@ pub struct Environment {
     pub name: Option<String>,
     /// The current state of the environment.
     
-    pub state: Option<String>,
+    pub state: Option<EnvironmentStateEnum>,
     /// Output only. The time at which this environment was last modified.
     #[serde(rename="updateTime")]
     
@@ -173,7 +173,7 @@ pub struct EnvironmentConfig {
     /// Optional. The size of the Cloud Composer environment. This field is supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.* and newer.
     #[serde(rename="environmentSize")]
     
-    pub environment_size: Option<String>,
+    pub environment_size: Option<EnvironmentConfigEnvironmentSizeEnum>,
     /// Output only. The Kubernetes Engine cluster used to run this environment.
     #[serde(rename="gkeCluster")]
     
@@ -449,7 +449,7 @@ pub struct NetworkingConfig {
     /// Optional. Indicates the user requested specifc connection type between Tenant and Customer projects. You cannot set networking connection type in public IP environment.
     #[serde(rename="connectionType")]
     
-    pub connection_type: Option<String>,
+    pub connection_type: Option<NetworkingConfigConnectionTypeEnum>,
 }
 
 impl client::Part for NetworkingConfig {}

@@ -190,7 +190,7 @@ pub struct Domain {
     pub site: Option<String>,
     /// Output only. Additional status of the domain association.
     
-    pub status: Option<String>,
+    pub status: Option<DomainStatusEnum>,
     /// Output only. The time at which the domain was last updated.
     #[serde(rename="updateTime")]
     
@@ -223,7 +223,7 @@ pub struct DomainProvisioning {
     /// The certificate provisioning status; updated when Firebase Hosting provisions an SSL certificate for the domain.
     #[serde(rename="certStatus")]
     
-    pub cert_status: Option<String>,
+    pub cert_status: Option<DomainProvisioningCertStatusEnum>,
     /// The IPs found at the last DNS fetch.
     #[serde(rename="discoveredIps")]
     
@@ -235,7 +235,7 @@ pub struct DomainProvisioning {
     /// The DNS record match status as of the last DNS fetch.
     #[serde(rename="dnsStatus")]
     
-    pub dns_status: Option<String>,
+    pub dns_status: Option<DomainProvisioningDnsStatusEnum>,
     /// The list of IPs to which the domain is expected to resolve.
     #[serde(rename="expectedIps")]
     
@@ -259,7 +259,7 @@ pub struct DomainRedirect {
     /// Required. The redirect status code.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DomainRedirectTypeEnum>,
 }
 
 impl client::Part for DomainRedirect {}
@@ -616,7 +616,7 @@ pub struct Release {
     /// Explains the reason for the release. Specify a value for this field only when creating a `SITE_DISABLE` type release.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ReleaseTypeEnum>,
     /// Output only. The configuration and content that was released.
     
     pub version: Option<Version>,
@@ -671,7 +671,7 @@ pub struct ServingConfig {
     /// How to handle well known App Association files.
     #[serde(rename="appAssociation")]
     
-    pub app_association: Option<String>,
+    pub app_association: Option<ServingConfigAppAssociationEnum>,
     /// Defines whether to drop the file extension from uploaded files.
     #[serde(rename="cleanUrls")]
     
@@ -691,7 +691,7 @@ pub struct ServingConfig {
     /// Defines how to handle a trailing slash in the URL path.
     #[serde(rename="trailingSlashBehavior")]
     
-    pub trailing_slash_behavior: Option<String>,
+    pub trailing_slash_behavior: Option<ServingConfigTrailingSlashBehaviorEnum>,
 }
 
 impl client::Part for ServingConfig {}
@@ -750,7 +750,7 @@ pub struct Site {
     /// Output only. The type of Hosting site. Every Firebase project has a `DEFAULT_SITE`, which is created when Hosting is provisioned for the project. All additional sites are `USER_SITE`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SiteTypeEnum>,
 }
 
 impl client::RequestValue for Site {}
@@ -862,7 +862,7 @@ pub struct Version {
     pub name: Option<String>,
     /// The deploy status of the version. For a successful deploy, call [`CreateVersion`](sites.versions/create) to make a new version (`CREATED` status), [upload all desired files](sites.versions/populateFiles) to the version, then [update](sites.versions/patch) the version to the `FINALIZED` status. Note that if you leave the version in the `CREATED` state for more than 12 hours, the system will automatically mark the version as `ABANDONED`. You can also change the status of a version to `DELETED` by calling [`DeleteVersion`](sites.versions/delete).
     
-    pub status: Option<String>,
+    pub status: Option<VersionStatusEnum>,
     /// Output only. The total stored bytesize of the version. This value is calculated after a version is `FINALIZED`.
     #[serde(rename="versionBytes")]
     
@@ -889,7 +889,7 @@ pub struct VersionFile {
     pub path: Option<String>,
     /// Output only. The current status of a particular file in the specified version. The value will be either `pending upload` or `uploaded`.
     
-    pub status: Option<String>,
+    pub status: Option<VersionFileStatusEnum>,
 }
 
 impl client::Part for VersionFile {}

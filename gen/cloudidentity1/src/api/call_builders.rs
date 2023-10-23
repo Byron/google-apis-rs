@@ -76,7 +76,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -316,7 +316,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -533,7 +533,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -758,7 +758,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1022,7 +1022,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1265,7 +1265,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._customer.as_ref() {
             params.push("customer", value);
         }
@@ -1545,7 +1545,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1858,7 +1858,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2170,7 +2170,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2462,7 +2462,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2754,7 +2754,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3041,7 +3041,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._customer.as_ref() {
             params.push("customer", value);
         }
@@ -3315,7 +3315,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._customer.as_ref() {
             params.push("customer", value);
         }
@@ -3597,7 +3597,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3919,7 +3919,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._user_id.as_ref() {
             params.push("userId", value);
         }
@@ -4238,7 +4238,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4530,7 +4530,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5102,7 +5102,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._customer.as_ref() {
             params.push("customer", value);
         }
@@ -5376,7 +5376,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._customer.as_ref() {
             params.push("customer", value);
         }
@@ -5604,12 +5604,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.devices().list()
-///              .view("sed")
-///              .page_token("duo")
-///              .page_size(-34)
-///              .order_by("et")
-///              .filter("voluptua.")
-///              .customer("amet.")
+///              .view(&Default::default())
+///              .page_token("sed")
+///              .page_size(-20)
+///              .order_by("dolore")
+///              .filter("et")
+///              .customer("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5617,7 +5617,7 @@ pub struct DeviceListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a CloudIdentity<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<DeviceViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -5777,8 +5777,8 @@ where
     /// Optional. The view to use for the List request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> DeviceListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &DeviceViewEnum) -> DeviceListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Optional. A page token, received from a previous `ListDevices` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDevices` must match the call that provided the page token.
@@ -5970,7 +5970,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6211,7 +6211,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_check_transitive_membership("parent")
-///              .query("dolor")
+///              .query("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6257,7 +6257,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -6536,7 +6536,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6821,7 +6821,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7083,7 +7083,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7301,7 +7301,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_get_membership_graph("parent")
-///              .query("dolor")
+///              .query("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7347,7 +7347,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -7575,9 +7575,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_list("parent")
-///              .view("vero")
-///              .page_token("vero")
-///              .page_size(-88)
+///              .view(&Default::default())
+///              .page_token("duo")
+///              .page_size(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7586,7 +7586,7 @@ pub struct GroupMembershipListCall<'a, S>
 
    pub(super) hub: &'a CloudIdentity<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<GroupViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7625,7 +7625,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -7752,8 +7752,8 @@ where
     /// The level of detail to be returned. If unspecified, defaults to `View.BASIC`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> GroupMembershipListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &GroupViewEnum) -> GroupMembershipListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The `next_page_token` value returned from a previous search request, if any.
@@ -7873,8 +7873,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_lookup("parent")
-///              .member_key_namespace("vero")
-///              .member_key_id("elitr")
+///              .member_key_namespace("invidunt")
+///              .member_key_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7921,7 +7921,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._member_key_namespace.as_ref() {
             params.push("memberKey.namespace", value);
         }
@@ -8210,7 +8210,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8451,9 +8451,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_search_transitive_groups("parent")
-///              .query("no")
-///              .page_token("ipsum")
-///              .page_size(-23)
+///              .query("Lorem")
+///              .page_token("diam")
+///              .page_size(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8501,7 +8501,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -8749,8 +8749,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_search_transitive_memberships("parent")
-///              .page_token("consetetur")
-///              .page_size(-28)
+///              .page_token("accusam")
+///              .page_size(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8797,7 +8797,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9041,7 +9041,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().create(req)
-///              .initial_group_config("et")
+///              .initial_group_config(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -9050,7 +9050,7 @@ pub struct GroupCreateCall<'a, S>
 
    pub(super) hub: &'a CloudIdentity<S>,
    pub(super) _request: Group,
-   pub(super) _initial_group_config: Option<String>,
+   pub(super) _initial_group_config: Option<GroupInitialGroupConfigEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -9213,8 +9213,8 @@ where
     /// Optional. The initial configuration option for the `Group`.
     ///
     /// Sets the *initial group config* query property to the given value.
-    pub fn initial_group_config(mut self, new_value: &str) -> GroupCreateCall<'a, S> {
-        self._initial_group_config = Some(new_value.to_string());
+    pub fn initial_group_config(mut self, new_value: &GroupInitialGroupConfigEnum) -> GroupCreateCall<'a, S> {
+        self._initial_group_config = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9364,7 +9364,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9626,7 +9626,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9890,7 +9890,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -10118,10 +10118,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().list()
-///              .view("sed")
-///              .parent("takimata")
-///              .page_token("dolores")
-///              .page_size(-62)
+///              .view(&Default::default())
+///              .parent("erat")
+///              .page_token("consetetur")
+///              .page_size(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10129,7 +10129,7 @@ pub struct GroupListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a CloudIdentity<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<GroupViewEnum>,
    pub(super) _parent: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -10281,8 +10281,8 @@ where
     /// The level of detail to be returned. If unspecified, defaults to `View.BASIC`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> GroupListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &GroupViewEnum) -> GroupListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Required. The parent resource under which to list all `Group` resources. Must be of the form `identitysources/{identity_source}` for external- identity-mapped groups or `customers/{customer_id}` for Google Groups. The `customer_id` must begin with "C" (for example, 'C046psxkn'). [Find your customer ID.] (https://support.google.com/cloudidentity/answer/10070793)
@@ -10409,8 +10409,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().lookup()
-///              .group_key_namespace("et")
-///              .group_key_id("accusam")
+///              .group_key_namespace("sed")
+///              .group_key_id("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10729,7 +10729,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -10980,10 +10980,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().search()
-///              .view("dolore")
-///              .query("dolore")
-///              .page_token("dolore")
-///              .page_size(-78)
+///              .view(&Default::default())
+///              .query("gubergren")
+///              .page_token("et")
+///              .page_size(-23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10991,7 +10991,7 @@ pub struct GroupSearchCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a CloudIdentity<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<GroupViewEnum>,
    pub(super) _query: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -11143,8 +11143,8 @@ where
     /// The level of detail to be returned. If unspecified, defaults to `View.BASIC`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> GroupSearchCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &GroupViewEnum) -> GroupSearchCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Required. The search query. Must be specified in [Common Expression Language](https://opensource.google/projects/cel). May only contain equality operators on the parent and inclusion operators on labels (e.g., `parent == 'customers/{customer_id}' && 'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). The `customer_id` must begin with "C" (for example, 'C046psxkn'). [Find your customer ID.] (https://support.google.com/cloudidentity/answer/10070793)
@@ -11324,7 +11324,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -11626,7 +11626,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -11911,7 +11911,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12173,7 +12173,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12391,8 +12391,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inbound_saml_sso_profiles().idp_credentials_list("parent")
-///              .page_token("no")
-///              .page_size(-7)
+///              .page_token("amet.")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12439,7 +12439,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12994,7 +12994,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13256,7 +13256,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13474,9 +13474,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inbound_saml_sso_profiles().list()
-///              .page_token("sit")
-///              .page_size(-35)
-///              .filter("tempor")
+///              .page_token("invidunt")
+///              .page_size(-11)
+///              .filter("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13806,7 +13806,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -14374,7 +14374,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14636,7 +14636,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14854,9 +14854,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inbound_sso_assignments().list()
-///              .page_token("sanctus")
-///              .page_size(-56)
-///              .filter("est")
+///              .page_token("et")
+///              .page_size(-39)
+///              .filter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15186,7 +15186,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }

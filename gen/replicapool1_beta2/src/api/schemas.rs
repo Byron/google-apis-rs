@@ -292,7 +292,7 @@ pub struct Operation {
     pub start_time: Option<String>,
     /// [Output Only] Status of the operation.
     
-    pub status: Option<String>,
+    pub status: Option<OperationStatusEnum>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
     
@@ -363,7 +363,7 @@ pub struct ReplicaPoolAutoHealingPolicy {
     /// The action to perform when an instance becomes unhealthy. Possible values are RECREATE or REBOOT. RECREATE replaces an unhealthy instance with a new instance that is based on the instance template for this managed instance group. REBOOT performs a soft reboot on an instance. If the instance cannot reboot, the instance performs a hard restart.
     #[serde(rename="actionType")]
     
-    pub action_type: Option<String>,
+    pub action_type: Option<ReplicaPoolAutoHealingPolicyActionTypeEnum>,
     /// The URL for the HealthCheck that signals autohealing.
     #[serde(rename="healthCheck")]
     
@@ -420,7 +420,7 @@ impl client::Part for OperationErrorErrors {}
 pub struct OperationWarnings {
     /// [Output only] The warning type identifier for this warning.
     
-    pub code: Option<String>,
+    pub code: Option<OperationWarningCodeEnum>,
     /// [Output only] Metadata for this warning in key:value format.
     
     pub data: Option<Vec<OperationWarningsData>>,

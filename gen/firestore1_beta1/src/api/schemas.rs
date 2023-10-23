@@ -275,7 +275,7 @@ pub struct CompositeFilter {
     pub filters: Option<Vec<Filter>>,
     /// The operator for combining multiple filters.
     
-    pub op: Option<String>,
+    pub op: Option<CompositeFilterOpEnum>,
 }
 
 impl client::Part for CompositeFilter {}
@@ -516,7 +516,7 @@ pub struct FieldFilter {
     pub field: Option<FieldReference>,
     /// The operator to filter by.
     
-    pub op: Option<String>,
+    pub op: Option<FieldFilterOpEnum>,
     /// The value to compare to.
     
     pub value: Option<Value>,
@@ -572,7 +572,7 @@ pub struct FieldTransform {
     /// Sets the field to the given server value.
     #[serde(rename="setToServerValue")]
     
-    pub set_to_server_value: Option<String>,
+    pub set_to_server_value: Option<FieldTransformSetToServerValueEnum>,
 }
 
 impl client::Part for FieldTransform {}
@@ -674,7 +674,7 @@ pub struct GoogleFirestoreAdminV1beta1Index {
     pub name: Option<String>,
     /// The state of the index. Output only.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleFirestoreAdminV1beta1IndexStateEnum>,
 }
 
 impl client::RequestValue for GoogleFirestoreAdminV1beta1Index {}
@@ -694,7 +694,7 @@ pub struct GoogleFirestoreAdminV1beta1IndexField {
     pub field_path: Option<String>,
     /// The field's mode.
     
-    pub mode: Option<String>,
+    pub mode: Option<GoogleFirestoreAdminV1beta1IndexFieldModeEnum>,
 }
 
 impl client::Part for GoogleFirestoreAdminV1beta1IndexField {}
@@ -936,7 +936,7 @@ impl client::Part for MapValue {}
 pub struct Order {
     /// The direction to order by. Defaults to `ASCENDING`.
     
-    pub direction: Option<String>,
+    pub direction: Option<OrderDirectionEnum>,
     /// The field to order by.
     
     pub field: Option<FieldReference>,
@@ -1372,7 +1372,7 @@ pub struct TargetChange {
     /// The type of change that occurred.
     #[serde(rename="targetChangeType")]
     
-    pub target_change_type: Option<String>,
+    pub target_change_type: Option<TargetChangeTargetChangeTypeEnum>,
     /// The target IDs of targets that have changed. If empty, the change applies to all targets. The order of the target IDs is not defined.
     #[serde(rename="targetIds")]
     
@@ -1414,7 +1414,7 @@ pub struct UnaryFilter {
     pub field: Option<FieldReference>,
     /// The unary operator to apply.
     
-    pub op: Option<String>,
+    pub op: Option<UnaryFilterOpEnum>,
 }
 
 impl client::Part for UnaryFilter {}
@@ -1460,7 +1460,7 @@ pub struct Value {
     /// A null value.
     #[serde(rename="nullValue")]
     
-    pub null_value: Option<String>,
+    pub null_value: Option<ValueNullValueEnum>,
     /// A reference to a document. For example: `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     #[serde(rename="referenceValue")]
     

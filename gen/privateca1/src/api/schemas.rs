@@ -99,7 +99,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -175,7 +175,7 @@ pub struct CaPool {
     pub publishing_options: Option<PublishingOptions>,
     /// Required. Immutable. The Tier of this CaPool.
     
-    pub tier: Option<String>,
+    pub tier: Option<CaPoolTierEnum>,
 }
 
 impl client::RequestValue for CaPool {}
@@ -274,7 +274,7 @@ pub struct Certificate {
     /// Immutable. Specifies how the Certificate's identity fields are to be decided. If this is omitted, the `DEFAULT` subject mode will be used.
     #[serde(rename="subjectMode")]
     
-    pub subject_mode: Option<String>,
+    pub subject_mode: Option<CertificateSubjectModeEnum>,
     /// Output only. The time at which this Certificate was updated.
     #[serde(rename="updateTime")]
     
@@ -345,18 +345,18 @@ pub struct CertificateAuthority {
     pub pem_ca_certificates: Option<Vec<String>>,
     /// Output only. The State for this CertificateAuthority.
     
-    pub state: Option<String>,
+    pub state: Option<CertificateAuthorityStateEnum>,
     /// Optional. If this is a subordinate CertificateAuthority, this field will be set with the subordinate configuration, which describes its issuers. This may be updated, but this CertificateAuthority must continue to validate.
     #[serde(rename="subordinateConfig")]
     
     pub subordinate_config: Option<SubordinateConfig>,
     /// Output only. The CaPool.Tier of the CaPool that includes this CertificateAuthority.
     
-    pub tier: Option<String>,
+    pub tier: Option<CertificateAuthorityTierEnum>,
     /// Required. Immutable. The Type of this CertificateAuthority.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CertificateAuthorityTypeEnum>,
     /// Output only. The time at which this CertificateAuthority was last updated.
     #[serde(rename="updateTime")]
     
@@ -449,7 +449,7 @@ pub struct CertificateExtensionConstraints {
     /// Optional. A set of named X.509 extensions. Will be combined with additional_extensions to determine the full set of X.509 extensions.
     #[serde(rename="knownExtensions")]
     
-    pub known_extensions: Option<Vec<String>>,
+    pub known_extensions: Option<Vec<CertificateExtensionConstraintKnownExtensionsEnum>>,
 }
 
 impl client::Part for CertificateExtensionConstraints {}
@@ -540,7 +540,7 @@ pub struct CertificateRevocationList {
     pub sequence_number: Option<i64>,
     /// Output only. The State for this CertificateRevocationList.
     
-    pub state: Option<String>,
+    pub state: Option<CertificateRevocationListStateEnum>,
     /// Output only. The time at which this CertificateRevocationList was updated.
     #[serde(rename="updateTime")]
     
@@ -629,7 +629,7 @@ pub struct EcKeyType {
     /// Optional. A signature algorithm that must be used. If this is omitted, any EC-based signature algorithm will be allowed.
     #[serde(rename="signatureAlgorithm")]
     
-    pub signature_algorithm: Option<String>,
+    pub signature_algorithm: Option<EcKeyTypeSignatureAlgorithmEnum>,
 }
 
 impl client::Part for EcKeyType {}
@@ -945,7 +945,7 @@ impl client::Part for KeyUsageOptions {}
 pub struct KeyVersionSpec {
     /// The algorithm to use for creating a managed Cloud KMS key for a for a simplified experience. All managed keys will be have their ProtectionLevel as `HSM`.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<KeyVersionSpecAlgorithmEnum>,
     /// The resource name for an existing Cloud KMS CryptoKeyVersion in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`. This option enables full flexibility in the key's capabilities and properties.
     #[serde(rename="cloudKmsKeyVersion")]
     
@@ -1273,7 +1273,7 @@ impl client::ResponseResult for Policy {}
 pub struct PublicKey {
     /// Required. The format of the public key.
     
-    pub format: Option<String>,
+    pub format: Option<PublicKeyFormatEnum>,
     /// Required. A public key. The padding and encoding must match with the `KeyFormat` value specified for the `format` field.
     
     #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
@@ -1313,7 +1313,7 @@ pub struct RevocationDetails {
     /// Indicates why a Certificate was revoked.
     #[serde(rename="revocationState")]
     
-    pub revocation_state: Option<String>,
+    pub revocation_state: Option<RevocationDetailRevocationStateEnum>,
     /// The time at which this Certificate was revoked.
     #[serde(rename="revocationTime")]
     
@@ -1336,7 +1336,7 @@ impl client::Part for RevocationDetails {}
 pub struct RevokeCertificateRequest {
     /// Required. The RevocationReason for revoking this certificate.
     
-    pub reason: Option<String>,
+    pub reason: Option<RevokeCertificateRequestReasonEnum>,
     /// Optional. An ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     #[serde(rename="requestId")]
     
@@ -1363,7 +1363,7 @@ pub struct RevokedCertificate {
     /// The reason the Certificate was revoked.
     #[serde(rename="revocationReason")]
     
-    pub revocation_reason: Option<String>,
+    pub revocation_reason: Option<RevokedCertificateRevocationReasonEnum>,
 }
 
 impl client::Part for RevokedCertificate {}

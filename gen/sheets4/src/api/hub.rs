@@ -38,10 +38,10 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.spreadsheets().values_append(req, "spreadsheetId", "range")
-///              .value_input_option("dolor")
-///              .response_value_render_option("ea")
-///              .response_date_time_render_option("ipsum")
-///              .insert_data_option("invidunt")
+///              .value_input_option(&Default::default())
+///              .response_value_render_option(&Default::default())
+///              .response_date_time_render_option(&Default::default())
+///              .insert_data_option(&Default::default())
 ///              .include_values_in_response(true)
 ///              .doit().await;
 /// 

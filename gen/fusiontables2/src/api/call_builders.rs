@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("columnId", self._column_id);
+        params.push("tableId", &self._table_id);
+        params.push("columnId", &self._column_id);
 
         params.extend(self._additional_params.iter());
 
@@ -330,8 +330,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("columnId", self._column_id);
+        params.push("tableId", &self._table_id);
+        params.push("columnId", &self._column_id);
 
         params.extend(self._additional_params.iter());
 
@@ -606,7 +606,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -891,7 +891,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1177,8 +1177,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("columnId", self._column_id);
+        params.push("tableId", &self._table_id);
+        params.push("columnId", &self._column_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1477,8 +1477,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("columnId", self._column_id);
+        params.push("tableId", &self._table_id);
+        params.push("columnId", &self._column_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1785,7 +1785,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("sql", self._sql);
+        params.push("sql", &self._sql);
         if let Some(value) = self._typed.as_ref() {
             params.push("typed", value.to_string());
         }
@@ -2084,7 +2084,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("sql", self._sql);
+        params.push("sql", &self._sql);
         if let Some(value) = self._typed.as_ref() {
             params.push("typed", value.to_string());
         }
@@ -2368,8 +2368,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("styleId", self._style_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("styleId", &self._style_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2627,8 +2627,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("styleId", self._style_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("styleId", &self._style_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2903,7 +2903,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3188,7 +3188,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3474,8 +3474,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("styleId", self._style_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("styleId", &self._style_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3774,8 +3774,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("styleId", self._style_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("styleId", &self._style_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4068,7 +4068,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._copy_presentation.as_ref() {
             params.push("copyPresentation", value.to_string());
         }
@@ -4336,7 +4336,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4583,7 +4583,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4853,7 +4853,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._start_line.as_ref() {
             params.push("startLine", value.to_string());
         }
@@ -5275,7 +5275,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._encoding.as_ref() {
             params.push("encoding", value);
         }
@@ -6195,7 +6195,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._replace_view_definition.as_ref() {
             params.push("replaceViewDefinition", value.to_string());
         }
@@ -6486,7 +6486,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6756,7 +6756,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._start_line.as_ref() {
             params.push("startLine", value.to_string());
         }
@@ -7181,7 +7181,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._replace_view_definition.as_ref() {
             params.push("replaceViewDefinition", value.to_string());
         }
@@ -7473,8 +7473,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("taskId", self._task_id);
+        params.push("tableId", &self._table_id);
+        params.push("taskId", &self._task_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7732,8 +7732,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("taskId", self._task_id);
+        params.push("tableId", &self._table_id);
+        params.push("taskId", &self._task_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8007,7 +8007,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -8296,8 +8296,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("templateId", self._template_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("templateId", &self._template_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8555,8 +8555,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("templateId", self._template_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("templateId", &self._template_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8831,7 +8831,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9116,7 +9116,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
+        params.push("tableId", &self._table_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9402,8 +9402,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("templateId", self._template_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("templateId", &self._template_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -9702,8 +9702,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("tableId", self._table_id);
-        params.push("templateId", self._template_id.to_string());
+        params.push("tableId", &self._table_id);
+        params.push("templateId", &self._template_id.to_string());
 
         params.extend(self._additional_params.iter());
 

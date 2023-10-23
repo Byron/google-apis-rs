@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -371,7 +371,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._schema_id.as_ref() {
             params.push("schemaId", value);
         }
@@ -666,7 +666,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -930,7 +930,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._revision_id.as_ref() {
             params.push("revisionId", value);
         }
@@ -1158,7 +1158,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().schemas_get("name")
-///              .view("gubergren")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1167,7 +1167,7 @@ pub struct ProjectSchemaGetCall<'a, S>
 
    pub(super) hub: &'a Pubsub<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1204,7 +1204,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1325,8 +1325,8 @@ where
     /// The set of fields to return in the response. If not set, returns a Schema with all fields filled out. Set to `BASIC` to omit the `definition`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSchemaGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectSchemaGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1432,7 +1432,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().schemas_get_iam_policy("resource")
-///              .options_requested_policy_version(-12)
+///              .options_requested_policy_version(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1478,7 +1478,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -1706,9 +1706,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().schemas_list("parent")
-///              .view("dolor")
-///              .page_token("ea")
-///              .page_size(-55)
+///              .view(&Default::default())
+///              .page_token("eos")
+///              .page_size(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1717,7 +1717,7 @@ pub struct ProjectSchemaListCall<'a, S>
 
    pub(super) hub: &'a Pubsub<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1756,7 +1756,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1883,8 +1883,8 @@ where
     /// The set of Schema fields to return in the response. If not set, returns Schemas with `name` and `type`, but not `definition`. Set to `FULL` to retrieve all fields.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSchemaListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectSchemaListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The value returned by the last `ListSchemasResponse`; indicates that this is a continuation of a prior `ListSchemas` call, and that the system should return the next page of data.
@@ -2004,9 +2004,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().schemas_list_revisions("name")
-///              .view("amet")
-///              .page_token("duo")
-///              .page_size(-50)
+///              .view(&Default::default())
+///              .page_token("ipsum")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2015,7 +2015,7 @@ pub struct ProjectSchemaListRevisionCall<'a, S>
 
    pub(super) hub: &'a Pubsub<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2054,7 +2054,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -2181,8 +2181,8 @@ where
     /// The set of Schema fields to return in the response. If not set, returns Schemas with `name` and `type`, but not `definition`. Set to `FULL` to retrieve all fields.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSchemaListRevisionCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectSchemaListRevisionCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The page token, received from a previous ListSchemaRevisions call. Provide this to retrieve the subsequent page.
@@ -2353,7 +2353,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2645,7 +2645,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -2937,7 +2937,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -3229,7 +3229,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3521,7 +3521,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3813,7 +3813,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4098,7 +4098,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("snapshot", self._snapshot);
+        params.push("snapshot", &self._snapshot);
 
         params.extend(self._additional_params.iter());
 
@@ -4360,7 +4360,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("snapshot", self._snapshot);
+        params.push("snapshot", &self._snapshot);
 
         params.extend(self._additional_params.iter());
 
@@ -4578,7 +4578,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snapshots_get_iam_policy("resource")
-///              .options_requested_policy_version(-17)
+///              .options_requested_policy_version(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4624,7 +4624,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -4852,8 +4852,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snapshots_list("project")
-///              .page_token("Lorem")
-///              .page_size(-25)
+///              .page_token("gubergren")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4900,7 +4900,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5189,7 +5189,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5481,7 +5481,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -5773,7 +5773,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -6065,7 +6065,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -6357,7 +6357,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6642,7 +6642,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -6904,7 +6904,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -7166,7 +7166,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -7384,7 +7384,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().subscriptions_get_iam_policy("resource")
-///              .options_requested_policy_version(-24)
+///              .options_requested_policy_version(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7430,7 +7430,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -7658,8 +7658,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().subscriptions_list("project")
-///              .page_token("vero")
-///              .page_size(-31)
+///              .page_token("sed")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7706,7 +7706,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7995,7 +7995,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -8287,7 +8287,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -8579,7 +8579,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8871,7 +8871,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -9163,7 +9163,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("subscription", self._subscription);
+        params.push("subscription", &self._subscription);
 
         params.extend(self._additional_params.iter());
 
@@ -9455,7 +9455,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -9747,7 +9747,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -9988,8 +9988,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_snapshots_list("topic")
-///              .page_token("dolor")
-///              .page_size(-18)
+///              .page_token("amet.")
+///              .page_size(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10036,7 +10036,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("topic", self._topic);
+        params.push("topic", &self._topic);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10274,8 +10274,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_subscriptions_list("topic")
-///              .page_token("sadipscing")
-///              .page_size(-15)
+///              .page_token("dolor")
+///              .page_size(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10322,7 +10322,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("topic", self._topic);
+        params.push("topic", &self._topic);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10611,7 +10611,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10896,7 +10896,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("topic", self._topic);
+        params.push("topic", &self._topic);
 
         params.extend(self._additional_params.iter());
 
@@ -11158,7 +11158,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("topic", self._topic);
+        params.push("topic", &self._topic);
 
         params.extend(self._additional_params.iter());
 
@@ -11376,7 +11376,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_get_iam_policy("resource")
-///              .options_requested_policy_version(-88)
+///              .options_requested_policy_version(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11422,7 +11422,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -11651,7 +11651,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_list("project")
 ///              .page_token("vero")
-///              .page_size(-44)
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11698,7 +11698,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11987,7 +11987,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12279,7 +12279,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("topic", self._topic);
+        params.push("topic", &self._topic);
 
         params.extend(self._additional_params.iter());
 
@@ -12571,7 +12571,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -12863,7 +12863,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 

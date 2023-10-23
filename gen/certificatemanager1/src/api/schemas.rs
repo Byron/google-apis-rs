@@ -15,10 +15,10 @@ pub struct AuthorizationAttemptInfo {
     /// Output only. Reason for failure of the authorization attempt for the domain.
     #[serde(rename="failureReason")]
     
-    pub failure_reason: Option<String>,
+    pub failure_reason: Option<AuthorizationAttemptInfoFailureReasonEnum>,
     /// Output only. State of the domain for managed certificate issuance.
     
-    pub state: Option<String>,
+    pub state: Option<AuthorizationAttemptInfoStateEnum>,
 }
 
 impl client::Part for AuthorizationAttemptInfo {}
@@ -82,7 +82,7 @@ pub struct Certificate {
     pub san_dnsnames: Option<Vec<String>>,
     /// Immutable. The scope of the certificate.
     
-    pub scope: Option<String>,
+    pub scope: Option<CertificateScopeEnum>,
     /// If set, defines data of a self-managed certificate.
     #[serde(rename="selfManaged")]
     
@@ -155,7 +155,7 @@ pub struct CertificateIssuanceConfig {
     /// Required. The key algorithm to use when generating the private key.
     #[serde(rename="keyAlgorithm")]
     
-    pub key_algorithm: Option<String>,
+    pub key_algorithm: Option<CertificateIssuanceConfigKeyAlgorithmEnum>,
     /// Set of labels associated with a CertificateIssuanceConfig.
     
     pub labels: Option<HashMap<String, String>>,
@@ -251,13 +251,13 @@ pub struct CertificateMapEntry {
     pub labels: Option<HashMap<String, String>>,
     /// A predefined matcher for particular cases, other than SNI selection.
     
-    pub matcher: Option<String>,
+    pub matcher: Option<CertificateMapEntryMatcherEnum>,
     /// A user-defined name of the Certificate Map Entry. Certificate Map Entry names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*/certificateMapEntries/*`.
     
     pub name: Option<String>,
     /// Output only. A serving state of this Certificate Map Entry.
     
-    pub state: Option<String>,
+    pub state: Option<CertificateMapEntryStateEnum>,
     /// Output only. The update timestamp of a Certificate Map Entry.
     #[serde(rename="updateTime")]
     
@@ -633,7 +633,7 @@ pub struct ManagedCertificate {
     pub provisioning_issue: Option<ProvisioningIssue>,
     /// Output only. State of the managed certificate resource.
     
-    pub state: Option<String>,
+    pub state: Option<ManagedCertificateStateEnum>,
 }
 
 impl client::Part for ManagedCertificate {}
@@ -696,7 +696,7 @@ pub struct ProvisioningIssue {
     pub details: Option<String>,
     /// Output only. Reason for provisioning failures.
     
-    pub reason: Option<String>,
+    pub reason: Option<ProvisioningIssueReasonEnum>,
 }
 
 impl client::Part for ProvisioningIssue {}

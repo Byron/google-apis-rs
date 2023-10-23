@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -624,7 +624,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -842,8 +842,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_adunits_list("parent")
-///              .page_token("dolore")
-///              .page_size(-22)
+///              .page_token("sed")
+///              .page_size(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -890,7 +890,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1128,8 +1128,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_adunits_list_linked_custom_channels("parent")
-///              .page_token("amet.")
-///              .page_size(-96)
+///              .page_token("kasd")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1176,7 +1176,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1467,7 +1467,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1769,7 +1769,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2054,7 +2054,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2316,7 +2316,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2534,8 +2534,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_customchannels_list("parent")
-///              .page_token("Stet")
-///              .page_size(-99)
+///              .page_token("sed")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2582,7 +2582,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2820,8 +2820,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_customchannels_list_linked_ad_units("parent")
-///              .page_token("vero")
-///              .page_size(-76)
+///              .page_token("et")
+///              .page_size(-28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2868,7 +2868,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3159,7 +3159,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -3454,7 +3454,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3672,8 +3672,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_urlchannels_list("parent")
-///              .page_token("elitr")
-///              .page_size(-6)
+///              .page_token("dolor")
+///              .page_size(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3720,7 +3720,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4002,7 +4002,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4264,7 +4264,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4482,8 +4482,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_list("parent")
-///              .page_token("accusam")
-///              .page_size(-59)
+///              .page_token("dolor")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4530,7 +4530,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4768,7 +4768,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().alerts_list("parent")
-///              .language_code("voluptua.")
+///              .language_code("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4814,7 +4814,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._language_code.as_ref() {
             params.push("languageCode", value);
         }
@@ -5086,7 +5086,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -5304,16 +5304,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_saved_generate("name")
-///              .start_date_year(-96)
-///              .start_date_month(-2)
-///              .start_date_day(-30)
-///              .reporting_time_zone("takimata")
-///              .language_code("dolores")
-///              .end_date_year(-62)
-///              .end_date_month(-74)
+///              .start_date_year(-76)
+///              .start_date_month(-44)
+///              .start_date_day(-6)
+///              .reporting_time_zone(&Default::default())
+///              .language_code("diam")
+///              .end_date_year(-61)
+///              .end_date_month(-100)
 ///              .end_date_day(-23)
-///              .date_range("voluptua.")
-///              .currency_code("dolore")
+///              .date_range(&Default::default())
+///              .currency_code("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5325,12 +5325,12 @@ pub struct AccountReportSavedGenerateCall<'a, S>
    pub(super) _start_date_year: Option<i32>,
    pub(super) _start_date_month: Option<i32>,
    pub(super) _start_date_day: Option<i32>,
-   pub(super) _reporting_time_zone: Option<String>,
+   pub(super) _reporting_time_zone: Option<AccountReportingTimeZoneEnum>,
    pub(super) _language_code: Option<String>,
    pub(super) _end_date_year: Option<i32>,
    pub(super) _end_date_month: Option<i32>,
    pub(super) _end_date_day: Option<i32>,
-   pub(super) _date_range: Option<String>,
+   pub(super) _date_range: Option<AccountDateRangeEnum>,
    pub(super) _currency_code: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -5368,7 +5368,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._start_date_year.as_ref() {
             params.push("startDate.year", value.to_string());
         }
@@ -5537,8 +5537,8 @@ where
     /// Timezone in which to generate the report. If unspecified, this defaults to the account timezone. For more information, see [changing the time zone of your reports](https://support.google.com/adsense/answer/9830725).
     ///
     /// Sets the *reporting time zone* query property to the given value.
-    pub fn reporting_time_zone(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, S> {
-        self._reporting_time_zone = Some(new_value.to_string());
+    pub fn reporting_time_zone(mut self, new_value: &AccountReportingTimeZoneEnum) -> AccountReportSavedGenerateCall<'a, S> {
+        self._reporting_time_zone = Some(new_value.clone());
         self
     }
     /// The language to use for translating report output. If unspecified, this defaults to English ("en"). If the given language is not supported, report output will be returned in English. The language is specified as an [IETF BCP-47 language code](https://en.wikipedia.org/wiki/IETF_language_tag).
@@ -5572,8 +5572,8 @@ where
     /// Date range of the report, if unset the range will be considered CUSTOM.
     ///
     /// Sets the *date range* query property to the given value.
-    pub fn date_range(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, S> {
-        self._date_range = Some(new_value.to_string());
+    pub fn date_range(mut self, new_value: &AccountDateRangeEnum) -> AccountReportSavedGenerateCall<'a, S> {
+        self._date_range = Some(new_value.clone());
         self
     }
     /// The [ISO-4217 currency code](https://en.wikipedia.org/wiki/ISO_4217) to use when reporting on monetary metrics. Defaults to the account's currency if not set.
@@ -5686,16 +5686,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_saved_generate_csv("name")
-///              .start_date_year(-34)
-///              .start_date_month(-78)
-///              .start_date_day(-2)
-///              .reporting_time_zone("ea")
-///              .language_code("sadipscing")
-///              .end_date_year(-6)
-///              .end_date_month(-38)
-///              .end_date_day(-11)
-///              .date_range("est")
-///              .currency_code("At")
+///              .start_date_year(-28)
+///              .start_date_month(-72)
+///              .start_date_day(-31)
+///              .reporting_time_zone(&Default::default())
+///              .language_code("consetetur")
+///              .end_date_year(-2)
+///              .end_date_month(-30)
+///              .end_date_day(-9)
+///              .date_range(&Default::default())
+///              .currency_code("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5707,12 +5707,12 @@ pub struct AccountReportSavedGenerateCsvCall<'a, S>
    pub(super) _start_date_year: Option<i32>,
    pub(super) _start_date_month: Option<i32>,
    pub(super) _start_date_day: Option<i32>,
-   pub(super) _reporting_time_zone: Option<String>,
+   pub(super) _reporting_time_zone: Option<AccountReportingTimeZoneEnum>,
    pub(super) _language_code: Option<String>,
    pub(super) _end_date_year: Option<i32>,
    pub(super) _end_date_month: Option<i32>,
    pub(super) _end_date_day: Option<i32>,
-   pub(super) _date_range: Option<String>,
+   pub(super) _date_range: Option<AccountDateRangeEnum>,
    pub(super) _currency_code: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -5750,7 +5750,7 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._start_date_year.as_ref() {
             params.push("startDate.year", value.to_string());
         }
@@ -5919,8 +5919,8 @@ where
     /// Timezone in which to generate the report. If unspecified, this defaults to the account timezone. For more information, see [changing the time zone of your reports](https://support.google.com/adsense/answer/9830725).
     ///
     /// Sets the *reporting time zone* query property to the given value.
-    pub fn reporting_time_zone(mut self, new_value: &str) -> AccountReportSavedGenerateCsvCall<'a, S> {
-        self._reporting_time_zone = Some(new_value.to_string());
+    pub fn reporting_time_zone(mut self, new_value: &AccountReportingTimeZoneEnum) -> AccountReportSavedGenerateCsvCall<'a, S> {
+        self._reporting_time_zone = Some(new_value.clone());
         self
     }
     /// The language to use for translating report output. If unspecified, this defaults to English ("en"). If the given language is not supported, report output will be returned in English. The language is specified as an [IETF BCP-47 language code](https://en.wikipedia.org/wiki/IETF_language_tag).
@@ -5954,8 +5954,8 @@ where
     /// Date range of the report, if unset the range will be considered CUSTOM.
     ///
     /// Sets the *date range* query property to the given value.
-    pub fn date_range(mut self, new_value: &str) -> AccountReportSavedGenerateCsvCall<'a, S> {
-        self._date_range = Some(new_value.to_string());
+    pub fn date_range(mut self, new_value: &AccountDateRangeEnum) -> AccountReportSavedGenerateCsvCall<'a, S> {
+        self._date_range = Some(new_value.clone());
         self
     }
     /// The [ISO-4217 currency code](https://en.wikipedia.org/wiki/ISO_4217) to use when reporting on monetary metrics. Defaults to the account's currency if not set.
@@ -6068,8 +6068,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_saved_list("parent")
-///              .page_token("sit")
-///              .page_size(-35)
+///              .page_token("et")
+///              .page_size(-23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6116,7 +6116,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6354,21 +6354,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_generate("account")
-///              .start_date_year(-32)
-///              .start_date_month(-5)
-///              .start_date_day(-18)
-///              .reporting_time_zone("sanctus")
-///              .add_order_by("Lorem")
-///              .add_metrics("est")
-///              .limit(-30)
-///              .language_code("diam")
-///              .add_filters("dolores")
-///              .end_date_year(-69)
-///              .end_date_month(-68)
-///              .end_date_day(-93)
-///              .add_dimensions("no")
-///              .date_range("et")
-///              .currency_code("elitr")
+///              .start_date_year(-34)
+///              .start_date_month(-34)
+///              .start_date_day(-34)
+///              .reporting_time_zone(&Default::default())
+///              .add_order_by("voluptua.")
+///              .add_metrics(&Default::default())
+///              .limit(-2)
+///              .language_code("ea")
+///              .add_filters("sadipscing")
+///              .end_date_year(-6)
+///              .end_date_month(-38)
+///              .end_date_day(-11)
+///              .add_dimensions(&Default::default())
+///              .date_range(&Default::default())
+///              .currency_code("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6380,17 +6380,17 @@ pub struct AccountReportGenerateCall<'a, S>
    pub(super) _start_date_year: Option<i32>,
    pub(super) _start_date_month: Option<i32>,
    pub(super) _start_date_day: Option<i32>,
-   pub(super) _reporting_time_zone: Option<String>,
+   pub(super) _reporting_time_zone: Option<AccountReportingTimeZoneEnum>,
    pub(super) _order_by: Vec<String>,
-   pub(super) _metrics: Vec<String>,
+   pub(super) _metrics: Option<AccountMetricsEnum>,
    pub(super) _limit: Option<i32>,
    pub(super) _language_code: Option<String>,
    pub(super) _filters: Vec<String>,
    pub(super) _end_date_year: Option<i32>,
    pub(super) _end_date_month: Option<i32>,
    pub(super) _end_date_day: Option<i32>,
-   pub(super) _dimensions: Vec<String>,
-   pub(super) _date_range: Option<String>,
+   pub(super) _dimensions: Option<AccountDimensionsEnum>,
+   pub(super) _date_range: Option<AccountDateRangeEnum>,
    pub(super) _currency_code: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -6428,7 +6428,7 @@ where
         }
 
         let mut params = Params::with_capacity(18 + self._additional_params.len());
-        params.push("account", self._account);
+        params.push("account", &self._account);
         if let Some(value) = self._start_date_year.as_ref() {
             params.push("startDate.year", value.to_string());
         }
@@ -6620,8 +6620,8 @@ where
     /// Timezone in which to generate the report. If unspecified, this defaults to the account timezone. For more information, see [changing the time zone of your reports](https://support.google.com/adsense/answer/9830725).
     ///
     /// Sets the *reporting time zone* query property to the given value.
-    pub fn reporting_time_zone(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
-        self._reporting_time_zone = Some(new_value.to_string());
+    pub fn reporting_time_zone(mut self, new_value: &AccountReportingTimeZoneEnum) -> AccountReportGenerateCall<'a, S> {
+        self._reporting_time_zone = Some(new_value.clone());
         self
     }
     /// The name of a dimension or metric to sort the resulting report on, can be prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
@@ -6636,8 +6636,8 @@ where
     ///
     /// Append the given value to the *metrics* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_metrics(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
-        self._metrics.push(new_value.to_string());
+    pub fn add_metrics(mut self, new_value: &AccountMetricsEnum) -> AccountReportGenerateCall<'a, S> {
+        self._metrics.push(new_value.clone());
         self
     }
     /// The maximum number of rows of report data to return. Reports producing more rows than the requested limit will be truncated. If unset, this defaults to 100,000 rows for `Reports.GenerateReport` and 1,000,000 rows for `Reports.GenerateCsvReport`, which are also the maximum values permitted here. Report truncation can be identified (for `Reports.GenerateReport` only) by comparing the number of rows returned to the value returned in `total_matched_rows`.
@@ -6687,15 +6687,15 @@ where
     ///
     /// Append the given value to the *dimensions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_dimensions(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
-        self._dimensions.push(new_value.to_string());
+    pub fn add_dimensions(mut self, new_value: &AccountDimensionsEnum) -> AccountReportGenerateCall<'a, S> {
+        self._dimensions.push(new_value.clone());
         self
     }
     /// Date range of the report, if unset the range will be considered CUSTOM.
     ///
     /// Sets the *date range* query property to the given value.
-    pub fn date_range(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
-        self._date_range = Some(new_value.to_string());
+    pub fn date_range(mut self, new_value: &AccountDateRangeEnum) -> AccountReportGenerateCall<'a, S> {
+        self._date_range = Some(new_value.clone());
         self
     }
     /// The [ISO-4217 currency code](https://en.wikipedia.org/wiki/ISO_4217) to use when reporting on monetary metrics. Defaults to the account's currency if not set.
@@ -6808,21 +6808,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_generate_csv("account")
-///              .start_date_year(-61)
-///              .start_date_month(-91)
-///              .start_date_day(-77)
-///              .reporting_time_zone("sadipscing")
-///              .add_order_by("aliquyam")
-///              .add_metrics("dolores")
-///              .limit(-95)
-///              .language_code("erat")
-///              .add_filters("aliquyam")
-///              .end_date_year(-47)
-///              .end_date_month(-57)
-///              .end_date_day(-24)
-///              .add_dimensions("sea")
-///              .date_range("consetetur")
-///              .currency_code("consetetur")
+///              .start_date_year(-43)
+///              .start_date_month(-98)
+///              .start_date_day(-35)
+///              .reporting_time_zone(&Default::default())
+///              .add_order_by("tempor")
+///              .add_metrics(&Default::default())
+///              .limit(-32)
+///              .language_code("ipsum")
+///              .add_filters("et")
+///              .end_date_year(-8)
+///              .end_date_month(-56)
+///              .end_date_day(-7)
+///              .add_dimensions(&Default::default())
+///              .date_range(&Default::default())
+///              .currency_code("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6834,17 +6834,17 @@ pub struct AccountReportGenerateCsvCall<'a, S>
    pub(super) _start_date_year: Option<i32>,
    pub(super) _start_date_month: Option<i32>,
    pub(super) _start_date_day: Option<i32>,
-   pub(super) _reporting_time_zone: Option<String>,
+   pub(super) _reporting_time_zone: Option<AccountReportingTimeZoneEnum>,
    pub(super) _order_by: Vec<String>,
-   pub(super) _metrics: Vec<String>,
+   pub(super) _metrics: Option<AccountMetricsEnum>,
    pub(super) _limit: Option<i32>,
    pub(super) _language_code: Option<String>,
    pub(super) _filters: Vec<String>,
    pub(super) _end_date_year: Option<i32>,
    pub(super) _end_date_month: Option<i32>,
    pub(super) _end_date_day: Option<i32>,
-   pub(super) _dimensions: Vec<String>,
-   pub(super) _date_range: Option<String>,
+   pub(super) _dimensions: Option<AccountDimensionsEnum>,
+   pub(super) _date_range: Option<AccountDateRangeEnum>,
    pub(super) _currency_code: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -6882,7 +6882,7 @@ where
         }
 
         let mut params = Params::with_capacity(18 + self._additional_params.len());
-        params.push("account", self._account);
+        params.push("account", &self._account);
         if let Some(value) = self._start_date_year.as_ref() {
             params.push("startDate.year", value.to_string());
         }
@@ -7074,8 +7074,8 @@ where
     /// Timezone in which to generate the report. If unspecified, this defaults to the account timezone. For more information, see [changing the time zone of your reports](https://support.google.com/adsense/answer/9830725).
     ///
     /// Sets the *reporting time zone* query property to the given value.
-    pub fn reporting_time_zone(mut self, new_value: &str) -> AccountReportGenerateCsvCall<'a, S> {
-        self._reporting_time_zone = Some(new_value.to_string());
+    pub fn reporting_time_zone(mut self, new_value: &AccountReportingTimeZoneEnum) -> AccountReportGenerateCsvCall<'a, S> {
+        self._reporting_time_zone = Some(new_value.clone());
         self
     }
     /// The name of a dimension or metric to sort the resulting report on, can be prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
@@ -7090,8 +7090,8 @@ where
     ///
     /// Append the given value to the *metrics* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_metrics(mut self, new_value: &str) -> AccountReportGenerateCsvCall<'a, S> {
-        self._metrics.push(new_value.to_string());
+    pub fn add_metrics(mut self, new_value: &AccountMetricsEnum) -> AccountReportGenerateCsvCall<'a, S> {
+        self._metrics.push(new_value.clone());
         self
     }
     /// The maximum number of rows of report data to return. Reports producing more rows than the requested limit will be truncated. If unset, this defaults to 100,000 rows for `Reports.GenerateReport` and 1,000,000 rows for `Reports.GenerateCsvReport`, which are also the maximum values permitted here. Report truncation can be identified (for `Reports.GenerateReport` only) by comparing the number of rows returned to the value returned in `total_matched_rows`.
@@ -7141,15 +7141,15 @@ where
     ///
     /// Append the given value to the *dimensions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_dimensions(mut self, new_value: &str) -> AccountReportGenerateCsvCall<'a, S> {
-        self._dimensions.push(new_value.to_string());
+    pub fn add_dimensions(mut self, new_value: &AccountDimensionsEnum) -> AccountReportGenerateCsvCall<'a, S> {
+        self._dimensions.push(new_value.clone());
         self
     }
     /// Date range of the report, if unset the range will be considered CUSTOM.
     ///
     /// Sets the *date range* query property to the given value.
-    pub fn date_range(mut self, new_value: &str) -> AccountReportGenerateCsvCall<'a, S> {
-        self._date_range = Some(new_value.to_string());
+    pub fn date_range(mut self, new_value: &AccountDateRangeEnum) -> AccountReportGenerateCsvCall<'a, S> {
+        self._date_range = Some(new_value.clone());
         self
     }
     /// The [ISO-4217 currency code](https://en.wikipedia.org/wiki/ISO_4217) to use when reporting on monetary metrics. Defaults to the account's currency if not set.
@@ -7306,7 +7306,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7568,7 +7568,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7786,8 +7786,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().sites_list("parent")
-///              .page_token("elitr")
-///              .page_size(-20)
+///              .page_token("et")
+///              .page_size(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7834,7 +7834,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8116,7 +8116,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8378,7 +8378,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8596,8 +8596,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list()
-///              .page_token("sit")
-///              .page_size(-93)
+///              .page_token("elitr")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8863,8 +8863,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list_child_accounts("parent")
-///              .page_token("Lorem")
-///              .page_size(-17)
+///              .page_token("nonumy")
+///              .page_size(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8911,7 +8911,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

@@ -187,7 +187,7 @@ pub struct GoogleCloudChannelV1ChannelPartnerLink {
     /// Required. State of the channel partner link.
     #[serde(rename="linkState")]
     
-    pub link_state: Option<String>,
+    pub link_state: Option<GoogleCloudChannelV1ChannelPartnerLinkLinkStateEnum>,
     /// Output only. Resource name for the channel partner link, in the format accounts/{account_id}/channelPartnerLinks/{id}.
     
     pub name: Option<String>,
@@ -322,7 +322,7 @@ pub struct GoogleCloudChannelV1CloudIdentityInfo {
     /// CustomerType indicates verification type needed for using services.
     #[serde(rename="customerType")]
     
-    pub customer_type: Option<String>,
+    pub customer_type: Option<GoogleCloudChannelV1CloudIdentityInfoCustomerTypeEnum>,
     /// Edu information about the customer.
     #[serde(rename="eduData")]
     
@@ -362,7 +362,7 @@ pub struct GoogleCloudChannelV1Column {
     /// The type of the values for this column.
     #[serde(rename="dataType")]
     
-    pub data_type: Option<String>,
+    pub data_type: Option<GoogleCloudChannelV1ColumnDataTypeEnum>,
     /// The column's display name.
     #[serde(rename="displayName")]
     
@@ -409,7 +409,7 @@ pub struct GoogleCloudChannelV1ConditionalOverride {
     /// Required. The RebillingBasis to use for the applied override. Shows the relative cost based on your repricing costs.
     #[serde(rename="rebillingBasis")]
     
-    pub rebilling_basis: Option<String>,
+    pub rebilling_basis: Option<GoogleCloudChannelV1ConditionalOverrideRebillingBasisEnum>,
     /// Required. Specifies the condition which, if met, will apply the override.
     #[serde(rename="repricingCondition")]
     
@@ -571,7 +571,7 @@ pub struct GoogleCloudChannelV1CustomerConstraints {
     /// Allowed Customer Type.
     #[serde(rename="allowedCustomerTypes")]
     
-    pub allowed_customer_types: Option<Vec<String>>,
+    pub allowed_customer_types: Option<Vec<GoogleCloudChannelV1CustomerConstraintAllowedCustomerTypesEnum>>,
     /// Allowed geographical regions of the customer.
     #[serde(rename="allowedRegions")]
     
@@ -579,7 +579,7 @@ pub struct GoogleCloudChannelV1CustomerConstraints {
     /// Allowed Promotional Order Type. Present for Promotional offers.
     #[serde(rename="promotionalOrderTypes")]
     
-    pub promotional_order_types: Option<Vec<String>>,
+    pub promotional_order_types: Option<Vec<GoogleCloudChannelV1CustomerConstraintPromotionalOrderTypesEnum>>,
 }
 
 impl client::Part for GoogleCloudChannelV1CustomerConstraints {}
@@ -653,11 +653,11 @@ pub struct GoogleCloudChannelV1EduData {
     /// Size of the institute.
     #[serde(rename="instituteSize")]
     
-    pub institute_size: Option<String>,
+    pub institute_size: Option<GoogleCloudChannelV1EduDataInstituteSizeEnum>,
     /// Designated institute type of customer.
     #[serde(rename="instituteType")]
     
-    pub institute_type: Option<String>,
+    pub institute_type: Option<GoogleCloudChannelV1EduDataInstituteTypeEnum>,
     /// Web address for the edu customer's institution.
     
     pub website: Option<String>,
@@ -705,7 +705,7 @@ pub struct GoogleCloudChannelV1Entitlement {
     /// Output only. Current provisioning state of the entitlement.
     #[serde(rename="provisioningState")]
     
-    pub provisioning_state: Option<String>,
+    pub provisioning_state: Option<GoogleCloudChannelV1EntitlementProvisioningStateEnum>,
     /// Optional. This purchase order (PO) information is for resellers to use for their company tracking usage. If a purchaseOrderId value is given, it appears in the API responses and shows up in the invoice. The property accepts up to 80 plain text characters. This is only supported for Google Workspace entitlements.
     #[serde(rename="purchaseOrderId")]
     
@@ -713,7 +713,7 @@ pub struct GoogleCloudChannelV1Entitlement {
     /// Output only. Enumerable of all current suspension reasons for an entitlement.
     #[serde(rename="suspensionReasons")]
     
-    pub suspension_reasons: Option<Vec<String>>,
+    pub suspension_reasons: Option<Vec<GoogleCloudChannelV1EntitlementSuspensionReasonsEnum>>,
     /// Output only. Settings for trial offers.
     #[serde(rename="trialSettings")]
     
@@ -1269,7 +1269,7 @@ pub struct GoogleCloudChannelV1Media {
     /// Type of the media.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudChannelV1MediaTypeEnum>,
 }
 
 impl client::Part for GoogleCloudChannelV1Media {}
@@ -1376,7 +1376,7 @@ pub struct GoogleCloudChannelV1ParameterDefinition {
     /// Data type of the parameter. Minimal value, Maximum value and allowed values will use specified data type here.
     #[serde(rename="parameterType")]
     
-    pub parameter_type: Option<String>,
+    pub parameter_type: Option<GoogleCloudChannelV1ParameterDefinitionParameterTypeEnum>,
 }
 
 impl client::Part for GoogleCloudChannelV1ParameterDefinition {}
@@ -1410,7 +1410,7 @@ pub struct GoogleCloudChannelV1Period {
     /// Period Type.
     #[serde(rename="periodType")]
     
-    pub period_type: Option<String>,
+    pub period_type: Option<GoogleCloudChannelV1PeriodPeriodTypeEnum>,
 }
 
 impl client::Part for GoogleCloudChannelV1Period {}
@@ -1434,11 +1434,11 @@ pub struct GoogleCloudChannelV1Plan {
     /// Describes how a reseller will be billed.
     #[serde(rename="paymentPlan")]
     
-    pub payment_plan: Option<String>,
+    pub payment_plan: Option<GoogleCloudChannelV1PlanPaymentPlanEnum>,
     /// Specifies when the payment needs to happen.
     #[serde(rename="paymentType")]
     
-    pub payment_type: Option<String>,
+    pub payment_type: Option<GoogleCloudChannelV1PlanPaymentTypeEnum>,
     /// Present for Offers with a trial period. For trial-only Offers, a paid service needs to start before the trial period ends for continued service. For Regular Offers with a trial period, the regular pricing goes into effect when trial period ends, or if paid service is started before the end of the trial period.
     #[serde(rename="trialPeriod")]
     
@@ -1492,7 +1492,7 @@ pub struct GoogleCloudChannelV1PriceByResource {
     /// Resource Type. Example: SEAT
     #[serde(rename="resourceType")]
     
-    pub resource_type: Option<String>,
+    pub resource_type: Option<GoogleCloudChannelV1PriceByResourceResourceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudChannelV1PriceByResource {}
@@ -1516,7 +1516,7 @@ pub struct GoogleCloudChannelV1PricePhase {
     /// Defines the phase period type.
     #[serde(rename="periodType")]
     
-    pub period_type: Option<String>,
+    pub period_type: Option<GoogleCloudChannelV1PricePhasePeriodTypeEnum>,
     /// Price of the phase. Present if there are no price tiers.
     
     pub price: Option<GoogleCloudChannelV1Price>,
@@ -1709,7 +1709,7 @@ pub struct GoogleCloudChannelV1RenewalSettings {
     /// Describes how a reseller will be billed.
     #[serde(rename="paymentPlan")]
     
-    pub payment_plan: Option<String>,
+    pub payment_plan: Option<GoogleCloudChannelV1RenewalSettingPaymentPlanEnum>,
     /// If true and enable_renewal = true, the unit (for example seats or licenses) will be set to the number of active units at renewal time.
     #[serde(rename="resizeUnitCount")]
     
@@ -1870,7 +1870,7 @@ pub struct GoogleCloudChannelV1RepricingConfig {
     /// Required. The RebillingBasis to use for this bill. Specifies the relative cost based on repricing costs you will apply.
     #[serde(rename="rebillingBasis")]
     
-    pub rebilling_basis: Option<String>,
+    pub rebilling_basis: Option<GoogleCloudChannelV1RepricingConfigRebillingBasisEnum>,
 }
 
 impl client::Part for GoogleCloudChannelV1RepricingConfig {}
@@ -2035,7 +2035,7 @@ pub struct GoogleCloudChannelV1TransferEligibility {
     /// Specified the reason for ineligibility.
     #[serde(rename="ineligibilityReason")]
     
-    pub ineligibility_reason: Option<String>,
+    pub ineligibility_reason: Option<GoogleCloudChannelV1TransferEligibilityIneligibilityReasonEnum>,
     /// Whether reseller is eligible to transfer the SKU.
     #[serde(rename="isEligible")]
     

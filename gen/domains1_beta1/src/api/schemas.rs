@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -93,7 +93,7 @@ pub struct ConfigureContactSettingsRequest {
     /// The list of contact notices that the caller acknowledges. The notices needed here depend on the values specified in `contact_settings`.
     #[serde(rename="contactNotices")]
     
-    pub contact_notices: Option<Vec<String>>,
+    pub contact_notices: Option<Vec<ConfigureContactSettingsRequestContactNoticesEnum>>,
     /// Fields of the `ContactSettings` to update.
     #[serde(rename="contactSettings")]
     
@@ -203,7 +203,7 @@ pub struct ContactSettings {
     pub admin_contact: Option<Contact>,
     /// Required. Privacy setting for the contacts associated with the `Registration`.
     
-    pub privacy: Option<String>,
+    pub privacy: Option<ContactSettingPrivacyEnum>,
     /// Required. The registrant contact for the `Registration`. *Caution: Anyone with access to this email address, phone number, and/or postal address can take control of the domain.* *Warning: For new `Registration`s, the registrant receives an email confirmation that they must complete within 15 days to avoid domain suspension.*
     #[serde(rename="registrantContact")]
     
@@ -275,7 +275,7 @@ pub struct Domain {
     /// The state of this domain as a `Registration` resource.
     #[serde(rename="resourceState")]
     
-    pub resource_state: Option<String>,
+    pub resource_state: Option<DomainResourceStateEnum>,
     /// Price to renew the domain for one year. Only set when `resource_state` is `IMPORTABLE`.
     #[serde(rename="yearlyPrice")]
     
@@ -294,14 +294,14 @@ impl client::Part for Domain {}
 pub struct DsRecord {
     /// The algorithm used to generate the referenced DNSKEY.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<DsRecordAlgorithmEnum>,
     /// The digest generated from the referenced DNSKEY.
     
     pub digest: Option<String>,
     /// The hash function used to generate the digest of the referenced DNSKEY.
     #[serde(rename="digestType")]
     
-    pub digest_type: Option<String>,
+    pub digest_type: Option<DsRecordDigestTypeEnum>,
     /// The key tag of the record. Must be set in range 0 -- 65535.
     #[serde(rename="keyTag")]
     
@@ -388,7 +388,7 @@ pub struct GoogleDomainsDns {
     /// Required. The state of DS records for this domain. Used to enable or disable automatic DNSSEC.
     #[serde(rename="dsState")]
     
-    pub ds_state: Option<String>,
+    pub ds_state: Option<GoogleDomainsDnDsStateEnum>,
     /// Output only. A list of name servers that store the DNS zone for this domain. Each name server is a domain name, with Unicode domain names expressed in Punycode format. This field is automatically populated with the name servers assigned to the Google Domains DNS zone.
     #[serde(rename="nameServers")]
     
@@ -533,11 +533,11 @@ pub struct ManagementSettings {
     /// Output only. The renewal method for this `Registration`.
     #[serde(rename="renewalMethod")]
     
-    pub renewal_method: Option<String>,
+    pub renewal_method: Option<ManagementSettingRenewalMethodEnum>,
     /// Controls whether the domain can be transferred to another registrar.
     #[serde(rename="transferLockState")]
     
-    pub transfer_lock_state: Option<String>,
+    pub transfer_lock_state: Option<ManagementSettingTransferLockStateEnum>,
 }
 
 impl client::Part for ManagementSettings {}
@@ -702,11 +702,11 @@ pub struct RegisterDomainRequest {
     /// The list of contact notices that the caller acknowledges. The notices needed here depend on the values specified in `registration.contact_settings`.
     #[serde(rename="contactNotices")]
     
-    pub contact_notices: Option<Vec<String>>,
+    pub contact_notices: Option<Vec<RegisterDomainRequestContactNoticesEnum>>,
     /// The list of domain notices that you acknowledge. Call `RetrieveRegisterParameters` to see the notices that need acknowledgement.
     #[serde(rename="domainNotices")]
     
-    pub domain_notices: Option<Vec<String>>,
+    pub domain_notices: Option<Vec<RegisterDomainRequestDomainNoticesEnum>>,
     /// Required. The complete `Registration` resource to be created.
     
     pub registration: Option<Registration>,
@@ -732,7 +732,7 @@ impl client::RequestValue for RegisterDomainRequest {}
 pub struct RegisterParameters {
     /// Indicates whether the domain is available for registration. This value is accurate when obtained by calling `RetrieveRegisterParameters`, but is approximate when obtained by calling `SearchDomains`.
     
-    pub availability: Option<String>,
+    pub availability: Option<RegisterParameterAvailabilityEnum>,
     /// The domain name. Unicode domain names are expressed in Punycode format.
     #[serde(rename="domainName")]
     
@@ -740,11 +740,11 @@ pub struct RegisterParameters {
     /// Notices about special properties of the domain.
     #[serde(rename="domainNotices")]
     
-    pub domain_notices: Option<Vec<String>>,
+    pub domain_notices: Option<Vec<RegisterParameterDomainNoticesEnum>>,
     /// Contact privacy options that the domain supports.
     #[serde(rename="supportedPrivacy")]
     
-    pub supported_privacy: Option<Vec<String>>,
+    pub supported_privacy: Option<Vec<RegisterParameterSupportedPrivacyEnum>>,
     /// Price to register or renew the domain for one year.
     #[serde(rename="yearlyPrice")]
     
@@ -788,7 +788,7 @@ pub struct Registration {
     pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The set of issues with the `Registration` that require attention.
     
-    pub issues: Option<Vec<String>>,
+    pub issues: Option<Vec<RegistrationIssuesEnum>>,
     /// Set of labels associated with the `Registration`.
     
     pub labels: Option<HashMap<String, String>>,
@@ -806,18 +806,18 @@ pub struct Registration {
     /// Output only. The reason the domain registration failed. Only set for domains in REGISTRATION_FAILED state.
     #[serde(rename="registerFailureReason")]
     
-    pub register_failure_reason: Option<String>,
+    pub register_failure_reason: Option<RegistrationRegisterFailureReasonEnum>,
     /// Output only. The state of the `Registration`
     
-    pub state: Option<String>,
+    pub state: Option<RegistrationStateEnum>,
     /// Output only. Set of options for the `contact_settings.privacy` field that this `Registration` supports.
     #[serde(rename="supportedPrivacy")]
     
-    pub supported_privacy: Option<Vec<String>>,
+    pub supported_privacy: Option<Vec<RegistrationSupportedPrivacyEnum>>,
     /// Output only. The reason the domain transfer failed. Only set for domains in TRANSFER_FAILED state.
     #[serde(rename="transferFailureReason")]
     
-    pub transfer_failure_reason: Option<String>,
+    pub transfer_failure_reason: Option<RegistrationTransferFailureReasonEnum>,
 }
 
 impl client::RequestValue for Registration {}
@@ -1022,7 +1022,7 @@ pub struct TransferDomainRequest {
     /// The list of contact notices that you acknowledge. The notices needed here depend on the values specified in `registration.contact_settings`.
     #[serde(rename="contactNotices")]
     
-    pub contact_notices: Option<Vec<String>>,
+    pub contact_notices: Option<Vec<TransferDomainRequestContactNoticesEnum>>,
     /// Required. The complete `Registration` resource to be created. You can leave `registration.dns_settings` unset to import the domain's current DNS configuration from its current registrar. Use this option only if you are sure that the domain's current DNS service does not cease upon transfer, as is often the case for DNS services provided for free by the registrar.
     
     pub registration: Option<Registration>,
@@ -1065,11 +1065,11 @@ pub struct TransferParameters {
     /// Contact privacy options that the domain supports.
     #[serde(rename="supportedPrivacy")]
     
-    pub supported_privacy: Option<Vec<String>>,
+    pub supported_privacy: Option<Vec<TransferParameterSupportedPrivacyEnum>>,
     /// Indicates whether the domain is protected by a transfer lock. For a transfer to succeed, this must show `UNLOCKED`. To unlock a domain, go to its current registrar.
     #[serde(rename="transferLockState")]
     
-    pub transfer_lock_state: Option<String>,
+    pub transfer_lock_state: Option<TransferParameterTransferLockStateEnum>,
     /// Price to transfer or renew the domain for one year.
     #[serde(rename="yearlyPrice")]
     

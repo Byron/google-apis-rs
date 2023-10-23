@@ -98,8 +98,8 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.featuretiles().get("name")
-//!              .region_code("ut")
-//!              .language_code("gubergren")
+//!              .region_code("ipsum")
+//!              .language_code("sed")
 //!              .enable_unclipped_buildings(true)
 //!              .enable_private_roads(true)
 //!              .enable_political_features(true)
@@ -108,12 +108,12 @@
 //!              .enable_detailed_highway_types(true)
 //!              .client_tile_version_id("eos")
 //!              .client_info_user_id("labore")
-//!              .client_info_platform("sed")
-//!              .client_info_operating_system("duo")
-//!              .client_info_device_model("sed")
-//!              .client_info_application_version("no")
-//!              .client_info_application_id("Stet")
-//!              .client_info_api_client("kasd")
+//!              .client_info_platform(&Default::default())
+//!              .client_info_operating_system("sed")
+//!              .client_info_device_model("duo")
+//!              .client_info_application_version("sed")
+//!              .client_info_application_id("no")
+//!              .client_info_api_client("Stet")
 //!              .always_include_building_footprints(true)
 //!              .doit().await;
 //! 

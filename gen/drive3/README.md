@@ -157,8 +157,8 @@ let result = hub.files().list()
              .include_labels("gubergren")
              .include_items_from_all_drives(false)
              .drive_id("dolor")
-             .corpus("ea")
-             .corpora("ipsum")
+             .corpus(&Default::default())
+             .corpora("ea")
              .doit().await;
 
 match result {

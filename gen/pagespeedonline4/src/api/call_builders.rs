@@ -26,14 +26,14 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pagespeedapi().runpagespeed("url")
-///              .utm_source("dolor")
-///              .utm_campaign("Lorem")
-///              .strategy("eos")
-///              .snapshots(false)
-///              .screenshot(true)
-///              .add_rule("duo")
-///              .locale("sed")
-///              .filter_third_party_resources(true)
+///              .utm_source("ipsum")
+///              .utm_campaign("est")
+///              .strategy(&Default::default())
+///              .snapshots(true)
+///              .screenshot(false)
+///              .add_rule("Lorem")
+///              .locale("eos")
+///              .filter_third_party_resources(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -44,7 +44,7 @@ pub struct PagespeedapiRunpagespeedCall<'a, S>
    pub(super) _url: String,
    pub(super) _utm_source: Option<String>,
    pub(super) _utm_campaign: Option<String>,
-   pub(super) _strategy: Option<String>,
+   pub(super) _strategy: Option<PagespeedapiStrategyEnum>,
    pub(super) _snapshots: Option<bool>,
    pub(super) _screenshot: Option<bool>,
    pub(super) _rule: Vec<String>,
@@ -85,7 +85,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("url", self._url);
+        params.push("url", &self._url);
         if let Some(value) = self._utm_source.as_ref() {
             params.push("utm_source", value);
         }
@@ -226,8 +226,8 @@ where
     /// The analysis strategy (desktop or mobile) to use, and desktop is the default
     ///
     /// Sets the *strategy* query property to the given value.
-    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
-        self._strategy = Some(new_value.to_string());
+    pub fn strategy(mut self, new_value: &PagespeedapiStrategyEnum) -> PagespeedapiRunpagespeedCall<'a, S> {
+        self._strategy = Some(new_value.clone());
         self
     }
     /// Indicates if binary data containing snapshot images should be included

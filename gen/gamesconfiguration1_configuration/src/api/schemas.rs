@@ -17,7 +17,7 @@ pub struct AchievementConfiguration {
     /// The type of the achievement.
     #[serde(rename="achievementType")]
     
-    pub achievement_type: Option<String>,
+    pub achievement_type: Option<AchievementConfigurationAchievementTypeEnum>,
     /// The draft data of the achievement.
     
     pub draft: Option<AchievementConfigurationDetail>,
@@ -27,7 +27,7 @@ pub struct AchievementConfiguration {
     /// The initial state of the achievement.
     #[serde(rename="initialState")]
     
-    pub initial_state: Option<String>,
+    pub initial_state: Option<AchievementConfigurationInitialStateEnum>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string `gamesConfiguration#achievementConfiguration`.
     
     pub kind: Option<String>,
@@ -155,7 +155,7 @@ pub struct GamesNumberFormatConfiguration {
     /// The formatting for the number.
     #[serde(rename="numberFormatType")]
     
-    pub number_format_type: Option<String>,
+    pub number_format_type: Option<GamesNumberFormatConfigurationNumberFormatTypeEnum>,
     /// An optional suffix for the NUMERIC format type. These strings follow the same plural rules as all Android string resources.
     
     pub suffix: Option<GamesNumberAffixConfiguration>,
@@ -204,7 +204,7 @@ pub struct LeaderboardConfiguration {
     /// no description provided
     #[serde(rename="scoreOrder")]
     
-    pub score_order: Option<String>,
+    pub score_order: Option<LeaderboardConfigurationScoreOrderEnum>,
     /// The token for this resource.
     
     pub token: Option<String>,

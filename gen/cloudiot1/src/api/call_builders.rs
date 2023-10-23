@@ -72,7 +72,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._num_versions.as_ref() {
             params.push("numVersions", value.to_string());
         }
@@ -346,7 +346,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._num_states.as_ref() {
             params.push("numStates", value.to_string());
         }
@@ -625,7 +625,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -910,7 +910,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1174,7 +1174,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._field_mask.as_ref() {
             params.push("fieldMask", value.to_string());
         }
@@ -1404,12 +1404,12 @@ where
 /// let result = hub.projects().locations_registries_devices_list("parent")
 ///              .page_token("duo")
 ///              .page_size(-55)
-///              .gateway_list_options_gateway_type("gubergren")
-///              .gateway_list_options_associations_gateway_id("Lorem")
-///              .gateway_list_options_associations_device_id("gubergren")
+///              .gateway_list_options_gateway_type(&Default::default())
+///              .gateway_list_options_associations_gateway_id("gubergren")
+///              .gateway_list_options_associations_device_id("Lorem")
 ///              .field_mask(&Default::default())
-///              .add_device_num_ids(26)
-///              .add_device_ids("dolor")
+///              .add_device_num_ids(89)
+///              .add_device_ids("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1420,7 +1420,7 @@ pub struct ProjectLocationRegistryDeviceListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _gateway_list_options_gateway_type: Option<String>,
+   pub(super) _gateway_list_options_gateway_type: Option<ProjectGatewayListOptionsGatewayTypeEnum>,
    pub(super) _gateway_list_options_associations_gateway_id: Option<String>,
    pub(super) _gateway_list_options_associations_device_id: Option<String>,
    pub(super) _field_mask: Option<client::FieldMask>,
@@ -1462,7 +1462,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1622,8 +1622,8 @@ where
     /// If `GATEWAY` is specified, only gateways are returned. If `NON_GATEWAY` is specified, only non-gateway devices are returned. If `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
     ///
     /// Sets the *gateway list options.gateway type* query property to the given value.
-    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
-        self._gateway_list_options_gateway_type = Some(new_value.to_string());
+    pub fn gateway_list_options_gateway_type(mut self, new_value: &ProjectGatewayListOptionsGatewayTypeEnum) -> ProjectLocationRegistryDeviceListCall<'a, S> {
+        self._gateway_list_options_gateway_type = Some(new_value.clone());
         self
     }
     /// If set, only devices associated with the specified gateway are returned. The gateway ID can be numeric (`num_id`) or the user-defined string (`id`). For example, if `123` is specified, only devices bound to the gateway with `num_id` 123 are returned.
@@ -1817,7 +1817,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2111,7 +2111,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2413,7 +2413,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2654,14 +2654,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_groups_devices_list("parent")
-///              .page_token("duo")
-///              .page_size(-50)
-///              .gateway_list_options_gateway_type("sed")
-///              .gateway_list_options_associations_gateway_id("ut")
-///              .gateway_list_options_associations_device_id("gubergren")
+///              .page_token("amet")
+///              .page_size(-20)
+///              .gateway_list_options_gateway_type(&Default::default())
+///              .gateway_list_options_associations_gateway_id("ipsum")
+///              .gateway_list_options_associations_device_id("sed")
 ///              .field_mask(&Default::default())
-///              .add_device_num_ids(85)
-///              .add_device_ids("est")
+///              .add_device_num_ids(64)
+///              .add_device_ids("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2672,7 +2672,7 @@ pub struct ProjectLocationRegistryGroupDeviceListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _gateway_list_options_gateway_type: Option<String>,
+   pub(super) _gateway_list_options_gateway_type: Option<ProjectGatewayListOptionsGatewayTypeEnum>,
    pub(super) _gateway_list_options_associations_gateway_id: Option<String>,
    pub(super) _gateway_list_options_associations_device_id: Option<String>,
    pub(super) _field_mask: Option<client::FieldMask>,
@@ -2714,7 +2714,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2874,8 +2874,8 @@ where
     /// If `GATEWAY` is specified, only gateways are returned. If `NON_GATEWAY` is specified, only non-gateway devices are returned. If `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
     ///
     /// Sets the *gateway list options.gateway type* query property to the given value.
-    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
-        self._gateway_list_options_gateway_type = Some(new_value.to_string());
+    pub fn gateway_list_options_gateway_type(mut self, new_value: &ProjectGatewayListOptionsGatewayTypeEnum) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
+        self._gateway_list_options_gateway_type = Some(new_value.clone());
         self
     }
     /// If set, only devices associated with the specified gateway are returned. The gateway ID can be numeric (`num_id`) or the user-defined string (`id`). For example, if `123` is specified, only devices bound to the gateway with `num_id` 123 are returned.
@@ -3069,7 +3069,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -3361,7 +3361,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -3653,7 +3653,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -3945,7 +3945,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4237,7 +4237,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4522,7 +4522,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4784,7 +4784,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5053,7 +5053,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -5294,8 +5294,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_list("parent")
-///              .page_token("sed")
-///              .page_size(-70)
+///              .page_token("eos")
+///              .page_size(-86)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5342,7 +5342,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5633,7 +5633,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -5935,7 +5935,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -6227,7 +6227,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -6519,7 +6519,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 

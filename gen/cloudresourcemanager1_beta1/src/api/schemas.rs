@@ -48,7 +48,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -258,7 +258,7 @@ pub struct Organization {
     /// The organization's current lifecycle state. Assigned by the server.
     #[serde(rename="lifecycleState")]
     
-    pub lifecycle_state: Option<String>,
+    pub lifecycle_state: Option<OrganizationLifecycleStateEnum>,
     /// Output only. The resource name of the organization. This is the organization's relative path in the API. Its format is "organizations/[organization_id]". For example, "organizations/1234".
     
     pub name: Option<String>,
@@ -355,7 +355,7 @@ pub struct Project {
     /// The Project lifecycle state. Read-only.
     #[serde(rename="lifecycleState")]
     
-    pub lifecycle_state: Option<String>,
+    pub lifecycle_state: Option<ProjectLifecycleStateEnum>,
     /// The optional user-assigned display name of the Project. When present it must be between 4 to 30 characters. Allowed characters are: lowercase and uppercase letters, numbers, hyphen, single-quote, double-quote, space, and exclamation point. Example: `My Project` Read-write.
     
     pub name: Option<String>,

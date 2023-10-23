@@ -644,9 +644,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.instances().update(req, "project", "zone", "instance")
-//!              .request_id("takimata")
-//!              .most_disruptive_allowed_action("amet.")
-//!              .minimal_action("duo")
+//!              .request_id("sed")
+//!              .most_disruptive_allowed_action(&Default::default())
+//!              .minimal_action(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

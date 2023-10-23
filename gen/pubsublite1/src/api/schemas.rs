@@ -242,7 +242,7 @@ pub struct DeliveryConfig {
     /// The DeliveryRequirement for this subscription.
     #[serde(rename="deliveryRequirement")]
     
-    pub delivery_requirement: Option<String>,
+    pub delivery_requirement: Option<DeliveryConfigDeliveryRequirementEnum>,
 }
 
 impl client::Part for DeliveryConfig {}
@@ -277,7 +277,7 @@ pub struct ExportConfig {
     /// Output only. The current state of the export, which may be different to the desired state due to errors. This field is output only.
     #[serde(rename="currentState")]
     
-    pub current_state: Option<String>,
+    pub current_state: Option<ExportConfigCurrentStateEnum>,
     /// Optional. The name of an optional Pub/Sub Lite topic to publish messages that can not be exported to the destination. For example, the message can not be published to the Pub/Sub service because it does not satisfy the constraints documented at https://cloud.google.com/pubsub/docs/publisher. Structured like: projects/{project_number}/locations/{location}/topics/{topic_id}. Must be within the same project and location as the subscription. The topic may be changed or removed.
     #[serde(rename="deadLetterTopic")]
     
@@ -285,7 +285,7 @@ pub struct ExportConfig {
     /// The desired state of this export. Setting this to values other than `ACTIVE` and `PAUSED` will result in an error.
     #[serde(rename="desiredState")]
     
-    pub desired_state: Option<String>,
+    pub desired_state: Option<ExportConfigDesiredStateEnum>,
     /// Messages are automatically written from the Pub/Sub Lite topic associated with this subscription to a Pub/Sub topic.
     #[serde(rename="pubsubConfig")]
     
@@ -623,7 +623,7 @@ pub struct SeekSubscriptionRequest {
     /// Seek to a named position with respect to the message backlog.
     #[serde(rename="namedTarget")]
     
-    pub named_target: Option<String>,
+    pub named_target: Option<SeekSubscriptionRequestNamedTargetEnum>,
     /// Seek to the first message whose publish or event time is greater than or equal to the specified query time. If no such message can be located, will seek to the end of the message backlog.
     #[serde(rename="timeTarget")]
     

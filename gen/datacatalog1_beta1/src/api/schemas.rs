@@ -139,7 +139,7 @@ pub struct GoogleCloudDatacatalogV1beta1BigQueryTableSpec {
     /// Output only. The table source type.
     #[serde(rename="tableSourceType")]
     
-    pub table_source_type: Option<String>,
+    pub table_source_type: Option<GoogleCloudDatacatalogV1beta1BigQueryTableSpecTableSourceTypeEnum>,
     /// Spec of a BigQuery table. This field should only be populated if `table_source_type` is `BIGQUERY_TABLE`.
     #[serde(rename="tableSpec")]
     
@@ -217,7 +217,7 @@ pub struct GoogleCloudDatacatalogV1beta1Entry {
     /// Output only. This field indicates the entry's source system that Data Catalog integrates with, such as BigQuery or Pub/Sub.
     #[serde(rename="integratedSystem")]
     
-    pub integrated_system: Option<String>,
+    pub integrated_system: Option<GoogleCloudDatacatalogV1beta1EntryIntegratedSystemEnum>,
     /// The resource this metadata entry refers to. For Google Cloud Platform resources, `linked_resource` is the [full name of the resource](https://cloud.google.com/apis/design/resource_names#full_resource_name). For example, the `linked_resource` for a table resource from BigQuery is: * //bigquery.googleapis.com/projects/projectId/datasets/datasetId/tables/tableId Output only when Entry is of type in the EntryType enum. For entries with user_specified_type, this field is optional and defaults to an empty string.
     #[serde(rename="linkedResource")]
     
@@ -235,7 +235,7 @@ pub struct GoogleCloudDatacatalogV1beta1Entry {
     /// The type of the entry. Only used for Entries with types in the EntryType enum.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDatacatalogV1beta1EntryTypeEnum>,
     /// Output only. Statistics on the usage level of the resource.
     #[serde(rename="usageSignal")]
     
@@ -320,7 +320,7 @@ pub struct GoogleCloudDatacatalogV1beta1FieldType {
     /// Represents primitive types - string, bool etc.
     #[serde(rename="primitiveType")]
     
-    pub primitive_type: Option<String>,
+    pub primitive_type: Option<GoogleCloudDatacatalogV1beta1FieldTypePrimitiveTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1beta1FieldType {}
@@ -781,7 +781,7 @@ pub struct GoogleCloudDatacatalogV1beta1SearchCatalogResult {
     /// Type of the search result. This field can be used to determine which Get method to call to fetch the full resource.
     #[serde(rename="searchResultType")]
     
-    pub search_result_type: Option<String>,
+    pub search_result_type: Option<GoogleCloudDatacatalogV1beta1SearchCatalogResultSearchResultTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1beta1SearchCatalogResult {}
@@ -824,7 +824,7 @@ pub struct GoogleCloudDatacatalogV1beta1SerializedTaxonomy {
     /// A list of policy types that are activated for a taxonomy.
     #[serde(rename="activatedPolicyTypes")]
     
-    pub activated_policy_types: Option<Vec<String>>,
+    pub activated_policy_types: Option<Vec<GoogleCloudDatacatalogV1beta1SerializedTaxonomyActivatedPolicyTypesEnum>>,
     /// Description of the serialized taxonomy. The length of the description is limited to 2000 bytes when encoded in UTF-8. If not set, defaults to an empty description.
     
     pub description: Option<String>,
@@ -1058,7 +1058,7 @@ pub struct GoogleCloudDatacatalogV1beta1Taxonomy {
     /// Optional. A list of policy types that are activated for this taxonomy. If not set, defaults to an empty list.
     #[serde(rename="activatedPolicyTypes")]
     
-    pub activated_policy_types: Option<Vec<String>>,
+    pub activated_policy_types: Option<Vec<GoogleCloudDatacatalogV1beta1TaxonomyActivatedPolicyTypesEnum>>,
     /// Optional. Description of this taxonomy. It must: contain only unicode characters, tabs, newlines, carriage returns and page breaks; and be at most 2000 bytes long when encoded in UTF-8. If not set, defaults to an empty description.
     
     pub description: Option<String>,
@@ -1098,7 +1098,7 @@ pub struct GoogleCloudDatacatalogV1beta1TaxonomyService {
     pub identity: Option<String>,
     /// The GCP service name.
     
-    pub name: Option<String>,
+    pub name: Option<GoogleCloudDatacatalogV1beta1TaxonomyServiceNameEnum>,
 }
 
 impl client::Part for GoogleCloudDatacatalogV1beta1TaxonomyService {}

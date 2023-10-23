@@ -383,7 +383,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageAnchorPageRef {
     /// Optional. The type of the layout element that is being referenced if any.
     #[serde(rename="layoutType")]
     
-    pub layout_type: Option<String>,
+    pub layout_type: Option<GoogleCloudDocumentaiV1beta2DocumentPageAnchorPageRefLayoutTypeEnum>,
     /// Required. Index into the Document.pages element, for example using `Document.pages` to locate the related page element. This field is skipped when its value is the default `0`. See https://developers.google.com/protocol-buffers/docs/proto3#json.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -597,7 +597,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageLayout {
     pub confidence: Option<f32>,
     /// Detected orientation for the Layout.
     
-    pub orientation: Option<String>,
+    pub orientation: Option<GoogleCloudDocumentaiV1beta2DocumentPageLayoutOrientationEnum>,
     /// Text anchor indexing into the Document.text.
     #[serde(rename="textAnchor")]
     
@@ -804,7 +804,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageTokenDetectedBreak {
     /// Detected break type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDocumentaiV1beta2DocumentPageTokenDetectedBreakTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageTokenDetectedBreak {}
@@ -852,7 +852,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentProvenance {
     /// The type of provenance operation.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDocumentaiV1beta2DocumentProvenanceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentProvenance {}

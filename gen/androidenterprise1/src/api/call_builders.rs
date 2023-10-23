@@ -72,9 +72,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -347,9 +347,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -633,9 +633,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -918,8 +918,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1200,9 +1200,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1518,9 +1518,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value);
         }
@@ -2302,7 +2302,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().create_enrollment_token("enterpriseId")
-///              .device_type("est")
+///              .device_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2311,7 +2311,7 @@ pub struct EnterpriseCreateEnrollmentTokenCall<'a, S>
 
    pub(super) hub: &'a AndroidEnterprise<S>,
    pub(super) _enterprise_id: String,
-   pub(super) _device_type: Option<String>,
+   pub(super) _device_type: Option<EnterpriseDeviceTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2348,7 +2348,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
         if let Some(value) = self._device_type.as_ref() {
             params.push("deviceType", value);
         }
@@ -2469,8 +2469,8 @@ where
     /// Whether it’s a dedicated device or a knowledge worker device.
     ///
     /// Sets the *device type* query property to the given value.
-    pub fn device_type(mut self, new_value: &str) -> EnterpriseCreateEnrollmentTokenCall<'a, S> {
-        self._device_type = Some(new_value.to_string());
+    pub fn device_type(mut self, new_value: &EnterpriseDeviceTypeEnum) -> EnterpriseCreateEnrollmentTokenCall<'a, S> {
+        self._device_type = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2627,7 +2627,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2919,7 +2919,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("token", self._token);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -3153,7 +3153,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().generate_signup_url()
-///              .callback_url("est")
+///              .callback_url("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3452,7 +3452,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3670,7 +3670,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().get_service_account("enterpriseId")
-///              .key_type("dolor")
+///              .key_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3679,7 +3679,7 @@ pub struct EnterpriseGetServiceAccountCall<'a, S>
 
    pub(super) hub: &'a AndroidEnterprise<S>,
    pub(super) _enterprise_id: String,
-   pub(super) _key_type: Option<String>,
+   pub(super) _key_type: Option<EnterpriseKeyTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3716,7 +3716,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
         if let Some(value) = self._key_type.as_ref() {
             params.push("keyType", value);
         }
@@ -3837,8 +3837,8 @@ where
     /// The type of credential to return with the service account. Required.
     ///
     /// Sets the *key type* query property to the given value.
-    pub fn key_type(mut self, new_value: &str) -> EnterpriseGetServiceAccountCall<'a, S> {
-        self._key_type = Some(new_value.to_string());
+    pub fn key_type(mut self, new_value: &EnterpriseKeyTypeEnum) -> EnterpriseGetServiceAccountCall<'a, S> {
+        self._key_type = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3988,7 +3988,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4250,7 +4250,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("domain", self._domain);
+        params.push("domain", &self._domain);
 
         params.extend(self._additional_params.iter());
 
@@ -4461,7 +4461,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().pull_notification_set()
-///              .request_mode("labore")
+///              .request_mode(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -4469,7 +4469,7 @@ pub struct EnterprisePullNotificationSetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a AndroidEnterprise<S>,
-   pub(super) _request_mode: Option<String>,
+   pub(super) _request_mode: Option<EnterpriseRequestModeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -4609,8 +4609,8 @@ where
     /// The request mode for pulling notifications. Specifying waitForNotifications will cause the request to block and wait until one or more notifications are present, or return an empty notification list if no notifications are present after some time. Specifying returnImmediately will cause the request to immediately return the pending notifications, or an empty list if no notifications are present. If omitted, defaults to waitForNotifications.
     ///
     /// Sets the *request mode* query property to the given value.
-    pub fn request_mode(mut self, new_value: &str) -> EnterprisePullNotificationSetCall<'a, S> {
-        self._request_mode = Some(new_value.to_string());
+    pub fn request_mode(mut self, new_value: &EnterpriseRequestModeEnum) -> EnterprisePullNotificationSetCall<'a, S> {
+        self._request_mode = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4760,7 +4760,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5029,7 +5029,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5321,7 +5321,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5606,7 +5606,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5859,9 +5859,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("entitlementId", self._entitlement_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("entitlementId", &self._entitlement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6134,9 +6134,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("entitlementId", self._entitlement_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("entitlementId", &self._entitlement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6419,8 +6419,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6703,9 +6703,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("entitlementId", self._entitlement_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("entitlementId", &self._entitlement_id);
         if let Some(value) = self._install.as_ref() {
             params.push("install", value.to_string());
         }
@@ -7021,8 +7021,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("groupLicenseId", self._group_license_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("groupLicenseId", &self._group_license_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7294,7 +7294,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7557,8 +7557,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("groupLicenseId", self._group_license_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("groupLicenseId", &self._group_license_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7833,10 +7833,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
-        params.push("installId", self._install_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
+        params.push("installId", &self._install_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8120,10 +8120,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
-        params.push("installId", self._install_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
+        params.push("installId", &self._install_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8417,9 +8417,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8711,10 +8711,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
-        params.push("installId", self._install_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
+        params.push("installId", &self._install_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9032,10 +9032,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
-        params.push("managedConfigurationForDeviceId", self._managed_configuration_for_device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
+        params.push("managedConfigurationForDeviceId", &self._managed_configuration_for_device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9319,10 +9319,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
-        params.push("managedConfigurationForDeviceId", self._managed_configuration_for_device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
+        params.push("managedConfigurationForDeviceId", &self._managed_configuration_for_device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9616,9 +9616,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9910,10 +9910,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("deviceId", self._device_id);
-        params.push("managedConfigurationForDeviceId", self._managed_configuration_for_device_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("deviceId", &self._device_id);
+        params.push("managedConfigurationForDeviceId", &self._managed_configuration_for_device_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10230,9 +10230,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("managedConfigurationForUserId", self._managed_configuration_for_user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("managedConfigurationForUserId", &self._managed_configuration_for_user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10505,9 +10505,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("managedConfigurationForUserId", self._managed_configuration_for_user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("managedConfigurationForUserId", &self._managed_configuration_for_user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10790,8 +10790,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11072,9 +11072,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
-        params.push("managedConfigurationForUserId", self._managed_configuration_for_user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
+        params.push("managedConfigurationForUserId", &self._managed_configuration_for_user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11380,8 +11380,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11609,7 +11609,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("permissionId")
-///              .language("aliquyam")
+///              .language("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11655,7 +11655,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("permissionId", self._permission_id);
+        params.push("permissionId", &self._permission_id);
         if let Some(value) = self._language.as_ref() {
             params.push("language", value);
         }
@@ -11935,8 +11935,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12176,7 +12176,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().generate_approval_url("enterpriseId", "productId")
-///              .language_code("est")
+///              .language_code("tempor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12223,8 +12223,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
         if let Some(value) = self._language_code.as_ref() {
             params.push("languageCode", value);
         }
@@ -12462,7 +12462,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().get("enterpriseId", "productId")
-///              .language("dolores")
+///              .language("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12509,8 +12509,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
         if let Some(value) = self._language.as_ref() {
             params.push("language", value);
         }
@@ -12748,7 +12748,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().get_app_restrictions_schema("enterpriseId", "productId")
-///              .language("sed")
+///              .language("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12795,8 +12795,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
         if let Some(value) = self._language.as_ref() {
             params.push("language", value);
         }
@@ -13079,8 +13079,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13308,11 +13308,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list("enterpriseId")
-///              .token("sed")
-///              .query("no")
-///              .max_results(10)
-///              .language("At")
-///              .approved(true)
+///              .token("dolores")
+///              .query("et")
+///              .max_results(8)
+///              .language("no")
+///              .approved(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13362,7 +13362,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
         if let Some(value) = self._token.as_ref() {
             params.push("token", value);
         }
@@ -13675,8 +13675,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("productId", self._product_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13938,8 +13938,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("keyId", self._key_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("keyId", &self._key_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14207,7 +14207,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14492,7 +14492,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14756,9 +14756,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
-        params.push("clusterId", self._cluster_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15031,9 +15031,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
-        params.push("clusterId", self._cluster_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15323,8 +15323,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15620,8 +15620,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15902,9 +15902,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
-        params.push("clusterId", self._cluster_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
+        params.push("clusterId", &self._cluster_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16210,8 +16210,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16473,8 +16473,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16753,7 +16753,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17038,7 +17038,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17308,8 +17308,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("pageId", self._page_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("pageId", &self._page_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17605,8 +17605,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17868,8 +17868,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18142,8 +18142,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18416,8 +18416,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18696,7 +18696,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18982,8 +18982,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("email", self._email);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("email", &self._email);
 
         params.extend(self._additional_params.iter());
 
@@ -19256,8 +19256,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19526,8 +19526,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19830,8 +19830,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("userId", self._user_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20127,8 +20127,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("webAppId", self._web_app_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("webAppId", &self._web_app_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20390,8 +20390,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("webAppId", self._web_app_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("webAppId", &self._web_app_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20670,7 +20670,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20955,7 +20955,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
+        params.push("enterpriseId", &self._enterprise_id);
 
         params.extend(self._additional_params.iter());
 
@@ -21225,8 +21225,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("enterpriseId", self._enterprise_id);
-        params.push("webAppId", self._web_app_id);
+        params.push("enterpriseId", &self._enterprise_id);
+        params.push("webAppId", &self._web_app_id);
 
         params.extend(self._additional_params.iter());
 

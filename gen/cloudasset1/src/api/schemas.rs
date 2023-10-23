@@ -342,7 +342,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -463,7 +463,7 @@ pub struct ConditionEvaluation {
     /// The evaluation result.
     #[serde(rename="evaluationValue")]
     
-    pub evaluation_value: Option<String>,
+    pub evaluation_value: Option<ConditionEvaluationEvaluationValueEnum>,
 }
 
 impl client::Part for ConditionEvaluation {}
@@ -582,7 +582,7 @@ pub struct ExportAssetsRequest {
     /// Asset content type. If not specified, no content but the asset name will be returned.
     #[serde(rename="contentType")]
     
-    pub content_type: Option<String>,
+    pub content_type: Option<ExportAssetsRequestContentTypeEnum>,
     /// Required. Output configuration indicating where the results will be output to.
     #[serde(rename="outputConfig")]
     
@@ -653,7 +653,7 @@ pub struct Feed {
     /// Asset content type. If not specified, no content but the asset name and type will be returned.
     #[serde(rename="contentType")]
     
-    pub content_type: Option<String>,
+    pub content_type: Option<FeedContentTypeEnum>,
     /// Required. Feed output configuration defining where the asset updates are published to.
     #[serde(rename="feedOutputConfig")]
     
@@ -851,7 +851,7 @@ pub struct GoogleCloudAssetV1BigQueryDestination {
     /// The partition key for BigQuery partitioned table.
     #[serde(rename="partitionKey")]
     
-    pub partition_key: Option<String>,
+    pub partition_key: Option<GoogleCloudAssetV1BigQueryDestinationPartitionKeyEnum>,
     /// Required. The prefix of the BigQuery tables to which the analysis results will be written. Tables will be created based on this table_prefix if not exist: * _analysis table will contain export operation's metadata. * _analysis_result will contain all the IamPolicyAnalysisResult. When [partition_key] is specified, both tables will be partitioned based on the [partition_key].
     #[serde(rename="tablePrefix")]
     
@@ -890,7 +890,7 @@ pub struct GoogleCloudAssetV1Constraint {
     /// The evaluation behavior of this constraint in the absence of 'Policy'.
     #[serde(rename="constraintDefault")]
     
-    pub constraint_default: Option<String>,
+    pub constraint_default: Option<GoogleCloudAssetV1ConstraintConstraintDefaultEnum>,
     /// Detailed description of what this `Constraint` controls as well as how and where it is enforced.
     
     pub description: Option<String>,
@@ -920,7 +920,7 @@ pub struct GoogleCloudAssetV1CustomConstraint {
     /// Allow or deny type.
     #[serde(rename="actionType")]
     
-    pub action_type: Option<String>,
+    pub action_type: Option<GoogleCloudAssetV1CustomConstraintActionTypeEnum>,
     /// Organization Policy condition/expression. For example: `resource.instanceName.matches("[production|test]_.*_(\d)+")'` or, `resource.management.auto_upgrade == true`
     
     pub condition: Option<String>,
@@ -934,7 +934,7 @@ pub struct GoogleCloudAssetV1CustomConstraint {
     /// All the operations being applied for this constraint.
     #[serde(rename="methodTypes")]
     
-    pub method_types: Option<Vec<String>>,
+    pub method_types: Option<Vec<GoogleCloudAssetV1CustomConstraintMethodTypesEnum>>,
     /// Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example : "organizations/123/customConstraints/custom.createOnlyE2TypeVms"
     
     pub name: Option<String>,
@@ -1183,7 +1183,7 @@ pub struct GoogleCloudOrgpolicyV1ListPolicy {
     /// The policy all_values state.
     #[serde(rename="allValues")]
     
-    pub all_values: Option<String>,
+    pub all_values: Option<GoogleCloudOrgpolicyV1ListPolicyAllValuesEnum>,
     /// List of values allowed at this resource. Can only be set if `all_values` is set to `ALL_VALUES_UNSPECIFIED`.
     #[serde(rename="allowedValues")]
     
@@ -1338,7 +1338,7 @@ pub struct GoogleIdentityAccesscontextmanagerV1BasicLevel {
     /// How the `conditions` list should be combined to determine if a request is granted this `AccessLevel`. If AND is used, each `Condition` in `conditions` must be satisfied for the `AccessLevel` to be applied. If OR is used, at least one `Condition` in `conditions` must be satisfied for the `AccessLevel` to be applied. Default behavior is AND.
     #[serde(rename="combiningFunction")]
     
-    pub combining_function: Option<String>,
+    pub combining_function: Option<GoogleIdentityAccesscontextmanagerV1BasicLevelCombiningFunctionEnum>,
     /// Required. A list of requirements for the `AccessLevel` to be granted.
     
     pub conditions: Option<Vec<GoogleIdentityAccesscontextmanagerV1Condition>>,
@@ -1405,11 +1405,11 @@ pub struct GoogleIdentityAccesscontextmanagerV1DevicePolicy {
     /// Allowed device management levels, an empty list allows all management levels.
     #[serde(rename="allowedDeviceManagementLevels")]
     
-    pub allowed_device_management_levels: Option<Vec<String>>,
+    pub allowed_device_management_levels: Option<Vec<GoogleIdentityAccesscontextmanagerV1DevicePolicyAllowedDeviceManagementLevelsEnum>>,
     /// Allowed encryptions statuses, an empty list allows all statuses.
     #[serde(rename="allowedEncryptionStatuses")]
     
-    pub allowed_encryption_statuses: Option<Vec<String>>,
+    pub allowed_encryption_statuses: Option<Vec<GoogleIdentityAccesscontextmanagerV1DevicePolicyAllowedEncryptionStatusesEnum>>,
     /// Allowed OS versions, an empty list allows all types and all versions.
     #[serde(rename="osConstraints")]
     
@@ -1444,7 +1444,7 @@ pub struct GoogleIdentityAccesscontextmanagerV1EgressFrom {
     /// Specifies the type of identities that are allowed access to outside the perimeter. If left unspecified, then members of `identities` field will be allowed access.
     #[serde(rename="identityType")]
     
-    pub identity_type: Option<String>,
+    pub identity_type: Option<GoogleIdentityAccesscontextmanagerV1EgressFromIdentityTypeEnum>,
 }
 
 impl client::Part for GoogleIdentityAccesscontextmanagerV1EgressFrom {}
@@ -1505,7 +1505,7 @@ pub struct GoogleIdentityAccesscontextmanagerV1IngressFrom {
     /// Specifies the type of identities that are allowed access from outside the perimeter. If left unspecified, then members of `identities` field will be allowed access.
     #[serde(rename="identityType")]
     
-    pub identity_type: Option<String>,
+    pub identity_type: Option<GoogleIdentityAccesscontextmanagerV1IngressFromIdentityTypeEnum>,
     /// Sources that this IngressPolicy authorizes access from.
     
     pub sources: Option<Vec<GoogleIdentityAccesscontextmanagerV1IngressSource>>,
@@ -1603,7 +1603,7 @@ pub struct GoogleIdentityAccesscontextmanagerV1OsConstraint {
     /// Required. The allowed OS type.
     #[serde(rename="osType")]
     
-    pub os_type: Option<String>,
+    pub os_type: Option<GoogleIdentityAccesscontextmanagerV1OsConstraintOsTypeEnum>,
     /// Only allows requests from devices with a verified Chrome OS. Verifications includes requirements that the device is enterprise-managed, conformant to domain policies, and the caller has permission to call the API targeted by the request.
     #[serde(rename="requireVerifiedChromeOs")]
     
@@ -1629,7 +1629,7 @@ pub struct GoogleIdentityAccesscontextmanagerV1ServicePerimeter {
     /// Perimeter type indicator. A single project is allowed to be a member of single regular perimeter, but multiple service perimeter bridges. A project cannot be a included in a perimeter bridge without being included in regular perimeter. For perimeter bridges, the restricted service list as well as access level lists must be empty.
     #[serde(rename="perimeterType")]
     
-    pub perimeter_type: Option<String>,
+    pub perimeter_type: Option<GoogleIdentityAccesscontextmanagerV1ServicePerimeterPerimeterTypeEnum>,
     /// Proposed (or dry run) ServicePerimeter configuration. This configuration allows to specify and test ServicePerimeter configuration without enforcing actual access restrictions. Only allowed to be set when the "use_explicit_dry_run_spec" flag is set.
     
     pub spec: Option<GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig>,
@@ -1829,7 +1829,7 @@ pub struct IamPolicyAnalysisState {
     pub cause: Option<String>,
     /// The Google standard error code that best describes the state. For example: - OK means the analysis on this entity has been successfully finished; - PERMISSION_DENIED means an access denied error is encountered; - DEADLINE_EXCEEDED means the analysis on this entity hasn't been started in time;
     
-    pub code: Option<String>,
+    pub code: Option<IamPolicyAnalysisStateCodeEnum>,
 }
 
 impl client::Part for IamPolicyAnalysisState {}
@@ -1935,11 +1935,11 @@ pub struct Item {
     /// The origin of this inventory item.
     #[serde(rename="originType")]
     
-    pub origin_type: Option<String>,
+    pub origin_type: Option<ItemOriginTypeEnum>,
     /// The specific type of inventory, correlating to its specific details.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ItemTypeEnum>,
     /// When this inventory item was last modified.
     #[serde(rename="updateTime")]
     
@@ -2235,7 +2235,7 @@ pub struct PartitionSpec {
     /// The partition key for BigQuery partitioned table.
     #[serde(rename="partitionKey")]
     
-    pub partition_key: Option<String>,
+    pub partition_key: Option<PartitionSpecPartitionKeyEnum>,
 }
 
 impl client::Part for PartitionSpec {}
@@ -2936,7 +2936,7 @@ pub struct TemporalAsset {
     /// State of prior_asset.
     #[serde(rename="priorAssetState")]
     
-    pub prior_asset_state: Option<String>,
+    pub prior_asset_state: Option<TemporalAssetPriorAssetStateEnum>,
     /// The time window when the asset data and state was observed.
     
     pub window: Option<TimeWindow>,

@@ -13,7 +13,7 @@ pub struct Activity {
     /// Type of this activity.
     #[serde(rename="activityType")]
     
-    pub activity_type: Option<String>,
+    pub activity_type: Option<ActivityActivityTypeEnum>,
     /// This will be set if `activity_type` equals `SCREEN_VIEW`.
     
     pub appview: Option<ScreenviewData>,
@@ -78,7 +78,7 @@ pub struct Cohort {
     /// Type of the cohort. The only supported type as of now is `FIRST_VISIT_DATE`. If this field is unspecified the cohort is treated as `FIRST_VISIT_DATE` type cohort.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CohortTypeEnum>,
 }
 
 impl client::Part for Cohort {}
@@ -222,7 +222,7 @@ pub struct DimensionFilter {
     pub not: Option<bool>,
     /// How to match the dimension to the expression. The default is REGEXP.
     
-    pub operator: Option<String>,
+    pub operator: Option<DimensionFilterOperatorEnum>,
 }
 
 impl client::Part for DimensionFilter {}
@@ -240,7 +240,7 @@ pub struct DimensionFilterClause {
     pub filters: Option<Vec<DimensionFilter>>,
     /// The operator for combining multiple dimension filters. If unspecified, it is treated as an `OR`.
     
-    pub operator: Option<String>,
+    pub operator: Option<DimensionFilterClauseOperatorEnum>,
 }
 
 impl client::Part for DimensionFilterClause {}
@@ -279,11 +279,11 @@ pub struct EcommerceData {
     /// Action associated with this e-commerce action.
     #[serde(rename="actionType")]
     
-    pub action_type: Option<String>,
+    pub action_type: Option<EcommerceDataActionTypeEnum>,
     /// The type of this e-commerce activity.
     #[serde(rename="ecommerceType")]
     
-    pub ecommerce_type: Option<String>,
+    pub ecommerce_type: Option<EcommerceDataEcommerceTypeEnum>,
     /// Details of the products in this transaction.
     
     pub products: Option<Vec<ProductData>>,
@@ -456,7 +456,7 @@ pub struct Metric {
     /// Specifies how the metric expression should be formatted, for example `INTEGER`.
     #[serde(rename="formattingType")]
     
-    pub formatting_type: Option<String>,
+    pub formatting_type: Option<MetricFormattingTypeEnum>,
 }
 
 impl client::Part for Metric {}
@@ -482,7 +482,7 @@ pub struct MetricFilter {
     pub not: Option<bool>,
     /// Is the metric `EQUAL`, `LESS_THAN` or `GREATER_THAN` the comparisonValue, the default is `EQUAL`. If the operator is `IS_MISSING`, checks if the metric is missing and would ignore the comparisonValue.
     
-    pub operator: Option<String>,
+    pub operator: Option<MetricFilterOperatorEnum>,
 }
 
 impl client::Part for MetricFilter {}
@@ -500,7 +500,7 @@ pub struct MetricFilterClause {
     pub filters: Option<Vec<MetricFilter>>,
     /// The operator for combining multiple metric filters. If unspecified, it is treated as an `OR`.
     
-    pub operator: Option<String>,
+    pub operator: Option<MetricFilterClauseOperatorEnum>,
 }
 
 impl client::Part for MetricFilterClause {}
@@ -539,7 +539,7 @@ pub struct MetricHeaderEntry {
     /// The type of the metric, for example `INTEGER`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<MetricHeaderEntryTypeEnum>,
 }
 
 impl client::Part for MetricHeaderEntry {}
@@ -575,11 +575,11 @@ pub struct OrderBy {
     /// The order type. The default orderType is `VALUE`.
     #[serde(rename="orderType")]
     
-    pub order_type: Option<String>,
+    pub order_type: Option<OrderByOrderTypeEnum>,
     /// The sorting order for the field.
     #[serde(rename="sortOrder")]
     
-    pub sort_order: Option<String>,
+    pub sort_order: Option<OrderBySortOrderEnum>,
 }
 
 impl client::Part for OrderBy {}
@@ -862,7 +862,7 @@ pub struct ReportRequest {
     /// The desired report [sample](https://support.google.com/analytics/answer/2637192) size. If the the `samplingLevel` field is unspecified the `DEFAULT` sampling level is used. Every [ReportRequest](#ReportRequest) within a `batchGet` method must contain the same `samplingLevel` definition. See [developer guide](https://developers.google.com/analytics/devguides/reporting/core/v4/basics#sampling) for details.
     #[serde(rename="samplingLevel")]
     
-    pub sampling_level: Option<String>,
+    pub sampling_level: Option<ReportRequestSamplingLevelEnum>,
     /// Segment the data returned for the request. A segment definition helps look at a subset of the segment request. A request can contain up to four segments. Every [ReportRequest](#ReportRequest) within a `batchGet` method must contain the same `segments` definition. Requests with segments must have the `ga:segment` dimension.
     
     pub segments: Option<Vec<Segment>>,
@@ -955,7 +955,7 @@ pub struct SearchUserActivityRequest {
     /// Set of all activity types being requested. Only acvities matching these types will be returned in the response. If empty, all activies will be returned.
     #[serde(rename="activityTypes")]
     
-    pub activity_types: Option<Vec<String>>,
+    pub activity_types: Option<Vec<SearchUserActivityRequestActivityTypesEnum>>,
     /// Date range for which to retrieve the user activity. If a date range is not provided, the default date range is (startDate: current date - 7 days, endDate: current date - 1 day).
     #[serde(rename="dateRange")]
     
@@ -1075,7 +1075,7 @@ pub struct SegmentDimensionFilter {
     pub min_comparison_value: Option<String>,
     /// The operator to use to match the dimension with the expressions.
     
-    pub operator: Option<String>,
+    pub operator: Option<SegmentDimensionFilterOperatorEnum>,
 }
 
 impl client::Part for SegmentDimensionFilter {}
@@ -1148,10 +1148,10 @@ pub struct SegmentMetricFilter {
     pub metric_name: Option<String>,
     /// Specifies is the operation to perform to compare the metric. The default is `EQUAL`.
     
-    pub operator: Option<String>,
+    pub operator: Option<SegmentMetricFilterOperatorEnum>,
     /// Scope for a metric defines the level at which that metric is defined. The specified metric scope must be equal to or greater than its primary scope as defined in the data model. The primary scope is defined by if the segment is selecting users or sessions.
     
-    pub scope: Option<String>,
+    pub scope: Option<SegmentMetricFilterScopeEnum>,
 }
 
 impl client::Part for SegmentMetricFilter {}
@@ -1167,7 +1167,7 @@ pub struct SegmentSequenceStep {
     /// Specifies if the step immediately precedes or can be any time before the next step.
     #[serde(rename="matchType")]
     
-    pub match_type: Option<String>,
+    pub match_type: Option<SegmentSequenceStepMatchTypeEnum>,
     /// A sequence is specified with a list of Or grouped filters which are combined with `AND` operator.
     #[serde(rename="orFiltersForSegment")]
     
@@ -1251,7 +1251,7 @@ pub struct User {
     /// Type of the user in the request. The field `userId` is associated with this type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<UserTypeEnum>,
     /// Unique Id of the user for which the data is being requested.
     #[serde(rename="userId")]
     

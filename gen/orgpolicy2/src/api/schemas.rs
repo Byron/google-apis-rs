@@ -31,7 +31,7 @@ pub struct GoogleCloudOrgpolicyV2Constraint {
     /// The evaluation behavior of this constraint in the absence of 'Policy'.
     #[serde(rename="constraintDefault")]
     
-    pub constraint_default: Option<String>,
+    pub constraint_default: Option<GoogleCloudOrgpolicyV2ConstraintConstraintDefaultEnum>,
     /// Detailed description of what this `Constraint` controls as well as how and where it is enforced. Mutable.
     
     pub description: Option<String>,
@@ -98,7 +98,7 @@ pub struct GoogleCloudOrgpolicyV2CustomConstraint {
     /// Allow or deny type.
     #[serde(rename="actionType")]
     
-    pub action_type: Option<String>,
+    pub action_type: Option<GoogleCloudOrgpolicyV2CustomConstraintActionTypeEnum>,
     /// Org policy condition/expression. For example: `resource.instanceName.matches("[production|test]_.*_(\d)+")'` or, `resource.management.auto_upgrade == true` The max length of the condition is 1000 characters.
     
     pub condition: Option<String>,
@@ -112,7 +112,7 @@ pub struct GoogleCloudOrgpolicyV2CustomConstraint {
     /// All the operations being applied for this constraint.
     #[serde(rename="methodTypes")]
     
-    pub method_types: Option<Vec<String>>,
+    pub method_types: Option<Vec<GoogleCloudOrgpolicyV2CustomConstraintMethodTypesEnum>>,
     /// Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example : "organizations/123/customConstraints/custom.createOnlyE2TypeVms" The max length is 70 characters and the min length is 1. Note that the prefix "organizations/{organization_id}/customConstraints/" is not counted.
     
     pub name: Option<String>,

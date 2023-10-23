@@ -32,8 +32,8 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().get("projectId", "datasetId", "tableId")
-///              .view("gubergren")
-///              .selected_fields("Lorem")
+///              .view(&Default::default())
+///              .selected_fields("duo")
 ///              .doit().await;
 /// 
 /// match result {

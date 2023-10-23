@@ -104,7 +104,7 @@ pub struct AlertFeedback {
     /// Required. The type of the feedback.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AlertFeedbackTypeEnum>,
 }
 
 impl client::RequestValue for AlertFeedback {}
@@ -257,7 +257,7 @@ pub struct CloudPubsubTopic {
     /// Optional. The format of the payload that would be sent. If not specified the format will be JSON.
     #[serde(rename="payloadFormat")]
     
-    pub payload_format: Option<String>,
+    pub payload_format: Option<CloudPubsubTopicPayloadFormatEnum>,
     /// The `name` field of a Cloud Pubsub [Topic] (https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics#Topic).
     #[serde(rename="topicName")]
     

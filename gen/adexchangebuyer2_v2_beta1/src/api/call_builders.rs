@@ -78,8 +78,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -376,9 +376,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id.to_string());
-        params.push("invitationId", self._invitation_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id.to_string());
+        params.push("invitationId", &self._invitation_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -665,8 +665,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -960,9 +960,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id.to_string());
-        params.push("userId", self._user_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id.to_string());
+        params.push("userId", &self._user_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1249,8 +1249,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1551,9 +1551,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id.to_string());
-        params.push("userId", self._user_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id.to_string());
+        params.push("userId", &self._user_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1865,7 +1865,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2151,8 +2151,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2430,7 +2430,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._partner_client_id.as_ref() {
             params.push("partnerClientId", value);
         }
@@ -2730,8 +2730,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("clientAccountId", self._client_account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("clientAccountId", &self._client_account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3034,8 +3034,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3337,8 +3337,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -3648,8 +3648,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3906,7 +3906,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().creatives_create(req, "accountId")
-///              .duplicate_id_mode("et")
+///              .duplicate_id_mode(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -3916,7 +3916,7 @@ pub struct AccountCreativeCreateCall<'a, S>
    pub(super) hub: &'a AdExchangeBuyerII<S>,
    pub(super) _request: Creative,
    pub(super) _account_id: String,
-   pub(super) _duplicate_id_mode: Option<String>,
+   pub(super) _duplicate_id_mode: Option<AccountDuplicateIdModeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -3953,7 +3953,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._duplicate_id_mode.as_ref() {
             params.push("duplicateIdMode", value);
         }
@@ -4097,8 +4097,8 @@ where
     /// Indicates if multiple creatives can share an ID or not. Default is NO_DUPLICATES (one ID per creative).
     ///
     /// Sets the *duplicate id mode* query property to the given value.
-    pub fn duplicate_id_mode(mut self, new_value: &str) -> AccountCreativeCreateCall<'a, S> {
-        self._duplicate_id_mode = Some(new_value.to_string());
+    pub fn duplicate_id_mode(mut self, new_value: &AccountDuplicateIdModeEnum) -> AccountCreativeCreateCall<'a, S> {
+        self._duplicate_id_mode = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4249,8 +4249,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4478,9 +4478,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().creatives_list("accountId")
-///              .query("vero")
-///              .page_token("erat")
-///              .page_size(-93)
+///              .query("et")
+///              .page_token("vero")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4528,7 +4528,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -4828,8 +4828,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5132,8 +5132,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5436,8 +5436,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("creativeId", self._creative_id);
+        params.push("accountId", &self._account_id);
+        params.push("creativeId", &self._creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5688,10 +5688,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().finalized_proposals_list("accountId")
-///              .page_token("dolor")
-///              .page_size(-18)
-///              .filter_syntax("et")
-///              .filter("sadipscing")
+///              .page_token("diam")
+///              .page_size(-49)
+///              .filter_syntax(&Default::default())
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5702,7 +5702,7 @@ pub struct AccountFinalizedProposalListCall<'a, S>
    pub(super) _account_id: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _filter_syntax: Option<String>,
+   pub(super) _filter_syntax: Option<AccountFilterSyntaxEnum>,
    pub(super) _filter: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -5740,7 +5740,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5884,8 +5884,8 @@ where
     /// Syntax the filter is written in. Current implementation defaults to PQL but in the future it will be LIST_FILTER.
     ///
     /// Sets the *filter syntax* query property to the given value.
-    pub fn filter_syntax(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, S> {
-        self._filter_syntax = Some(new_value.to_string());
+    pub fn filter_syntax(mut self, new_value: &AccountFilterSyntaxEnum) -> AccountFinalizedProposalListCall<'a, S> {
+        self._filter_syntax = Some(new_value.clone());
         self
     }
     /// An optional PQL filter query used to query for proposals. Nested repeated fields, such as proposal.deals.targetingCriterion, cannot be filtered.
@@ -6050,8 +6050,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6354,8 +6354,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6651,8 +6651,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("productId", self._product_id);
+        params.push("accountId", &self._account_id);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6880,9 +6880,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().products_list("accountId")
-///              .page_token("vero")
-///              .page_size(-44)
-///              .filter("Lorem")
+///              .page_token("invidunt")
+///              .page_size(-65)
+///              .filter("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6930,7 +6930,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7230,8 +7230,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7534,8 +7534,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7838,8 +7838,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8142,8 +8142,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8445,7 +8445,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8731,8 +8731,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8960,10 +8960,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().proposals_list("accountId")
-///              .page_token("takimata")
-///              .page_size(-19)
-///              .filter_syntax("gubergren")
-///              .filter("et")
+///              .page_token("amet.")
+///              .page_size(-30)
+///              .filter_syntax(&Default::default())
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8974,7 +8974,7 @@ pub struct AccountProposalListCall<'a, S>
    pub(super) _account_id: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _filter_syntax: Option<String>,
+   pub(super) _filter_syntax: Option<AccountFilterSyntaxEnum>,
    pub(super) _filter: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -9012,7 +9012,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9156,8 +9156,8 @@ where
     /// Syntax the filter is written in. Current implementation defaults to PQL but in the future it will be LIST_FILTER.
     ///
     /// Sets the *filter syntax* query property to the given value.
-    pub fn filter_syntax(mut self, new_value: &str) -> AccountProposalListCall<'a, S> {
-        self._filter_syntax = Some(new_value.to_string());
+    pub fn filter_syntax(mut self, new_value: &AccountFilterSyntaxEnum) -> AccountProposalListCall<'a, S> {
+        self._filter_syntax = Some(new_value.clone());
         self
     }
     /// An optional PQL filter query used to query for proposals. Nested repeated fields, such as proposal.deals.targetingCriterion, cannot be filtered.
@@ -9322,8 +9322,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9626,8 +9626,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -9930,8 +9930,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("proposalId", self._proposal_id);
+        params.push("accountId", &self._account_id);
+        params.push("proposalId", &self._proposal_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10227,8 +10227,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("publisherProfileId", self._publisher_profile_id);
+        params.push("accountId", &self._account_id);
+        params.push("publisherProfileId", &self._publisher_profile_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10456,8 +10456,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().publisher_profiles_list("accountId")
-///              .page_token("Lorem")
-///              .page_size(-38)
+///              .page_token("amet.")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10504,7 +10504,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10742,8 +10742,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_bid_metrics_list("filterSetName")
-///              .page_token("est")
-///              .page_size(-27)
+///              .page_token("Lorem")
+///              .page_size(-38)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10790,7 +10790,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11028,8 +11028,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_bid_response_errors_list("filterSetName")
-///              .page_token("sit")
-///              .page_size(-35)
+///              .page_token("est")
+///              .page_size(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11076,7 +11076,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11314,8 +11314,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_bid_responses_without_bids_list("filterSetName")
-///              .page_token("aliquyam")
-///              .page_size(-5)
+///              .page_token("sit")
+///              .page_size(-35)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11362,7 +11362,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11600,8 +11600,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_filtered_bid_requests_list("filterSetName")
-///              .page_token("sanctus")
-///              .page_size(-56)
+///              .page_token("aliquyam")
+///              .page_size(-5)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11648,7 +11648,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11885,9 +11885,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().accounts_filter_sets_filtered_bids_creatives_list("filterSetName", -30)
-///              .page_token("diam")
-///              .page_size(-19)
+/// let result = hub.bidders().accounts_filter_sets_filtered_bids_creatives_list("filterSetName", -8)
+///              .page_token("Lorem")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11935,8 +11935,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
-        params.push("creativeStatusId", self._creative_status_id.to_string());
+        params.push("filterSetName", &self._filter_set_name);
+        params.push("creativeStatusId", &self._creative_status_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12183,9 +12183,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().accounts_filter_sets_filtered_bids_details_list("filterSetName", -68)
-///              .page_token("sed")
-///              .page_size(-11)
+/// let result = hub.bidders().accounts_filter_sets_filtered_bids_details_list("filterSetName", -29)
+///              .page_token("dolores")
+///              .page_size(-69)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12233,8 +12233,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
-        params.push("creativeStatusId", self._creative_status_id.to_string());
+        params.push("filterSetName", &self._filter_set_name);
+        params.push("creativeStatusId", &self._creative_status_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12482,8 +12482,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_filtered_bids_list("filterSetName")
-///              .page_token("elitr")
-///              .page_size(-80)
+///              .page_token("sed")
+///              .page_size(-11)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12530,7 +12530,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12768,8 +12768,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_impression_metrics_list("filterSetName")
-///              .page_token("nonumy")
-///              .page_size(-77)
+///              .page_token("elitr")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12816,7 +12816,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13054,8 +13054,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_losing_bids_list("filterSetName")
-///              .page_token("aliquyam")
-///              .page_size(-69)
+///              .page_token("nonumy")
+///              .page_size(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13102,7 +13102,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13340,8 +13340,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_non_billable_winning_bids_list("filterSetName")
-///              .page_token("erat")
-///              .page_size(-82)
+///              .page_token("aliquyam")
+///              .page_size(-69)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13388,7 +13388,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13632,7 +13632,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_create(req, "ownerName")
-///              .is_transient(true)
+///              .is_transient(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13679,7 +13679,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("ownerName", self._owner_name);
+        params.push("ownerName", &self._owner_name);
         if let Some(value) = self._is_transient.as_ref() {
             params.push("isTransient", value.to_string());
         }
@@ -13974,7 +13974,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14236,7 +14236,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14454,8 +14454,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_list("ownerName")
-///              .page_token("consetetur")
-///              .page_size(-65)
+///              .page_token("sea")
+///              .page_size(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14502,7 +14502,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("ownerName", self._owner_name);
+        params.push("ownerName", &self._owner_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -14740,8 +14740,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_bid_metrics_list("filterSetName")
-///              .page_token("aliquyam")
-///              .page_size(-94)
+///              .page_token("Stet")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14788,7 +14788,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15026,8 +15026,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_bid_response_errors_list("filterSetName")
-///              .page_token("diam")
-///              .page_size(-57)
+///              .page_token("elitr")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15074,7 +15074,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15312,8 +15312,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_bid_responses_without_bids_list("filterSetName")
-///              .page_token("sed")
-///              .page_size(-75)
+///              .page_token("est")
+///              .page_size(-53)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15360,7 +15360,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15598,8 +15598,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_filtered_bid_requests_list("filterSetName")
-///              .page_token("ea")
-///              .page_size(-15)
+///              .page_token("eos")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15646,7 +15646,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15883,9 +15883,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().filter_sets_filtered_bids_creatives_list("filterSetName", -25)
-///              .page_token("et")
-///              .page_size(-10)
+/// let result = hub.bidders().filter_sets_filtered_bids_creatives_list("filterSetName", -15)
+///              .page_token("dolores")
+///              .page_size(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15933,8 +15933,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
-        params.push("creativeStatusId", self._creative_status_id.to_string());
+        params.push("filterSetName", &self._filter_set_name);
+        params.push("creativeStatusId", &self._creative_status_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -16181,9 +16181,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().filter_sets_filtered_bids_details_list("filterSetName", -77)
-///              .page_token("dolore")
-///              .page_size(-40)
+/// let result = hub.bidders().filter_sets_filtered_bids_details_list("filterSetName", -10)
+///              .page_token("et")
+///              .page_size(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16231,8 +16231,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
-        params.push("creativeStatusId", self._creative_status_id.to_string());
+        params.push("filterSetName", &self._filter_set_name);
+        params.push("creativeStatusId", &self._creative_status_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -16480,8 +16480,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_filtered_bids_list("filterSetName")
-///              .page_token("accusam")
-///              .page_size(-47)
+///              .page_token("eirmod")
+///              .page_size(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16528,7 +16528,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -16766,8 +16766,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_impression_metrics_list("filterSetName")
-///              .page_token("dolores")
-///              .page_size(-81)
+///              .page_token("amet")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16814,7 +16814,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17052,8 +17052,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_losing_bids_list("filterSetName")
-///              .page_token("sea")
-///              .page_size(-59)
+///              .page_token("erat")
+///              .page_size(-73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17100,7 +17100,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17338,8 +17338,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_non_billable_winning_bids_list("filterSetName")
-///              .page_token("et")
-///              .page_size(-77)
+///              .page_token("takimata")
+///              .page_size(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17386,7 +17386,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("filterSetName", self._filter_set_name);
+        params.push("filterSetName", &self._filter_set_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17630,7 +17630,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_create(req, "ownerName")
-///              .is_transient(true)
+///              .is_transient(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17677,7 +17677,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("ownerName", self._owner_name);
+        params.push("ownerName", &self._owner_name);
         if let Some(value) = self._is_transient.as_ref() {
             params.push("isTransient", value.to_string());
         }
@@ -17972,7 +17972,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -18234,7 +18234,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -18452,8 +18452,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_list("ownerName")
-///              .page_token("et")
-///              .page_size(-12)
+///              .page_token("erat")
+///              .page_size(-10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18500,7 +18500,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("ownerName", self._owner_name);
+        params.push("ownerName", &self._owner_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

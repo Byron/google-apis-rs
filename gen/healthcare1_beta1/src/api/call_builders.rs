@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -624,7 +624,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -842,10 +842,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_annotation_stores_annotations_list("parent")
-///              .view("ut")
-///              .page_token("gubergren")
-///              .page_size(-16)
-///              .filter("est")
+///              .view(&Default::default())
+///              .page_token("ut")
+///              .page_size(-12)
+///              .filter("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -854,7 +854,7 @@ pub struct ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S>
 
    pub(super) hub: &'a CloudHealthcare<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _filter: Option<String>,
@@ -894,7 +894,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1024,8 +1024,8 @@ where
     /// Controls which fields are populated in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
@@ -1205,7 +1205,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1462,7 +1462,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_annotation_stores_create(req, "parent")
-///              .annotation_store_id("est")
+///              .annotation_store_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1509,7 +1509,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._annotation_store_id.as_ref() {
             params.push("annotationStoreId", value);
         }
@@ -1804,7 +1804,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2073,7 +2073,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2365,7 +2365,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2650,7 +2650,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2868,7 +2868,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_annotation_stores_get_iam_policy("resource")
-///              .options_requested_policy_version(-86)
+///              .options_requested_policy_version(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2914,7 +2914,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -3193,7 +3193,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3434,9 +3434,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_annotation_stores_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
-///              .filter("Stet")
+///              .page_token("duo")
+///              .page_size(-80)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3484,7 +3484,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3785,7 +3785,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4087,7 +4087,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4379,7 +4379,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4673,7 +4673,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._attribute_definition_id.as_ref() {
             params.push("attributeDefinitionId", value);
         }
@@ -4968,7 +4968,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5230,7 +5230,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5448,9 +5448,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_attribute_definitions_list("parent")
-///              .page_token("duo")
-///              .page_size(-34)
-///              .filter("et")
+///              .page_token("sed")
+///              .page_size(-20)
+///              .filter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5498,7 +5498,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5799,7 +5799,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -6101,7 +6101,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6386,7 +6386,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6648,7 +6648,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6866,9 +6866,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_consent_artifacts_list("parent")
-///              .page_token("et")
-///              .page_size(-22)
-///              .filter("sadipscing")
+///              .page_token("dolor")
+///              .page_size(-18)
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6916,7 +6916,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7215,7 +7215,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7507,7 +7507,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -7792,7 +7792,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8054,7 +8054,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8316,7 +8316,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8534,9 +8534,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_consents_list("parent")
-///              .page_token("Stet")
-///              .page_size(-76)
-///              .filter("elitr")
+///              .page_token("invidunt")
+///              .page_size(-65)
+///              .filter("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8584,7 +8584,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8832,9 +8832,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_consents_list_revisions("name")
-///              .page_token("diam")
-///              .page_size(-61)
-///              .filter("ipsum")
+///              .page_token("Lorem")
+///              .page_size(-29)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8882,7 +8882,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9183,7 +9183,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -9485,7 +9485,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9777,7 +9777,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10069,7 +10069,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10361,7 +10361,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -10646,7 +10646,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10908,7 +10908,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -11126,9 +11126,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_user_data_mappings_list("parent")
-///              .page_token("sed")
-///              .page_size(-9)
-///              .filter("dolores")
+///              .page_token("amet.")
+///              .page_size(-30)
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11176,7 +11176,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11477,7 +11477,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -11779,7 +11779,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("consentStore", self._consent_store);
+        params.push("consentStore", &self._consent_store);
 
         params.extend(self._additional_params.iter());
 
@@ -12026,7 +12026,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_create(req, "parent")
-///              .consent_store_id("voluptua.")
+///              .consent_store_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12073,7 +12073,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._consent_store_id.as_ref() {
             params.push("consentStoreId", value);
         }
@@ -12368,7 +12368,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12637,7 +12637,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("consentStore", self._consent_store);
+        params.push("consentStore", &self._consent_store);
 
         params.extend(self._additional_params.iter());
 
@@ -12922,7 +12922,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13140,7 +13140,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_get_iam_policy("resource")
-///              .options_requested_policy_version(-2)
+///              .options_requested_policy_version(-78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13186,7 +13186,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -13414,9 +13414,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_consent_stores_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-6)
-///              .filter("invidunt")
+///              .page_token("ea")
+///              .page_size(-95)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13464,7 +13464,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13765,7 +13765,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -14067,7 +14067,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("consentStore", self._consent_store);
+        params.push("consentStore", &self._consent_store);
 
         params.extend(self._additional_params.iter());
 
@@ -14359,7 +14359,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -14651,7 +14651,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -14937,8 +14937,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -15211,8 +15211,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -15485,8 +15485,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -15759,8 +15759,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -16033,8 +16033,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -16307,8 +16307,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -16581,8 +16581,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -16855,8 +16855,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -17129,8 +17129,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -17403,8 +17403,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -17677,8 +17677,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -17950,8 +17950,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -18224,8 +18224,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -18498,8 +18498,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -18772,8 +18772,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -19053,8 +19053,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -19358,7 +19358,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._dicom_store_id.as_ref() {
             params.push("dicomStoreId", value);
         }
@@ -19660,7 +19660,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("sourceStore", self._source_store);
+        params.push("sourceStore", &self._source_store);
 
         params.extend(self._additional_params.iter());
 
@@ -19945,7 +19945,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -20214,7 +20214,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -20499,7 +20499,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -20717,7 +20717,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_dicom_stores_get_iam_policy("resource")
-///              .options_requested_policy_version(-42)
+///              .options_requested_policy_version(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20763,7 +20763,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -21042,7 +21042,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -21283,9 +21283,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_dicom_stores_list("parent")
-///              .page_token("sed")
-///              .page_size(-75)
-///              .filter("Lorem")
+///              .page_token("sit")
+///              .page_size(-93)
+///              .filter("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21333,7 +21333,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21634,7 +21634,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -21930,8 +21930,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -22204,8 +22204,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -22478,8 +22478,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -22758,7 +22758,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -23051,8 +23051,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("dicomWebPath", self._dicom_web_path);
+        params.push("parent", &self._parent);
+        params.push("dicomWebPath", &self._dicom_web_path);
 
         params.extend(self._additional_params.iter());
 
@@ -23354,7 +23354,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -23595,12 +23595,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_fhir__concept_map_search_translate("parent")
-///              .url("amet")
-///              .target("erat")
-///              .system("dolores")
-///              .source("erat")
-///              .concept_map_version("accusam")
-///              .code("sea")
+///              .url("accusam")
+///              .target("amet")
+///              .system("erat")
+///              .source("dolores")
+///              .concept_map_version("erat")
+///              .code("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23651,7 +23651,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._url.as_ref() {
             params.push("url", value);
         }
@@ -23929,9 +23929,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_fhir__concept_map_translate("name")
-///              .system("Lorem")
-///              .concept_map_version("et")
-///              .code("At")
+///              .system("takimata")
+///              .concept_map_version("Lorem")
+///              .code("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23979,7 +23979,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._system.as_ref() {
             params.push("system", value);
         }
@@ -24271,7 +24271,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -24489,12 +24489,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_fhir__patient_everything("name")
-///              .start("sit")
-///              .end("erat")
-///              ._type("sea")
-///              ._since("nonumy")
-///              ._page_token("et")
-///              ._count(-12)
+///              .start("et")
+///              .end("sit")
+///              ._type("erat")
+///              ._since("sea")
+///              ._page_token("nonumy")
+///              ._count(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24545,7 +24545,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._start.as_ref() {
             params.push("start", value);
         }
@@ -24867,7 +24867,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -25091,7 +25091,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_fhir__resource_validate(req, "parent", "type")
-///              .profile("sit")
+///              .profile("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25139,8 +25139,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("type", self._type_);
+        params.push("parent", &self._parent);
+        params.push("type", &self._type_);
         if let Some(value) = self._profile.as_ref() {
             params.push("profile", value);
         }
@@ -25445,7 +25445,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -25708,8 +25708,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("type", self._type_);
+        params.push("parent", &self._parent);
+        params.push("type", &self._type_);
 
         params.extend(self._additional_params.iter());
 
@@ -25989,8 +25989,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("type", self._type_);
+        params.push("parent", &self._parent);
+        params.push("type", &self._type_);
 
         params.extend(self._additional_params.iter());
 
@@ -26293,8 +26293,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("type", self._type_);
+        params.push("parent", &self._parent);
+        params.push("type", &self._type_);
 
         params.extend(self._additional_params.iter());
 
@@ -26597,8 +26597,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("type", self._type_);
+        params.push("parent", &self._parent);
+        params.push("type", &self._type_);
 
         params.extend(self._additional_params.iter());
 
@@ -26893,7 +26893,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -27162,7 +27162,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -27403,10 +27403,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_fhir_history("name")
-///              ._since("accusam")
-///              ._page_token("gubergren")
-///              ._count(-45)
-///              ._at("At")
+///              ._since("Lorem")
+///              ._page_token("accusam")
+///              ._count(-62)
+///              ._at("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27455,7 +27455,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self.__since.as_ref() {
             params.push("_since", value);
         }
@@ -27764,7 +27764,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -28049,7 +28049,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -28318,7 +28318,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -28611,8 +28611,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        params.push("resourceType", self._resource_type);
+        params.push("parent", &self._parent);
+        params.push("resourceType", &self._resource_type);
 
         params.extend(self._additional_params.iter());
 
@@ -28914,7 +28914,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -29199,7 +29199,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -29468,7 +29468,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -29715,7 +29715,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_create(req, "parent")
-///              .fhir_store_id("amet.")
+///              .fhir_store_id("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29762,7 +29762,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._fhir_store_id.as_ref() {
             params.push("fhirStoreId", value);
         }
@@ -30064,7 +30064,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("sourceStore", self._source_store);
+        params.push("sourceStore", &self._source_store);
 
         params.extend(self._additional_params.iter());
 
@@ -30349,7 +30349,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -30618,7 +30618,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -30903,7 +30903,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -31121,7 +31121,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_get_iam_policy("resource")
-///              .options_requested_policy_version(-58)
+///              .options_requested_policy_version(-101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31167,7 +31167,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -31446,7 +31446,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -31687,9 +31687,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_list("parent")
-///              .page_token("tempor")
-///              .page_size(-34)
-///              .filter("eos")
+///              .page_token("rebum.")
+///              .page_size(-39)
+///              .filter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -31737,7 +31737,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -32038,7 +32038,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -32340,7 +32340,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -32632,7 +32632,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -32873,8 +32873,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_messages_batch_get("parent")
-///              .view("At")
-///              .add_ids("sit")
+///              .view(&Default::default())
+///              .add_ids("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32883,7 +32883,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S>
 
    pub(super) hub: &'a CloudHealthcare<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _ids: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -32921,7 +32921,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -33047,8 +33047,8 @@ where
     /// Specifies the parts of the Messages resource to return in the response. When unspecified, equivalent to BASIC.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The resource id of the HL7v2 messages to retrieve in the format: `{message_id}`, where the full resource name is `{parent}/messages/{message_id}` A maximum of 100 messages can be retrieved in a batch. All 'ids' have to be under parent.
@@ -33213,7 +33213,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -33498,7 +33498,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -33716,7 +33716,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_messages_get("name")
-///              .view("ut")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -33725,7 +33725,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S>
 
    pub(super) hub: &'a CloudHealthcare<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -33762,7 +33762,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -33883,8 +33883,8 @@ where
     /// Specifies which parts of the Message resource to return in the response. When unspecified, equivalent to FULL.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -34041,7 +34041,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -34282,11 +34282,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_messages_list("parent")
-///              .view("kasd")
-///              .page_token("sadipscing")
-///              .page_size(-39)
-///              .order_by("sea")
-///              .filter("et")
+///              .view(&Default::default())
+///              .page_token("ut")
+///              .page_size(-16)
+///              .order_by("duo")
+///              .filter("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -34295,7 +34295,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S>
 
    pub(super) hub: &'a CloudHealthcare<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<ProjectViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -34336,7 +34336,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -34469,8 +34469,8 @@ where
     /// Specifies the parts of the Message to return in the response. When unspecified, equivalent to BASIC. Setting this to anything other than BASIC with a `page_size` larger than the default can generate a large response, which impacts the performance of this method.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &ProjectViewEnum) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
@@ -34657,7 +34657,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -34914,7 +34914,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_create(req, "parent")
-///              .hl7_v2_store_id("takimata")
+///              .hl7_v2_store_id("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -34961,7 +34961,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._hl7_v2_store_id.as_ref() {
             params.push("hl7V2StoreId", value);
         }
@@ -35256,7 +35256,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -35525,7 +35525,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -35810,7 +35810,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -36028,7 +36028,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_get_iam_policy("resource")
-///              .options_requested_policy_version(-15)
+///              .options_requested_policy_version(-66)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36074,7 +36074,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -36353,7 +36353,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -36594,9 +36594,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_list("parent")
-///              .page_token("sit")
-///              .page_size(-26)
-///              .filter("rebum.")
+///              .page_token("clita")
+///              .page_size(-15)
+///              .filter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -36644,7 +36644,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -36945,7 +36945,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -37247,7 +37247,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -37539,7 +37539,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -37831,7 +37831,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -38116,7 +38116,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -38334,9 +38334,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_operations_list("name")
-///              .page_token("dolor")
-///              .page_size(-82)
-///              .filter("magna")
+///              .page_token("dolores")
+///              .page_size(-30)
+///              .filter("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -38384,7 +38384,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -38638,7 +38638,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_create(req, "parent")
-///              .dataset_id("nonumy")
+///              .dataset_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -38685,7 +38685,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._dataset_id.as_ref() {
             params.push("datasetId", value);
         }
@@ -38987,7 +38987,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("sourceDataset", self._source_dataset);
+        params.push("sourceDataset", &self._source_dataset);
 
         params.extend(self._additional_params.iter());
 
@@ -39272,7 +39272,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -39534,7 +39534,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -39752,7 +39752,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_get_iam_policy("resource")
-///              .options_requested_policy_version(-43)
+///              .options_requested_policy_version(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39798,7 +39798,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
         if let Some(value) = self._options_requested_policy_version.as_ref() {
             params.push("options.requestedPolicyVersion", value.to_string());
         }
@@ -40026,8 +40026,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_list("parent")
-///              .page_token("takimata")
-///              .page_size(-99)
+///              .page_token("accusam")
+///              .page_size(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40074,7 +40074,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -40365,7 +40365,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -40667,7 +40667,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -40959,7 +40959,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -41251,7 +41251,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("nlpService", self._nlp_service);
+        params.push("nlpService", &self._nlp_service);
 
         params.extend(self._additional_params.iter());
 
@@ -41536,7 +41536,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -41754,9 +41754,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("dolores")
-///              .page_size(-96)
-///              .filter("no")
+///              .page_token("erat")
+///              .page_size(-71)
+///              .filter("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -41804,7 +41804,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

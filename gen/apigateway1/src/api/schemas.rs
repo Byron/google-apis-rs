@@ -32,7 +32,7 @@ pub struct ApigatewayApi {
     pub name: Option<String>,
     /// Output only. State of the API.
     
-    pub state: Option<String>,
+    pub state: Option<ApigatewayApiStateEnum>,
     /// Output only. Updated time.
     #[serde(rename="updateTime")]
     
@@ -92,7 +92,7 @@ pub struct ApigatewayApiConfig {
     pub service_config_id: Option<String>,
     /// Output only. State of the API Config.
     
-    pub state: Option<String>,
+    pub state: Option<ApigatewayApiConfigStateEnum>,
     /// Output only. Updated time.
     #[serde(rename="updateTime")]
     
@@ -189,7 +189,7 @@ pub struct ApigatewayAuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<ApigatewayAuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for ApigatewayAuditLogConfig {}
@@ -292,7 +292,7 @@ pub struct ApigatewayGateway {
     pub name: Option<String>,
     /// Output only. The current state of the Gateway.
     
-    pub state: Option<String>,
+    pub state: Option<ApigatewayGatewayStateEnum>,
     /// Output only. Updated time.
     #[serde(rename="updateTime")]
     

@@ -120,7 +120,7 @@ let mut req = Message::default();
 let result = hub.users().messages_import(req, "userId")
              .process_for_calendar(true)
              .never_mark_spam(false)
-             .internal_date_source("amet.")
+             .internal_date_source(&Default::default())
              .deleted(true)
              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 

@@ -13,11 +13,11 @@ pub struct AggregationInfo {
     /// no description provided
     #[serde(rename="aggregationInterval")]
     
-    pub aggregation_interval: Option<String>,
+    pub aggregation_interval: Option<AggregationInfoAggregationIntervalEnum>,
     /// no description provided
     #[serde(rename="aggregationLevel")]
     
-    pub aggregation_level: Option<String>,
+    pub aggregation_level: Option<AggregationInfoAggregationLevelEnum>,
 }
 
 impl client::Part for AggregationInfo {}
@@ -56,7 +56,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -187,7 +187,7 @@ pub struct GeoTaxonomy {
     /// The type of Geo Taxonomy: GLOBAL, REGIONAL, or MULTI_REGIONAL.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GeoTaxonomyTypeEnum>,
 }
 
 impl client::Part for GeoTaxonomy {}

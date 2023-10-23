@@ -123,9 +123,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.sites().versions_files_list("parent")
-//!              .status("At")
-//!              .page_token("sanctus")
-//!              .page_size(-80)
+//!              .status(&Default::default())
+//!              .page_token("voluptua.")
+//!              .page_size(-27)
 //!              .doit().await;
 //! 
 //! match result {

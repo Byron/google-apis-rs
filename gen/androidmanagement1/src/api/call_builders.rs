@@ -72,7 +72,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._language_code.as_ref() {
             params.push("languageCode", value);
         }
@@ -344,7 +344,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -606,7 +606,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -868,7 +868,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1136,7 +1136,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1385,7 +1385,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_delete("name")
 ///              .wipe_reason_message("ipsum")
-///              .add_wipe_data_flags("sed")
+///              .add_wipe_data_flags(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1395,7 +1395,7 @@ pub struct EnterpriseDeviceDeleteCall<'a, S>
    pub(super) hub: &'a AndroidManagement<S>,
    pub(super) _name: String,
    pub(super) _wipe_reason_message: Option<String>,
-   pub(super) _wipe_data_flags: Vec<String>,
+   pub(super) _wipe_data_flags: Option<EnterpriseWipeDataFlagsEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1432,7 +1432,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._wipe_reason_message.as_ref() {
             params.push("wipeReasonMessage", value);
         }
@@ -1566,8 +1566,8 @@ where
     ///
     /// Append the given value to the *wipe data flags* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_wipe_data_flags(mut self, new_value: &str) -> EnterpriseDeviceDeleteCall<'a, S> {
-        self._wipe_data_flags.push(new_value.to_string());
+    pub fn add_wipe_data_flags(mut self, new_value: &EnterpriseWipeDataFlagsEnum) -> EnterpriseDeviceDeleteCall<'a, S> {
+        self._wipe_data_flags.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1717,7 +1717,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1986,7 +1986,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2227,8 +2227,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_list("parent")
-///              .page_token("est")
-///              .page_size(-50)
+///              .page_token("rebum.")
+///              .page_size(-57)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2275,7 +2275,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2566,7 +2566,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2868,7 +2868,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3153,7 +3153,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3415,7 +3415,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3633,8 +3633,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().enrollment_tokens_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-25)
+///              .page_token("dolor")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3681,7 +3681,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3963,7 +3963,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4225,7 +4225,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4443,8 +4443,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().policies_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .page_token("duo")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4491,7 +4491,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4782,7 +4782,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -5084,7 +5084,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -5369,7 +5369,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5631,7 +5631,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5850,7 +5850,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().web_apps_list("parent")
 ///              .page_token("et")
-///              .page_size(-76)
+///              .page_size(-68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5897,7 +5897,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6188,7 +6188,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -6490,7 +6490,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -6737,9 +6737,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().create(req)
-///              .signup_url_name("duo")
-///              .project_id("dolore")
-///              .enterprise_token("et")
+///              .signup_url_name("sed")
+///              .project_id("duo")
+///              .enterprise_token("dolore")
 ///              .agreement_accepted(false)
 ///              .doit().await;
 /// # }
@@ -7096,7 +7096,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7358,7 +7358,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7576,10 +7576,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().list()
-///              .view("et")
+///              .view(&Default::default())
 ///              .project_id("et")
-///              .page_token("sadipscing")
-///              .page_size(-15)
+///              .page_token("et")
+///              .page_size(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7587,7 +7587,7 @@ pub struct EnterpriseListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a AndroidManagement<S>,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<EnterpriseViewEnum>,
    pub(super) _project_id: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -7739,8 +7739,8 @@ where
     /// Specifies which Enterprise fields to return. This method only supports BASIC.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> EnterpriseListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &EnterpriseViewEnum) -> EnterpriseListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// Required. The Cloud project ID of the EMM managing the enterprises.
@@ -7920,7 +7920,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -8171,8 +8171,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.signup_urls().create()
-///              .project_id("duo")
-///              .callback_url("vero")
+///              .project_id("dolor")
+///              .callback_url("duo")
 ///              .doit().await;
 /// # }
 /// ```

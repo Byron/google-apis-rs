@@ -19,7 +19,7 @@ pub struct AdvertisedId {
     /// Required.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AdvertisedIdTypeEnum>,
 }
 
 impl client::Part for AdvertisedId {}
@@ -129,7 +129,7 @@ pub struct Beacon {
     /// Optional.
     #[serde(rename="expectedStability")]
     
-    pub expected_stability: Option<String>,
+    pub expected_stability: Option<BeaconExpectedStabilityEnum>,
     /// The indoor level information for this beacon, if known. As returned by the
     /// Google Maps API.
     /// Optional.
@@ -170,7 +170,7 @@ pub struct Beacon {
     /// Current status of the beacon.
     /// Required.
     
-    pub status: Option<String>,
+    pub status: Option<BeaconStatusEnum>,
 }
 
 impl client::RequestValue for Beacon {}
@@ -329,7 +329,7 @@ impl client::ResponseResult for DeleteAttachmentsResponse {}
 pub struct Diagnostics {
     /// An unordered list of Alerts that the beacon has.
     
-    pub alerts: Option<Vec<String>>,
+    pub alerts: Option<Vec<DiagnosticAlertsEnum>>,
     /// Resource name of the beacon. For Eddystone-EID beacons, this may
     /// be the beacon's current EID, or the beacon's "stable" Eddystone-UID.
     #[serde(rename="beaconName")]
@@ -701,7 +701,7 @@ pub struct Namespace {
     /// via `beaconinfo.getforobserved`.
     #[serde(rename="servingVisibility")]
     
-    pub serving_visibility: Option<String>,
+    pub serving_visibility: Option<NamespaceServingVisibilityEnum>,
 }
 
 impl client::RequestValue for Namespace {}

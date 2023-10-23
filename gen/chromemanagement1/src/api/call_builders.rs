@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -332,7 +332,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -594,7 +594,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -864,7 +864,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1172,7 +1172,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._org_unit_id.as_ref() {
             params.push("orgUnitId", value);
         }
@@ -1468,7 +1468,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -1754,7 +1754,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -2044,7 +2044,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2356,7 +2356,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2629,8 +2629,8 @@ where
 ///              .org_unit_id("ea")
 ///              .order_by("dolor")
 ///              .filter("Lorem")
-///              .app_type("eos")
-///              .app_id("labore")
+///              .app_type(&Default::default())
+///              .app_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2644,7 +2644,7 @@ pub struct CustomerReportFindInstalledAppDeviceCall<'a, S>
    pub(super) _org_unit_id: Option<String>,
    pub(super) _order_by: Option<String>,
    pub(super) _filter: Option<String>,
-   pub(super) _app_type: Option<String>,
+   pub(super) _app_type: Option<CustomerAppTypeEnum>,
    pub(super) _app_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -2682,7 +2682,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("customer", self._customer);
+        params.push("customer", &self._customer);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2856,8 +2856,8 @@ where
     /// Type of the app.
     ///
     /// Sets the *app type* query property to the given value.
-    pub fn app_type(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
-        self._app_type = Some(new_value.to_string());
+    pub fn app_type(mut self, new_value: &CustomerAppTypeEnum) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
+        self._app_type = Some(new_value.clone());
         self
     }
     /// Unique identifier of the app. For Chrome apps and extensions, the 32-character id (e.g. ehoadneljpdggcbbknedodolkkjodefl). For Android apps, the package name (e.g. com.evernote).
@@ -3016,7 +3016,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -3245,9 +3245,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().telemetry_devices_list("parent")
 ///              .read_mask(&Default::default())
-///              .page_token("sed")
-///              .page_size(-61)
-///              .filter("Stet")
+///              .page_token("duo")
+///              .page_size(-80)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3296,7 +3296,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }
@@ -3555,9 +3555,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().telemetry_events_list("parent")
 ///              .read_mask(&Default::default())
-///              .page_token("et")
-///              .page_size(-43)
-///              .filter("et")
+///              .page_token("kasd")
+///              .page_size(-24)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3606,7 +3606,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._read_mask.as_ref() {
             params.push("readMask", value.to_string());
         }

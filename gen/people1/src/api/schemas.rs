@@ -65,7 +65,7 @@ pub struct AgeRangeType {
     /// The age range.
     #[serde(rename="ageRange")]
     
-    pub age_range: Option<String>,
+    pub age_range: Option<AgeRangeTypeAgeRangeEnum>,
     /// Metadata about the age range.
     
     pub metadata: Option<FieldMetadata>,
@@ -94,7 +94,7 @@ pub struct BatchCreateContactsRequest {
     pub read_mask: Option<client::FieldMask>,
     /// Optional. A mask of what source types to return in the post mutate read. Defaults to READ_SOURCE_TYPE_CONTACT and READ_SOURCE_TYPE_PROFILE if not set.
     
-    pub sources: Option<Vec<String>>,
+    pub sources: Option<Vec<BatchCreateContactsRequestSourcesEnum>>,
 }
 
 impl client::RequestValue for BatchCreateContactsRequest {}
@@ -179,7 +179,7 @@ pub struct BatchUpdateContactsRequest {
     pub read_mask: Option<client::FieldMask>,
     /// Optional. A mask of what source types to return. Defaults to READ_SOURCE_TYPE_CONTACT and READ_SOURCE_TYPE_PROFILE if not set.
     
-    pub sources: Option<Vec<String>>,
+    pub sources: Option<Vec<BatchUpdateContactsRequestSourcesEnum>>,
     /// Required. A field mask to restrict which fields on the person are updated. Multiple fields can be specified by separating them with commas. All specified fields will be replaced, or cleared if left empty for each person. Valid values are: * addresses * biographies * birthdays * calendarUrls * clientData * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * relations * sipAddresses * urls * userDefined
     #[serde(rename="updateMask")]
     
@@ -219,7 +219,7 @@ pub struct Biography {
     /// The content type of the biography.
     #[serde(rename="contentType")]
     
-    pub content_type: Option<String>,
+    pub content_type: Option<BiographyContentTypeEnum>,
     /// Metadata about the biography.
     
     pub metadata: Option<FieldMetadata>,
@@ -348,7 +348,7 @@ pub struct ContactGroup {
     /// Output only. The contact group type.
     #[serde(rename="groupType")]
     
-    pub group_type: Option<String>,
+    pub group_type: Option<ContactGroupGroupTypeEnum>,
     /// Output only. The total number of contacts in the group irrespective of max members in specified in the request.
     #[serde(rename="memberCount")]
     
@@ -472,7 +472,7 @@ pub struct CopyOtherContactToMyContactsGroupRequest {
     pub read_mask: Option<client::FieldMask>,
     /// Optional. A mask of what source types to return. Defaults to READ_SOURCE_TYPE_CONTACT and READ_SOURCE_TYPE_PROFILE if not set.
     
-    pub sources: Option<Vec<String>>,
+    pub sources: Option<Vec<CopyOtherContactToMyContactsGroupRequestSourcesEnum>>,
 }
 
 impl client::RequestValue for CopyOtherContactToMyContactsGroupRequest {}
@@ -1059,7 +1059,7 @@ pub struct MiscKeyword {
     /// The miscellaneous keyword type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<MiscKeywordTypeEnum>,
     /// The value of the miscellaneous keyword.
     
     pub value: Option<String>,
@@ -1200,7 +1200,7 @@ pub struct Nickname {
     /// The type of the nickname.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<NicknameTypeEnum>,
     /// The nickname.
     
     pub value: Option<String>,
@@ -1315,7 +1315,7 @@ pub struct Person {
     /// Output only. **DEPRECATED** (Please use `person.ageRanges` instead) The person's age range.
     #[serde(rename="ageRange")]
     
-    pub age_range: Option<String>,
+    pub age_range: Option<PersonAgeRangeEnum>,
     /// Output only. The person's age ranges.
     #[serde(rename="ageRanges")]
     
@@ -1463,7 +1463,7 @@ pub struct PersonMetadata {
     /// Output only. **DEPRECATED** (Please use `person.metadata.sources.profileMetadata.objectType` instead) The type of the person object.
     #[serde(rename="objectType")]
     
-    pub object_type: Option<String>,
+    pub object_type: Option<PersonMetadataObjectTypeEnum>,
     /// Output only. Any former resource names this person has had. Populated only for `people.connections.list` requests that include a sync token. The resource name may change when adding or removing fields that link a contact and profile such as a verified email, verified phone number, or profile URL.
     #[serde(rename="previousResourceNames")]
     
@@ -1563,11 +1563,11 @@ pub struct ProfileMetadata {
     /// Output only. The profile object type.
     #[serde(rename="objectType")]
     
-    pub object_type: Option<String>,
+    pub object_type: Option<ProfileMetadataObjectTypeEnum>,
     /// Output only. The user types.
     #[serde(rename="userTypes")]
     
-    pub user_types: Option<Vec<String>>,
+    pub user_types: Option<Vec<ProfileMetadataUserTypesEnum>>,
 }
 
 impl client::Part for ProfileMetadata {}
@@ -1790,7 +1790,7 @@ pub struct Source {
     /// The source type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SourceTypeEnum>,
     /// Output only. **Only populated in `person.metadata.sources`.** Last update timestamp of this source.
     #[serde(rename="updateTime")]
     
@@ -1889,7 +1889,7 @@ pub struct UpdateContactPhotoRequest {
     pub photo_bytes: Option<Vec<u8>>,
     /// Optional. A mask of what source types to return. Defaults to READ_SOURCE_TYPE_CONTACT and READ_SOURCE_TYPE_PROFILE if not set.
     
-    pub sources: Option<Vec<String>>,
+    pub sources: Option<Vec<UpdateContactPhotoRequestSourcesEnum>>,
 }
 
 impl client::RequestValue for UpdateContactPhotoRequest {}

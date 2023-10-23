@@ -9,7 +9,7 @@ pub struct GoogleCloudPolicysimulatorV1AccessStateDiff {
     /// How the principal's access, specified in the AccessState field, changed between the current (baseline) policies and proposed (simulated) policies.
     #[serde(rename="accessChange")]
     
-    pub access_change: Option<String>,
+    pub access_change: Option<GoogleCloudPolicysimulatorV1AccessStateDiffAccessChangeEnum>,
     /// The results of evaluating the access tuple under the current (baseline) policies. If the AccessState couldn't be fully evaluated, this field explains why.
     
     pub baseline: Option<GoogleCloudPolicysimulatorV1ExplainedAccess>,
@@ -52,7 +52,7 @@ impl client::Part for GoogleCloudPolicysimulatorV1AccessTuple {}
 pub struct GoogleCloudPolicysimulatorV1BindingExplanation {
     /// Required. Indicates whether _this binding_ provides the specified permission to the specified principal for the specified resource. This field does _not_ indicate whether the principal actually has the permission for the resource. There might be another binding that overrides this binding. To determine whether the principal actually has the permission, use the `access` field in the TroubleshootIamPolicyResponse.
     
-    pub access: Option<String>,
+    pub access: Option<GoogleCloudPolicysimulatorV1BindingExplanationAccessEnum>,
     /// A condition expression that prevents this binding from granting access unless the expression evaluates to `true`. To learn about IAM Conditions, see https://cloud.google.com/iam/docs/conditions-overview.
     
     pub condition: Option<GoogleTypeExpr>,
@@ -61,18 +61,18 @@ pub struct GoogleCloudPolicysimulatorV1BindingExplanation {
     pub memberships: Option<HashMap<String, GoogleCloudPolicysimulatorV1BindingExplanationAnnotatedMembership>>,
     /// The relevance of this binding to the overall determination for the entire policy.
     
-    pub relevance: Option<String>,
+    pub relevance: Option<GoogleCloudPolicysimulatorV1BindingExplanationRelevanceEnum>,
     /// The role that this binding grants. For example, `roles/compute.serviceAgent`. For a complete list of predefined IAM roles, as well as the permissions in each role, see https://cloud.google.com/iam/help/roles/reference.
     
     pub role: Option<String>,
     /// Indicates whether the role granted by this binding contains the specified permission.
     #[serde(rename="rolePermission")]
     
-    pub role_permission: Option<String>,
+    pub role_permission: Option<GoogleCloudPolicysimulatorV1BindingExplanationRolePermissionEnum>,
     /// The relevance of the permission's existence, or nonexistence, in the role to the overall determination for the entire policy.
     #[serde(rename="rolePermissionRelevance")]
     
-    pub role_permission_relevance: Option<String>,
+    pub role_permission_relevance: Option<GoogleCloudPolicysimulatorV1BindingExplanationRolePermissionRelevanceEnum>,
 }
 
 impl client::Part for GoogleCloudPolicysimulatorV1BindingExplanation {}
@@ -87,10 +87,10 @@ impl client::Part for GoogleCloudPolicysimulatorV1BindingExplanation {}
 pub struct GoogleCloudPolicysimulatorV1BindingExplanationAnnotatedMembership {
     /// Indicates whether the binding includes the principal.
     
-    pub membership: Option<String>,
+    pub membership: Option<GoogleCloudPolicysimulatorV1BindingExplanationAnnotatedMembershipMembershipEnum>,
     /// The relevance of the principal's status to the overall determination for the binding.
     
-    pub relevance: Option<String>,
+    pub relevance: Option<GoogleCloudPolicysimulatorV1BindingExplanationAnnotatedMembershipRelevanceEnum>,
 }
 
 impl client::Part for GoogleCloudPolicysimulatorV1BindingExplanationAnnotatedMembership {}
@@ -106,7 +106,7 @@ pub struct GoogleCloudPolicysimulatorV1ExplainedAccess {
     /// Whether the principal in the access tuple has permission to access the resource in the access tuple under the given policies.
     #[serde(rename="accessState")]
     
-    pub access_state: Option<String>,
+    pub access_state: Option<GoogleCloudPolicysimulatorV1ExplainedAccesAccessStateEnum>,
     /// If the AccessState is `UNKNOWN`, this field contains a list of errors explaining why the result is `UNKNOWN`. If the `AccessState` is `GRANTED` or `NOT_GRANTED`, this field is omitted.
     
     pub errors: Option<Vec<GoogleRpcStatus>>,
@@ -127,7 +127,7 @@ impl client::Part for GoogleCloudPolicysimulatorV1ExplainedAccess {}
 pub struct GoogleCloudPolicysimulatorV1ExplainedPolicy {
     /// Indicates whether _this policy_ provides the specified permission to the specified principal for the specified resource. This field does _not_ indicate whether the principal actually has the permission for the resource. There might be another policy that overrides this policy. To determine whether the principal actually has the permission, use the `access` field in the TroubleshootIamPolicyResponse.
     
-    pub access: Option<String>,
+    pub access: Option<GoogleCloudPolicysimulatorV1ExplainedPolicyAccessEnum>,
     /// Details about how each binding in the policy affects the principal's ability, or inability, to use the permission for the resource. If the user who created the Replay does not have access to the policy, this field is omitted.
     #[serde(rename="bindingExplanations")]
     
@@ -141,7 +141,7 @@ pub struct GoogleCloudPolicysimulatorV1ExplainedPolicy {
     pub policy: Option<GoogleIamV1Policy>,
     /// The relevance of this policy to the overall determination in the TroubleshootIamPolicyResponse. If the user who created the Replay does not have access to the policy, this field is omitted.
     
-    pub relevance: Option<String>,
+    pub relevance: Option<GoogleCloudPolicysimulatorV1ExplainedPolicyRelevanceEnum>,
 }
 
 impl client::Part for GoogleCloudPolicysimulatorV1ExplainedPolicy {}
@@ -201,7 +201,7 @@ pub struct GoogleCloudPolicysimulatorV1Replay {
     pub results_summary: Option<GoogleCloudPolicysimulatorV1ReplayResultsSummary>,
     /// Output only. The current state of the `Replay`.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudPolicysimulatorV1ReplayStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudPolicysimulatorV1Replay {}
@@ -218,7 +218,7 @@ pub struct GoogleCloudPolicysimulatorV1ReplayConfig {
     /// The logs to use as input for the Replay.
     #[serde(rename="logSource")]
     
-    pub log_source: Option<String>,
+    pub log_source: Option<GoogleCloudPolicysimulatorV1ReplayConfigLogSourceEnum>,
     /// A mapping of the resources that you want to simulate policies for and the policies that you want to simulate. Keys are the full resource names for the resources. For example, `//cloudresourcemanager.googleapis.com/projects/my-project`. For examples of full resource names for Google Cloud services, see https://cloud.google.com/iam/help/troubleshooter/full-resource-names. Values are Policy objects representing the policies that you want to simulate. Replays automatically take into account any IAM policies inherited through the resource hierarchy, and any policies set on descendant resources. You do not need to include these policies in the policy overlay.
     #[serde(rename="policyOverlay")]
     
@@ -345,7 +345,7 @@ pub struct GoogleIamV1AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1AuditLogConfig {}

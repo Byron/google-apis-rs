@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
 
         params.extend(self._additional_params.iter());
 
@@ -359,8 +359,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("metric", self._metric);
+        params.push("project", &self._project);
+        params.push("metric", &self._metric);
 
         params.extend(self._additional_params.iter());
 
@@ -641,7 +641,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
         }
@@ -920,7 +920,7 @@ where
 ///              .oldest("ut")
 ///              .add_labels("gubergren")
 ///              .count(-16)
-///              .aggregator("est")
+///              .aggregator(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -938,7 +938,7 @@ pub struct TimeseryListCall<'a, S>
    pub(super) _oldest: Option<String>,
    pub(super) _labels: Vec<String>,
    pub(super) _count: Option<i32>,
-   pub(super) _aggregator: Option<String>,
+   pub(super) _aggregator: Option<TimeseryAggregatorEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -975,9 +975,9 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("metric", self._metric);
-        params.push("youngest", self._youngest);
+        params.push("project", &self._project);
+        params.push("metric", &self._metric);
+        params.push("youngest", &self._youngest);
         if let Some(value) = self._window.as_ref() {
             params.push("window", value);
         }
@@ -1220,8 +1220,8 @@ where
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     ///
     /// Sets the *aggregator* query property to the given value.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
-        self._aggregator = Some(new_value.to_string());
+    pub fn aggregator(mut self, new_value: &TimeseryAggregatorEnum) -> TimeseryListCall<'a, S> {
+        self._aggregator = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1374,7 +1374,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
 
         params.extend(self._additional_params.iter());
 
@@ -1617,13 +1617,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.timeseries_descriptors().list(req, "project", "metric", "youngest")
-///              .window("ea")
-///              .timespan("dolor")
-///              .page_token("Lorem")
-///              .oldest("eos")
-///              .add_labels("labore")
-///              .count(-43)
-///              .aggregator("duo")
+///              .window("gubergren")
+///              .timespan("ea")
+///              .page_token("dolor")
+///              .oldest("Lorem")
+///              .add_labels("eos")
+///              .count(-86)
+///              .aggregator(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1641,7 +1641,7 @@ pub struct TimeseriesDescriptorListCall<'a, S>
    pub(super) _oldest: Option<String>,
    pub(super) _labels: Vec<String>,
    pub(super) _count: Option<i32>,
-   pub(super) _aggregator: Option<String>,
+   pub(super) _aggregator: Option<TimeseriesDescriptorAggregatorEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1678,9 +1678,9 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("metric", self._metric);
-        params.push("youngest", self._youngest);
+        params.push("project", &self._project);
+        params.push("metric", &self._metric);
+        params.push("youngest", &self._youngest);
         if let Some(value) = self._window.as_ref() {
             params.push("window", value);
         }
@@ -1923,8 +1923,8 @@ where
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     ///
     /// Sets the *aggregator* query property to the given value.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
-        self._aggregator = Some(new_value.to_string());
+    pub fn aggregator(mut self, new_value: &TimeseriesDescriptorAggregatorEnum) -> TimeseriesDescriptorListCall<'a, S> {
+        self._aggregator = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

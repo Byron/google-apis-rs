@@ -225,7 +225,7 @@ impl client::Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentInt
 pub struct GoogleCloudMlV1_StudyConfig_MetricSpec {
     /// Required. The optimization goal of the metric.
     
-    pub goal: Option<String>,
+    pub goal: Option<GoogleCloudMlV1StudyConfigMetricSpecGoalEnum>,
     /// Required. The name of the metric.
     
     pub metric: Option<String>,
@@ -279,11 +279,11 @@ pub struct GoogleCloudMlV1_StudyConfig_ParameterSpec {
     /// How the parameter should be scaled. Leave unset for categorical parameters.
     #[serde(rename="scaleType")]
     
-    pub scale_type: Option<String>,
+    pub scale_type: Option<GoogleCloudMlV1StudyConfigParameterSpecScaleTypeEnum>,
     /// Required. The type of the parameter.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudMlV1StudyConfigParameterSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudMlV1_StudyConfig_ParameterSpec {}
@@ -330,7 +330,7 @@ pub struct GoogleCloudMlV1__AcceleratorConfig {
     /// The type of accelerator to use.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudMlV1AcceleratorConfigTypeEnum>,
 }
 
 impl client::Part for GoogleCloudMlV1__AcceleratorConfig {}
@@ -450,11 +450,11 @@ pub struct GoogleCloudMlV1__Capability {
     /// Available accelerators for the capability.
     #[serde(rename="availableAccelerators")]
     
-    pub available_accelerators: Option<Vec<String>>,
+    pub available_accelerators: Option<Vec<GoogleCloudMlV1CapabilityAvailableAcceleratorsEnum>>,
     /// no description provided
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudMlV1CapabilityTypeEnum>,
 }
 
 impl client::Part for GoogleCloudMlV1__Capability {}
@@ -723,7 +723,7 @@ pub struct GoogleCloudMlV1__HyperparameterOutput {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The detailed state of the trial.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudMlV1HyperparameterOutputStateEnum>,
     /// The trial id for these results.
     #[serde(rename="trialId")]
     
@@ -746,14 +746,14 @@ impl client::Part for GoogleCloudMlV1__HyperparameterOutput {}
 pub struct GoogleCloudMlV1__HyperparameterSpec {
     /// Optional. The search algorithm specified for the hyperparameter tuning job. Uses the default AI Platform hyperparameter tuning algorithm if unspecified.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<GoogleCloudMlV1HyperparameterSpecAlgorithmEnum>,
     /// Optional. Indicates if the hyperparameter tuning job enables auto trial early stopping.
     #[serde(rename="enableTrialEarlyStopping")]
     
     pub enable_trial_early_stopping: Option<bool>,
     /// Required. The type of goal to use for tuning. Available types are `MAXIMIZE` and `MINIMIZE`. Defaults to `MAXIMIZE`.
     
-    pub goal: Option<String>,
+    pub goal: Option<GoogleCloudMlV1HyperparameterSpecGoalEnum>,
     /// Optional. The TensorFlow summary tag name to use for optimizing trials. For current versions of TensorFlow, this tag name should exactly match what is shown in TensorBoard, including all scopes. For versions of TensorFlow prior to 0.12, this should be only the tag passed to tf.Summary. By default, "training/hptuning/metric" will be used.
     #[serde(rename="hyperparameterMetricTag")]
     
@@ -853,7 +853,7 @@ pub struct GoogleCloudMlV1__Job {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The detailed state of a job.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudMlV1JobStateEnum>,
     /// Input parameters to create a training job.
     #[serde(rename="trainingInput")]
     
@@ -1103,7 +1103,7 @@ impl client::Part for GoogleCloudMlV1__Measurement {}
 pub struct GoogleCloudMlV1__MetricSpec {
     /// metric name.
     
-    pub name: Option<String>,
+    pub name: Option<GoogleCloudMlV1MetricSpecNameEnum>,
     /// Target specifies the target value for the given metric; once real metric deviates from the threshold by a certain percentage, the node count changes.
     
     pub target: Option<i32>,
@@ -1189,11 +1189,11 @@ pub struct GoogleCloudMlV1__ParameterSpec {
     /// Optional. How the parameter should be scaled to the hypercube. Leave unset for categorical parameters. Some kind of scaling is strongly recommended for real or integral parameters (e.g., `UNIT_LINEAR_SCALE`).
     #[serde(rename="scaleType")]
     
-    pub scale_type: Option<String>,
+    pub scale_type: Option<GoogleCloudMlV1ParameterSpecScaleTypeEnum>,
     /// Required. The type of the parameter.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudMlV1ParameterSpecTypeEnum>,
 }
 
 impl client::Part for GoogleCloudMlV1__ParameterSpec {}
@@ -1234,7 +1234,7 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Required. The format of the input data files.
     #[serde(rename="dataFormat")]
     
-    pub data_format: Option<String>,
+    pub data_format: Option<GoogleCloudMlV1PredictionInputDataFormatEnum>,
     /// Required. The Cloud Storage location of the input data files. May contain wildcards.
     #[serde(rename="inputPaths")]
     
@@ -1251,7 +1251,7 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Optional. Format of the output data files, defaults to JSON.
     #[serde(rename="outputDataFormat")]
     
-    pub output_data_format: Option<String>,
+    pub output_data_format: Option<GoogleCloudMlV1PredictionInputOutputDataFormatEnum>,
     /// Required. The output Google Cloud Storage location.
     #[serde(rename="outputPath")]
     
@@ -1477,7 +1477,7 @@ pub struct GoogleCloudMlV1__Study {
     pub name: Option<String>,
     /// Output only. The detailed state of a study.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudMlV1StudyStateEnum>,
     /// Required. Configuration of the study.
     #[serde(rename="studyConfig")]
     
@@ -1497,7 +1497,7 @@ impl client::ResponseResult for GoogleCloudMlV1__Study {}
 pub struct GoogleCloudMlV1__StudyConfig {
     /// The search algorithm specified for the study.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<GoogleCloudMlV1StudyConfigAlgorithmEnum>,
     /// Configuration for automated stopping of unpromising Trials.
     #[serde(rename="automatedStoppingConfig")]
     
@@ -1620,7 +1620,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// Required. Specifies the machine types, the number of replicas for workers and parameter servers.
     #[serde(rename="scaleTier")]
     
-    pub scale_tier: Option<String>,
+    pub scale_tier: Option<GoogleCloudMlV1TrainingInputScaleTierEnum>,
     /// Optional. Scheduling options for a training job.
     
     pub scheduling: Option<GoogleCloudMlV1__Scheduling>,
@@ -1740,7 +1740,7 @@ pub struct GoogleCloudMlV1__Trial {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The detailed state of a trial.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudMlV1TrialStateEnum>,
     /// Output only. If true, the parameters in this trial are not attempted again.
     #[serde(rename="trialInfeasible")]
     
@@ -1801,7 +1801,7 @@ pub struct GoogleCloudMlV1__Version {
     pub explanation_config: Option<GoogleCloudMlV1__ExplanationConfig>,
     /// Optional. The machine learning framework AI Platform uses to train this version of the model. Valid values are `TENSORFLOW`, `SCIKIT_LEARN`, `XGBOOST`. If you do not specify a framework, AI Platform will analyze files in the deployment_uri to determine a framework. If you choose `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version of the model to 1.4 or greater. Do **not** specify a framework if you’re deploying a [custom prediction routine](https://cloud.google.com/ai-platform/prediction/docs/custom-prediction-routines) or if you’re using a [custom container](https://cloud.google.com/ai-platform/prediction/docs/use-custom-container).
     
-    pub framework: Option<String>,
+    pub framework: Option<GoogleCloudMlV1VersionFrameworkEnum>,
     /// Output only. If true, this version will be used to handle prediction requests that do not specify a version. You can change the default version by calling projects.methods.versions.setDefault.
     #[serde(rename="isDefault")]
     
@@ -1861,7 +1861,7 @@ pub struct GoogleCloudMlV1__Version {
     pub service_account: Option<String>,
     /// Output only. The state of a version.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudMlV1VersionStateEnum>,
 }
 
 impl client::RequestValue for GoogleCloudMlV1__Version {}
@@ -1917,7 +1917,7 @@ pub struct GoogleIamV1__AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<GoogleIamV1AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for GoogleIamV1__AuditLogConfig {}

@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 
@@ -919,7 +919,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if let Some(value) = self._delete_contacts.as_ref() {
             params.push("deleteContacts", value.to_string());
         }
@@ -1195,7 +1195,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if let Some(value) = self._max_members.as_ref() {
             params.push("maxMembers", value.to_string());
         }
@@ -1775,7 +1775,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 
@@ -2067,7 +2067,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 
@@ -2309,7 +2309,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.other_contacts().list()
 ///              .sync_token("amet")
-///              .add_sources("duo")
+///              .add_sources(&Default::default())
 ///              .request_sync_token(true)
 ///              .read_mask(&Default::default())
 ///              .page_token("sed")
@@ -2322,7 +2322,7 @@ pub struct OtherContactListCall<'a, S>
 
    pub(super) hub: &'a PeopleService<S>,
    pub(super) _sync_token: Option<String>,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<OtherContactSourcesEnum>,
    pub(super) _request_sync_token: Option<bool>,
    pub(super) _read_mask: Option<client::FieldMask>,
    pub(super) _page_token: Option<String>,
@@ -2491,8 +2491,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> OtherContactListCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &OtherContactSourcesEnum) -> OtherContactListCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Optional. Whether the response should return `next_sync_token` on the last page of results. It can be used to get incremental changes since the last request by setting it on the request `sync_token`. More details about sync behavior at `otherContacts.list`.
@@ -2906,13 +2906,13 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().connections_list("resourceName")
 ///              .sync_token("ipsum")
-///              .add_sources("ipsum")
-///              .sort_order("est")
+///              .add_sources(&Default::default())
+///              .sort_order(&Default::default())
 ///              .request_sync_token(true)
 ///              .request_mask_include_field(&Default::default())
 ///              .person_fields(&Default::default())
-///              .page_token("ea")
-///              .page_size(-99)
+///              .page_token("est")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2922,8 +2922,8 @@ pub struct PersonConnectionListCall<'a, S>
    pub(super) hub: &'a PeopleService<S>,
    pub(super) _resource_name: String,
    pub(super) _sync_token: Option<String>,
-   pub(super) _sources: Vec<String>,
-   pub(super) _sort_order: Option<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
+   pub(super) _sort_order: Option<PersonSortOrderEnum>,
    pub(super) _request_sync_token: Option<bool>,
    pub(super) _request_mask_include_field: Option<client::FieldMask>,
    pub(super) _person_fields: Option<client::FieldMask>,
@@ -2965,7 +2965,7 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if let Some(value) = self._sync_token.as_ref() {
             params.push("syncToken", value);
         }
@@ -3117,15 +3117,15 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonConnectionListCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonConnectionListCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Optional. The order in which the connections should be sorted. Defaults to `LAST_MODIFIED_ASCENDING`.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> PersonConnectionListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &PersonSortOrderEnum) -> PersonConnectionListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// Optional. Whether the response should return `next_sync_token` on the last page of results. It can be used to get incremental changes since the last request by setting it on the request `sync_token`. More details about sync behavior at `people.connections.list`.
@@ -4091,7 +4091,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().create_contact(req)
-///              .add_sources("Lorem")
+///              .add_sources(&Default::default())
 ///              .person_fields(&Default::default())
 ///              .doit().await;
 /// # }
@@ -4101,7 +4101,7 @@ pub struct PersonCreateContactCall<'a, S>
 
    pub(super) hub: &'a PeopleService<S>,
    pub(super) _request: Person,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _person_fields: Option<client::FieldMask>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -4271,8 +4271,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonCreateContactCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonCreateContactCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Defaults to all fields if not set. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
@@ -4429,7 +4429,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 
@@ -4647,7 +4647,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().delete_contact_photo("resourceName")
-///              .add_sources("sed")
+///              .add_sources(&Default::default())
 ///              .person_fields(&Default::default())
 ///              .doit().await;
 /// # }
@@ -4657,7 +4657,7 @@ pub struct PersonDeleteContactPhotoCall<'a, S>
 
    pub(super) hub: &'a PeopleService<S>,
    pub(super) _resource_name: String,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _person_fields: Option<client::FieldMask>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -4695,7 +4695,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if self._sources.len() > 0 {
             for f in self._sources.iter() {
                 params.push("sources", f);
@@ -4822,8 +4822,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonDeleteContactPhotoCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonDeleteContactPhotoCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Optional. A field mask to restrict which fields on the person are returned. Multiple fields can be specified by separating them with commas. Defaults to empty if not set, which will skip the post mutate get. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
@@ -4936,7 +4936,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().get("resourceName")
-///              .add_sources("sed")
+///              .add_sources(&Default::default())
 ///              .request_mask_include_field(&Default::default())
 ///              .person_fields(&Default::default())
 ///              .doit().await;
@@ -4947,7 +4947,7 @@ pub struct PersonGetCall<'a, S>
 
    pub(super) hub: &'a PeopleService<S>,
    pub(super) _resource_name: String,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _request_mask_include_field: Option<client::FieldMask>,
    pub(super) _person_fields: Option<client::FieldMask>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4986,7 +4986,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if self._sources.len() > 0 {
             for f in self._sources.iter() {
                 params.push("sources", f);
@@ -5116,8 +5116,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonGetCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonGetCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
@@ -5237,8 +5237,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().get_batch_get()
-///              .add_sources("no")
-///              .add_resource_names("Stet")
+///              .add_sources(&Default::default())
+///              .add_resource_names("eos")
 ///              .request_mask_include_field(&Default::default())
 ///              .person_fields(&Default::default())
 ///              .doit().await;
@@ -5248,7 +5248,7 @@ pub struct PersonGetBatchGetCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a PeopleService<S>,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _resource_names: Vec<String>,
    pub(super) _request_mask_include_field: Option<client::FieldMask>,
    pub(super) _person_fields: Option<client::FieldMask>,
@@ -5405,8 +5405,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonGetBatchGetCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonGetBatchGetCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Required. The resource names of the people to provide information about. It's repeatable. The URL query parameter should be resourceNames=<name1>&resourceNames=<name2>&... - To get information about the authenticated user, specify `people/me`. - To get information about a google account, specify `people/{account_id}`. - To get information about a contact, specify the resource name that identifies the contact as returned by `people.connections.list`. There is a maximum of 200 resource names.
@@ -5534,13 +5534,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().list_directory_people()
-///              .sync_token("kasd")
-///              .add_sources("et")
+///              .sync_token("labore")
+///              .add_sources(&Default::default())
 ///              .request_sync_token(true)
 ///              .read_mask(&Default::default())
-///              .page_token("et")
-///              .page_size(-68)
-///              .add_merge_sources("vero")
+///              .page_token("duo")
+///              .page_size(-80)
+///              .add_merge_sources(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5549,12 +5549,12 @@ pub struct PersonListDirectoryPersonCall<'a, S>
 
    pub(super) hub: &'a PeopleService<S>,
    pub(super) _sync_token: Option<String>,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _request_sync_token: Option<bool>,
    pub(super) _read_mask: Option<client::FieldMask>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _merge_sources: Vec<String>,
+   pub(super) _merge_sources: Option<PersonMergeSourcesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5724,8 +5724,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonListDirectoryPersonCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonListDirectoryPersonCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Optional. Whether the response should return `next_sync_token`. It can be used to get incremental changes since the last request by setting it on the request `sync_token`. More details about sync behavior at `people.listDirectoryPeople`.
@@ -5760,8 +5760,8 @@ where
     ///
     /// Append the given value to the *merge sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_merge_sources(mut self, new_value: &str) -> PersonListDirectoryPersonCall<'a, S> {
-        self._merge_sources.push(new_value.to_string());
+    pub fn add_merge_sources(mut self, new_value: &PersonMergeSourcesEnum) -> PersonListDirectoryPersonCall<'a, S> {
+        self._merge_sources.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5867,10 +5867,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().search_contacts()
-///              .add_sources("erat")
+///              .add_sources(&Default::default())
 ///              .read_mask(&Default::default())
-///              .query("sed")
-///              .page_size(-20)
+///              .query("no")
+///              .page_size(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5878,7 +5878,7 @@ pub struct PersonSearchContactCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a PeopleService<S>,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _read_mask: Option<client::FieldMask>,
    pub(super) _query: Option<String>,
    pub(super) _page_size: Option<i32>,
@@ -6033,8 +6033,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonSearchContactCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonSearchContactCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
@@ -6161,12 +6161,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().search_directory_people()
-///              .add_sources("dolore")
+///              .add_sources(&Default::default())
 ///              .read_mask(&Default::default())
-///              .query("et")
-///              .page_token("voluptua.")
-///              .page_size(-2)
-///              .add_merge_sources("consetetur")
+///              .query("kasd")
+///              .page_token("et")
+///              .page_size(-43)
+///              .add_merge_sources(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -6174,12 +6174,12 @@ pub struct PersonSearchDirectoryPersonCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a PeopleService<S>,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _read_mask: Option<client::FieldMask>,
    pub(super) _query: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _merge_sources: Vec<String>,
+   pub(super) _merge_sources: Option<PersonMergeSourcesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -6339,8 +6339,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonSearchDirectoryPersonCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonSearchDirectoryPersonCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
@@ -6375,8 +6375,8 @@ where
     ///
     /// Append the given value to the *merge sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_merge_sources(mut self, new_value: &str) -> PersonSearchDirectoryPersonCall<'a, S> {
-        self._merge_sources.push(new_value.to_string());
+    pub fn add_merge_sources(mut self, new_value: &PersonMergeSourcesEnum) -> PersonSearchDirectoryPersonCall<'a, S> {
+        self._merge_sources.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6489,7 +6489,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().update_contact(req, "resourceName")
 ///              .update_person_fields(&Default::default())
-///              .add_sources("dolor")
+///              .add_sources(&Default::default())
 ///              .person_fields(&Default::default())
 ///              .doit().await;
 /// # }
@@ -6501,7 +6501,7 @@ pub struct PersonUpdateContactCall<'a, S>
    pub(super) _request: Person,
    pub(super) _resource_name: String,
    pub(super) _update_person_fields: Option<client::FieldMask>,
-   pub(super) _sources: Vec<String>,
+   pub(super) _sources: Option<PersonSourcesEnum>,
    pub(super) _person_fields: Option<client::FieldMask>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -6539,7 +6539,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if let Some(value) = self._update_person_fields.as_ref() {
             params.push("updatePersonFields", value.to_string());
         }
@@ -6699,8 +6699,8 @@ where
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PersonUpdateContactCall<'a, S> {
-        self._sources.push(new_value.to_string());
+    pub fn add_sources(mut self, new_value: &PersonSourcesEnum) -> PersonUpdateContactCall<'a, S> {
+        self._sources.push(new_value.clone());
         self
     }
     /// Optional. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Defaults to all fields if not set. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
@@ -6864,7 +6864,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
 
         params.extend(self._additional_params.iter());
 

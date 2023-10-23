@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -339,7 +339,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -624,7 +624,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -886,7 +886,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1157,7 +1157,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -1408,9 +1408,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().get_login_profile("name")
-///              .view("gubergren")
-///              .system_id("eos")
-///              .project_id("dolor")
+///              .view(&Default::default())
+///              .system_id("ipsum")
+///              .project_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1419,7 +1419,7 @@ pub struct UserGetLoginProfileCall<'a, S>
 
    pub(super) hub: &'a CloudOSLogin<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<UserViewEnum>,
    pub(super) _system_id: Option<String>,
    pub(super) _project_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1458,7 +1458,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1585,8 +1585,8 @@ where
     /// The view configures whether to retrieve security keys information.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> UserGetLoginProfileCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &UserViewEnum) -> UserGetLoginProfileCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// A system ID for filtering the results of the request.
@@ -1712,8 +1712,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().import_ssh_public_key(req, "parent")
-///              .view("ipsum")
-///              .project_id("invidunt")
+///              .view(&Default::default())
+///              .project_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1723,7 +1723,7 @@ pub struct UserImportSshPublicKeyCall<'a, S>
    pub(super) hub: &'a CloudOSLogin<S>,
    pub(super) _request: SshPublicKey,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<UserViewEnum>,
    pub(super) _project_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -1761,7 +1761,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1908,8 +1908,8 @@ where
     /// The view configures whether to retrieve security keys information.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> UserImportSshPublicKeyCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &UserViewEnum) -> UserImportSshPublicKeyCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The project ID of the Google Cloud Platform project.

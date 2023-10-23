@@ -96,7 +96,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.webfonts().list()
-//!              .sort("magna")
+//!              .sort(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

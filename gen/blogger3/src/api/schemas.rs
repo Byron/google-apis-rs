@@ -46,7 +46,7 @@ pub struct Blog {
     pub self_link: Option<String>,
     /// The status of the blog.
     
-    pub status: Option<String>,
+    pub status: Option<BlogStatusEnum>,
     /// RFC 3339 date-time when this blog was last updated.
     
     pub updated: Option<String>,
@@ -109,7 +109,7 @@ pub struct BlogPerUserInfo {
     pub photos_album_key: Option<String>,
     /// Access permissions that the user has for the blog (ADMIN, AUTHOR, or READER).
     
-    pub role: Option<String>,
+    pub role: Option<BlogPerUserInfoRoleEnum>,
     /// ID of the User.
     #[serde(rename="userId")]
     
@@ -193,7 +193,7 @@ pub struct Comment {
     pub self_link: Option<String>,
     /// The status of the comment (only populated for admin users).
     
-    pub status: Option<String>,
+    pub status: Option<CommentStatusEnum>,
     /// RFC 3339 date-time when this comment was last updated.
     
     pub updated: Option<String>,
@@ -282,7 +282,7 @@ pub struct Page {
     pub self_link: Option<String>,
     /// The status of the page for admin resources (either LIVE or DRAFT).
     
-    pub status: Option<String>,
+    pub status: Option<PageStatusEnum>,
     /// The title of this entity. This is the name displayed in the Admin user interface.
     
     pub title: Option<String>,
@@ -414,7 +414,7 @@ pub struct Post {
     /// Comment control and display setting for readers of this post.
     #[serde(rename="readerComments")]
     
-    pub reader_comments: Option<String>,
+    pub reader_comments: Option<PostReaderCommentsEnum>,
     /// The container of comments on this Post.
     
     pub replies: Option<PostReplies>,
@@ -424,7 +424,7 @@ pub struct Post {
     pub self_link: Option<String>,
     /// Status of the post. Only set for admin-level requests.
     
-    pub status: Option<String>,
+    pub status: Option<PostStatusEnum>,
     /// The title of the Post.
     
     pub title: Option<String>,
@@ -841,7 +841,7 @@ pub struct PageviewsCounts {
     /// Time range the given count applies to.
     #[serde(rename="timeRange")]
     
-    pub time_range: Option<String>,
+    pub time_range: Option<PageviewsCountTimeRangeEnum>,
 }
 
 impl client::NestedType for PageviewsCounts {}

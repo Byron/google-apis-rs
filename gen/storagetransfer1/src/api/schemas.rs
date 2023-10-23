@@ -25,7 +25,7 @@ pub struct AgentPool {
     pub name: Option<String>,
     /// Output only. Specifies the state of the AgentPool.
     
-    pub state: Option<String>,
+    pub state: Option<AgentPoolStateEnum>,
 }
 
 impl client::RequestValue for AgentPool {}
@@ -249,7 +249,7 @@ pub struct ErrorSummary {
     /// Required.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<ErrorSummaryErrorCodeEnum>,
     /// Required. Count of this type of error.
     #[serde(rename="errorCount")]
     
@@ -431,11 +431,11 @@ pub struct LoggingConfig {
     /// States in which `log_actions` are logged. If empty, no logs are generated. Not supported for transfers with PosixFilesystem data sources; use enable_onprem_gcs_transfer_logs instead.
     #[serde(rename="logActionStates")]
     
-    pub log_action_states: Option<Vec<String>>,
+    pub log_action_states: Option<Vec<LoggingConfigLogActionStatesEnum>>,
     /// Specifies the actions to be logged. If empty, no logs are generated. Not supported for transfers with PosixFilesystem data sources; use enable_onprem_gcs_transfer_logs instead.
     #[serde(rename="logActions")]
     
-    pub log_actions: Option<Vec<String>>,
+    pub log_actions: Option<Vec<LoggingConfigLogActionsEnum>>,
 }
 
 impl client::Part for LoggingConfig {}
@@ -450,35 +450,35 @@ impl client::Part for LoggingConfig {}
 pub struct MetadataOptions {
     /// Specifies how each object's ACLs should be preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as ACL_DESTINATION_BUCKET_DEFAULT.
     
-    pub acl: Option<String>,
+    pub acl: Option<MetadataOptionAclEnum>,
     /// Specifies how each file's POSIX group ID (GID) attribute should be handled by the transfer. By default, GID is not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.
     
-    pub gid: Option<String>,
+    pub gid: Option<MetadataOptionGidEnum>,
     /// Specifies how each object's Cloud KMS customer-managed encryption key (CMEK) is preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as KMS_KEY_DESTINATION_BUCKET_DEFAULT.
     #[serde(rename="kmsKey")]
     
-    pub kms_key: Option<String>,
+    pub kms_key: Option<MetadataOptionKmsKeyEnum>,
     /// Specifies how each file's mode attribute should be handled by the transfer. By default, mode is not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.
     
-    pub mode: Option<String>,
+    pub mode: Option<MetadataOptionModeEnum>,
     /// Specifies the storage class to set on objects being transferred to Google Cloud Storage buckets. If unspecified, the default behavior is the same as STORAGE_CLASS_DESTINATION_BUCKET_DEFAULT.
     #[serde(rename="storageClass")]
     
-    pub storage_class: Option<String>,
+    pub storage_class: Option<MetadataOptionStorageClassEnum>,
     /// Specifies how symlinks should be handled by the transfer. By default, symlinks are not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.
     
-    pub symlink: Option<String>,
+    pub symlink: Option<MetadataOptionSymlinkEnum>,
     /// Specifies how each object's temporary hold status should be preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as TEMPORARY_HOLD_PRESERVE.
     #[serde(rename="temporaryHold")]
     
-    pub temporary_hold: Option<String>,
+    pub temporary_hold: Option<MetadataOptionTemporaryHoldEnum>,
     /// Specifies how each object's `timeCreated` metadata is preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as TIME_CREATED_SKIP.
     #[serde(rename="timeCreated")]
     
-    pub time_created: Option<String>,
+    pub time_created: Option<MetadataOptionTimeCreatedEnum>,
     /// Specifies how each file's POSIX user ID (UID) attribute should be handled by the transfer. By default, UID is not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.
     
-    pub uid: Option<String>,
+    pub uid: Option<MetadataOptionUidEnum>,
 }
 
 impl client::Part for MetadataOptions {}
@@ -494,11 +494,11 @@ pub struct NotificationConfig {
     /// Event types for which a notification is desired. If empty, send notifications for all event types.
     #[serde(rename="eventTypes")]
     
-    pub event_types: Option<Vec<String>>,
+    pub event_types: Option<Vec<NotificationConfigEventTypesEnum>>,
     /// Required. The desired format of the notification message payloads.
     #[serde(rename="payloadFormat")]
     
-    pub payload_format: Option<String>,
+    pub payload_format: Option<NotificationConfigPayloadFormatEnum>,
     /// Required. The `Topic.name` of the Pub/Sub topic to which to publish notifications. Must be of the format: `projects/{project}/topics/{topic}`. Not matching this format results in an INVALID_ARGUMENT error.
     #[serde(rename="pubsubTopic")]
     
@@ -654,18 +654,18 @@ pub struct S3CompatibleMetadata {
     /// Specifies the authentication and authorization method used by the storage service. When not specified, Transfer Service will attempt to determine right auth method to use.
     #[serde(rename="authMethod")]
     
-    pub auth_method: Option<String>,
+    pub auth_method: Option<S3CompatibleMetadataAuthMethodEnum>,
     /// The Listing API to use for discovering objects. When not specified, Transfer Service will attempt to determine the right API to use.
     #[serde(rename="listApi")]
     
-    pub list_api: Option<String>,
+    pub list_api: Option<S3CompatibleMetadataListApiEnum>,
     /// Specifies the network protocol of the agent. When not specified, the default value of NetworkProtocol NETWORK_PROTOCOL_HTTPS is used.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<S3CompatibleMetadataProtocolEnum>,
     /// Specifies the API request model used to call the storage service. When not specified, the default value of RequestModel REQUEST_MODEL_VIRTUAL_HOSTED_STYLE is used.
     #[serde(rename="requestModel")]
     
-    pub request_model: Option<String>,
+    pub request_model: Option<S3CompatibleMetadataRequestModelEnum>,
 }
 
 impl client::Part for S3CompatibleMetadata {}
@@ -925,7 +925,7 @@ pub struct TransferJob {
     pub schedule: Option<Schedule>,
     /// Status of the job. This value MUST be specified for `CreateTransferJobRequests`. **Note:** The effect of the new job status takes place during a subsequent job run. For example, if you change the job status from ENABLED to DISABLED, and an operation spawned by the transfer is running, the status change would not affect the current operation.
     
-    pub status: Option<String>,
+    pub status: Option<TransferJobStatusEnum>,
     /// Transfer specification.
     #[serde(rename="transferSpec")]
     
@@ -995,7 +995,7 @@ pub struct TransferOperation {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Status of the transfer operation.
     
-    pub status: Option<String>,
+    pub status: Option<TransferOperationStatusEnum>,
     /// The name of the transfer job that triggers this transfer operation.
     #[serde(rename="transferJobName")]
     
@@ -1035,7 +1035,7 @@ pub struct TransferOptions {
     /// When to overwrite objects that already exist in the sink. If not set, overwrite behavior is determined by overwrite_objects_already_existing_in_sink.
     #[serde(rename="overwriteWhen")]
     
-    pub overwrite_when: Option<String>,
+    pub overwrite_when: Option<TransferOptionOverwriteWhenEnum>,
 }
 
 impl client::Part for TransferOptions {}

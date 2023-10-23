@@ -47,7 +47,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -395,7 +395,7 @@ pub struct DomainMappingSpec {
     /// The mode of the certificate.
     #[serde(rename="certificateMode")]
     
-    pub certificate_mode: Option<String>,
+    pub certificate_mode: Option<DomainMappingSpecCertificateModeEnum>,
     /// If set, the mapping will override any mapping set before this spec was set. It is recommended that the user leaves this empty to receive an error warning about a potential conflict and only set it once the respective UI has given such a warning.
     #[serde(rename="forceOverride")]
     
@@ -1472,7 +1472,7 @@ pub struct ResourceRecord {
     /// Resource record type. Example: `AAAA`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ResourceRecordTypeEnum>,
 }
 
 impl client::Part for ResourceRecord {}

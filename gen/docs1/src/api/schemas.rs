@@ -25,7 +25,7 @@ pub struct AutoText {
     /// The type of this auto text.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AutoTextTypeEnum>,
 }
 
 impl client::Part for AutoText {}
@@ -233,7 +233,7 @@ pub struct CreateFooterRequest {
     /// The type of footer to create.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CreateFooterRequestTypeEnum>,
 }
 
 impl client::Part for CreateFooterRequest {}
@@ -304,7 +304,7 @@ pub struct CreateHeaderRequest {
     /// The type of header to create.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CreateHeaderRequestTypeEnum>,
 }
 
 impl client::Part for CreateHeaderRequest {}
@@ -370,7 +370,7 @@ pub struct CreateParagraphBulletsRequest {
     /// The kinds of bullet glyphs to be used.
     #[serde(rename="bulletPreset")]
     
-    pub bullet_preset: Option<String>,
+    pub bullet_preset: Option<CreateParagraphBulletsRequestBulletPresetEnum>,
     /// The range to apply the bullet preset to.
     
     pub range: Option<Range>,
@@ -583,7 +583,7 @@ pub struct Dimension {
     pub magnitude: Option<f64>,
     /// The units for magnitude.
     
-    pub unit: Option<String>,
+    pub unit: Option<DimensionUnitEnum>,
 }
 
 impl client::Part for Dimension {}
@@ -656,7 +656,7 @@ pub struct Document {
     /// Output only. The suggestions view mode applied to the document. Note: When editing a document, changes must be based on a document with SUGGESTIONS_INLINE.
     #[serde(rename="suggestionsViewMode")]
     
-    pub suggestions_view_mode: Option<String>,
+    pub suggestions_view_mode: Option<DocumentSuggestionsViewModeEnum>,
     /// The title of the document.
     
     pub title: Option<String>,
@@ -922,11 +922,11 @@ pub struct EmbeddedObjectBorder {
     /// The dash style of the border.
     #[serde(rename="dashStyle")]
     
-    pub dash_style: Option<String>,
+    pub dash_style: Option<EmbeddedObjectBorderDashStyleEnum>,
     /// The property state of the border property.
     #[serde(rename="propertyState")]
     
-    pub property_state: Option<String>,
+    pub property_state: Option<EmbeddedObjectBorderPropertyStateEnum>,
     /// The width of the border.
     
     pub width: Option<Dimension>,
@@ -1442,7 +1442,7 @@ pub struct InsertSectionBreakRequest {
     /// The type of section to insert.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<InsertSectionBreakRequestSectionTypeEnum>,
 }
 
 impl client::Part for InsertSectionBreakRequest {}
@@ -1736,7 +1736,7 @@ pub struct NamedStyle {
     /// The type of this named style.
     #[serde(rename="namedStyleType")]
     
-    pub named_style_type: Option<String>,
+    pub named_style_type: Option<NamedStyleNamedStyleTypeEnum>,
     /// The paragraph style of this named style.
     #[serde(rename="paragraphStyle")]
     
@@ -1760,7 +1760,7 @@ pub struct NamedStyleSuggestionState {
     /// The named style type that this suggestion state corresponds to. This field is provided as a convenience for matching the NamedStyleSuggestionState with its corresponding NamedStyle.
     #[serde(rename="namedStyleType")]
     
-    pub named_style_type: Option<String>,
+    pub named_style_type: Option<NamedStyleSuggestionStateNamedStyleTypeEnum>,
     /// A mask that indicates which of the fields in paragraph style have been changed in this suggestion.
     #[serde(rename="paragraphStyleSuggestionState")]
     
@@ -1815,7 +1815,7 @@ pub struct NestingLevel {
     /// The alignment of the bullet within the space allotted for rendering the bullet.
     #[serde(rename="bulletAlignment")]
     
-    pub bullet_alignment: Option<String>,
+    pub bullet_alignment: Option<NestingLevelBulletAlignmentEnum>,
     /// The format string used by bullets at this level of nesting. The glyph format contains one or more placeholders, and these placeholders are replaced with the appropriate values depending on the glyph_type or glyph_symbol. The placeholders follow the pattern `%[nesting_level]`. Furthermore, placeholders can have prefixes and suffixes. Thus, the glyph format follows the pattern `%[nesting_level]`. Note that the prefix and suffix are optional and can be arbitrary strings. For example, the glyph format `%0.` indicates that the rendered glyph will replace the placeholder with the corresponding glyph for nesting level 0 followed by a period as the suffix. So a list with a glyph type of UPPER_ALPHA and glyph format `%0.` at nesting level 0 will result in a list with rendered glyphs `A.` `B.` `C.` The glyph format can contain placeholders for the current nesting level as well as placeholders for parent nesting levels. For example, a list can have a glyph format of `%0.` at nesting level 0 and a glyph format of `%0.%1.` at nesting level 1. Assuming both nesting levels have DECIMAL glyph types, this would result in a list with rendered glyphs `1.` `2.` ` 2.1.` ` 2.2.` `3.` For nesting levels that are ordered, the string that replaces a placeholder in the glyph format for a particular paragraph depends on the paragraph's order within the list.
     #[serde(rename="glyphFormat")]
     
@@ -1827,7 +1827,7 @@ pub struct NestingLevel {
     /// The type of glyph used by bullets when paragraphs at this level of nesting are ordered. The glyph type determines the type of glyph used to replace placeholders within the glyph_format when paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph format with a number corresponding to list item's order within the list.
     #[serde(rename="glyphType")]
     
-    pub glyph_type: Option<String>,
+    pub glyph_type: Option<NestingLevelGlyphTypeEnum>,
     /// The amount of indentation for the first line of paragraphs at this level of nesting.
     #[serde(rename="indentFirstLine")]
     
@@ -2003,7 +2003,7 @@ pub struct ParagraphBorder {
     /// The dash style of the border.
     #[serde(rename="dashStyle")]
     
-    pub dash_style: Option<String>,
+    pub dash_style: Option<ParagraphBorderDashStyleEnum>,
     /// The padding of the border.
     
     pub padding: Option<Dimension>,
@@ -2082,7 +2082,7 @@ impl client::Part for ParagraphElement {}
 pub struct ParagraphStyle {
     /// The text alignment for this paragraph.
     
-    pub alignment: Option<String>,
+    pub alignment: Option<ParagraphStyleAlignmentEnum>,
     /// Whether to avoid widows and orphans for the paragraph. If unset, the value is inherited from the parent.
     #[serde(rename="avoidWidowAndOrphan")]
     
@@ -2109,7 +2109,7 @@ pub struct ParagraphStyle {
     pub border_top: Option<ParagraphBorder>,
     /// The text direction of this paragraph. If unset, the value defaults to LEFT_TO_RIGHT since paragraph direction is not inherited.
     
-    pub direction: Option<String>,
+    pub direction: Option<ParagraphStyleDirectionEnum>,
     /// The heading ID of the paragraph. If empty, then this paragraph is not a heading. This property is read-only.
     #[serde(rename="headingId")]
     
@@ -2141,7 +2141,7 @@ pub struct ParagraphStyle {
     /// The named style type of the paragraph. Since updating the named style type affects other properties within ParagraphStyle, the named style type is applied before the other properties are updated.
     #[serde(rename="namedStyleType")]
     
-    pub named_style_type: Option<String>,
+    pub named_style_type: Option<ParagraphStyleNamedStyleTypeEnum>,
     /// Whether the current paragraph should always start at the beginning of a page. If unset, the value is inherited from the parent. Attempting to update page_break_before for paragraphs in unsupported regions, including Table, Header, Footer and Footnote, can result in an invalid document state that returns a 400 bad request error.
     #[serde(rename="pageBreakBefore")]
     
@@ -2160,7 +2160,7 @@ pub struct ParagraphStyle {
     /// The spacing mode for the paragraph.
     #[serde(rename="spacingMode")]
     
-    pub spacing_mode: Option<String>,
+    pub spacing_mode: Option<ParagraphStyleSpacingModeEnum>,
     /// A list of the tab stops for this paragraph. The list of tab stops is not inherited. This property is read-only.
     #[serde(rename="tabStops")]
     
@@ -2381,7 +2381,7 @@ impl client::Part for PositionedObject {}
 pub struct PositionedObjectPositioning {
     /// The layout of this positioned object.
     
-    pub layout: Option<String>,
+    pub layout: Option<PositionedObjectPositioningLayoutEnum>,
     /// The offset of the left edge of the positioned object relative to the beginning of the Paragraph it's tethered to. The exact positioning of the object can depend on other content in the document and the document's styling.
     #[serde(rename="leftOffset")]
     
@@ -2532,7 +2532,7 @@ pub struct ReplaceImageRequest {
     /// The replacement method.
     #[serde(rename="imageReplaceMethod")]
     
-    pub image_replace_method: Option<String>,
+    pub image_replace_method: Option<ReplaceImageRequestImageReplaceMethodEnum>,
     /// The URI of the new image. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB, cannot exceed 25 megapixels, and must be in PNG, JPEG, or GIF format. The provided URI can't surpass 2 KB in length. The URI is saved with the image, and exposed through the ImageProperties.source_uri field.
     
     pub uri: Option<String>,
@@ -2884,11 +2884,11 @@ pub struct SectionStyle {
     /// The style of column separators. This style can be set even when there's one column in the section. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename="columnSeparatorStyle")]
     
-    pub column_separator_style: Option<String>,
+    pub column_separator_style: Option<SectionStyleColumnSeparatorStyleEnum>,
     /// The content direction of this section. If unset, the value defaults to LEFT_TO_RIGHT. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename="contentDirection")]
     
-    pub content_direction: Option<String>,
+    pub content_direction: Option<SectionStyleContentDirectionEnum>,
     /// The ID of the default footer. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_footer_id. This property is read-only.
     #[serde(rename="defaultFooterId")]
     
@@ -2944,7 +2944,7 @@ pub struct SectionStyle {
     /// Output only. The type of section.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<SectionStyleSectionTypeEnum>,
     /// Indicates whether to use the first page header / footer IDs for the first page of the section. If unset, it inherits from DocumentStyle's use_first_page_header_footer for the first section. If the value is unset for subsequent sectors, it should be interpreted as false. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename="useFirstPageHeaderFooter")]
     
@@ -3325,7 +3325,7 @@ impl client::Part for SuggestedTextStyle {}
 pub struct TabStop {
     /// The alignment of this tab stop. If unset, the value defaults to START.
     
-    pub alignment: Option<String>,
+    pub alignment: Option<TabStopAlignmentEnum>,
     /// The offset between this tab stop and the start margin.
     
     pub offset: Option<Dimension>,
@@ -3420,7 +3420,7 @@ pub struct TableCellBorder {
     /// The dash style of the border.
     #[serde(rename="dashStyle")]
     
-    pub dash_style: Option<String>,
+    pub dash_style: Option<TableCellBorderDashStyleEnum>,
     /// The width of the border.
     
     pub width: Option<Dimension>,
@@ -3487,7 +3487,7 @@ pub struct TableCellStyle {
     /// The alignment of the content in the table cell. The default alignment matches the alignment for newly created table cells in the Docs editor.
     #[serde(rename="contentAlignment")]
     
-    pub content_alignment: Option<String>,
+    pub content_alignment: Option<TableCellStyleContentAlignmentEnum>,
     /// The bottom padding of the cell.
     #[serde(rename="paddingBottom")]
     
@@ -3586,7 +3586,7 @@ pub struct TableColumnProperties {
     /// The width type of the column.
     #[serde(rename="widthType")]
     
-    pub width_type: Option<String>,
+    pub width_type: Option<TableColumnPropertyWidthTypeEnum>,
 }
 
 impl client::Part for TableColumnProperties {}
@@ -3780,7 +3780,7 @@ pub struct TextStyle {
     /// The text's vertical offset from its normal position. Text with `SUPERSCRIPT` or `SUBSCRIPT` baseline offsets is automatically rendered in a smaller font size, computed based on the `font_size` field. Changes in this field don't affect the `font_size`.
     #[serde(rename="baselineOffset")]
     
-    pub baseline_offset: Option<String>,
+    pub baseline_offset: Option<TextStyleBaselineOffsetEnum>,
     /// Whether or not the text is rendered as bold.
     
     pub bold: Option<bool>,

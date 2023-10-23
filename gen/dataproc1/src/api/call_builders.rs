@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -624,7 +624,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -893,7 +893,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -1182,7 +1182,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1471,7 +1471,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -1763,7 +1763,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -2055,7 +2055,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2351,7 +2351,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -2656,7 +2656,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2918,7 +2918,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3184,7 +3184,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3466,7 +3466,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3728,7 +3728,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3990,7 +3990,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -4258,7 +4258,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4557,7 +4557,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4844,7 +4844,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._version.as_ref() {
             params.push("version", value.to_string());
         }
@@ -5118,7 +5118,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._version.as_ref() {
             params.push("version", value.to_string());
         }
@@ -5397,7 +5397,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -5689,7 +5689,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5983,7 +5983,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -6282,7 +6282,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6571,7 +6571,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -6863,7 +6863,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -7155,7 +7155,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7447,7 +7447,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -7732,7 +7732,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7994,7 +7994,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8263,7 +8263,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -8552,7 +8552,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8841,7 +8841,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -9133,7 +9133,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -9425,7 +9425,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9721,7 +9721,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -10026,7 +10026,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10295,7 +10295,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -10543,7 +10543,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_create(req, "projectId", "region")
 ///              .request_id("diam")
-///              .action_on_failed_primary_workers("no")
+///              .action_on_failed_primary_workers(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -10555,7 +10555,7 @@ pub struct ProjectRegionClusterCreateCall<'a, S>
    pub(super) _project_id: String,
    pub(super) _region: String,
    pub(super) _request_id: Option<String>,
-   pub(super) _action_on_failed_primary_workers: Option<String>,
+   pub(super) _action_on_failed_primary_workers: Option<ProjectActionOnFailedPrimaryWorkersEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -10592,8 +10592,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -10757,8 +10757,8 @@ where
     /// Optional. Failure action when primary worker creation fails.
     ///
     /// Sets the *action on failed primary workers* query property to the given value.
-    pub fn action_on_failed_primary_workers(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a, S> {
-        self._action_on_failed_primary_workers = Some(new_value.to_string());
+    pub fn action_on_failed_primary_workers(mut self, new_value: &ProjectActionOnFailedPrimaryWorkersEnum) -> ProjectRegionClusterCreateCall<'a, S> {
+        self._action_on_failed_primary_workers = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10864,8 +10864,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_delete("projectId", "region", "clusterName")
-///              .request_id("consetetur")
-///              .cluster_uuid("voluptua.")
+///              .request_id("takimata")
+///              .cluster_uuid("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10914,9 +10914,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -11227,9 +11227,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
 
         params.extend(self._additional_params.iter());
 
@@ -11536,9 +11536,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
 
         params.extend(self._additional_params.iter());
 
@@ -11827,7 +11827,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -12121,9 +12121,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("region", self._region);
-        params.push("cluster", self._cluster);
+        params.push("project", &self._project);
+        params.push("region", &self._region);
+        params.push("cluster", &self._cluster);
 
         params.extend(self._additional_params.iter());
 
@@ -12386,7 +12386,7 @@ where
 /// let result = hub.projects().regions_clusters_list("projectId", "region")
 ///              .page_token("dolore")
 ///              .page_size(-34)
-///              .filter("voluptua.")
+///              .filter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12435,8 +12435,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12701,7 +12701,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_patch(req, "projectId", "region", "clusterName")
 ///              .update_mask(&Default::default())
-///              .request_id("Lorem")
+///              .request_id("sadipscing")
 ///              .graceful_decommission_timeout(chrono::Duration::seconds(8299010))
 ///              .doit().await;
 /// # }
@@ -12753,9 +12753,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -13099,9 +13099,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
 
         params.extend(self._additional_params.iter());
 
@@ -13413,7 +13413,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -13707,9 +13707,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
 
         params.extend(self._additional_params.iter());
 
@@ -14023,9 +14023,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("clusterName", self._cluster_name);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("clusterName", &self._cluster_name);
 
         params.extend(self._additional_params.iter());
 
@@ -14337,7 +14337,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -14631,9 +14631,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("jobId", &self._job_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14940,9 +14940,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("jobId", &self._job_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15226,9 +15226,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("jobId", &self._job_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15517,7 +15517,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -15760,9 +15760,9 @@ where
 /// let result = hub.projects().regions_jobs_list("projectId", "region")
 ///              .page_token("no")
 ///              .page_size(-91)
-///              .job_state_matcher("At")
-///              .filter("sadipscing")
-///              .cluster_name("aliquyam")
+///              .job_state_matcher(&Default::default())
+///              .filter("At")
+///              .cluster_name("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15774,7 +15774,7 @@ pub struct ProjectRegionJobListCall<'a, S>
    pub(super) _region: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _job_state_matcher: Option<String>,
+   pub(super) _job_state_matcher: Option<ProjectJobStateMatcherEnum>,
    pub(super) _filter: Option<String>,
    pub(super) _cluster_name: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15813,8 +15813,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15971,8 +15971,8 @@ where
     /// Optional. Specifies enumerated categories of jobs to list. (default = match ALL jobs).If filter is provided, jobStateMatcher will be ignored.
     ///
     /// Sets the *job state matcher* query property to the given value.
-    pub fn job_state_matcher(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
-        self._job_state_matcher = Some(new_value.to_string());
+    pub fn job_state_matcher(mut self, new_value: &ProjectJobStateMatcherEnum) -> ProjectRegionJobListCall<'a, S> {
+        self._job_state_matcher = Some(new_value.clone());
         self
     }
     /// Optional. A filter constraining the jobs to list. Filters are case-sensitive and have the following syntax:field = value AND field = value ...where field is status.state or labels.[KEY], and [KEY] is a label key. value can be * to match all values. status.state can be either ACTIVE or NON_ACTIVE. Only the logical AND operator is supported; space-separated items are treated as having an implicit AND operator.Example filter:status.state = ACTIVE AND labels.env = staging AND labels.starred = *
@@ -16147,9 +16147,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
-        params.push("jobId", self._job_id);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
+        params.push("jobId", &self._job_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -16471,7 +16471,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -16764,8 +16764,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
 
         params.extend(self._additional_params.iter());
 
@@ -17068,8 +17068,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("region", self._region);
+        params.push("projectId", &self._project_id);
+        params.push("region", &self._region);
 
         params.extend(self._additional_params.iter());
 
@@ -17371,7 +17371,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -17656,7 +17656,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -17918,7 +17918,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -18180,7 +18180,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -18449,7 +18449,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -18690,9 +18690,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_operations_list("name")
-///              .page_token("duo")
-///              .page_size(-42)
-///              .filter("est")
+///              .page_token("elitr")
+///              .page_size(-20)
+///              .filter("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18740,7 +18740,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -19039,7 +19039,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -19331,7 +19331,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -19623,7 +19623,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -19864,7 +19864,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_delete("name")
-///              .version(-17)
+///              .version(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19910,7 +19910,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._version.as_ref() {
             params.push("version", value.to_string());
         }
@@ -20138,7 +20138,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_get("name")
-///              .version(-19)
+///              .version(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20184,7 +20184,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._version.as_ref() {
             params.push("version", value.to_string());
         }
@@ -20463,7 +20463,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -20755,7 +20755,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -21002,7 +21002,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_instantiate_inline(req, "parent")
-///              .request_id("et")
+///              .request_id("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21049,7 +21049,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -21300,8 +21300,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_list("parent")
-///              .page_token("dolore")
-///              .page_size(-40)
+///              .page_token("At")
+///              .page_size(-84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21348,7 +21348,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -21637,7 +21637,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -21929,7 +21929,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -22221,7 +22221,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

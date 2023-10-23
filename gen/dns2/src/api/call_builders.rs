@@ -81,9 +81,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -402,10 +402,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
-        params.push("changeId", self._change_id);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
+        params.push("changeId", &self._change_id);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -663,8 +663,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list("project", "location", "managedZone")
 ///              .sort_order("rebum.")
-///              .sort_by("est")
-///              .page_token("ipsum")
+///              .sort_by(&Default::default())
+///              .page_token("est")
 ///              .max_results(-50)
 ///              .doit().await;
 /// # }
@@ -677,7 +677,7 @@ pub struct ChangeListCall<'a, S>
    pub(super) _location: String,
    pub(super) _managed_zone: String,
    pub(super) _sort_order: Option<String>,
-   pub(super) _sort_by: Option<String>,
+   pub(super) _sort_by: Option<ChangeSortByEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -716,9 +716,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -874,8 +874,8 @@ where
     /// Sorting criterion. The only supported value is change sequence.
     ///
     /// Sets the *sort by* query property to the given value.
-    pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, S> {
-        self._sort_by = Some(new_value.to_string());
+    pub fn sort_by(mut self, new_value: &ChangeSortByEnum) -> ChangeListCall<'a, S> {
+        self._sort_by = Some(new_value.clone());
         self
     }
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
@@ -995,8 +995,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.dns_keys().get("project", "location", "managedZone", "dnsKeyId")
-///              .digest_type("Lorem")
-///              .client_operation_id("eos")
+///              .digest_type("dolor")
+///              .client_operation_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1046,10 +1046,10 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
-        params.push("dnsKeyId", self._dns_key_id);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
+        params.push("dnsKeyId", &self._dns_key_id);
         if let Some(value) = self._digest_type.as_ref() {
             params.push("digestType", value);
         }
@@ -1317,9 +1317,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.dns_keys().list("project", "location", "managedZone")
-///              .page_token("sed")
-///              .max_results(-61)
-///              .digest_type("Stet")
+///              .page_token("duo")
+///              .max_results(-80)
+///              .digest_type("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1369,9 +1369,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1688,10 +1688,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
+        params.push("operation", &self._operation);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -1949,9 +1949,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zone_operations().list("project", "location", "managedZone")
-///              .sort_by("duo")
-///              .page_token("dolore")
-///              .max_results(-22)
+///              .sort_by(&Default::default())
+///              .page_token("sed")
+///              .max_results(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1962,7 +1962,7 @@ pub struct ManagedZoneOperationListCall<'a, S>
    pub(super) _project: String,
    pub(super) _location: String,
    pub(super) _managed_zone: String,
-   pub(super) _sort_by: Option<String>,
+   pub(super) _sort_by: Option<ManagedZoneOperationSortByEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2001,9 +2001,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._sort_by.as_ref() {
             params.push("sortBy", value);
         }
@@ -2150,8 +2150,8 @@ where
     /// Sorting criterion. The only supported values are START_TIME and ID.
     ///
     /// Sets the *sort by* query property to the given value.
-    pub fn sort_by(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, S> {
-        self._sort_by = Some(new_value.to_string());
+    pub fn sort_by(mut self, new_value: &ManagedZoneOperationSortByEnum) -> ManagedZoneOperationListCall<'a, S> {
+        self._sort_by = Some(new_value.clone());
         self
     }
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
@@ -2277,7 +2277,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().create(req, "project", "location")
-///              .client_operation_id("consetetur")
+///              .client_operation_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2325,8 +2325,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -2587,7 +2587,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().delete("project", "location", "managedZone")
-///              .client_operation_id("et")
+///              .client_operation_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2635,9 +2635,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -2874,7 +2874,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().get("project", "location", "managedZone")
-///              .client_operation_id("duo")
+///              .client_operation_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2922,9 +2922,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -3223,7 +3223,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -3464,9 +3464,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().list("project", "location")
-///              .page_token("Stet")
-///              .max_results(-76)
-///              .dns_name("elitr")
+///              .page_token("vero")
+///              .max_results(-88)
+///              .dns_name("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3515,8 +3515,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3780,7 +3780,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().patch(req, "project", "location", "managedZone")
-///              .client_operation_id("ipsum")
+///              .client_operation_id("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3829,9 +3829,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -4153,7 +4153,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4445,7 +4445,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -4692,7 +4692,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().update(req, "project", "location", "managedZone")
-///              .client_operation_id("erat")
+///              .client_operation_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4741,9 +4741,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -5020,7 +5020,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.policies().create(req, "project", "location")
-///              .client_operation_id("sed")
+///              .client_operation_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5068,8 +5068,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -5330,7 +5330,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.policies().delete("project", "location", "policy")
-///              .client_operation_id("et")
+///              .client_operation_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5378,9 +5378,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("policy", self._policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("policy", &self._policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -5617,7 +5617,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.policies().get("project", "location", "policy")
-///              .client_operation_id("dolore")
+///              .client_operation_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5665,9 +5665,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("policy", self._policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("policy", &self._policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -5915,8 +5915,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.policies().list("project", "location")
-///              .page_token("amet.")
-///              .max_results(-17)
+///              .page_token("dolore")
+///              .max_results(-78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5964,8 +5964,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6219,7 +6219,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.policies().patch(req, "project", "location", "policy")
-///              .client_operation_id("no")
+///              .client_operation_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6268,9 +6268,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("policy", self._policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("policy", &self._policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -6547,7 +6547,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.policies().update(req, "project", "location", "policy")
-///              .client_operation_id("sit")
+///              .client_operation_id("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6596,9 +6596,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("policy", self._policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("policy", &self._policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -6869,7 +6869,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().get("project", "location")
-///              .client_operation_id("aliquyam")
+///              .client_operation_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6916,8 +6916,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -7160,7 +7160,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().create(req, "project", "location", "managedZone")
-///              .client_operation_id("Lorem")
+///              .client_operation_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7209,9 +7209,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -7482,7 +7482,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().delete("project", "location", "managedZone", "name", "type")
-///              .client_operation_id("et")
+///              .client_operation_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7532,11 +7532,11 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
-        params.push("name", self._name);
-        params.push("type", self._type_);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
+        params.push("name", &self._name);
+        params.push("type", &self._type_);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -7793,7 +7793,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().get("project", "location", "managedZone", "name", "type")
-///              .client_operation_id("no")
+///              .client_operation_id("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7843,11 +7843,11 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
-        params.push("name", self._name);
-        params.push("type", self._type_);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
+        params.push("name", &self._name);
+        params.push("type", &self._type_);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -8115,10 +8115,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().list("project", "location", "managedZone")
-///              .type_("aliquyam")
-///              .page_token("dolores")
-///              .name("sadipscing")
-///              .max_results(-31)
+///              .type_("At")
+///              .page_token("sadipscing")
+///              .name("aliquyam")
+///              .max_results(-69)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8169,9 +8169,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -8455,7 +8455,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().patch(req, "project", "location", "managedZone", "name", "type")
-///              .client_operation_id("consetetur")
+///              .client_operation_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8506,11 +8506,11 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("managedZone", self._managed_zone);
-        params.push("name", self._name);
-        params.push("type", self._type_);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("managedZone", &self._managed_zone);
+        params.push("name", &self._name);
+        params.push("type", &self._type_);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -8807,7 +8807,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policies().create(req, "project", "location")
-///              .client_operation_id("est")
+///              .client_operation_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8855,8 +8855,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -9117,7 +9117,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policies().delete("project", "location", "responsePolicy")
-///              .client_operation_id("diam")
+///              .client_operation_id("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9165,9 +9165,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -9404,7 +9404,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policies().get("project", "location", "responsePolicy")
-///              .client_operation_id("eos")
+///              .client_operation_id("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9452,9 +9452,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -9702,8 +9702,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policies().list("project", "location")
-///              .page_token("Stet")
-///              .max_results(-19)
+///              .page_token("Lorem")
+///              .max_results(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9751,8 +9751,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10055,9 +10055,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -10334,7 +10334,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policies().update(req, "project", "location", "responsePolicy")
-///              .client_operation_id("Lorem")
+///              .client_operation_id("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10383,9 +10383,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -10662,7 +10662,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policy_rules().create(req, "project", "location", "responsePolicy")
-///              .client_operation_id("dolores")
+///              .client_operation_id("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10711,9 +10711,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -10984,7 +10984,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policy_rules().delete("project", "location", "responsePolicy", "responsePolicyRule")
-///              .client_operation_id("Lorem")
+///              .client_operation_id("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11033,10 +11033,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
-        params.push("responsePolicyRule", self._response_policy_rule);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
+        params.push("responsePolicyRule", &self._response_policy_rule);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -11283,7 +11283,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policy_rules().get("project", "location", "responsePolicy", "responsePolicyRule")
-///              .client_operation_id("sit")
+///              .client_operation_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11332,10 +11332,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
-        params.push("responsePolicyRule", self._response_policy_rule);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
+        params.push("responsePolicyRule", &self._response_policy_rule);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -11593,8 +11593,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policy_rules().list("project", "location", "responsePolicy")
-///              .page_token("et")
-///              .max_results(-12)
+///              .page_token("sea")
+///              .max_results(-41)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11643,9 +11643,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11909,7 +11909,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policy_rules().patch(req, "project", "location", "responsePolicy", "responsePolicyRule")
-///              .client_operation_id("aliquyam")
+///              .client_operation_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11959,10 +11959,10 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
-        params.push("responsePolicyRule", self._response_policy_rule);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
+        params.push("responsePolicyRule", &self._response_policy_rule);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }
@@ -12249,7 +12249,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.response_policy_rules().update(req, "project", "location", "responsePolicy", "responsePolicyRule")
-///              .client_operation_id("gubergren")
+///              .client_operation_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12299,10 +12299,10 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("location", self._location);
-        params.push("responsePolicy", self._response_policy);
-        params.push("responsePolicyRule", self._response_policy_rule);
+        params.push("project", &self._project);
+        params.push("location", &self._location);
+        params.push("responsePolicy", &self._response_policy);
+        params.push("responsePolicyRule", &self._response_policy_rule);
         if let Some(value) = self._client_operation_id.as_ref() {
             params.push("clientOperationId", value);
         }

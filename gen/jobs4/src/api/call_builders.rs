@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -339,7 +339,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -631,7 +631,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -916,7 +916,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1178,7 +1178,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1446,7 +1446,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._require_open_jobs.as_ref() {
             params.push("requireOpenJobs", value.to_string());
         }
@@ -1747,7 +1747,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -2049,7 +2049,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2341,7 +2341,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2633,7 +2633,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -2925,7 +2925,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -3210,7 +3210,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3472,7 +3472,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3692,8 +3692,8 @@ where
 /// let result = hub.projects().tenants_jobs_list("parent")
 ///              .page_token("invidunt")
 ///              .page_size(-47)
-///              .job_view("duo")
-///              .filter("ipsum")
+///              .job_view(&Default::default())
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3704,7 +3704,7 @@ pub struct ProjectTenantJobListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _job_view: Option<String>,
+   pub(super) _job_view: Option<ProjectJobViewEnum>,
    pub(super) _filter: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -3742,7 +3742,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3886,8 +3886,8 @@ where
     /// The desired job attributes returned for jobs in the search response. Defaults to JobView.JOB_VIEW_FULL if no value is specified.
     ///
     /// Sets the *job view* query property to the given value.
-    pub fn job_view(mut self, new_value: &str) -> ProjectTenantJobListCall<'a, S> {
-        self._job_view = Some(new_value.to_string());
+    pub fn job_view(mut self, new_value: &ProjectJobViewEnum) -> ProjectTenantJobListCall<'a, S> {
+        self._job_view = Some(new_value.clone());
         self
     }
     /// Required. The filter string specifies the jobs to be enumerated. Supported operator: =, AND The fields eligible for filtering are: * `companyName` * `requisitionId` * `status` Available values: OPEN, EXPIRED, ALL. Defaults to OPEN if no value is specified. At least one of `companyName` and `requisitionId` must present or an INVALID_ARGUMENT error is thrown. Sample Query: * companyName = "projects/foo/tenants/bar/companies/baz" * companyName = "projects/foo/tenants/bar/companies/baz" AND requisitionId = "req-1" * companyName = "projects/foo/tenants/bar/companies/baz" AND status = "EXPIRED" * requisitionId = "req-1" * requisitionId = "req-1" AND status = "EXPIRED"
@@ -4053,7 +4053,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4355,7 +4355,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4647,7 +4647,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4888,12 +4888,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().tenants_complete_query("tenant")
-///              .type_("est")
-///              .scope("ipsum")
-///              .query("ipsum")
-///              .page_size(-7)
-///              .add_language_codes("gubergren")
-///              .company("ea")
+///              .type_(&Default::default())
+///              .scope(&Default::default())
+///              .query("rebum.")
+///              .page_size(-57)
+///              .add_language_codes("ipsum")
+///              .company("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4902,8 +4902,8 @@ pub struct ProjectTenantCompleteQueryCall<'a, S>
 
    pub(super) hub: &'a CloudTalentSolution<S>,
    pub(super) _tenant: String,
-   pub(super) _type_: Option<String>,
-   pub(super) _scope: Option<String>,
+   pub(super) _type_: Option<ProjectTypeEnum>,
+   pub(super) _scope: Option<ProjectScopeEnum>,
    pub(super) _query: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _language_codes: Vec<String>,
@@ -4944,7 +4944,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("tenant", self._tenant);
+        params.push("tenant", &self._tenant);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value);
         }
@@ -5082,15 +5082,15 @@ where
     /// The completion topic. The default is CompletionType.COMBINED.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ProjectTenantCompleteQueryCall<'a, S> {
-        self._type_ = Some(new_value.to_string());
+    pub fn type_(mut self, new_value: &ProjectTypeEnum) -> ProjectTenantCompleteQueryCall<'a, S> {
+        self._type_ = Some(new_value.clone());
         self
     }
     /// The scope of the completion. The defaults is CompletionScope.PUBLIC.
     ///
     /// Sets the *scope* query property to the given value.
-    pub fn scope(mut self, new_value: &str) -> ProjectTenantCompleteQueryCall<'a, S> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &ProjectScopeEnum) -> ProjectTenantCompleteQueryCall<'a, S> {
+        self._scope = Some(new_value.clone());
         self
     }
     /// Required. The query used to generate suggestions. The maximum number of allowed characters is 255.
@@ -5276,7 +5276,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -5561,7 +5561,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5823,7 +5823,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6041,8 +6041,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().tenants_list("parent")
-///              .page_token("sed")
-///              .page_size(-70)
+///              .page_token("Lorem")
+///              .page_size(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6089,7 +6089,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6380,7 +6380,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }

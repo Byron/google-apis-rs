@@ -92,7 +92,7 @@ pub struct AnalyzeEntitiesRequest {
     /// A list of licensed vocabularies to use in the request, in addition to the default unlicensed vocabularies.
     #[serde(rename="licensedVocabularies")]
     
-    pub licensed_vocabularies: Option<Vec<String>>,
+    pub licensed_vocabularies: Option<Vec<AnalyzeEntitiesRequestLicensedVocabulariesEnum>>,
 }
 
 impl client::RequestValue for AnalyzeEntitiesRequest {}
@@ -295,7 +295,7 @@ pub struct AttributeDefinition {
     pub allowed_values: Option<Vec<String>>,
     /// Required. The category of the attribute. The value of this field cannot be changed after creation.
     
-    pub category: Option<String>,
+    pub category: Option<AttributeDefinitionCategoryEnum>,
     /// Optional. Default values of the attribute in Consents. If no default values are specified, it defaults to an empty value.
     #[serde(rename="consentDefaultValues")]
     
@@ -349,7 +349,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -481,7 +481,7 @@ pub struct CheckDataAccessRequest {
     /// Optional. The view for CheckDataAccessResponse. If unspecified, defaults to `BASIC` and returns `consented` as `TRUE` or `FALSE`.
     #[serde(rename="responseView")]
     
-    pub response_view: Option<String>,
+    pub response_view: Option<CheckDataAccessRequestResponseViewEnum>,
 }
 
 impl client::RequestValue for CheckDataAccessRequest {}
@@ -625,7 +625,7 @@ pub struct Consent {
     pub revision_id: Option<String>,
     /// Required. Indicates the current state of this Consent.
     
-    pub state: Option<String>,
+    pub state: Option<ConsentStateEnum>,
     /// Input only. The time to live for this Consent from when it is created.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -698,7 +698,7 @@ pub struct ConsentEvaluation {
     /// The evaluation result.
     #[serde(rename="evaluationResult")]
     
-    pub evaluation_result: Option<String>,
+    pub evaluation_result: Option<ConsentEvaluationEvaluationResultEnum>,
 }
 
 impl client::Part for ConsentEvaluation {}
@@ -1075,7 +1075,7 @@ pub struct DicomConfig {
     /// Tag filtering profile that determines which tags to keep/remove.
     #[serde(rename="filterProfile")]
     
-    pub filter_profile: Option<String>,
+    pub filter_profile: Option<DicomConfigFilterProfileEnum>,
     /// List of tags to keep. Remove all other tags.
     #[serde(rename="keepList")]
     
@@ -1158,7 +1158,7 @@ pub struct DicomTagConfig {
     /// Base profile type for handling DICOM tags.
     #[serde(rename="profileType")]
     
-    pub profile_type: Option<String>,
+    pub profile_type: Option<DicomTagConfigProfileTypeEnum>,
 }
 
 impl client::Part for DicomTagConfig {}
@@ -1353,7 +1353,7 @@ pub struct EvaluateUserConsentsRequest {
     /// Optional. The view for EvaluateUserConsentsResponse. If unspecified, defaults to `BASIC` and returns `consented` as `TRUE` or `FALSE`.
     #[serde(rename="responseView")]
     
-    pub response_view: Option<String>,
+    pub response_view: Option<EvaluateUserConsentsRequestResponseViewEnum>,
     /// Required. User ID to evaluate consents for.
     #[serde(rename="userId")]
     
@@ -1575,7 +1575,7 @@ pub struct FhirFieldConfig {
     /// Base profile type for handling FHIR fields.
     #[serde(rename="profileType")]
     
-    pub profile_type: Option<String>,
+    pub profile_type: Option<FhirFieldConfigProfileTypeEnum>,
 }
 
 impl client::Part for FhirFieldConfig {}
@@ -1648,7 +1648,7 @@ pub struct FhirStore {
     /// Enable parsing of references within complex FHIR data types such as Extensions. If this value is set to ENABLED, then features like referential integrity and Bundle reference rewriting apply to all references. If this flag has not been specified the behavior of the FHIR store will not change, references in complex data types will not be parsed. New stores will have this value set to ENABLED after a notification period. Warning: turning on this flag causes processing existing resources to fail if they contain references to non-existent resources.
     #[serde(rename="complexDataTypeReferenceParsing")]
     
-    pub complex_data_type_reference_parsing: Option<String>,
+    pub complex_data_type_reference_parsing: Option<FhirStoreComplexDataTypeReferenceParsingEnum>,
     /// If true, overrides the default search behavior for this FHIR store to `handling=strict` which returns an error for unrecognized search parameters. If false, uses the FHIR specification default `handling=lenient` which ignores unrecognized search parameters. The handling can always be changed from the default on an individual API call by setting the HTTP header `Prefer: handling=strict` or `Prefer: handling=lenient`.
     #[serde(rename="defaultSearchHandlingStrict")]
     
@@ -1693,7 +1693,7 @@ pub struct FhirStore {
     pub validation_config: Option<ValidationConfig>,
     /// Immutable. The FHIR specification version that this FHIR store supports natively. This field is immutable after store creation. Requests are rejected if they contain FHIR resources of a different version. Version is required for every FHIR store.
     
-    pub version: Option<String>,
+    pub version: Option<FhirStoreVersionEnum>,
 }
 
 impl client::RequestValue for FhirStore {}
@@ -1739,7 +1739,7 @@ impl client::Part for Field {}
 pub struct FieldMetadata {
     /// Deidentify action for one field.
     
-    pub action: Option<String>,
+    pub action: Option<FieldMetadataActionEnum>,
     /// List of paths to FHIR fields to redact. Each path is a period-separated list where each component is either a field name or FHIR type name. All types begin with an upper case letter. For example, the resource field "Patient.Address.city", which uses a string type, can be matched by "Patient.Address.String". Path also supports partial matching. For example, "Patient.Address.city" can be matched by "Address.city" (Patient omitted). Partial matching and type matching can be combined. For example, "Patient.Address.city" can be matched by "Address.String". For "choice" types (those defined in the FHIR spec with the form: field[x]), use two separate components. For example, "deceasedAge.unit" is matched by "Deceased.Age.unit". Supported types are: AdministrativeGenderCode, Base64Binary, Boolean, Code, Date, DateTime, Decimal, HumanName, Id, Instant, Integer, LanguageCode, Markdown, Oid, PositiveInt, String, UnsignedInt, Uri, Uuid, Xhtml. The sub-type for HumanName(for example HumanName.given, HumanName.family) can be omitted.
     
     pub paths: Option<Vec<String>>,
@@ -1801,11 +1801,11 @@ pub struct GcsDestination {
     /// The format of the exported HL7v2 message files.
     #[serde(rename="contentStructure")]
     
-    pub content_structure: Option<String>,
+    pub content_structure: Option<GcsDestinationContentStructureEnum>,
     /// Specifies the parts of the Message resource to include in the export. If not specified, FULL is used.
     #[serde(rename="messageView")]
     
-    pub message_view: Option<String>,
+    pub message_view: Option<GcsDestinationMessageViewEnum>,
     /// URI of an existing Cloud Storage directory where the server writes result files, in the format `gs://{bucket-id}/{path/to/destination/dir}`. If there is no trailing slash, the service appends one when composing the object path.
     #[serde(rename="uriPrefix")]
     
@@ -1843,7 +1843,7 @@ pub struct GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination {
     /// Specifies the schema format to export.
     #[serde(rename="schemaType")]
     
-    pub schema_type: Option<String>,
+    pub schema_type: Option<GoogleCloudHealthcareV1beta1AnnotationBigQueryDestinationSchemaTypeEnum>,
     /// BigQuery URI to a table, up to 2000 characters long, must be of the form bq://projectId.bqDatasetId.tableId.
     #[serde(rename="tableUri")]
     
@@ -1851,7 +1851,7 @@ pub struct GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination {
     /// Determines if existing data in the destination dataset is overwritten, appended to, or not written if the tables contain data. If a write_disposition is specified, the `force` parameter is ignored.
     #[serde(rename="writeDisposition")]
     
-    pub write_disposition: Option<String>,
+    pub write_disposition: Option<GoogleCloudHealthcareV1beta1AnnotationBigQueryDestinationWriteDispositionEnum>,
 }
 
 impl client::Part for GoogleCloudHealthcareV1beta1AnnotationBigQueryDestination {}
@@ -2012,7 +2012,7 @@ pub struct GoogleCloudHealthcareV1beta1DicomBigQueryDestination {
     /// Determines whether the existing table in the destination is to be overwritten or appended to. If a write_disposition is specified, the `force` parameter is ignored.
     #[serde(rename="writeDisposition")]
     
-    pub write_disposition: Option<String>,
+    pub write_disposition: Option<GoogleCloudHealthcareV1beta1DicomBigQueryDestinationWriteDispositionEnum>,
 }
 
 impl client::Part for GoogleCloudHealthcareV1beta1DicomBigQueryDestination {}
@@ -2090,7 +2090,7 @@ pub struct GoogleCloudHealthcareV1beta1FhirBigQueryDestination {
     /// Determines if existing data in the destination dataset is overwritten, appended to, or not written if the tables contain data. If a write_disposition is specified, the `force` parameter is ignored.
     #[serde(rename="writeDisposition")]
     
-    pub write_disposition: Option<String>,
+    pub write_disposition: Option<GoogleCloudHealthcareV1beta1FhirBigQueryDestinationWriteDispositionEnum>,
 }
 
 impl client::Part for GoogleCloudHealthcareV1beta1FhirBigQueryDestination {}
@@ -2364,7 +2364,7 @@ pub struct ImageConfig {
     /// Determines how to redact text from image.
     #[serde(rename="textRedactionMode")]
     
-    pub text_redaction_mode: Option<String>,
+    pub text_redaction_mode: Option<ImageConfigTextRedactionModeEnum>,
 }
 
 impl client::Part for ImageConfig {}
@@ -2444,7 +2444,7 @@ pub struct ImportResourcesRequest {
     /// The content structure in the source location. If not specified, the server treats the input source files as BUNDLE.
     #[serde(rename="contentStructure")]
     
-    pub content_structure: Option<String>,
+    pub content_structure: Option<ImportResourcesRequestContentStructureEnum>,
     /// Cloud Storage source data location and import configuration. The Cloud Healthcare Service Agent requires the `roles/storage.objectViewer` Cloud IAM roles on the Cloud Storage location. The Healthcare Service Agent Each Cloud Storage object should be a text file that contains the format specified in ContentStructure.
     #[serde(rename="gcsSource")]
     
@@ -3157,7 +3157,7 @@ pub struct Options {
     /// Set `Action` for [`StudyInstanceUID`, `SeriesInstanceUID`, `SOPInstanceUID`, and `MediaStorageSOPInstanceUID`](http://dicom.nema.org/medical/dicom/2018e/output/chtml/part06/chapter_6.html).
     #[serde(rename="primaryIds")]
     
-    pub primary_ids: Option<String>,
+    pub primary_ids: Option<OptionPrimaryIdsEnum>,
 }
 
 impl client::Part for Options {}
@@ -3199,7 +3199,7 @@ pub struct ParserConfig {
     pub segment_terminator: Option<Vec<u8>>,
     /// Immutable. Determines the version of both the default parser to be used when `schema` is not given, as well as the schematized parser used when `schema` is specified. This field is immutable after HL7v2 store creation.
     
-    pub version: Option<String>,
+    pub version: Option<ParserConfigVersionEnum>,
 }
 
 impl client::Part for ParserConfig {}
@@ -3482,7 +3482,7 @@ pub struct SchemaConfig {
     /// Specifies the output schema type. Schema type is required.
     #[serde(rename="schemaType")]
     
-    pub schema_type: Option<String>,
+    pub schema_type: Option<SchemaConfigSchemaTypeEnum>,
 }
 
 impl client::Part for SchemaConfig {}
@@ -3534,14 +3534,14 @@ pub struct SchemaPackage {
     /// Determines how messages that fail to parse are handled.
     #[serde(rename="schematizedParsingType")]
     
-    pub schematized_parsing_type: Option<String>,
+    pub schematized_parsing_type: Option<SchemaPackageSchematizedParsingTypeEnum>,
     /// Schema type definitions that are layered based on their VersionSources that match the incoming message. Type definitions present in higher indices override those in lower indices with the same type name if their VersionSources all match an incoming message.
     
     pub types: Option<Vec<Hl7TypesConfig>>,
     /// Determines how unexpected segments (segments not matched to the schema) are handled.
     #[serde(rename="unexpectedSegmentHandling")]
     
-    pub unexpected_segment_handling: Option<String>,
+    pub unexpected_segment_handling: Option<SchemaPackageUnexpectedSegmentHandlingEnum>,
 }
 
 impl client::Part for SchemaPackage {}
@@ -3863,7 +3863,7 @@ pub struct TextConfig {
     /// Base profile type for text transformation.
     #[serde(rename="profileType")]
     
-    pub profile_type: Option<String>,
+    pub profile_type: Option<TextConfigProfileTypeEnum>,
     /// The transformations to apply to the detected data. Deprecated. Use `additional_transformations` instead.
     
     pub transformations: Option<Vec<InfoTypeTransformation>>,
@@ -3906,7 +3906,7 @@ pub struct TimePartitioning {
     /// Type of partitioning.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<TimePartitioningTypeEnum>,
 }
 
 impl client::Part for TimePartitioning {}
@@ -3927,7 +3927,7 @@ pub struct Type {
     pub name: Option<String>,
     /// If this is a primitive type then this field is the type of the primitive For example, STRING. Leave unspecified for composite types.
     
-    pub primitive: Option<String>,
+    pub primitive: Option<TypePrimitiveEnum>,
 }
 
 impl client::Part for Type {}

@@ -60,7 +60,7 @@ pub struct Attribute {
     /// Output only. The type of value that this attribute contains. This should be used to determine how to interpret the value.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<AttributeValueTypeEnum>,
     /// The values for this attribute. The type of the values supplied must match that expected for that attribute. This is a repeated field where multiple attribute values may be provided. Attribute types only support one value.
     
     pub values: Option<Vec<json::Value>>,
@@ -100,7 +100,7 @@ pub struct AttributeMetadata {
     /// The value type for the attribute. Values set and retrieved should be expected to be of this type.
     #[serde(rename="valueType")]
     
-    pub value_type: Option<String>,
+    pub value_type: Option<AttributeMetadataValueTypeEnum>,
 }
 
 impl client::Part for AttributeMetadata {}
@@ -788,7 +788,7 @@ pub struct OpenInfo {
     pub opening_date: Option<Date>,
     /// Required. Indicates whether or not the Location is currently open for business. All locations are open by default, unless updated to be closed.
     
-    pub status: Option<String>,
+    pub status: Option<OpenInfoStatusEnum>,
 }
 
 impl client::Part for OpenInfo {}
@@ -954,7 +954,7 @@ pub struct RelevantLocation {
     /// Required. The type of the relationship.
     #[serde(rename="relationType")]
     
-    pub relation_type: Option<String>,
+    pub relation_type: Option<RelevantLocationRelationTypeEnum>,
 }
 
 impl client::Part for RelevantLocation {}
@@ -1055,7 +1055,7 @@ pub struct ServiceAreaBusiness {
     /// Required. Indicates the type of the service area business.
     #[serde(rename="businessType")]
     
-    pub business_type: Option<String>,
+    pub business_type: Option<ServiceAreaBusinesBusinessTypeEnum>,
     /// The area that this business serves defined through a set of places.
     
     pub places: Option<Places>,
@@ -1211,7 +1211,7 @@ pub struct TimePeriod {
     /// Required. Indicates the day of the week this period ends on.
     #[serde(rename="closeDay")]
     
-    pub close_day: Option<String>,
+    pub close_day: Option<TimePeriodCloseDayEnum>,
     /// Required. Valid values are 00:00-24:00, where 24:00 represents midnight at the end of the specified day field.
     #[serde(rename="closeTime")]
     
@@ -1219,7 +1219,7 @@ pub struct TimePeriod {
     /// Required. Indicates the day of the week this period starts on.
     #[serde(rename="openDay")]
     
-    pub open_day: Option<String>,
+    pub open_day: Option<TimePeriodOpenDayEnum>,
     /// Required. Valid values are 00:00-24:00, where 24:00 represents midnight at the end of the specified day field.
     #[serde(rename="openTime")]
     

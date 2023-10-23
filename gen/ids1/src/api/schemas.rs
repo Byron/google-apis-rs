@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -129,10 +129,10 @@ pub struct Endpoint {
     pub network: Option<String>,
     /// Required. Lowest threat severity that this endpoint will alert on.
     
-    pub severity: Option<String>,
+    pub severity: Option<EndpointSeverityEnum>,
     /// Output only. Current state of the endpoint.
     
-    pub state: Option<String>,
+    pub state: Option<EndpointStateEnum>,
     /// List of threat IDs to be excepted from generating alerts.
     #[serde(rename="threatExceptions")]
     

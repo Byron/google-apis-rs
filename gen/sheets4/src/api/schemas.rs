@@ -331,7 +331,7 @@ impl client::Part for AppendCellsRequest {}
 pub struct AppendDimensionRequest {
     /// Whether rows or columns should be appended.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<AppendDimensionRequestDimensionEnum>,
     /// The number of rows or columns to append.
     
     pub length: Option<i32>,
@@ -494,7 +494,7 @@ pub struct BaselineValueFormat {
     /// The comparison type of key value with baseline value.
     #[serde(rename="comparisonType")]
     
-    pub comparison_type: Option<String>,
+    pub comparison_type: Option<BaselineValueFormatComparisonTypeEnum>,
     /// Description which is appended after the baseline value. This field is optional.
     
     pub description: Option<String>,
@@ -538,7 +538,7 @@ pub struct BasicChartAxis {
     pub format: Option<TextFormat>,
     /// The position of this axis.
     
-    pub position: Option<String>,
+    pub position: Option<BasicChartAxiPositionEnum>,
     /// The title of this axis. If set, this overrides any title inferred from headers of the data.
     
     pub title: Option<String>,
@@ -609,11 +609,11 @@ pub struct BasicChartSeries {
     /// The minor axis that will specify the range of values for this series. For example, if charting stocks over time, the "Volume" series may want to be pinned to the right with the prices pinned to the left, because the scale of trading volume is different than the scale of prices. It is an error to specify an axis that isn't a valid minor axis for the chart's type.
     #[serde(rename="targetAxis")]
     
-    pub target_axis: Option<String>,
+    pub target_axis: Option<BasicChartSeryTargetAxisEnum>,
     /// The type of this series. Valid only if the chartType is COMBO. Different types will change the way the series is visualized. Only LINE, AREA, and COLUMN are supported.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<BasicChartSeryTypeEnum>,
 }
 
 impl client::Part for BasicChartSeries {}
@@ -632,11 +632,11 @@ pub struct BasicChartSpec {
     /// The type of the chart.
     #[serde(rename="chartType")]
     
-    pub chart_type: Option<String>,
+    pub chart_type: Option<BasicChartSpecChartTypeEnum>,
     /// The behavior of tooltips and data highlighting when hovering on data and chart area.
     #[serde(rename="compareMode")]
     
-    pub compare_mode: Option<String>,
+    pub compare_mode: Option<BasicChartSpecCompareModeEnum>,
     /// The domain of data this is charting. Only a single domain is supported.
     
     pub domains: Option<Vec<BasicChartDomain>>,
@@ -651,7 +651,7 @@ pub struct BasicChartSpec {
     /// The position of the chart legend.
     #[serde(rename="legendPosition")]
     
-    pub legend_position: Option<String>,
+    pub legend_position: Option<BasicChartSpecLegendPositionEnum>,
     /// Gets whether all lines should be rendered smooth or straight by default. Applies to Line charts.
     #[serde(rename="lineSmoothing")]
     
@@ -662,7 +662,7 @@ pub struct BasicChartSpec {
     /// The stacked type for charts that support vertical stacking. Applies to Area, Bar, Column, Combo, and Stepped Area charts.
     #[serde(rename="stackedType")]
     
-    pub stacked_type: Option<String>,
+    pub stacked_type: Option<BasicChartSpecStackedTypeEnum>,
     /// True to make the chart 3D. Applies to Bar and Column charts.
     #[serde(rename="threeDimensional")]
     
@@ -833,15 +833,15 @@ pub struct BatchGetValuesByDataFilterRequest {
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     #[serde(rename="dateTimeRenderOption")]
     
-    pub date_time_render_option: Option<String>,
+    pub date_time_render_option: Option<BatchGetValuesByDataFilterRequestDateTimeRenderOptionEnum>,
     /// The major dimension that results should use. For example, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then a request that selects that range and sets `majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas a request that sets `majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     #[serde(rename="majorDimension")]
     
-    pub major_dimension: Option<String>,
+    pub major_dimension: Option<BatchGetValuesByDataFilterRequestMajorDimensionEnum>,
     /// How values should be represented in the output. The default render option is FORMATTED_VALUE.
     #[serde(rename="valueRenderOption")]
     
-    pub value_render_option: Option<String>,
+    pub value_render_option: Option<BatchGetValuesByDataFilterRequestValueRenderOptionEnum>,
 }
 
 impl client::RequestValue for BatchGetValuesByDataFilterRequest {}
@@ -974,15 +974,15 @@ pub struct BatchUpdateValuesByDataFilterRequest {
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     #[serde(rename="responseDateTimeRenderOption")]
     
-    pub response_date_time_render_option: Option<String>,
+    pub response_date_time_render_option: Option<BatchUpdateValuesByDataFilterRequestResponseDateTimeRenderOptionEnum>,
     /// Determines how values in the response should be rendered. The default render option is FORMATTED_VALUE.
     #[serde(rename="responseValueRenderOption")]
     
-    pub response_value_render_option: Option<String>,
+    pub response_value_render_option: Option<BatchUpdateValuesByDataFilterRequestResponseValueRenderOptionEnum>,
     /// How the input data should be interpreted.
     #[serde(rename="valueInputOption")]
     
-    pub value_input_option: Option<String>,
+    pub value_input_option: Option<BatchUpdateValuesByDataFilterRequestValueInputOptionEnum>,
 }
 
 impl client::RequestValue for BatchUpdateValuesByDataFilterRequest {}
@@ -1048,15 +1048,15 @@ pub struct BatchUpdateValuesRequest {
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     #[serde(rename="responseDateTimeRenderOption")]
     
-    pub response_date_time_render_option: Option<String>,
+    pub response_date_time_render_option: Option<BatchUpdateValuesRequestResponseDateTimeRenderOptionEnum>,
     /// Determines how values in the response should be rendered. The default render option is FORMATTED_VALUE.
     #[serde(rename="responseValueRenderOption")]
     
-    pub response_value_render_option: Option<String>,
+    pub response_value_render_option: Option<BatchUpdateValuesRequestResponseValueRenderOptionEnum>,
     /// How the input data should be interpreted.
     #[serde(rename="valueInputOption")]
     
-    pub value_input_option: Option<String>,
+    pub value_input_option: Option<BatchUpdateValuesRequestValueInputOptionEnum>,
 }
 
 impl client::RequestValue for BatchUpdateValuesRequest {}
@@ -1175,7 +1175,7 @@ pub struct BooleanCondition {
     /// The type of condition.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<BooleanConditionTypeEnum>,
     /// The values of the condition. The number of supported values depends on the condition type. Some support zero values, others one or two values, and ConditionType.ONE_OF_LIST supports an arbitrary number of values.
     
     pub values: Option<Vec<ConditionValue>>,
@@ -1218,7 +1218,7 @@ pub struct Border {
     pub color_style: Option<ColorStyle>,
     /// The style of the border.
     
-    pub style: Option<String>,
+    pub style: Option<BorderStyleEnum>,
     /// The width of the border, in pixels. Deprecated; the width is determined by the "style" field.
     
     pub width: Option<i32>,
@@ -1300,7 +1300,7 @@ pub struct BubbleChartSpec {
     /// Where the legend of the chart should be drawn.
     #[serde(rename="legendPosition")]
     
-    pub legend_position: Option<String>,
+    pub legend_position: Option<BubbleChartSpecLegendPositionEnum>,
     /// The data containing the bubble y-values. These values locate the bubbles in the chart vertically.
     
     pub series: Option<ChartData>,
@@ -1467,11 +1467,11 @@ pub struct CellFormat {
     /// The horizontal alignment of the value in the cell.
     #[serde(rename="horizontalAlignment")]
     
-    pub horizontal_alignment: Option<String>,
+    pub horizontal_alignment: Option<CellFormatHorizontalAlignmentEnum>,
     /// If one exists, how a hyperlink should be displayed in the cell.
     #[serde(rename="hyperlinkDisplayType")]
     
-    pub hyperlink_display_type: Option<String>,
+    pub hyperlink_display_type: Option<CellFormatHyperlinkDisplayTypeEnum>,
     /// A format describing how number values should be represented to the user.
     #[serde(rename="numberFormat")]
     
@@ -1482,7 +1482,7 @@ pub struct CellFormat {
     /// The direction of the text in the cell.
     #[serde(rename="textDirection")]
     
-    pub text_direction: Option<String>,
+    pub text_direction: Option<CellFormatTextDirectionEnum>,
     /// The format of the text in the cell (unless overridden by a format run). Setting a cell-level link here clears the cell's existing links. Setting the link field in a TextFormatRun takes precedence over the cell-level link.
     #[serde(rename="textFormat")]
     
@@ -1494,11 +1494,11 @@ pub struct CellFormat {
     /// The vertical alignment of the value in the cell.
     #[serde(rename="verticalAlignment")]
     
-    pub vertical_alignment: Option<String>,
+    pub vertical_alignment: Option<CellFormatVerticalAlignmentEnum>,
     /// The wrap strategy for the value in the cell.
     #[serde(rename="wrapStrategy")]
     
-    pub wrap_strategy: Option<String>,
+    pub wrap_strategy: Option<CellFormatWrapStrategyEnum>,
 }
 
 impl client::Part for CellFormat {}
@@ -1522,7 +1522,7 @@ pub struct ChartAxisViewWindowOptions {
     /// The view window's mode.
     #[serde(rename="viewWindowMode")]
     
-    pub view_window_mode: Option<String>,
+    pub view_window_mode: Option<ChartAxisViewWindowOptionViewWindowModeEnum>,
 }
 
 impl client::Part for ChartAxisViewWindowOptions {}
@@ -1556,7 +1556,7 @@ pub struct ChartData {
     /// The aggregation type for the series of a data source chart. Only supported for data source charts.
     #[serde(rename="aggregateType")]
     
-    pub aggregate_type: Option<String>,
+    pub aggregate_type: Option<ChartDataAggregateTypeEnum>,
     /// The reference to the data source column that the data reads from.
     #[serde(rename="columnReference")]
     
@@ -1584,7 +1584,7 @@ pub struct ChartDateTimeRule {
     /// The type of date-time grouping to apply.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ChartDateTimeRuleTypeEnum>,
 }
 
 impl client::Part for ChartDateTimeRule {}
@@ -1695,7 +1695,7 @@ pub struct ChartSpec {
     /// Determines how the charts will use hidden rows or columns.
     #[serde(rename="hiddenDimensionStrategy")]
     
-    pub hidden_dimension_strategy: Option<String>,
+    pub hidden_dimension_strategy: Option<ChartSpecHiddenDimensionStrategyEnum>,
     /// A histogram chart specification.
     #[serde(rename="histogramChart")]
     
@@ -1847,7 +1847,7 @@ pub struct ColorStyle {
     /// Theme color.
     #[serde(rename="themeColor")]
     
-    pub theme_color: Option<String>,
+    pub theme_color: Option<ColorStyleThemeColorEnum>,
 }
 
 impl client::Part for ColorStyle {}
@@ -1863,7 +1863,7 @@ pub struct ConditionValue {
     /// A relative date (based on the current date). Valid only if the type is DATE_BEFORE, DATE_AFTER, DATE_ON_OR_BEFORE or DATE_ON_OR_AFTER. Relative dates are not supported in data validation. They are supported only in conditional formatting and conditional filters.
     #[serde(rename="relativeDate")]
     
-    pub relative_date: Option<String>,
+    pub relative_date: Option<ConditionValueRelativeDateEnum>,
     /// A value the condition is based on. The value is parsed as if the user typed into a cell. Formulas are supported (and must begin with an `=` or a '+').
     #[serde(rename="userEnteredValue")]
     
@@ -1909,11 +1909,11 @@ pub struct CopyPasteRequest {
     /// How that data should be oriented when pasting.
     #[serde(rename="pasteOrientation")]
     
-    pub paste_orientation: Option<String>,
+    pub paste_orientation: Option<CopyPasteRequestPasteOrientationEnum>,
     /// What kind of data to paste.
     #[serde(rename="pasteType")]
     
-    pub paste_type: Option<String>,
+    pub paste_type: Option<CopyPasteRequestPasteTypeEnum>,
     /// The source range to copy.
     
     pub source: Option<GridRange>,
@@ -1987,7 +1987,7 @@ pub struct CutPasteRequest {
     /// What kind of data to paste. All the source data will be cut, regardless of what is pasted.
     #[serde(rename="pasteType")]
     
-    pub paste_type: Option<String>,
+    pub paste_type: Option<CutPasteRequestPasteTypeEnum>,
     /// The source data to cut.
     
     pub source: Option<GridRange>,
@@ -2006,7 +2006,7 @@ pub struct DataExecutionStatus {
     /// The error code.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<DataExecutionStatuErrorCodeEnum>,
     /// The error message, which may be empty.
     #[serde(rename="errorMessage")]
     
@@ -2017,7 +2017,7 @@ pub struct DataExecutionStatus {
     pub last_refresh_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The state of the data execution.
     
-    pub state: Option<String>,
+    pub state: Option<DataExecutionStatuStateEnum>,
 }
 
 impl client::Part for DataExecutionStatus {}
@@ -2061,7 +2061,7 @@ pub struct DataFilterValueRange {
     /// The major dimension of the values.
     #[serde(rename="majorDimension")]
     
-    pub major_dimension: Option<String>,
+    pub major_dimension: Option<DataFilterValueRangeMajorDimensionEnum>,
     /// The data to be written. If the provided values exceed any of the ranges matched by the data filter then the request fails. If the provided values are less than the matched ranges only the specified values are written, existing values in the matched ranges remain unaffected.
     
     pub values: Option<Vec<Vec<json::Value>>>,
@@ -2083,7 +2083,7 @@ pub struct DataLabel {
     pub custom_label_data: Option<ChartData>,
     /// The placement of the data label relative to the labeled data.
     
-    pub placement: Option<String>,
+    pub placement: Option<DataLabelPlacementEnum>,
     /// The text format used for the data label. The link field is not supported.
     #[serde(rename="textFormat")]
     
@@ -2091,7 +2091,7 @@ pub struct DataLabel {
     /// The type of the data label.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DataLabelTypeEnum>,
 }
 
 impl client::Part for DataLabel {}
@@ -2327,7 +2327,7 @@ pub struct DataSourceRefreshSchedule {
     /// The scope of the refresh. Must be ALL_DATA_SOURCES.
     #[serde(rename="refreshScope")]
     
-    pub refresh_scope: Option<String>,
+    pub refresh_scope: Option<DataSourceRefreshScheduleRefreshScopeEnum>,
     /// Weekly refresh schedule.
     #[serde(rename="weeklySchedule")]
     
@@ -2347,7 +2347,7 @@ pub struct DataSourceRefreshWeeklySchedule {
     /// Days of the week to refresh. At least one day must be specified.
     #[serde(rename="daysOfWeek")]
     
-    pub days_of_week: Option<Vec<String>>,
+    pub days_of_week: Option<Vec<DataSourceRefreshWeeklyScheduleDaysOfWeekEnum>>,
     /// The start time of a time interval in which a data source refresh is scheduled. Only `hours` part is used. The time interval size defaults to that in the Sheets editor.
     #[serde(rename="startTime")]
     
@@ -2429,7 +2429,7 @@ pub struct DataSourceTable {
     /// The type to select columns for the data source table. Defaults to SELECTED.
     #[serde(rename="columnSelectionType")]
     
-    pub column_selection_type: Option<String>,
+    pub column_selection_type: Option<DataSourceTableColumnSelectionTypeEnum>,
     /// Columns selected for the data source table. The column_selection_type must be SELECTED.
     
     pub columns: Option<Vec<DataSourceColumnReference>>,
@@ -2494,7 +2494,7 @@ pub struct DateTimeRule {
     /// The type of date-time grouping to apply.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DateTimeRuleTypeEnum>,
 }
 
 impl client::Part for DateTimeRule {}
@@ -2756,7 +2756,7 @@ pub struct DeleteRangeRequest {
     /// The dimension from which deleted cells will be replaced with. If ROWS, existing cells will be shifted upward to replace the deleted cells. If COLUMNS, existing cells will be shifted left to replace the deleted cells.
     #[serde(rename="shiftDimension")]
     
-    pub shift_dimension: Option<String>,
+    pub shift_dimension: Option<DeleteRangeRequestShiftDimensionEnum>,
 }
 
 impl client::Part for DeleteRangeRequest {}
@@ -2806,7 +2806,7 @@ pub struct DeveloperMetadata {
     pub metadata_value: Option<String>,
     /// The metadata visibility. Developer metadata must always have a visibility specified.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<DeveloperMetadataVisibilityEnum>,
 }
 
 impl client::ResponseResult for DeveloperMetadata {}
@@ -2826,7 +2826,7 @@ pub struct DeveloperMetadataLocation {
     /// The type of location this object represents. This field is read-only.
     #[serde(rename="locationType")]
     
-    pub location_type: Option<String>,
+    pub location_type: Option<DeveloperMetadataLocationLocationTypeEnum>,
     /// The ID of the sheet when metadata is associated with an entire sheet.
     #[serde(rename="sheetId")]
     
@@ -2849,11 +2849,11 @@ pub struct DeveloperMetadataLookup {
     /// Determines how this lookup matches the location. If this field is specified as EXACT, only developer metadata associated on the exact location specified is matched. If this field is specified to INTERSECTING, developer metadata associated on intersecting locations is also matched. If left unspecified, this field assumes a default value of INTERSECTING. If this field is specified, a metadataLocation must also be specified.
     #[serde(rename="locationMatchingStrategy")]
     
-    pub location_matching_strategy: Option<String>,
+    pub location_matching_strategy: Option<DeveloperMetadataLookupLocationMatchingStrategyEnum>,
     /// Limits the selected developer metadata to those entries which are associated with locations of the specified type. For example, when this field is specified as ROW this lookup only considers developer metadata associated on rows. If the field is left unspecified, all location types are considered. This field cannot be specified as SPREADSHEET when the locationMatchingStrategy is specified as INTERSECTING or when the metadataLocation is specified as a non-spreadsheet location: spreadsheet metadata cannot intersect any other developer metadata location. This field also must be left unspecified when the locationMatchingStrategy is specified as EXACT.
     #[serde(rename="locationType")]
     
-    pub location_type: Option<String>,
+    pub location_type: Option<DeveloperMetadataLookupLocationTypeEnum>,
     /// Limits the selected developer metadata to that which has a matching DeveloperMetadata.metadata_id.
     #[serde(rename="metadataId")]
     
@@ -2872,7 +2872,7 @@ pub struct DeveloperMetadataLookup {
     pub metadata_value: Option<String>,
     /// Limits the selected developer metadata to that which has a matching DeveloperMetadata.visibility. If left unspecified, all developer metadata visibile to the requesting project is considered.
     
-    pub visibility: Option<String>,
+    pub visibility: Option<DeveloperMetadataLookupVisibilityEnum>,
 }
 
 impl client::Part for DeveloperMetadataLookup {}
@@ -2940,7 +2940,7 @@ impl client::Part for DimensionProperties {}
 pub struct DimensionRange {
     /// The dimension of the span.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<DimensionRangeDimensionEnum>,
     /// The end (exclusive) of the span, or not set if unbounded.
     #[serde(rename="endIndex")]
     
@@ -3135,7 +3135,7 @@ pub struct ErrorValue {
     /// The type of error.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ErrorValueTypeEnum>,
 }
 
 impl client::Part for ErrorValue {}
@@ -3533,7 +3533,7 @@ pub struct HistogramChartSpec {
     /// The position of the chart legend.
     #[serde(rename="legendPosition")]
     
-    pub legend_position: Option<String>,
+    pub legend_position: Option<HistogramChartSpecLegendPositionEnum>,
     /// The outlier percentile is used to ensure that outliers do not adversely affect the calculation of bucket sizes. For example, setting an outlier percentile of 0.05 indicates that the top and bottom 5% of values when calculating buckets. The values are still included in the chart, they will be added to the first or last buckets instead of their own buckets. Must be between 0.0 and 0.5.
     #[serde(rename="outlierPercentile")]
     
@@ -3626,7 +3626,7 @@ pub struct InsertRangeRequest {
     /// The dimension which will be shifted when inserting cells. If ROWS, existing cells will be shifted down. If COLUMNS, existing cells will be shifted right.
     #[serde(rename="shiftDimension")]
     
-    pub shift_dimension: Option<String>,
+    pub shift_dimension: Option<InsertRangeRequestShiftDimensionEnum>,
 }
 
 impl client::Part for InsertRangeRequest {}
@@ -3649,7 +3649,7 @@ pub struct InterpolationPoint {
     /// How the value should be interpreted.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<InterpolationPointTypeEnum>,
     /// The value this interpolation point uses. May be a formula. Unused if type is MIN or MAX.
     
     pub value: Option<String>,
@@ -3727,7 +3727,7 @@ pub struct LineStyle {
     /// The dash type of the line.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<LineStyleTypeEnum>,
     /// The thickness of the line, in px.
     
     pub width: Option<i32>,
@@ -3835,7 +3835,7 @@ pub struct MergeCellsRequest {
     /// How the cells should be merged.
     #[serde(rename="mergeType")]
     
-    pub merge_type: Option<String>,
+    pub merge_type: Option<MergeCellsRequestMergeTypeEnum>,
     /// The range of cells to merge.
     
     pub range: Option<GridRange>,
@@ -3898,7 +3898,7 @@ pub struct NumberFormat {
     /// The type of the number format. When writing, this field must be set.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<NumberFormatTypeEnum>,
 }
 
 impl client::Part for NumberFormat {}
@@ -3925,7 +3925,7 @@ pub struct OrgChartSpec {
     /// The size of the org chart nodes.
     #[serde(rename="nodeSize")]
     
-    pub node_size: Option<String>,
+    pub node_size: Option<OrgChartSpecNodeSizeEnum>,
     /// The data containing the label of the parent for the corresponding node. A blank value indicates that the node has no parent and is a top-level node. This field is optional.
     #[serde(rename="parentLabels")]
     
@@ -4024,7 +4024,7 @@ pub struct PasteDataRequest {
     /// How the data should be pasted.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<PasteDataRequestTypeEnum>,
 }
 
 impl client::Part for PasteDataRequest {}
@@ -4043,7 +4043,7 @@ pub struct PieChartSpec {
     /// Where the legend of the pie chart should be drawn.
     #[serde(rename="legendPosition")]
     
-    pub legend_position: Option<String>,
+    pub legend_position: Option<PieChartSpecLegendPositionEnum>,
     /// The size of the hole in the pie chart.
     #[serde(rename="pieHole")]
     
@@ -4140,7 +4140,7 @@ pub struct PivotGroup {
     /// The order the values in this group should be sorted.
     #[serde(rename="sortOrder")]
     
-    pub sort_order: Option<String>,
+    pub sort_order: Option<PivotGroupSortOrderEnum>,
     /// The column offset of the source range that this grouping is based on. For example, if the source was `C10:E15`, a `sourceColumnOffset` of `0` means this group refers to column `C`, whereas the offset `1` would refer to column `D`.
     #[serde(rename="sourceColumnOffset")]
     
@@ -4273,7 +4273,7 @@ pub struct PivotTable {
     /// Whether values should be listed horizontally (as columns) or vertically (as rows).
     #[serde(rename="valueLayout")]
     
-    pub value_layout: Option<String>,
+    pub value_layout: Option<PivotTableValueLayoutEnum>,
     /// A list of values to include in the pivot table.
     
     pub values: Option<Vec<PivotValue>>,
@@ -4292,7 +4292,7 @@ pub struct PivotValue {
     /// If specified, indicates that pivot values should be displayed as the result of a calculation with another pivot value. For example, if calculated_display_type is specified as PERCENT_OF_GRAND_TOTAL, all the pivot values are displayed as the percentage of the grand total. In the Sheets editor, this is referred to as "Show As" in the value section of a pivot table.
     #[serde(rename="calculatedDisplayType")]
     
-    pub calculated_display_type: Option<String>,
+    pub calculated_display_type: Option<PivotValueCalculatedDisplayTypeEnum>,
     /// The reference to the data source column that this value reads from.
     #[serde(rename="dataSourceColumnReference")]
     
@@ -4310,7 +4310,7 @@ pub struct PivotValue {
     /// A function to summarize the value. If formula is set, the only supported values are SUM and CUSTOM. If sourceColumnOffset is set, then `CUSTOM` is not supported.
     #[serde(rename="summarizeFunction")]
     
-    pub summarize_function: Option<String>,
+    pub summarize_function: Option<PivotValueSummarizeFunctionEnum>,
 }
 
 impl client::Part for PivotValue {}
@@ -4325,7 +4325,7 @@ impl client::Part for PivotValue {}
 pub struct PointStyle {
     /// The point shape. If empty or unspecified, a default shape is used.
     
-    pub shape: Option<String>,
+    pub shape: Option<PointStyleShapeEnum>,
     /// The point size. If empty, a default size is used.
     
     pub size: Option<f64>,
@@ -4872,7 +4872,7 @@ pub struct ScorecardChartSpec {
     /// The aggregation type for key and baseline chart data in scorecard chart. This field is not supported for data source charts. Use the ChartData.aggregateType field of the key_value_data or baseline_value_data instead for data source charts. This field is optional.
     #[serde(rename="aggregateType")]
     
-    pub aggregate_type: Option<String>,
+    pub aggregate_type: Option<ScorecardChartSpecAggregateTypeEnum>,
     /// The data for scorecard baseline value. This field is optional.
     #[serde(rename="baselineValueData")]
     
@@ -4896,7 +4896,7 @@ pub struct ScorecardChartSpec {
     /// The number format source used in the scorecard chart. This field is optional.
     #[serde(rename="numberFormatSource")]
     
-    pub number_format_source: Option<String>,
+    pub number_format_source: Option<ScorecardChartSpecNumberFormatSourceEnum>,
     /// Value to scale scorecard key and baseline value. For example, a factor of 10 can be used to divide all values in the chart by 10. This field is optional.
     #[serde(rename="scaleFactor")]
     
@@ -5074,7 +5074,7 @@ pub struct SheetProperties {
     /// The type of sheet. Defaults to GRID. This field cannot be changed once set.
     #[serde(rename="sheetType")]
     
-    pub sheet_type: Option<String>,
+    pub sheet_type: Option<SheetPropertySheetTypeEnum>,
     /// The color of the tab in the UI. Deprecated: Use tab_color_style.
     #[serde(rename="tabColor")]
     
@@ -5147,7 +5147,7 @@ pub struct SlicerSpec {
     /// The horizontal alignment of title in the slicer. If unspecified, defaults to `LEFT`
     #[serde(rename="horizontalAlignment")]
     
-    pub horizontal_alignment: Option<String>,
+    pub horizontal_alignment: Option<SlicerSpecHorizontalAlignmentEnum>,
     /// The text format of title in the slicer. The link field is not supported.
     #[serde(rename="textFormat")]
     
@@ -5213,7 +5213,7 @@ pub struct SortSpec {
     /// The order data should be sorted.
     #[serde(rename="sortOrder")]
     
-    pub sort_order: Option<String>,
+    pub sort_order: Option<SortSpecSortOrderEnum>,
 }
 
 impl client::Part for SortSpec {}
@@ -5228,7 +5228,7 @@ impl client::Part for SortSpec {}
 pub struct SourceAndDestination {
     /// The dimension that data should be filled into.
     
-    pub dimension: Option<String>,
+    pub dimension: Option<SourceAndDestinationDimensionEnum>,
     /// The number of rows or columns that data should be filled into. Positive numbers expand beyond the last row or last column of the source. Negative numbers expand before the first row or first column of the source.
     #[serde(rename="fillLength")]
     
@@ -5315,7 +5315,7 @@ pub struct SpreadsheetProperties {
     /// The amount of time to wait before volatile functions are recalculated.
     #[serde(rename="autoRecalc")]
     
-    pub auto_recalc: Option<String>,
+    pub auto_recalc: Option<SpreadsheetPropertyAutoRecalcEnum>,
     /// The default format of all cells in the spreadsheet. CellData.effectiveFormat will not be set if the cell's format is equal to this default format. This field is read-only.
     #[serde(rename="defaultFormat")]
     
@@ -5435,7 +5435,7 @@ pub struct TextPosition {
     /// Horizontal alignment setting for the piece of text.
     #[serde(rename="horizontalAlignment")]
     
-    pub horizontal_alignment: Option<String>,
+    pub horizontal_alignment: Option<TextPositionHorizontalAlignmentEnum>,
 }
 
 impl client::Part for TextPosition {}
@@ -5472,7 +5472,7 @@ pub struct TextToColumnsRequest {
     /// The delimiter type to use.
     #[serde(rename="delimiterType")]
     
-    pub delimiter_type: Option<String>,
+    pub delimiter_type: Option<TextToColumnsRequestDelimiterTypeEnum>,
     /// The source data range. This must span exactly one column.
     
     pub source: Option<GridRange>,
@@ -5494,7 +5494,7 @@ pub struct ThemeColorPair {
     /// The type of the spreadsheet theme color.
     #[serde(rename="colorType")]
     
-    pub color_type: Option<String>,
+    pub color_type: Option<ThemeColorPairColorTypeEnum>,
 }
 
 impl client::Part for ThemeColorPair {}
@@ -6215,7 +6215,7 @@ pub struct ValueRange {
     /// The major dimension of the values. For output, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=A1:B2,majorDimension=ROWS` will return `[[1,2],[3,4]]`, whereas requesting `range=A1:B2,majorDimension=COLUMNS` will return `[[1,3],[2,4]]`. For input, with `range=A1:B2,majorDimension=ROWS` then `[[1,2],[3,4]]` will set `A1=1,B1=2,A2=3,B2=4`. With `range=A1:B2,majorDimension=COLUMNS` then `[[1,2],[3,4]]` will set `A1=1,B1=3,A2=2,B2=4`. When writing, if this field is not set, it defaults to ROWS.
     #[serde(rename="majorDimension")]
     
-    pub major_dimension: Option<String>,
+    pub major_dimension: Option<ValueRangeMajorDimensionEnum>,
     /// The range the values cover, in [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell). For output, this range indicates the entire requested range, even though the values will exclude trailing rows and columns. When appending values, this field represents the range to search for a table, after which values will be appended.
     
     pub range: Option<String>,
@@ -6358,7 +6358,7 @@ pub struct WaterfallChartSpec {
     /// The stacked type.
     #[serde(rename="stackedType")]
     
-    pub stacked_type: Option<String>,
+    pub stacked_type: Option<WaterfallChartSpecStackedTypeEnum>,
     /// Controls whether to display additional data labels on stacked charts which sum the total value of all stacked values at each value along the domain axis. stacked_type must be STACKED and neither CUSTOM nor placement can be set on the total_data_label.
     #[serde(rename="totalDataLabel")]
     

@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("activityId", self._activity_id);
+        params.push("activityId", &self._activity_id);
 
         params.extend(self._additional_params.iter());
 
@@ -283,8 +283,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().list("userId", "collection")
-///              .page_token("ea")
+/// let result = hub.activities().list("userId", &Default::default())
+///              .page_token("duo")
 ///              .max_results(46)
 ///              .doit().await;
 /// # }
@@ -294,7 +294,7 @@ pub struct ActivityListCall<'a, S>
 
    pub(super) hub: &'a Plus<S>,
    pub(super) _user_id: String,
-   pub(super) _collection: String,
+   pub(super) _collection: ActivityCollectionEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -333,8 +333,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("collection", self._collection);
+        params.push("userId", &self._user_id);
+        params.push("collection", &self._collection);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -461,8 +461,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ActivityListCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &ActivityCollectionEnum) -> ActivityListCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
@@ -578,10 +578,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().search("query")
-///              .page_token("amet")
-///              .order_by("duo")
-///              .max_results(51)
-///              .language("sed")
+///              .page_token("Lorem")
+///              .order_by(&Default::default())
+///              .max_results(89)
+///              .language("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -591,7 +591,7 @@ pub struct ActivitySearchCall<'a, S>
    pub(super) hub: &'a Plus<S>,
    pub(super) _query: String,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<ActivityOrderByEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _language: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -630,7 +630,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("query", self._query);
+        params.push("query", &self._query);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -760,8 +760,8 @@ where
     /// Specifies how to order search results.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ActivitySearchCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &ActivityOrderByEnum) -> ActivitySearchCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// The maximum number of activities to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
@@ -921,7 +921,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("commentId", self._comment_id);
+        params.push("commentId", &self._comment_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1135,9 +1135,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("activityId")
-///              .sort_order("rebum.")
-///              .page_token("est")
-///              .max_results(51)
+///              .sort_order(&Default::default())
+///              .page_token("ipsum")
+///              .max_results(13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1146,7 +1146,7 @@ pub struct CommentListCall<'a, S>
 
    pub(super) hub: &'a Plus<S>,
    pub(super) _activity_id: String,
-   pub(super) _sort_order: Option<String>,
+   pub(super) _sort_order: Option<CommentSortOrderEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1185,7 +1185,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("activityId", self._activity_id);
+        params.push("activityId", &self._activity_id);
         if let Some(value) = self._sort_order.as_ref() {
             params.push("sortOrder", value);
         }
@@ -1312,8 +1312,8 @@ where
     /// The order in which to sort the list of comments.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CommentListCall<'a, S> {
-        self._sort_order = Some(new_value.to_string());
+    pub fn sort_order(mut self, new_value: &CommentSortOrderEnum) -> CommentListCall<'a, S> {
+        self._sort_order = Some(new_value.clone());
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
@@ -1473,7 +1473,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("userId", self._user_id);
+        params.push("userId", &self._user_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1686,10 +1686,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.people().list("userId", "collection")
-///              .page_token("ea")
-///              .order_by("dolor")
-///              .max_results(45)
+/// let result = hub.people().list("userId", &Default::default())
+///              .page_token("ipsum")
+///              .order_by(&Default::default())
+///              .max_results(8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1698,9 +1698,9 @@ pub struct PersonListCall<'a, S>
 
    pub(super) hub: &'a Plus<S>,
    pub(super) _user_id: String,
-   pub(super) _collection: String,
+   pub(super) _collection: PersonCollectionEnum,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<PersonOrderByEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -1738,8 +1738,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("userId", self._user_id);
-        params.push("collection", self._collection);
+        params.push("userId", &self._user_id);
+        params.push("collection", &self._collection);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1869,8 +1869,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> PersonListCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &PersonCollectionEnum) -> PersonListCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
@@ -1883,8 +1883,8 @@ where
     /// The order to return people in.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PersonListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &PersonOrderByEnum) -> PersonListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
@@ -1992,9 +1992,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.people().list_by_activity("activityId", "collection")
-///              .page_token("sed")
-///              .max_results(31)
+/// let result = hub.people().list_by_activity("activityId", &Default::default())
+///              .page_token("gubergren")
+///              .max_results(85)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2003,7 +2003,7 @@ pub struct PersonListByActivityCall<'a, S>
 
    pub(super) hub: &'a Plus<S>,
    pub(super) _activity_id: String,
-   pub(super) _collection: String,
+   pub(super) _collection: PersonCollectionEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2042,8 +2042,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("activityId", self._activity_id);
-        params.push("collection", self._collection);
+        params.push("activityId", &self._activity_id);
+        params.push("collection", &self._collection);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2170,8 +2170,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> PersonListByActivityCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &PersonCollectionEnum) -> PersonListByActivityCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
@@ -2287,9 +2287,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().search("query")
-///              .page_token("no")
-///              .max_results(86)
-///              .language("kasd")
+///              .page_token("ipsum")
+///              .max_results(51)
+///              .language("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2337,7 +2337,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("query", self._query);
+        params.push("query", &self._query);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

@@ -362,7 +362,7 @@ pub struct CryptoKeyVersion {
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The current state of the CryptoKeyVersion.
     
-    pub state: Option<String>,
+    pub state: Option<CryptoKeyVersionStateEnum>,
     /// Output only. The resource name for this CryptoKeyVersion in the format
     /// `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
     
@@ -395,7 +395,7 @@ pub struct CloudAuditOptions {
     /// The log_name to populate in the Cloud Audit Record.
     #[serde(rename="logName")]
     
-    pub log_name: Option<String>,
+    pub log_name: Option<CloudAuditOptionLogNameEnum>,
 }
 
 impl client::Part for CloudAuditOptions {}
@@ -583,7 +583,7 @@ pub struct CryptoKey {
     /// The immutable purpose of this CryptoKey. Currently, the only acceptable
     /// purpose is ENCRYPT_DECRYPT.
     
-    pub purpose: Option<String>,
+    pub purpose: Option<CryptoKeyPurposeEnum>,
     /// At next_rotation_time, the Key Management Service will automatically:
     /// 
     /// 1. Create a new version of this CryptoKey.
@@ -632,7 +632,7 @@ pub struct Rule {
     pub permissions: Option<Vec<String>>,
     /// Required
     
-    pub action: Option<String>,
+    pub action: Option<RuleActionEnum>,
     /// If one or more 'not_in' clauses are specified, the rule matches
     /// if the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries.
     /// The format for in and not_in entries is the same as for members in a
@@ -799,20 +799,20 @@ impl client::ResponseResult for ListCryptoKeysResponse {}
 pub struct Condition {
     /// An operator to apply the subject with.
     
-    pub op: Option<String>,
+    pub op: Option<ConditionOpEnum>,
     /// Trusted attributes discharged by the service.
     
     pub svc: Option<String>,
     /// Trusted attributes supplied by any service that owns resources and uses
     /// the IAM system for access control.
     
-    pub sys: Option<String>,
+    pub sys: Option<ConditionSysEnum>,
     /// DEPRECATED. Use 'values' instead.
     
     pub value: Option<String>,
     /// Trusted attributes supplied by the IAM system.
     
-    pub iam: Option<String>,
+    pub iam: Option<ConditionIamEnum>,
     /// The objects of the condition. This is mutually exclusive with 'value'.
     
     pub values: Option<Vec<String>>,
@@ -874,7 +874,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}

@@ -79,7 +79,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._allow_unknown_devices.as_ref() {
             params.push("allowUnknownDevices", value.to_string());
         }
@@ -375,8 +375,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("deviceTierConfigId", self._device_tier_config_id.to_string());
+        params.push("packageName", &self._package_name);
+        params.push("deviceTierConfigId", &self._device_tier_config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -652,7 +652,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -942,8 +942,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1239,8 +1239,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1515,8 +1515,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1897,8 +1897,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2177,8 +2177,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
         if let Some(value) = self._device_tier_config_id.as_ref() {
             params.push("deviceTierConfigId", value);
         }
@@ -2580,9 +2580,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -2820,7 +2820,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -99, "deobfuscationFileType")
+/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -99, &Default::default())
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -2831,7 +2831,7 @@ pub struct EditDeobfuscationfileUploadCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _apk_version_code: i32,
-   pub(super) _deobfuscation_file_type: String,
+   pub(super) _deobfuscation_file_type: EditDeobfuscationFileTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2869,10 +2869,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("apkVersionCode", self._apk_version_code.to_string());
-        params.push("deobfuscationFileType", self._deobfuscation_file_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("apkVersionCode", &self._apk_version_code.to_string());
+        params.push("deobfuscationFileType", &self._deobfuscation_file_type);
 
         params.extend(self._additional_params.iter());
 
@@ -3121,8 +3121,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deobfuscation_file_type(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, S> {
-        self._deobfuscation_file_type = new_value.to_string();
+    pub fn deobfuscation_file_type(mut self, new_value: &EditDeobfuscationFileTypeEnum) -> EditDeobfuscationfileUploadCall<'a, S> {
+        self._deobfuscation_file_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3273,8 +3273,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3554,8 +3554,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3858,8 +3858,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4109,7 +4109,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_get("packageName", "editId", -24, "expansionFileType")
+/// let result = hub.edits().expansionfiles_get("packageName", "editId", -13, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -4120,7 +4120,7 @@ pub struct EditExpansionfileGetCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _apk_version_code: i32,
-   pub(super) _expansion_file_type: String,
+   pub(super) _expansion_file_type: EditExpansionFileTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -4157,10 +4157,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("apkVersionCode", self._apk_version_code.to_string());
-        params.push("expansionFileType", self._expansion_file_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("apkVersionCode", &self._apk_version_code.to_string());
+        params.push("expansionFileType", &self._expansion_file_type);
 
         params.extend(self._additional_params.iter());
 
@@ -4301,8 +4301,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, S> {
-        self._expansion_file_type = new_value.to_string();
+    pub fn expansion_file_type(mut self, new_value: &EditExpansionFileTypeEnum) -> EditExpansionfileGetCall<'a, S> {
+        self._expansion_file_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4413,7 +4413,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -76, "expansionFileType")
+/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -24, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -4425,7 +4425,7 @@ pub struct EditExpansionfilePatchCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _apk_version_code: i32,
-   pub(super) _expansion_file_type: String,
+   pub(super) _expansion_file_type: EditExpansionFileTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -4462,10 +4462,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("apkVersionCode", self._apk_version_code.to_string());
-        params.push("expansionFileType", self._expansion_file_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("apkVersionCode", &self._apk_version_code.to_string());
+        params.push("expansionFileType", &self._expansion_file_type);
 
         params.extend(self._additional_params.iter());
 
@@ -4629,8 +4629,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, S> {
-        self._expansion_file_type = new_value.to_string();
+    pub fn expansion_file_type(mut self, new_value: &EditExpansionFileTypeEnum) -> EditExpansionfilePatchCall<'a, S> {
+        self._expansion_file_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4741,7 +4741,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -34, "expansionFileType")
+/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -31, &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -4753,7 +4753,7 @@ pub struct EditExpansionfileUpdateCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _apk_version_code: i32,
-   pub(super) _expansion_file_type: String,
+   pub(super) _expansion_file_type: EditExpansionFileTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -4790,10 +4790,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("apkVersionCode", self._apk_version_code.to_string());
-        params.push("expansionFileType", self._expansion_file_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("apkVersionCode", &self._apk_version_code.to_string());
+        params.push("expansionFileType", &self._expansion_file_type);
 
         params.extend(self._additional_params.iter());
 
@@ -4957,8 +4957,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, S> {
-        self._expansion_file_type = new_value.to_string();
+    pub fn expansion_file_type(mut self, new_value: &EditExpansionFileTypeEnum) -> EditExpansionfileUpdateCall<'a, S> {
+        self._expansion_file_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5064,7 +5064,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -96, "expansionFileType")
+/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -34, &Default::default())
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -5075,7 +5075,7 @@ pub struct EditExpansionfileUploadCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _apk_version_code: i32,
-   pub(super) _expansion_file_type: String,
+   pub(super) _expansion_file_type: EditExpansionFileTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5113,10 +5113,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("apkVersionCode", self._apk_version_code.to_string());
-        params.push("expansionFileType", self._expansion_file_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("apkVersionCode", &self._apk_version_code.to_string());
+        params.push("expansionFileType", &self._expansion_file_type);
 
         params.extend(self._additional_params.iter());
 
@@ -5365,8 +5365,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, S> {
-        self._expansion_file_type = new_value.to_string();
+    pub fn expansion_file_type(mut self, new_value: &EditExpansionFileTypeEnum) -> EditExpansionfileUploadCall<'a, S> {
+        self._expansion_file_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5471,7 +5471,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().images_delete("packageName", "editId", "language", "imageType", "imageId")
+/// let result = hub.edits().images_delete("packageName", "editId", "language", &Default::default(), "imageId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5482,7 +5482,7 @@ pub struct EditImageDeleteCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _language: String,
-   pub(super) _image_type: String,
+   pub(super) _image_type: EditImageTypeEnum,
    pub(super) _image_id: String,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -5520,11 +5520,11 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
-        params.push("imageType", self._image_type);
-        params.push("imageId", self._image_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
+        params.push("imageType", &self._image_type);
+        params.push("imageId", &self._image_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5654,8 +5654,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteCall<'a, S> {
-        self._image_type = new_value.to_string();
+    pub fn image_type(mut self, new_value: &EditImageTypeEnum) -> EditImageDeleteCall<'a, S> {
+        self._image_type = new_value.clone();
         self
     }
     /// Unique identifier an image within the set of images attached to this edit.
@@ -5770,7 +5770,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().images_deleteall("packageName", "editId", "language", "imageType")
+/// let result = hub.edits().images_deleteall("packageName", "editId", "language", &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5781,7 +5781,7 @@ pub struct EditImageDeleteallCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _language: String,
-   pub(super) _image_type: String,
+   pub(super) _image_type: EditImageTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5818,10 +5818,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
-        params.push("imageType", self._image_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
+        params.push("imageType", &self._image_type);
 
         params.extend(self._additional_params.iter());
 
@@ -5962,8 +5962,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteallCall<'a, S> {
-        self._image_type = new_value.to_string();
+    pub fn image_type(mut self, new_value: &EditImageTypeEnum) -> EditImageDeleteallCall<'a, S> {
+        self._image_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6068,7 +6068,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().images_list("packageName", "editId", "language", "imageType")
+/// let result = hub.edits().images_list("packageName", "editId", "language", &Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -6079,7 +6079,7 @@ pub struct EditImageListCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _language: String,
-   pub(super) _image_type: String,
+   pub(super) _image_type: EditImageTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -6116,10 +6116,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
-        params.push("imageType", self._image_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
+        params.push("imageType", &self._image_type);
 
         params.extend(self._additional_params.iter());
 
@@ -6260,8 +6260,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageListCall<'a, S> {
-        self._image_type = new_value.to_string();
+    pub fn image_type(mut self, new_value: &EditImageTypeEnum) -> EditImageListCall<'a, S> {
+        self._image_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6367,7 +6367,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().images_upload("packageName", "editId", "language", "imageType")
+/// let result = hub.edits().images_upload("packageName", "editId", "language", &Default::default())
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -6378,7 +6378,7 @@ pub struct EditImageUploadCall<'a, S>
    pub(super) _package_name: String,
    pub(super) _edit_id: String,
    pub(super) _language: String,
-   pub(super) _image_type: String,
+   pub(super) _image_type: EditImageTypeEnum,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -6416,10 +6416,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
-        params.push("imageType", self._image_type);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
+        params.push("imageType", &self._image_type);
 
         params.extend(self._additional_params.iter());
 
@@ -6668,8 +6668,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageUploadCall<'a, S> {
-        self._image_type = new_value.to_string();
+    pub fn image_type(mut self, new_value: &EditImageTypeEnum) -> EditImageUploadCall<'a, S> {
+        self._image_type = new_value.clone();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6821,9 +6821,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
 
         params.extend(self._additional_params.iter());
 
@@ -7095,8 +7095,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7359,9 +7359,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
 
         params.extend(self._additional_params.iter());
 
@@ -7644,8 +7644,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7926,9 +7926,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
 
         params.extend(self._additional_params.iter());
 
@@ -8242,9 +8242,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("language", self._language);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("language", &self._language);
 
         params.extend(self._additional_params.iter());
 
@@ -8551,9 +8551,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -8844,9 +8844,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -9160,9 +9160,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -9469,9 +9469,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -9754,8 +9754,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -10036,9 +10036,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -10352,9 +10352,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
-        params.push("track", self._track);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
+        params.push("track", &self._track);
 
         params.extend(self._additional_params.iter());
 
@@ -10662,8 +10662,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
         if let Some(value) = self._changes_not_sent_for_review.as_ref() {
             params.push("changesNotSentForReview", value.to_string());
         }
@@ -10946,8 +10946,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11209,8 +11209,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11489,7 +11489,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
 
         params.extend(self._additional_params.iter());
 
@@ -11775,8 +11775,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("editId", self._edit_id);
+        params.push("packageName", &self._package_name);
+        params.push("editId", &self._edit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12006,7 +12006,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.generatedapks().download("packageName", -77, "downloadId")
+/// let result = hub.generatedapks().download("packageName", -19, "downloadId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12053,9 +12053,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("versionCode", self._version_code.to_string());
-        params.push("downloadId", self._download_id);
+        params.push("packageName", &self._package_name);
+        params.push("versionCode", &self._version_code.to_string());
+        params.push("downloadId", &self._download_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12281,7 +12281,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.generatedapks().list("packageName", -69)
+/// let result = hub.generatedapks().list("packageName", -93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12327,8 +12327,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("versionCode", self._version_code.to_string());
+        params.push("packageName", &self._package_name);
+        params.push("versionCode", &self._version_code.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -12607,7 +12607,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -12892,7 +12892,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -13152,7 +13152,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -13448,8 +13448,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("sku", self._sku);
+        params.push("packageName", &self._package_name);
+        params.push("sku", &self._sku);
 
         params.extend(self._additional_params.iter());
 
@@ -13711,8 +13711,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("sku", self._sku);
+        params.push("packageName", &self._package_name);
+        params.push("sku", &self._sku);
 
         params.extend(self._additional_params.iter());
 
@@ -13993,7 +13993,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._auto_convert_missing_prices.as_ref() {
             params.push("autoConvertMissingPrices", value.to_string());
         }
@@ -14244,9 +14244,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().list("packageName")
-///              .token("est")
+///              .token("erat")
 ///              .start_index(19)
-///              .max_results(7)
+///              .max_results(54)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14294,7 +14294,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._token.as_ref() {
             params.push("token", value);
         }
@@ -14548,7 +14548,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().patch(req, "packageName", "sku")
-///              .auto_convert_missing_prices(true)
+///              .auto_convert_missing_prices(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14596,8 +14596,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("sku", self._sku);
+        params.push("packageName", &self._package_name);
+        params.push("sku", &self._sku);
         if let Some(value) = self._auto_convert_missing_prices.as_ref() {
             params.push("autoConvertMissingPrices", value.to_string());
         }
@@ -14865,7 +14865,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().update(req, "packageName", "sku")
 ///              .auto_convert_missing_prices(false)
-///              .allow_missing(true)
+///              .allow_missing(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14914,8 +14914,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("sku", self._sku);
+        params.push("packageName", &self._package_name);
+        params.push("sku", &self._sku);
         if let Some(value) = self._auto_convert_missing_prices.as_ref() {
             params.push("autoConvertMissingPrices", value.to_string());
         }
@@ -15232,7 +15232,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
 
         params.extend(self._additional_params.iter());
 
@@ -15604,7 +15604,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
 
         params.extend(self._additional_params.iter());
 
@@ -15984,10 +15984,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
-        params.push("offerId", self._offer_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
+        params.push("offerId", &self._offer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16264,8 +16264,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_base_plans_offers_create(req, "packageName", "productId", "basePlanId")
-///              .regions_version_version("eirmod")
-///              .offer_id("Lorem")
+///              .regions_version_version("dolores")
+///              .offer_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16315,9 +16315,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
         if let Some(value) = self._regions_version_version.as_ref() {
             params.push("regionsVersion.version", value);
         }
@@ -16652,10 +16652,10 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
-        params.push("offerId", self._offer_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
+        params.push("offerId", &self._offer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16973,10 +16973,10 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
-        params.push("offerId", self._offer_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
+        params.push("offerId", &self._offer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17260,10 +17260,10 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
-        params.push("offerId", self._offer_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
+        params.push("offerId", &self._offer_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17511,8 +17511,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_base_plans_offers_list("packageName", "productId", "basePlanId")
-///              .page_token("sea")
-///              .page_size(-41)
+///              .page_token("Lorem")
+///              .page_size(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17561,9 +17561,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -17828,7 +17828,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_base_plans_offers_patch(req, "packageName", "productId", "basePlanId", "offerId")
 ///              .update_mask(&Default::default())
-///              .regions_version_version("consetetur")
+///              .regions_version_version("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17879,10 +17879,10 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
-        params.push("offerId", self._offer_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
+        params.push("offerId", &self._offer_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -18226,9 +18226,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18542,9 +18542,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18851,9 +18851,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19133,9 +19133,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("basePlanId", self._base_plan_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("basePlanId", &self._base_plan_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19448,8 +19448,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19706,8 +19706,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_create(req, "packageName")
-///              .regions_version_version("sadipscing")
-///              .product_id("At")
+///              .regions_version_version("aliquyam")
+///              .product_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19755,7 +19755,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._regions_version_version.as_ref() {
             params.push("regionsVersion.version", value);
         }
@@ -20061,8 +20061,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20324,8 +20324,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -20554,8 +20554,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_list("packageName")
 ///              .show_archived(true)
-///              .page_token("dolor")
-///              .page_size(-6)
+///              .page_token("At")
+///              .page_size(-53)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20603,7 +20603,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._show_archived.as_ref() {
             params.push("showArchived", value.to_string());
         }
@@ -20858,7 +20858,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_patch(req, "packageName", "productId")
 ///              .update_mask(&Default::default())
-///              .regions_version_version("no")
+///              .regions_version_version("magna")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20907,8 +20907,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -21230,7 +21230,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
 
         params.extend(self._additional_params.iter());
 
@@ -21518,8 +21518,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("orderId", self._order_id);
+        params.push("packageName", &self._package_name);
+        params.push("orderId", &self._order_id);
         if let Some(value) = self._revoke.as_ref() {
             params.push("revoke", value.to_string());
         }
@@ -21799,9 +21799,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -22097,9 +22097,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("productId", self._product_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("productId", &self._product_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -22390,9 +22390,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -22688,9 +22688,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -22970,9 +22970,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -23279,9 +23279,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -23565,9 +23565,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -23840,9 +23840,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("subscriptionId", self._subscription_id);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("subscriptionId", &self._subscription_id);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -24114,8 +24114,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("token", self._token);
+        params.push("packageName", &self._package_name);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -24343,12 +24343,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.purchases().voidedpurchases_list("packageName")
-///              .type_(-27)
-///              .token("invidunt")
-///              .start_time(-14)
-///              .start_index(86)
-///              .max_results(19)
-///              .end_time(-37)
+///              .type_(-10)
+///              .token("et")
+///              .start_time(-56)
+///              .start_index(68)
+///              .max_results(42)
+///              .end_time(-66)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24399,7 +24399,7 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._type_.as_ref() {
             params.push("type", value.to_string());
         }
@@ -24677,7 +24677,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().get("packageName", "reviewId")
-///              .translation_language("rebum.")
+///              .translation_language("clita")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24724,8 +24724,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("reviewId", self._review_id);
+        params.push("packageName", &self._package_name);
+        params.push("reviewId", &self._review_id);
         if let Some(value) = self._translation_language.as_ref() {
             params.push("translationLanguage", value);
         }
@@ -24963,10 +24963,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().list("packageName")
-///              .translation_language("consetetur")
-///              .token("dolores")
-///              .start_index(71)
-///              .max_results(63)
+///              .translation_language("aliquyam")
+///              .token("ut")
+///              .start_index(98)
+///              .max_results(75)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25015,7 +25015,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("packageName", self._package_name);
+        params.push("packageName", &self._package_name);
         if let Some(value) = self._translation_language.as_ref() {
             params.push("translationLanguage", value);
         }
@@ -25325,8 +25325,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("reviewId", self._review_id);
+        params.push("packageName", &self._package_name);
+        params.push("reviewId", &self._review_id);
 
         params.extend(self._additional_params.iter());
 
@@ -25582,7 +25582,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_create(req, "packageName", -83)
+/// let result = hub.systemapks().variants_create(req, "packageName", -19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25629,8 +25629,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("versionCode", self._version_code.to_string());
+        params.push("packageName", &self._package_name);
+        params.push("versionCode", &self._version_code.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -25883,7 +25883,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_download("packageName", -91, 83)
+/// let result = hub.systemapks().variants_download("packageName", -38, 37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25930,9 +25930,9 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("versionCode", self._version_code.to_string());
-        params.push("variantId", self._variant_id.to_string());
+        params.push("packageName", &self._package_name);
+        params.push("versionCode", &self._version_code.to_string());
+        params.push("variantId", &self._variant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -26158,7 +26158,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_get("packageName", -23, 62)
+/// let result = hub.systemapks().variants_get("packageName", -82, 18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26205,9 +26205,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("versionCode", self._version_code.to_string());
-        params.push("variantId", self._variant_id.to_string());
+        params.push("packageName", &self._package_name);
+        params.push("versionCode", &self._version_code.to_string());
+        params.push("variantId", &self._variant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -26444,7 +26444,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_list("packageName", -7)
+/// let result = hub.systemapks().variants_list("packageName", -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26490,8 +26490,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("packageName", self._package_name);
-        params.push("versionCode", self._version_code.to_string());
+        params.push("packageName", &self._package_name);
+        params.push("versionCode", &self._version_code.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -26770,7 +26770,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -27055,7 +27055,7 @@ where
         }
 
         let mut params = Params::with_capacity(2 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -27262,8 +27262,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().list("parent")
-///              .page_token("At")
-///              .page_size(-81)
+///              .page_token("tempor")
+///              .page_size(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27310,7 +27310,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -27601,7 +27601,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }

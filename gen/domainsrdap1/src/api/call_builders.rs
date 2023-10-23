@@ -69,7 +69,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("autnumId", self._autnum_id);
+        params.push("autnumId", &self._autnum_id);
 
         params.extend(self._additional_params.iter());
 
@@ -285,7 +285,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("domainName", self._domain_name);
+        params.push("domainName", &self._domain_name);
 
         params.extend(self._additional_params.iter());
 
@@ -502,7 +502,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("entityId", self._entity_id);
+        params.push("entityId", &self._entity_id);
 
         params.extend(self._additional_params.iter());
 
@@ -719,8 +719,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("ipId", self._ip_id);
-        params.push("ipId1", self._ip_id1);
+        params.push("ipId", &self._ip_id);
+        params.push("ipId1", &self._ip_id1);
 
         params.extend(self._additional_params.iter());
 
@@ -945,7 +945,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("nameserverId", self._nameserver_id);
+        params.push("nameserverId", &self._nameserver_id);
 
         params.extend(self._additional_params.iter());
 

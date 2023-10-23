@@ -32,13 +32,13 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pagespeedapi().runpagespeed("url")
-///              .utm_source("ut")
-///              .utm_campaign("gubergren")
-///              .strategy("rebum.")
+///              .utm_source("amet")
+///              .utm_campaign("duo")
+///              .strategy(&Default::default())
 ///              .snapshots(true)
-///              .screenshot(true)
-///              .add_rule("ipsum")
-///              .locale("est")
+///              .screenshot(false)
+///              .add_rule("ut")
+///              .locale("gubergren")
 ///              .filter_third_party_resources(true)
 ///              .doit().await;
 /// 

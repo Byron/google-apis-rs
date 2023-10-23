@@ -67,7 +67,7 @@ pub struct GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest {
     pub output_uri: Option<String>,
     /// Requested video annotation features.
     
-    pub features: Option<Vec<String>>,
+    pub features: Option<Vec<GoogleCloudVideointelligenceV1beta1AnnotateVideoRequestFeaturesEnum>>,
     /// Additional video context and/or feature-specific parameters.
     #[serde(rename="videoContext")]
     
@@ -155,7 +155,7 @@ pub struct GoogleCloudVideointelligenceV1beta1_VideoContext {
     /// defaults to `SHOT_MODE`.
     #[serde(rename="labelDetectionMode")]
     
-    pub label_detection_mode: Option<String>,
+    pub label_detection_mode: Option<GoogleCloudVideointelligenceV1beta1VideoContextLabelDetectionModeEnum>,
     /// Whether the video has been shot from a stationary (i.e. non-moving) camera.
     /// When set to true, might improve detection accuracy for moving objects.
     #[serde(rename="stationaryCamera")]

@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -362,7 +362,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -628,7 +628,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -917,7 +917,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1202,7 +1202,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1468,7 +1468,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1708,7 +1708,7 @@ where
 /// let result = hub.projects().locations_transfer_configs_runs_transfer_logs_list("parent")
 ///              .page_token("ipsum")
 ///              .page_size(-93)
-///              .add_message_types("ut")
+///              .add_message_types(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1719,7 +1719,7 @@ pub struct ProjectLocationTransferConfigRunTransferLogListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _message_types: Vec<String>,
+   pub(super) _message_types: Option<ProjectMessageTypesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1756,7 +1756,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1900,8 +1900,8 @@ where
     ///
     /// Append the given value to the *message types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_message_types(mut self, new_value: &str) -> ProjectLocationTransferConfigRunTransferLogListCall<'a, S> {
-        self._message_types.push(new_value.to_string());
+    pub fn add_message_types(mut self, new_value: &ProjectMessageTypesEnum) -> ProjectLocationTransferConfigRunTransferLogListCall<'a, S> {
+        self._message_types.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2051,7 +2051,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2313,7 +2313,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2531,10 +2531,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_runs_list("parent")
-///              .add_states("ipsum")
-///              .run_attempt("ipsum")
+///              .add_states(&Default::default())
+///              .run_attempt(&Default::default())
 ///              .page_token("est")
-///              .page_size(-62)
+///              .page_size(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2543,8 +2543,8 @@ pub struct ProjectLocationTransferConfigRunListCall<'a, S>
 
    pub(super) hub: &'a BigQueryDataTransfer<S>,
    pub(super) _parent: String,
-   pub(super) _states: Vec<String>,
-   pub(super) _run_attempt: Option<String>,
+   pub(super) _states: Option<ProjectStatesEnum>,
+   pub(super) _run_attempt: Option<ProjectRunAttemptEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2583,7 +2583,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if self._states.len() > 0 {
             for f in self._states.iter() {
                 params.push("states", f);
@@ -2716,15 +2716,15 @@ where
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_states(mut self, new_value: &str) -> ProjectLocationTransferConfigRunListCall<'a, S> {
-        self._states.push(new_value.to_string());
+    pub fn add_states(mut self, new_value: &ProjectStatesEnum) -> ProjectLocationTransferConfigRunListCall<'a, S> {
+        self._states.push(new_value.clone());
         self
     }
     /// Indicates how run attempts are to be pulled.
     ///
     /// Sets the *run attempt* query property to the given value.
-    pub fn run_attempt(mut self, new_value: &str) -> ProjectLocationTransferConfigRunListCall<'a, S> {
-        self._run_attempt = Some(new_value.to_string());
+    pub fn run_attempt(mut self, new_value: &ProjectRunAttemptEnum) -> ProjectLocationTransferConfigRunListCall<'a, S> {
+        self._run_attempt = Some(new_value.clone());
         self
     }
     /// Pagination token, which can be used to request a specific page of `ListTransferRunsRequest` list results. For multiple-page results, `ListTransferRunsResponse` outputs a `next_page` token, which can be used as the `page_token` value to request the next page of list results.
@@ -2850,9 +2850,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_create(req, "parent")
-///              .version_info("dolor")
-///              .service_account_name("Lorem")
-///              .authorization_code("eos")
+///              .version_info("est")
+///              .service_account_name("gubergren")
+///              .authorization_code("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2901,7 +2901,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_info.as_ref() {
             params.push("versionInfo", value);
         }
@@ -3216,7 +3216,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3478,7 +3478,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3696,9 +3696,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
-///              .add_data_source_ids("Stet")
+///              .page_token("labore")
+///              .page_size(-43)
+///              .add_data_source_ids("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3746,7 +3746,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4003,10 +4003,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_patch(req, "name")
-///              .version_info("et")
+///              .version_info("no")
 ///              .update_mask(&Default::default())
-///              .service_account_name("sed")
-///              .authorization_code("et")
+///              .service_account_name("Stet")
+///              .authorization_code("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4056,7 +4056,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._version_info.as_ref() {
             params.push("versionInfo", value);
         }
@@ -4388,7 +4388,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4680,7 +4680,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4972,7 +4972,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5257,7 +5257,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5475,9 +5475,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("dolore")
-///              .page_size(-22)
-///              .filter("voluptua.")
+///              .page_token("erat")
+///              .page_size(-93)
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5525,7 +5525,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5773,9 +5773,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_runs_transfer_logs_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-92)
-///              .add_message_types("dolor")
+///              .page_token("et")
+///              .page_size(-28)
+///              .add_message_types(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -5786,7 +5786,7 @@ pub struct ProjectTransferConfigRunTransferLogListCall<'a, S>
    pub(super) _parent: String,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _message_types: Vec<String>,
+   pub(super) _message_types: Option<ProjectMessageTypesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -5823,7 +5823,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5967,8 +5967,8 @@ where
     ///
     /// Append the given value to the *message types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_message_types(mut self, new_value: &str) -> ProjectTransferConfigRunTransferLogListCall<'a, S> {
-        self._message_types.push(new_value.to_string());
+    pub fn add_message_types(mut self, new_value: &ProjectMessageTypesEnum) -> ProjectTransferConfigRunTransferLogListCall<'a, S> {
+        self._message_types.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6118,7 +6118,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6380,7 +6380,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6598,10 +6598,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_runs_list("parent")
-///              .add_states("Stet")
-///              .run_attempt("dolor")
-///              .page_token("duo")
-///              .page_size(-76)
+///              .add_states(&Default::default())
+///              .run_attempt(&Default::default())
+///              .page_token("dolor")
+///              .page_size(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6610,8 +6610,8 @@ pub struct ProjectTransferConfigRunListCall<'a, S>
 
    pub(super) hub: &'a BigQueryDataTransfer<S>,
    pub(super) _parent: String,
-   pub(super) _states: Vec<String>,
-   pub(super) _run_attempt: Option<String>,
+   pub(super) _states: Option<ProjectStatesEnum>,
+   pub(super) _run_attempt: Option<ProjectRunAttemptEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6650,7 +6650,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if self._states.len() > 0 {
             for f in self._states.iter() {
                 params.push("states", f);
@@ -6783,15 +6783,15 @@ where
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_states(mut self, new_value: &str) -> ProjectTransferConfigRunListCall<'a, S> {
-        self._states.push(new_value.to_string());
+    pub fn add_states(mut self, new_value: &ProjectStatesEnum) -> ProjectTransferConfigRunListCall<'a, S> {
+        self._states.push(new_value.clone());
         self
     }
     /// Indicates how run attempts are to be pulled.
     ///
     /// Sets the *run attempt* query property to the given value.
-    pub fn run_attempt(mut self, new_value: &str) -> ProjectTransferConfigRunListCall<'a, S> {
-        self._run_attempt = Some(new_value.to_string());
+    pub fn run_attempt(mut self, new_value: &ProjectRunAttemptEnum) -> ProjectTransferConfigRunListCall<'a, S> {
+        self._run_attempt = Some(new_value.clone());
         self
     }
     /// Pagination token, which can be used to request a specific page of `ListTransferRunsRequest` list results. For multiple-page results, `ListTransferRunsResponse` outputs a `next_page` token, which can be used as the `page_token` value to request the next page of list results.
@@ -6917,9 +6917,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_create(req, "parent")
-///              .version_info("invidunt")
+///              .version_info("sadipscing")
 ///              .service_account_name("Stet")
-///              .authorization_code("vero")
+///              .authorization_code("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6968,7 +6968,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._version_info.as_ref() {
             params.push("versionInfo", value);
         }
@@ -7283,7 +7283,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7545,7 +7545,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7763,9 +7763,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_list("parent")
-///              .page_token("no")
-///              .page_size(-100)
-///              .add_data_source_ids("accusam")
+///              .page_token("invidunt")
+///              .page_size(-65)
+///              .add_data_source_ids("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7813,7 +7813,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8070,10 +8070,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_patch(req, "name")
-///              .version_info("consetetur")
+///              .version_info("Lorem")
 ///              .update_mask(&Default::default())
-///              .service_account_name("voluptua.")
-///              .authorization_code("et")
+///              .service_account_name("diam")
+///              .authorization_code("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8123,7 +8123,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._version_info.as_ref() {
             params.push("versionInfo", value);
         }
@@ -8455,7 +8455,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -8747,7 +8747,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -9039,7 +9039,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 

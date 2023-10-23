@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -363,8 +363,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("exportId", self._export_id);
+        params.push("matterId", &self._matter_id);
+        params.push("exportId", &self._export_id);
 
         params.extend(self._additional_params.iter());
 
@@ -637,8 +637,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("exportId", self._export_id);
+        params.push("matterId", &self._matter_id);
+        params.push("exportId", &self._export_id);
 
         params.extend(self._additional_params.iter());
 
@@ -866,8 +866,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().exports_list("matterId")
-///              .page_token("ea")
-///              .page_size(-55)
+///              .page_token("gubergren")
+///              .page_size(-75)
 ///              .doit().await;
 /// # }
 /// ```
@@ -914,7 +914,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1204,8 +1204,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1502,9 +1502,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
-        params.push("accountId", self._account_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1787,8 +1787,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2068,8 +2068,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2371,7 +2371,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2657,8 +2657,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2886,7 +2886,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().holds_get("matterId", "holdId")
-///              .view("dolor")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2896,7 +2896,7 @@ pub struct MatterHoldGetCall<'a, S>
    pub(super) hub: &'a Vault<S>,
    pub(super) _matter_id: String,
    pub(super) _hold_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<MatterViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2933,8 +2933,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3065,8 +3065,8 @@ where
     /// The amount of detail to return for a hold.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterHoldGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &MatterViewEnum) -> MatterHoldGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3172,9 +3172,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().holds_list("matterId")
-///              .view("eos")
-///              .page_token("labore")
-///              .page_size(-43)
+///              .view(&Default::default())
+///              .page_token("gubergren")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3183,7 +3183,7 @@ pub struct MatterHoldListCall<'a, S>
 
    pub(super) hub: &'a Vault<S>,
    pub(super) _matter_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<MatterViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3222,7 +3222,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -3349,8 +3349,8 @@ where
     /// The amount of detail to return for a hold.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterHoldListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &MatterViewEnum) -> MatterHoldListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The pagination token as returned in the response. An empty token means start from the beginning.
@@ -3522,8 +3522,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3826,8 +3826,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("holdId", self._hold_id);
+        params.push("matterId", &self._matter_id);
+        params.push("holdId", &self._hold_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4129,7 +4129,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4415,8 +4415,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("savedQueryId", self._saved_query_id);
+        params.push("matterId", &self._matter_id);
+        params.push("savedQueryId", &self._saved_query_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4689,8 +4689,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
-        params.push("savedQueryId", self._saved_query_id);
+        params.push("matterId", &self._matter_id);
+        params.push("savedQueryId", &self._saved_query_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4918,8 +4918,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().saved_queries_list("matterId")
-///              .page_token("erat")
-///              .page_size(-93)
+///              .page_token("et")
+///              .page_size(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4966,7 +4966,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5255,7 +5255,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5547,7 +5547,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5839,7 +5839,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6397,7 +6397,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6615,7 +6615,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().get("matterId")
-///              .view("consetetur")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -6624,7 +6624,7 @@ pub struct MatterGetCall<'a, S>
 
    pub(super) hub: &'a Vault<S>,
    pub(super) _matter_id: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<MatterViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -6661,7 +6661,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -6782,8 +6782,8 @@ where
     /// Specifies how much information about the matter to return in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &MatterViewEnum) -> MatterGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6889,10 +6889,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().list()
-///              .view("diam")
-///              .state("dolor")
-///              .page_token("et")
-///              .page_size(-22)
+///              .view(&Default::default())
+///              .state(&Default::default())
+///              .page_token("duo")
+///              .page_size(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6900,8 +6900,8 @@ pub struct MatterListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Vault<S>,
-   pub(super) _view: Option<String>,
-   pub(super) _state: Option<String>,
+   pub(super) _view: Option<MatterViewEnum>,
+   pub(super) _state: Option<MatterStateEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7052,15 +7052,15 @@ where
     /// Specifies how much information about the matter to return in response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &MatterViewEnum) -> MatterListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// If set, lists only matters with the specified state. The default lists matters of all states.
     ///
     /// Sets the *state* query property to the given value.
-    pub fn state(mut self, new_value: &str) -> MatterListCall<'a, S> {
-        self._state = Some(new_value.to_string());
+    pub fn state(mut self, new_value: &MatterStateEnum) -> MatterListCall<'a, S> {
+        self._state = Some(new_value.clone());
         self
     }
     /// The pagination token as returned in the response.
@@ -7231,7 +7231,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7523,7 +7523,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7815,7 +7815,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8107,7 +8107,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("matterId", self._matter_id);
+        params.push("matterId", &self._matter_id);
 
         params.extend(self._additional_params.iter());
 
@@ -8398,7 +8398,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8638,7 +8638,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8856,7 +8856,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9074,9 +9074,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list("name")
-///              .page_token("vero")
-///              .page_size(-44)
-///              .filter("Lorem")
+///              .page_token("sadipscing")
+///              .page_size(-15)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9123,7 +9123,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

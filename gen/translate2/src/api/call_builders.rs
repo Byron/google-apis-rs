@@ -836,8 +836,8 @@ where
 /// let result = hub.translations().list(&vec!["ipsum".into()], "target")
 ///              .source("At")
 ///              .model("sanctus")
-///              .format("sed")
-///              .add_cid("amet.")
+///              .format(&Default::default())
+///              .add_cid("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -849,7 +849,7 @@ pub struct TranslationListCall<'a, S>
    pub(super) _target: String,
    pub(super) _source: Option<String>,
    pub(super) _model: Option<String>,
-   pub(super) _format: Option<String>,
+   pub(super) _format: Option<TranslationFormatEnum>,
    pub(super) _cid: Vec<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -892,7 +892,7 @@ where
                 params.push("q", f);
             }
         }
-        params.push("target", self._target);
+        params.push("target", &self._target);
         if let Some(value) = self._source.as_ref() {
             params.push("source", value);
         }
@@ -1049,8 +1049,8 @@ where
     /// value of "html" indicates HTML and a value of "text" indicates plain-text.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> TranslationListCall<'a, S> {
-        self._format = Some(new_value.to_string());
+    pub fn format(mut self, new_value: &TranslationFormatEnum) -> TranslationListCall<'a, S> {
+        self._format = Some(new_value.clone());
         self
     }
     /// The customization id for translate

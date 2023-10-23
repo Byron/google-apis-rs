@@ -1461,10 +1461,10 @@ impl<'a, S> VolumeMethods<'a, S> {
     ///
     /// * `rating` - Rating to be given to the volume.
     /// * `volumeId` - ID of the source volume.
-    pub fn recommended_rate(&self, rating: &str, volume_id: &str) -> VolumeRecommendedRateCall<'a, S> {
+    pub fn recommended_rate(&self, rating: &VolumeRatingEnum, volume_id: &str) -> VolumeRecommendedRateCall<'a, S> {
         VolumeRecommendedRateCall {
             hub: self.hub,
-            _rating: rating.to_string(),
+            _rating: rating.clone(),
             _volume_id: volume_id.to_string(),
             _source: Default::default(),
             _locale: Default::default(),

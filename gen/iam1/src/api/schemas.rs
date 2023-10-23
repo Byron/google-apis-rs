@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -128,11 +128,11 @@ pub struct CreateServiceAccountKeyRequest {
     /// Which type of key and algorithm to use for the key. The default is currently a 2K RSA key. However this may change in the future.
     #[serde(rename="keyAlgorithm")]
     
-    pub key_algorithm: Option<String>,
+    pub key_algorithm: Option<CreateServiceAccountKeyRequestKeyAlgorithmEnum>,
     /// The output format of the private key. The default value is `TYPE_GOOGLE_CREDENTIALS_FILE`, which is the Google Credentials File format.
     #[serde(rename="privateKeyType")]
     
-    pub private_key_type: Option<String>,
+    pub private_key_type: Option<CreateServiceAccountKeyRequestPrivateKeyTypeEnum>,
 }
 
 impl client::RequestValue for CreateServiceAccountKeyRequest {}
@@ -326,14 +326,14 @@ pub struct LintResult {
     pub field_name: Option<String>,
     /// The validation unit level.
     
-    pub level: Option<String>,
+    pub level: Option<LintResultLevelEnum>,
     /// 0-based character position of problematic construct within the object identified by `field_name`. Currently, this is populated only for condition expression.
     #[serde(rename="locationOffset")]
     
     pub location_offset: Option<i32>,
     /// The validation unit severity.
     
-    pub severity: Option<String>,
+    pub severity: Option<LintResultSeverityEnum>,
     /// The validation unit name, for instance "lintValidationUnits/ConditionComplexityCheck".
     #[serde(rename="validationUnitName")]
     
@@ -565,7 +565,7 @@ pub struct Permission {
     /// The current custom role support level.
     #[serde(rename="customRolesSupportLevel")]
     
-    pub custom_roles_support_level: Option<String>,
+    pub custom_roles_support_level: Option<PermissionCustomRolesSupportLevelEnum>,
     /// A brief description of what this Permission is used for. This permission can ONLY be used in predefined roles.
     
     pub description: Option<String>,
@@ -582,7 +582,7 @@ pub struct Permission {
     pub primary_permission: Option<String>,
     /// The current launch stage of the permission.
     
-    pub stage: Option<String>,
+    pub stage: Option<PermissionStageEnum>,
     /// The title of this Permission.
     
     pub title: Option<String>,
@@ -686,7 +686,7 @@ pub struct QueryGrantableRolesRequest {
     pub page_token: Option<String>,
     /// no description provided
     
-    pub view: Option<String>,
+    pub view: Option<QueryGrantableRolesRequestViewEnum>,
 }
 
 impl client::RequestValue for QueryGrantableRolesRequest {}
@@ -808,7 +808,7 @@ pub struct Role {
     pub name: Option<String>,
     /// The current launch stage of the role. If the `ALPHA` launch stage has been selected for a role, the `stage` field will not be included in the returned definition for the role.
     
-    pub stage: Option<String>,
+    pub stage: Option<RoleStageEnum>,
     /// Optional. A human-readable title for the role. Typically this is limited to 100 UTF-8 bytes.
     
     pub title: Option<String>,
@@ -906,15 +906,15 @@ pub struct ServiceAccountKey {
     /// Specifies the algorithm (and possibly key size) for the key.
     #[serde(rename="keyAlgorithm")]
     
-    pub key_algorithm: Option<String>,
+    pub key_algorithm: Option<ServiceAccountKeyKeyAlgorithmEnum>,
     /// The key origin.
     #[serde(rename="keyOrigin")]
     
-    pub key_origin: Option<String>,
+    pub key_origin: Option<ServiceAccountKeyKeyOriginEnum>,
     /// The key type.
     #[serde(rename="keyType")]
     
-    pub key_type: Option<String>,
+    pub key_type: Option<ServiceAccountKeyKeyTypeEnum>,
     /// The resource name of the service account key in the following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     
     pub name: Option<String>,
@@ -926,7 +926,7 @@ pub struct ServiceAccountKey {
     /// The output format for the private key. Only provided in `CreateServiceAccountKey` responses, not in `GetServiceAccountKey` or `ListServiceAccountKey` responses. Google never exposes system-managed private keys, and never retains user-managed private keys.
     #[serde(rename="privateKeyType")]
     
-    pub private_key_type: Option<String>,
+    pub private_key_type: Option<ServiceAccountKeyPrivateKeyTypeEnum>,
     /// The public key data. Only provided in `GetServiceAccountKey` responses.
     #[serde(rename="publicKeyData")]
     
@@ -1250,7 +1250,7 @@ pub struct WorkloadIdentityPool {
     pub name: Option<String>,
     /// Output only. The state of the pool.
     
-    pub state: Option<String>,
+    pub state: Option<WorkloadIdentityPoolStateEnum>,
 }
 
 impl client::RequestValue for WorkloadIdentityPool {}
@@ -1302,7 +1302,7 @@ pub struct WorkloadIdentityPoolProvider {
     pub saml: Option<Saml>,
     /// Output only. The state of the provider.
     
-    pub state: Option<String>,
+    pub state: Option<WorkloadIdentityPoolProviderStateEnum>,
 }
 
 impl client::RequestValue for WorkloadIdentityPoolProvider {}

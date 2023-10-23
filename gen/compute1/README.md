@@ -644,8 +644,8 @@ let mut req = Instance::default();
 // Values shown here are possibly random and not representative !
 let result = hub.instances().update(req, "project", "zone", "instance")
              .request_id("ipsum")
-             .most_disruptive_allowed_action("voluptua.")
-             .minimal_action("At")
+             .most_disruptive_allowed_action(&Default::default())
+             .minimal_action(&Default::default())
              .doit().await;
 
 match result {

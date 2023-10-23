@@ -26,7 +26,7 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.hashes().search()
-///              .add_threat_types("ipsum")
+///              .add_threat_types(&Default::default())
 ///              .hash_prefix(vec![0, 1, 2, 3])
 ///              .doit().await;
 /// # }
@@ -35,7 +35,7 @@ pub struct HashSearchCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a WebRisk<S>,
-   pub(super) _threat_types: Vec<String>,
+   pub(super) _threat_types: Option<HashThreatTypesEnum>,
    pub(super) _hash_prefix: Option<Vec<u8>>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -182,8 +182,8 @@ where
     ///
     /// Append the given value to the *threat types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_threat_types(mut self, new_value: &str) -> HashSearchCall<'a, S> {
-        self._threat_types.push(new_value.to_string());
+    pub fn add_threat_types(mut self, new_value: &HashThreatTypesEnum) -> HashSearchCall<'a, S> {
+        self._threat_types.push(new_value.clone());
         self
     }
     /// A hash prefix, consisting of the most significant 4-32 bytes of a SHA256 hash. For JSON requests, this field is base64-encoded. Note that if this parameter is provided by a URI, it must be encoded using the web safe base64 variant (RFC 4648).
@@ -346,7 +346,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -586,7 +586,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -804,7 +804,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1022,9 +1022,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("amet.")
-///              .page_size(-59)
-///              .filter("amet.")
+///              .page_token("sed")
+///              .page_size(-2)
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1071,7 +1071,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1326,7 +1326,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1618,7 +1618,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -1860,10 +1860,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.threat_lists().compute_diff()
 ///              .version_token(vec![0, 1, 2, 3])
-///              .threat_type("gubergren")
-///              .add_constraints_supported_compressions("Lorem")
-///              .constraints_max_diff_entries(-12)
-///              .constraints_max_database_entries(-75)
+///              .threat_type(&Default::default())
+///              .add_constraints_supported_compressions(&Default::default())
+///              .constraints_max_diff_entries(-55)
+///              .constraints_max_database_entries(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1872,8 +1872,8 @@ pub struct ThreatListComputeDiffCall<'a, S>
 
    pub(super) hub: &'a WebRisk<S>,
    pub(super) _version_token: Option<Vec<u8>>,
-   pub(super) _threat_type: Option<String>,
-   pub(super) _constraints_supported_compressions: Vec<String>,
+   pub(super) _threat_type: Option<ThreatListThreatTypeEnum>,
+   pub(super) _constraints_supported_compressions: Option<ThreatListConstraintsSupportedCompressionsEnum>,
    pub(super) _constraints_max_diff_entries: Option<i32>,
    pub(super) _constraints_max_database_entries: Option<i32>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2036,16 +2036,16 @@ where
     /// Required. The threat list to update. Only a single ThreatType should be specified per request. If you want to handle multiple ThreatTypes, you must make one request per ThreatType.
     ///
     /// Sets the *threat type* query property to the given value.
-    pub fn threat_type(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, S> {
-        self._threat_type = Some(new_value.to_string());
+    pub fn threat_type(mut self, new_value: &ThreatListThreatTypeEnum) -> ThreatListComputeDiffCall<'a, S> {
+        self._threat_type = Some(new_value.clone());
         self
     }
     /// The compression types supported by the client.
     ///
     /// Append the given value to the *constraints.supported compressions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_constraints_supported_compressions(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, S> {
-        self._constraints_supported_compressions.push(new_value.to_string());
+    pub fn add_constraints_supported_compressions(mut self, new_value: &ThreatListConstraintsSupportedCompressionsEnum) -> ThreatListComputeDiffCall<'a, S> {
+        self._constraints_supported_compressions.push(new_value.clone());
         self
     }
     /// The maximum size in number of entries. The diff will not contain more entries than this value. This should be a power of 2 between 2**10 and 2**20. If zero, no diff size limit is set.
@@ -2165,8 +2165,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.uris().search()
-///              .uri("dolor")
-///              .add_threat_types("ea")
+///              .uri("Lorem")
+///              .add_threat_types(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -2175,7 +2175,7 @@ pub struct UriSearchCall<'a, S>
 
    pub(super) hub: &'a WebRisk<S>,
    pub(super) _uri: Option<String>,
-   pub(super) _threat_types: Vec<String>,
+   pub(super) _threat_types: Option<UriThreatTypesEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -2328,8 +2328,8 @@ where
     ///
     /// Append the given value to the *threat types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_threat_types(mut self, new_value: &str) -> UriSearchCall<'a, S> {
-        self._threat_types.push(new_value.to_string());
+    pub fn add_threat_types(mut self, new_value: &UriThreatTypesEnum) -> UriSearchCall<'a, S> {
+        self._threat_types.push(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

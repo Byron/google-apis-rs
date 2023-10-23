@@ -268,8 +268,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().claimwebsite(64, 89)
-///              .overwrite(true)
+/// let result = hub.accounts().claimwebsite(81, 51)
+///              .overwrite(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -316,8 +316,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._overwrite.as_ref() {
             params.push("overwrite", value.to_string());
         }
@@ -839,7 +839,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().delete(51, 94)
+/// let result = hub.accounts().delete(51, 51)
 ///              .force(true)
 ///              .dry_run(false)
 ///              .doit().await;
@@ -889,8 +889,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._force.as_ref() {
             params.push("force", value.to_string());
         }
@@ -1172,8 +1172,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1454,7 +1454,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -1757,8 +1757,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2057,7 +2057,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2349,8 +2349,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -2931,8 +2931,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if self._destinations.len() > 0 {
             for f in self._destinations.iter() {
                 params.push("destinations", f);
@@ -3223,7 +3223,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3804,8 +3804,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4081,7 +4081,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4373,8 +4373,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -4967,8 +4967,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("datafeedId", self._datafeed_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("datafeedId", &self._datafeed_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -5242,8 +5242,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("datafeedId", self._datafeed_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("datafeedId", &self._datafeed_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -5526,8 +5526,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("datafeedId", self._datafeed_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("datafeedId", &self._datafeed_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -5808,7 +5808,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -6107,7 +6107,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6399,8 +6399,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("datafeedId", self._datafeed_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("datafeedId", &self._datafeed_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -6983,8 +6983,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("datafeedId", self._datafeed_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("datafeedId", &self._datafeed_id.to_string());
         if let Some(value) = self._language.as_ref() {
             params.push("language", value);
         }
@@ -7280,7 +7280,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -7858,9 +7858,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("storeCode", self._store_code);
-        params.push("productId", self._product_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("storeCode", &self._store_code);
+        params.push("productId", &self._product_id);
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -8461,8 +8461,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -8735,8 +8735,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -9012,7 +9012,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9539,9 +9539,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
-        params.push("gmbEmail", self._gmb_email);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("gmbEmail", &self._gmb_email);
 
         params.extend(self._additional_params.iter());
 
@@ -9825,9 +9825,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
-        params.push("country", self._country);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("country", &self._country);
 
         params.extend(self._additional_params.iter());
 
@@ -10114,12 +10114,12 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
-        params.push("country", self._country);
-        params.push("language", self._language);
-        params.push("contactName", self._contact_name);
-        params.push("contactEmail", self._contact_email);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("country", &self._country);
+        params.push("language", &self._language);
+        params.push("contactName", &self._contact_name);
+        params.push("contactEmail", &self._contact_email);
 
         params.extend(self._additional_params.iter());
 
@@ -10437,9 +10437,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
-        params.push("country", self._country);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("country", &self._country);
         if let Some(value) = self._pos_external_account_id.as_ref() {
             params.push("posExternalAccountId", value);
         }
@@ -10751,8 +10751,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -11065,8 +11065,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11369,8 +11369,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -11673,7 +11673,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -11984,8 +11984,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("disbursementId", self._disbursement_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("disbursementId", &self._disbursement_id);
         if let Some(value) = self._transaction_start_date.as_ref() {
             params.push("transactionStartDate", value);
         }
@@ -12298,8 +12298,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("returnId", self._return_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("returnId", &self._return_id);
 
         params.extend(self._additional_params.iter());
 
@@ -12528,10 +12528,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.orderreturns().list(84)
 ///              .page_token("Stet")
-///              .order_by("dolores")
-///              .max_results(76)
-///              .created_start_date("et")
-///              .created_end_date("sea")
+///              .order_by(&Default::default())
+///              .max_results(82)
+///              .created_start_date("eos")
+///              .created_end_date("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12541,7 +12541,7 @@ pub struct OrderreturnListCall<'a, S>
    pub(super) hub: &'a ShoppingContent<S>,
    pub(super) _merchant_id: u64,
    pub(super) _page_token: Option<String>,
-   pub(super) _order_by: Option<String>,
+   pub(super) _order_by: Option<OrderreturnOrderByEnum>,
    pub(super) _max_results: Option<u32>,
    pub(super) _created_start_date: Option<String>,
    pub(super) _created_end_date: Option<String>,
@@ -12581,7 +12581,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -12721,8 +12721,8 @@ where
     /// Return the results in the specified order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
-        self._order_by = Some(new_value.to_string());
+    pub fn order_by(mut self, new_value: &OrderreturnOrderByEnum) -> OrderreturnListCall<'a, S> {
+        self._order_by = Some(new_value.clone());
         self
     }
     /// The maximum number of order returns to return in the response, used for paging. The default value is 25 returns per page, and the maximum allowed value is 250 returns per page.
@@ -12854,7 +12854,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().acknowledge(req, 27, "orderId")
+/// let result = hub.orders().acknowledge(req, 91, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12901,8 +12901,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13152,7 +13152,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().advancetestorder(17, "orderId")
+/// let result = hub.orders().advancetestorder(24, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13198,8 +13198,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13432,7 +13432,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().cancel(req, 50, "orderId")
+/// let result = hub.orders().cancel(req, 61, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13479,8 +13479,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -13736,7 +13736,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().cancellineitem(req, 54, "orderId")
+/// let result = hub.orders().cancellineitem(req, 78, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13783,8 +13783,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14040,7 +14040,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().canceltestorderbycustomer(req, 32, "orderId")
+/// let result = hub.orders().canceltestorderbycustomer(req, 70, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14087,8 +14087,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -14344,7 +14344,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().createtestorder(req, 28)
+/// let result = hub.orders().createtestorder(req, 20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14390,7 +14390,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -14636,7 +14636,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().createtestreturn(req, 91, "orderId")
+/// let result = hub.orders().createtestreturn(req, 28, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14683,8 +14683,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15207,7 +15207,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().get(50, "orderId")
+/// let result = hub.orders().get(42, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15253,8 +15253,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15481,7 +15481,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().getbymerchantorderid(24, "merchantOrderId")
+/// let result = hub.orders().getbymerchantorderid(79, "merchantOrderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15527,8 +15527,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("merchantOrderId", self._merchant_order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("merchantOrderId", &self._merchant_order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -15755,8 +15755,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().gettestordertemplate(79, "templateName")
-///              .country("erat")
+/// let result = hub.orders().gettestordertemplate(97, &Default::default())
+///              .country("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15765,7 +15765,7 @@ pub struct OrderGettestordertemplateCall<'a, S>
 
    pub(super) hub: &'a ShoppingContent<S>,
    pub(super) _merchant_id: u64,
-   pub(super) _template_name: String,
+   pub(super) _template_name: OrderTemplateNameEnum,
    pub(super) _country: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -15803,8 +15803,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("templateName", self._template_name);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("templateName", &self._template_name);
         if let Some(value) = self._country.as_ref() {
             params.push("country", value);
         }
@@ -15928,8 +15928,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
-        self._template_name = new_value.to_string();
+    pub fn template_name(mut self, new_value: &OrderTemplateNameEnum) -> OrderGettestordertemplateCall<'a, S> {
+        self._template_name = new_value.clone();
         self
     }
     /// The country of the template to retrieve. Defaults to `US`.
@@ -16047,7 +16047,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().instorerefundlineitem(req, 91, "orderId")
+/// let result = hub.orders().instorerefundlineitem(req, 53, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16094,8 +16094,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -16345,13 +16345,13 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().list(79)
-///              .add_statuses("gubergren")
-///              .placed_date_start("justo")
-///              .placed_date_end("sea")
-///              .page_token("consetetur")
-///              .order_by("sit")
-///              .max_results(69)
+/// let result = hub.orders().list(91)
+///              .add_statuses(&Default::default())
+///              .placed_date_start("nonumy")
+///              .placed_date_end("et")
+///              .page_token("gubergren")
+///              .order_by("justo")
+///              .max_results(41)
 ///              .acknowledged(false)
 ///              .doit().await;
 /// # }
@@ -16361,7 +16361,7 @@ pub struct OrderListCall<'a, S>
 
    pub(super) hub: &'a ShoppingContent<S>,
    pub(super) _merchant_id: u64,
-   pub(super) _statuses: Vec<String>,
+   pub(super) _statuses: Option<OrderStatusesEnum>,
    pub(super) _placed_date_start: Option<String>,
    pub(super) _placed_date_end: Option<String>,
    pub(super) _page_token: Option<String>,
@@ -16404,7 +16404,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if self._statuses.len() > 0 {
             for f in self._statuses.iter() {
                 params.push("statuses", f);
@@ -16546,8 +16546,8 @@ where
     ///
     /// Append the given value to the *statuses* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a, S> {
-        self._statuses.push(new_value.to_string());
+    pub fn add_statuses(mut self, new_value: &OrderStatusesEnum) -> OrderListCall<'a, S> {
+        self._statuses.push(new_value.clone());
         self
     }
     /// Obtains orders placed after this date (inclusively), in ISO 8601 format.
@@ -16700,7 +16700,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().refund(req, 82, "orderId")
+/// let result = hub.orders().refund(req, 3, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16747,8 +16747,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17004,7 +17004,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().rejectreturnlineitem(req, 39, "orderId")
+/// let result = hub.orders().rejectreturnlineitem(req, 76, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17051,8 +17051,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17308,7 +17308,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().returnlineitem(req, 69, "orderId")
+/// let result = hub.orders().returnlineitem(req, 82, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17355,8 +17355,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17612,7 +17612,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().returnrefundlineitem(req, 99, "orderId")
+/// let result = hub.orders().returnrefundlineitem(req, 39, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17659,8 +17659,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17916,7 +17916,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().setlineitemmetadata(req, 45, "orderId")
+/// let result = hub.orders().setlineitemmetadata(req, 69, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17963,8 +17963,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18220,7 +18220,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().shiplineitems(req, 39, "orderId")
+/// let result = hub.orders().shiplineitems(req, 99, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18267,8 +18267,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18524,7 +18524,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().updatelineitemshippingdetails(req, 74, "orderId")
+/// let result = hub.orders().updatelineitemshippingdetails(req, 45, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18571,8 +18571,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -18828,7 +18828,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().updatemerchantorderid(req, 81, "orderId")
+/// let result = hub.orders().updatemerchantorderid(req, 39, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18875,8 +18875,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19132,7 +19132,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().updateshipment(req, 18, "orderId")
+/// let result = hub.orders().updateshipment(req, 74, "orderId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19179,8 +19179,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("orderId", self._order_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("orderId", &self._order_id);
 
         params.extend(self._additional_params.iter());
 
@@ -19715,8 +19715,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().delete(97, 95, "storeCode")
-///              .dry_run(true)
+/// let result = hub.pos().delete(18, 79, "storeCode")
+///              .dry_run(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19764,9 +19764,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("targetMerchantId", self._target_merchant_id.to_string());
-        params.push("storeCode", self._store_code);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("targetMerchantId", &self._target_merchant_id.to_string());
+        params.push("storeCode", &self._store_code);
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -20002,7 +20002,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().get(90, 10, "storeCode")
+/// let result = hub.pos().get(49, 90, "storeCode")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20049,9 +20049,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("targetMerchantId", self._target_merchant_id.to_string());
-        params.push("storeCode", self._store_code);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("targetMerchantId", &self._target_merchant_id.to_string());
+        params.push("storeCode", &self._store_code);
 
         params.extend(self._additional_params.iter());
 
@@ -20294,8 +20294,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().insert(req, 88, 0)
-///              .dry_run(true)
+/// let result = hub.pos().insert(req, 58, 88)
+///              .dry_run(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20343,8 +20343,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("targetMerchantId", self._target_merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("targetMerchantId", &self._target_merchant_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -20610,7 +20610,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().inventory(req, 10, 35)
+/// let result = hub.pos().inventory(req, 43, 10)
 ///              .dry_run(true)
 ///              .doit().await;
 /// # }
@@ -20659,8 +20659,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("targetMerchantId", self._target_merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("targetMerchantId", &self._target_merchant_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -20920,7 +20920,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().list(67, 76)
+/// let result = hub.pos().list(62, 67)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20966,8 +20966,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("targetMerchantId", self._target_merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("targetMerchantId", &self._target_merchant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -21200,7 +21200,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().sale(req, 49, 17)
+/// let result = hub.pos().sale(req, 76, 49)
 ///              .dry_run(false)
 ///              .doit().await;
 /// # }
@@ -21249,8 +21249,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("targetMerchantId", self._target_merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("targetMerchantId", &self._target_merchant_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -21517,7 +21517,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().custombatch(req)
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21795,7 +21795,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.products().delete(25, "productId")
+/// let result = hub.products().delete(64, "productId")
 ///              .dry_run(true)
 ///              .doit().await;
 /// # }
@@ -21843,8 +21843,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("productId", self._product_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("productId", &self._product_id);
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -22070,7 +22070,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.products().get(14, "productId")
+/// let result = hub.products().get(25, "productId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22116,8 +22116,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("productId", self._product_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("productId", &self._product_id);
 
         params.extend(self._additional_params.iter());
 
@@ -22350,8 +22350,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.products().insert(req, 31)
-///              .dry_run(true)
+/// let result = hub.products().insert(req, 56)
+///              .dry_run(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22398,7 +22398,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }
@@ -22648,9 +22648,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.products().list(6)
-///              .page_token("tempor")
-///              .max_results(91)
+/// let result = hub.products().list(85)
+///              .page_token("duo")
+///              .max_results(38)
 ///              .include_invalid_inserted_items(false)
 ///              .doit().await;
 /// # }
@@ -22699,7 +22699,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -23231,9 +23231,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.productstatuses().get(68, "productId")
+/// let result = hub.productstatuses().get(91, "productId")
 ///              .include_attributes(true)
-///              .add_destinations("At")
+///              .add_destinations("magna")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23281,8 +23281,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("productId", self._product_id);
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("productId", &self._product_id);
         if let Some(value) = self._include_attributes.as_ref() {
             params.push("includeAttributes", value.to_string());
         }
@@ -23532,12 +23532,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.productstatuses().list(13)
-///              .page_token("clita")
-///              .max_results(86)
+/// let result = hub.productstatuses().list(42)
+///              .page_token("rebum.")
+///              .max_results(74)
 ///              .include_invalid_inserted_items(false)
 ///              .include_attributes(false)
-///              .add_destinations("dolores")
+///              .add_destinations("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23587,7 +23587,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -23864,7 +23864,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.shippingsettings().custombatch(req)
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24142,7 +24142,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().get(37, 2)
+/// let result = hub.shippingsettings().get(82, 71)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24188,8 +24188,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -24416,7 +24416,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().getsupportedcarriers(19)
+/// let result = hub.shippingsettings().getsupportedcarriers(63)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24461,7 +24461,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -24678,7 +24678,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().getsupportedholidays(18)
+/// let result = hub.shippingsettings().getsupportedholidays(37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24723,7 +24723,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -24940,7 +24940,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().getsupportedpickupservices(59)
+/// let result = hub.shippingsettings().getsupportedpickupservices(2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24985,7 +24985,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -25202,9 +25202,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().list(10)
-///              .page_token("et")
-///              .max_results(93)
+/// let result = hub.shippingsettings().list(19)
+///              .page_token("magna")
+///              .max_results(59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25251,7 +25251,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -25494,7 +25494,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().update(req, 78, 62)
+/// let result = hub.shippingsettings().update(req, 10, 83)
 ///              .dry_run(true)
 ///              .doit().await;
 /// # }
@@ -25543,8 +25543,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("merchantId", self._merchant_id.to_string());
-        params.push("accountId", self._account_id.to_string());
+        params.push("merchantId", &self._merchant_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
         if let Some(value) = self._dry_run.as_ref() {
             params.push("dryRun", value.to_string());
         }

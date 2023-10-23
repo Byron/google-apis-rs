@@ -9,7 +9,7 @@ pub struct Channel {
     /// Type of channel.
     #[serde(rename="channelType")]
     
-    pub channel_type: Option<String>,
+    pub channel_type: Option<ChannelChannelTypeEnum>,
     /// Channel name. Format is "{product}/platforms/{platform}/channels/{channel}"
     
     pub name: Option<String>,
@@ -150,7 +150,7 @@ pub struct Platform {
     /// Type of platform.
     #[serde(rename="platformType")]
     
-    pub platform_type: Option<String>,
+    pub platform_type: Option<PlatformPlatformTypeEnum>,
 }
 
 impl client::Resource for Platform {}

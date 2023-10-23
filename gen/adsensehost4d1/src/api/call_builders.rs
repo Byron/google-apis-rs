@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -344,7 +344,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -624,9 +624,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
-        params.push("adUnitId", self._ad_unit_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("adUnitId", &self._ad_unit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -906,9 +906,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
-        params.push("adUnitId", self._ad_unit_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("adUnitId", &self._ad_unit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1190,9 +1190,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
-        params.push("adUnitId", self._ad_unit_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("adUnitId", &self._ad_unit_id);
         if self._host_custom_channel_id.len() > 0 {
             for f in self._host_custom_channel_id.iter() {
                 params.push("hostCustomChannelId", f);
@@ -1491,8 +1491,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1790,8 +1790,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2098,9 +2098,9 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
-        params.push("adUnitId", self._ad_unit_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("adUnitId", &self._ad_unit_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2409,8 +2409,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("adClientId", self._ad_client_id);
+        params.push("accountId", &self._account_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -2717,9 +2717,9 @@ where
         }
 
         let mut params = Params::with_capacity(12 + self._additional_params.len());
-        params.push("accountId", self._account_id);
-        params.push("startDate", self._start_date);
-        params.push("endDate", self._end_date);
+        params.push("accountId", &self._account_id);
+        params.push("startDate", &self._start_date);
+        params.push("endDate", &self._end_date);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -3079,7 +3079,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id);
+        params.push("accountId", &self._account_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3593,7 +3593,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4069,10 +4069,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.associationsessions().start(&vec!["consetetur".into()], "websiteUrl")
-///              .website_locale("et")
-///              .user_locale("erat")
-///              .callback_url("consetetur")
+/// let result = hub.associationsessions().start(&Default::default(), "websiteUrl")
+///              .website_locale("voluptua.")
+///              .user_locale("et")
+///              .callback_url("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4080,7 +4080,7 @@ pub struct AssociationsessionStartCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a AdSenseHost<S>,
-   pub(super) _product_code: Vec<String>,
+   pub(super) _product_code: AssociationsessionProductCodeEnum,
    pub(super) _website_url: String,
    pub(super) _website_locale: Option<String>,
    pub(super) _user_locale: Option<String>,
@@ -4126,7 +4126,7 @@ where
                 params.push("productCode", f);
             }
         }
-        params.push("websiteUrl", self._website_url);
+        params.push("websiteUrl", &self._website_url);
         if let Some(value) = self._website_locale.as_ref() {
             params.push("websiteLocale", value);
         }
@@ -4240,8 +4240,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_product_code(mut self, new_value: &str) -> AssociationsessionStartCall<'a, S> {
-        self._product_code.push(new_value.to_string());
+    pub fn add_product_code(mut self, new_value: &AssociationsessionProductCodeEnum) -> AssociationsessionStartCall<'a, S> {
+        self._product_code.push(new_value.clone());
         self
     }
     /// The URL of the user's hosted website.
@@ -4418,7 +4418,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("token", self._token);
+        params.push("token", &self._token);
 
         params.extend(self._additional_params.iter());
 
@@ -4670,8 +4670,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
-        params.push("customChannelId", self._custom_channel_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("customChannelId", &self._custom_channel_id);
 
         params.extend(self._additional_params.iter());
 
@@ -4940,8 +4940,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
-        params.push("customChannelId", self._custom_channel_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("customChannelId", &self._custom_channel_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5216,7 +5216,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -5453,8 +5453,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customchannels().list("adClientId")
-///              .page_token("voluptua.")
-///              .max_results(67)
+///              .page_token("accusam")
+///              .max_results(23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5501,7 +5501,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
+        params.push("adClientId", &self._ad_client_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5787,8 +5787,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
-        params.push("customChannelId", self._custom_channel_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("customChannelId", &self._custom_channel_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6086,7 +6086,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -6323,13 +6323,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reports().generate("startDate", "endDate")
-///              .start_index(6)
-///              .add_sort("Lorem")
-///              .add_metric("invidunt")
-///              .max_results(90)
-///              .locale("est")
-///              .add_filter("At")
-///              .add_dimension("sed")
+///              .start_index(84)
+///              .add_sort("sadipscing")
+///              .add_metric("Lorem")
+///              .max_results(63)
+///              .locale("no")
+///              .add_filter("est")
+///              .add_dimension("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6382,8 +6382,8 @@ where
         }
 
         let mut params = Params::with_capacity(11 + self._additional_params.len());
-        params.push("startDate", self._start_date);
-        params.push("endDate", self._end_date);
+        params.push("startDate", &self._start_date);
+        params.push("endDate", &self._end_date);
         if let Some(value) = self._start_index.as_ref() {
             params.push("startIndex", value.to_string());
         }
@@ -6727,8 +6727,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
-        params.push("urlChannelId", self._url_channel_id);
+        params.push("adClientId", &self._ad_client_id);
+        params.push("urlChannelId", &self._url_channel_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7003,7 +7003,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
+        params.push("adClientId", &self._ad_client_id);
 
         params.extend(self._additional_params.iter());
 
@@ -7240,8 +7240,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.urlchannels().list("adClientId")
-///              .page_token("ipsum")
-///              .max_results(83)
+///              .page_token("aliquyam")
+///              .max_results(96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7288,7 +7288,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("adClientId", self._ad_client_id);
+        params.push("adClientId", &self._ad_client_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

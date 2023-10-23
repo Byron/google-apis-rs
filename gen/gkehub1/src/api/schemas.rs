@@ -75,7 +75,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -230,28 +230,28 @@ pub struct ConfigManagementConfigSyncDeploymentState {
     /// Deployment state of admission-webhook
     #[serde(rename="admissionWebhook")]
     
-    pub admission_webhook: Option<String>,
+    pub admission_webhook: Option<ConfigManagementConfigSyncDeploymentStateAdmissionWebhookEnum>,
     /// Deployment state of the git-sync pod
     #[serde(rename="gitSync")]
     
-    pub git_sync: Option<String>,
+    pub git_sync: Option<ConfigManagementConfigSyncDeploymentStateGitSyncEnum>,
     /// Deployment state of the importer pod
     
-    pub importer: Option<String>,
+    pub importer: Option<ConfigManagementConfigSyncDeploymentStateImporterEnum>,
     /// Deployment state of the monitor pod
     
-    pub monitor: Option<String>,
+    pub monitor: Option<ConfigManagementConfigSyncDeploymentStateMonitorEnum>,
     /// Deployment state of reconciler-manager pod
     #[serde(rename="reconcilerManager")]
     
-    pub reconciler_manager: Option<String>,
+    pub reconciler_manager: Option<ConfigManagementConfigSyncDeploymentStateReconcilerManagerEnum>,
     /// Deployment state of root-reconciler
     #[serde(rename="rootReconciler")]
     
-    pub root_reconciler: Option<String>,
+    pub root_reconciler: Option<ConfigManagementConfigSyncDeploymentStateRootReconcilerEnum>,
     /// Deployment state of the syncer pod
     
-    pub syncer: Option<String>,
+    pub syncer: Option<ConfigManagementConfigSyncDeploymentStateSyncerEnum>,
 }
 
 impl client::Part for ConfigManagementConfigSyncDeploymentState {}
@@ -355,15 +355,15 @@ pub struct ConfigManagementGatekeeperDeploymentState {
     /// Status of gatekeeper-audit deployment.
     #[serde(rename="gatekeeperAudit")]
     
-    pub gatekeeper_audit: Option<String>,
+    pub gatekeeper_audit: Option<ConfigManagementGatekeeperDeploymentStateGatekeeperAuditEnum>,
     /// Status of gatekeeper-controller-manager pod.
     #[serde(rename="gatekeeperControllerManagerState")]
     
-    pub gatekeeper_controller_manager_state: Option<String>,
+    pub gatekeeper_controller_manager_state: Option<ConfigManagementGatekeeperDeploymentStateGatekeeperControllerManagerStateEnum>,
     /// Status of the pod serving the mutation webhook.
     #[serde(rename="gatekeeperMutation")]
     
-    pub gatekeeper_mutation: Option<String>,
+    pub gatekeeper_mutation: Option<ConfigManagementGatekeeperDeploymentStateGatekeeperMutationEnum>,
 }
 
 impl client::Part for ConfigManagementGatekeeperDeploymentState {}
@@ -467,10 +467,10 @@ impl client::Part for ConfigManagementHierarchyControllerConfig {}
 pub struct ConfigManagementHierarchyControllerDeploymentState {
     /// The deployment state for Hierarchy Controller extension (e.g. v0.7.0-hc.1)
     
-    pub extension: Option<String>,
+    pub extension: Option<ConfigManagementHierarchyControllerDeploymentStateExtensionEnum>,
     /// The deployment state for open source HNC (e.g. v0.7.0-hc.0)
     
-    pub hnc: Option<String>,
+    pub hnc: Option<ConfigManagementHierarchyControllerDeploymentStateHncEnum>,
 }
 
 impl client::Part for ConfigManagementHierarchyControllerDeploymentState {}
@@ -634,7 +634,7 @@ pub struct ConfigManagementOperatorState {
     /// The state of the Operator's deployment
     #[serde(rename="deploymentState")]
     
-    pub deployment_state: Option<String>,
+    pub deployment_state: Option<ConfigManagementOperatorStateDeploymentStateEnum>,
     /// Install errors.
     
     pub errors: Option<Vec<ConfigManagementInstallError>>,
@@ -698,7 +698,7 @@ impl client::Part for ConfigManagementPolicyController {}
 pub struct ConfigManagementPolicyControllerMonitoring {
     /// Specifies the list of backends Policy Controller will export to. An empty list would effectively disable metrics export.
     
-    pub backends: Option<Vec<String>>,
+    pub backends: Option<Vec<ConfigManagementPolicyControllerMonitoringBackendsEnum>>,
 }
 
 impl client::Part for ConfigManagementPolicyControllerMonitoring {}
@@ -770,7 +770,7 @@ impl client::Part for ConfigManagementSyncError {}
 pub struct ConfigManagementSyncState {
     /// Sync status code
     
-    pub code: Option<String>,
+    pub code: Option<ConfigManagementSyncStateCodeEnum>,
     /// A list of errors resulting from problematic configs. This list will be truncated after 100 errors, although it is unlikely for that many errors to simultaneously exist.
     
     pub errors: Option<Vec<ConfigManagementSyncError>>,
@@ -946,7 +946,7 @@ impl client::ResponseResult for Feature {}
 pub struct FeatureResourceState {
     /// The current state of the Feature resource in the Hub API.
     
-    pub state: Option<String>,
+    pub state: Option<FeatureResourceStateStateEnum>,
 }
 
 impl client::Part for FeatureResourceState {}
@@ -961,7 +961,7 @@ impl client::Part for FeatureResourceState {}
 pub struct FeatureState {
     /// The high-level, machine-readable status of this Feature.
     
-    pub code: Option<String>,
+    pub code: Option<FeatureStateCodeEnum>,
     /// A human-readable description of the current status.
     
     pub description: Option<String>,
@@ -1192,7 +1192,7 @@ pub struct IdentityServiceMembershipState {
     pub member_config: Option<IdentityServiceMembershipSpec>,
     /// Deployment state on this member
     
-    pub state: Option<String>,
+    pub state: Option<IdentityServiceMembershipStateStateEnum>,
 }
 
 impl client::Part for IdentityServiceMembershipState {}
@@ -1626,7 +1626,7 @@ impl client::Part for MembershipFeatureState {}
 pub struct MembershipState {
     /// Output only. The current state of the Membership resource.
     
-    pub code: Option<String>,
+    pub code: Option<MembershipStateCodeEnum>,
 }
 
 impl client::Part for MembershipState {}
@@ -1686,7 +1686,7 @@ pub struct OnPremCluster {
     /// Immutable. The on prem cluster's type.
     #[serde(rename="clusterType")]
     
-    pub cluster_type: Option<String>,
+    pub cluster_type: Option<OnPremClusterClusterTypeEnum>,
     /// Immutable. Self-link of the GCP resource for the GKE On-Prem cluster. For example: //gkeonprem.googleapis.com/projects/my-project/locations/us-west1-a/vmwareClusters/my-cluster //gkeonprem.googleapis.com/projects/my-project/locations/us-west1-a/bareMetalClusters/my-cluster
     #[serde(rename="resourceLink")]
     
@@ -1847,7 +1847,7 @@ pub struct ServiceMeshControlPlaneManagement {
     pub details: Option<Vec<ServiceMeshStatusDetails>>,
     /// LifecycleState of control plane management.
     
-    pub state: Option<String>,
+    pub state: Option<ServiceMeshControlPlaneManagementStateEnum>,
 }
 
 impl client::Part for ServiceMeshControlPlaneManagement {}
@@ -1865,7 +1865,7 @@ pub struct ServiceMeshDataPlaneManagement {
     pub details: Option<Vec<ServiceMeshStatusDetails>>,
     /// Lifecycle status of data plane management.
     
-    pub state: Option<String>,
+    pub state: Option<ServiceMeshDataPlaneManagementStateEnum>,
 }
 
 impl client::Part for ServiceMeshDataPlaneManagement {}
@@ -1881,10 +1881,10 @@ pub struct ServiceMeshMembershipSpec {
     /// Enables automatic control plane management.
     #[serde(rename="controlPlane")]
     
-    pub control_plane: Option<String>,
+    pub control_plane: Option<ServiceMeshMembershipSpecControlPlaneEnum>,
     /// Enables automatic Service Mesh management.
     
-    pub management: Option<String>,
+    pub management: Option<ServiceMeshMembershipSpecManagementEnum>,
 }
 
 impl client::Part for ServiceMeshMembershipSpec {}
@@ -1961,7 +1961,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 pub struct Status {
     /// Code specifies AppDevExperienceFeature's subcomponent ready state.
     
-    pub code: Option<String>,
+    pub code: Option<StatusCodeEnum>,
     /// Description is populated if Code is Failed, explaining why it has failed.
     
     pub description: Option<String>,

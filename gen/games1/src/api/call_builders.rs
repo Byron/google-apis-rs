@@ -26,9 +26,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievement_definitions().list()
-///              .page_token("takimata")
-///              .max_results(-52)
-///              .language("duo")
+///              .page_token("sanctus")
+///              .max_results(-80)
+///              .language("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -304,8 +304,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().increment("achievementId", -62)
-///              .request_id(-51)
+/// let result = hub.achievements().increment("achievementId", -52)
+///              .request_id(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -352,8 +352,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
-        params.push("stepsToIncrement", self._steps_to_increment.to_string());
+        params.push("achievementId", &self._achievement_id);
+        params.push("stepsToIncrement", &self._steps_to_increment.to_string());
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value.to_string());
         }
@@ -591,10 +591,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().list("playerId")
-///              .state("eos")
-///              .page_token("dolor")
-///              .max_results(-17)
-///              .language("ipsum")
+///              .state(&Default::default())
+///              .page_token("gubergren")
+///              .max_results(-51)
+///              .language("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -603,7 +603,7 @@ pub struct AchievementListCall<'a, S>
 
    pub(super) hub: &'a Games<S>,
    pub(super) _player_id: String,
-   pub(super) _state: Option<String>,
+   pub(super) _state: Option<AchievementStateEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _language: Option<String>,
@@ -643,7 +643,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("playerId", self._player_id);
+        params.push("playerId", &self._player_id);
         if let Some(value) = self._state.as_ref() {
             params.push("state", value);
         }
@@ -773,8 +773,8 @@ where
     /// Tells the server to return only achievements with the specified state. If this parameter isn't specified, all achievements are returned.
     ///
     /// Sets the *state* query property to the given value.
-    pub fn state(mut self, new_value: &str) -> AchievementListCall<'a, S> {
-        self._state = Some(new_value.to_string());
+    pub fn state(mut self, new_value: &AchievementStateEnum) -> AchievementListCall<'a, S> {
+        self._state = Some(new_value.clone());
         self
     }
     /// The token returned by the previous request.
@@ -945,7 +945,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
+        params.push("achievementId", &self._achievement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1162,7 +1162,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().set_steps_at_least("achievementId", -20)
+/// let result = hub.achievements().set_steps_at_least("achievementId", -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1208,8 +1208,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
-        params.push("steps", self._steps.to_string());
+        params.push("achievementId", &self._achievement_id);
+        params.push("steps", &self._steps.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1481,7 +1481,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("achievementId", self._achievement_id);
+        params.push("achievementId", &self._achievement_id);
 
         params.extend(self._additional_params.iter());
 
@@ -1972,8 +1972,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get("applicationId")
-///              .platform_type("ut")
-///              .language("gubergren")
+///              .platform_type(&Default::default())
+///              .language("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1982,7 +1982,7 @@ pub struct ApplicationGetCall<'a, S>
 
    pub(super) hub: &'a Games<S>,
    pub(super) _application_id: String,
-   pub(super) _platform_type: Option<String>,
+   pub(super) _platform_type: Option<ApplicationPlatformTypeEnum>,
    pub(super) _language: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -2020,7 +2020,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("applicationId", self._application_id);
+        params.push("applicationId", &self._application_id);
         if let Some(value) = self._platform_type.as_ref() {
             params.push("platformType", value);
         }
@@ -2144,8 +2144,8 @@ where
     /// Restrict application details returned to the specific platform.
     ///
     /// Sets the *platform type* query property to the given value.
-    pub fn platform_type(mut self, new_value: &str) -> ApplicationGetCall<'a, S> {
-        self._platform_type = Some(new_value.to_string());
+    pub fn platform_type(mut self, new_value: &ApplicationPlatformTypeEnum) -> ApplicationGetCall<'a, S> {
+        self._platform_type = Some(new_value.clone());
         self
     }
     /// The preferred language to use for strings returned by this method.
@@ -2258,8 +2258,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get_end_point()
-///              .end_point_type("rebum.")
-///              .application_id("est")
+///              .end_point_type(&Default::default())
+///              .application_id("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2267,7 +2267,7 @@ pub struct ApplicationGetEndPointCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Games<S>,
-   pub(super) _end_point_type: Option<String>,
+   pub(super) _end_point_type: Option<ApplicationEndPointTypeEnum>,
    pub(super) _application_id: Option<String>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -2411,8 +2411,8 @@ where
     /// Type of endpoint being requested.
     ///
     /// Sets the *end point type* query property to the given value.
-    pub fn end_point_type(mut self, new_value: &str) -> ApplicationGetEndPointCall<'a, S> {
-        self._end_point_type = Some(new_value.to_string());
+    pub fn end_point_type(mut self, new_value: &ApplicationEndPointTypeEnum) -> ApplicationGetEndPointCall<'a, S> {
+        self._end_point_type = Some(new_value.clone());
         self
     }
     /// The application ID from the Google Play developer console.
@@ -2801,7 +2801,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("applicationId", self._application_id);
+        params.push("applicationId", &self._application_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3019,8 +3019,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_by_player()
-///              .page_token("ipsum")
-///              .max_results(-7)
+///              .page_token("sed")
+///              .max_results(-37)
 ///              .language("gubergren")
 ///              .doit().await;
 /// # }
@@ -3298,9 +3298,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_definitions()
-///              .page_token("ea")
-///              .max_results(-99)
-///              .language("Lorem")
+///              .page_token("rebum.")
+///              .max_results(-57)
+///              .language("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3583,7 +3583,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().record(req)
-///              .language("eos")
+///              .language("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3862,7 +3862,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().get("leaderboardId")
-///              .language("sed")
+///              .language("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3908,7 +3908,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
+        params.push("leaderboardId", &self._leaderboard_id);
         if let Some(value) = self._language.as_ref() {
             params.push("language", value);
         }
@@ -4136,9 +4136,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().list()
-///              .page_token("duo")
-///              .max_results(-80)
-///              .language("no")
+///              .page_token("ea")
+///              .max_results(-99)
+///              .language("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4657,10 +4657,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.metagame().list_categories_by_player("playerId", "collection")
-///              .page_token("et")
+/// let result = hub.metagame().list_categories_by_player("playerId", &Default::default())
+///              .page_token("labore")
 ///              .max_results(-43)
-///              .language("et")
+///              .language("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4669,7 +4669,7 @@ pub struct MetagameListCategoriesByPlayerCall<'a, S>
 
    pub(super) hub: &'a Games<S>,
    pub(super) _player_id: String,
-   pub(super) _collection: String,
+   pub(super) _collection: MetagameCollectionEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _language: Option<String>,
@@ -4709,8 +4709,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("playerId", self._player_id);
-        params.push("collection", self._collection);
+        params.push("playerId", &self._player_id);
+        params.push("collection", &self._collection);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4840,8 +4840,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &MetagameCollectionEnum) -> MetagameListCategoriesByPlayerCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The token returned by the previous request.
@@ -4968,8 +4968,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().get("playerId")
-///              .player_id_consistency_token("vero")
-///              .language("erat")
+///              .player_id_consistency_token("no")
+///              .language("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5016,7 +5016,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("playerId", self._player_id);
+        params.push("playerId", &self._player_id);
         if let Some(value) = self._player_id_consistency_token.as_ref() {
             params.push("playerIdConsistencyToken", value);
         }
@@ -5496,10 +5496,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.players().list("collection")
-///              .page_token("duo")
-///              .max_results(-34)
-///              .language("et")
+/// let result = hub.players().list(&Default::default())
+///              .page_token("kasd")
+///              .max_results(-24)
+///              .language("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5507,7 +5507,7 @@ pub struct PlayerListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a Games<S>,
-   pub(super) _collection: String,
+   pub(super) _collection: PlayerCollectionEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _language: Option<String>,
@@ -5547,7 +5547,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("collection", self._collection);
+        params.push("collection", &self._collection);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -5667,8 +5667,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> PlayerListCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &PlayerCollectionEnum) -> PlayerListCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The token returned by the previous request.
@@ -5839,7 +5839,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("clientRevision", self._client_revision);
+        params.push("clientRevision", &self._client_revision);
 
         params.extend(self._additional_params.iter());
 
@@ -6049,11 +6049,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().get("playerId", "leaderboardId", "timeSpan")
-///              .page_token("dolor")
-///              .max_results(-18)
-///              .language("et")
-///              .include_rank_type("sadipscing")
+/// let result = hub.scores().get("playerId", "leaderboardId", &Default::default())
+///              .page_token("erat")
+///              .max_results(-93)
+///              .language("duo")
+///              .include_rank_type(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -6063,11 +6063,11 @@ pub struct ScoreGetCall<'a, S>
    pub(super) hub: &'a Games<S>,
    pub(super) _player_id: String,
    pub(super) _leaderboard_id: String,
-   pub(super) _time_span: String,
+   pub(super) _time_span: ScoreTimeSpanEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _language: Option<String>,
-   pub(super) _include_rank_type: Option<String>,
+   pub(super) _include_rank_type: Option<ScoreIncludeRankTypeEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -6104,9 +6104,9 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("playerId", self._player_id);
-        params.push("leaderboardId", self._leaderboard_id);
-        params.push("timeSpan", self._time_span);
+        params.push("playerId", &self._player_id);
+        params.push("leaderboardId", &self._leaderboard_id);
+        params.push("timeSpan", &self._time_span);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6249,8 +6249,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a, S> {
-        self._time_span = new_value.to_string();
+    pub fn time_span(mut self, new_value: &ScoreTimeSpanEnum) -> ScoreGetCall<'a, S> {
+        self._time_span = new_value.clone();
         self
     }
     /// The token returned by the previous request.
@@ -6277,8 +6277,8 @@ where
     /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.
     ///
     /// Sets the *include rank type* query property to the given value.
-    pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a, S> {
-        self._include_rank_type = Some(new_value.to_string());
+    pub fn include_rank_type(mut self, new_value: &ScoreIncludeRankTypeEnum) -> ScoreGetCall<'a, S> {
+        self._include_rank_type = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6383,10 +6383,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().list("leaderboardId", "collection", "timeSpan")
-///              .page_token("vero")
-///              .max_results(-76)
-///              .language("invidunt")
+/// let result = hub.scores().list("leaderboardId", &Default::default(), &Default::default())
+///              .page_token("et")
+///              .max_results(-28)
+///              .language("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6395,8 +6395,8 @@ pub struct ScoreListCall<'a, S>
 
    pub(super) hub: &'a Games<S>,
    pub(super) _leaderboard_id: String,
-   pub(super) _collection: String,
-   pub(super) _time_span: String,
+   pub(super) _collection: ScoreCollectionEnum,
+   pub(super) _time_span: ScoreTimeSpanEnum,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<i32>,
    pub(super) _language: Option<String>,
@@ -6436,9 +6436,9 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
-        params.push("collection", self._collection);
-        params.push("timeSpan", self._time_span);
+        params.push("leaderboardId", &self._leaderboard_id);
+        params.push("collection", &self._collection);
+        params.push("timeSpan", &self._time_span);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6568,8 +6568,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &ScoreCollectionEnum) -> ScoreListCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The time span for the scores and ranks you're requesting.
@@ -6578,8 +6578,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a, S> {
-        self._time_span = new_value.to_string();
+    pub fn time_span(mut self, new_value: &ScoreTimeSpanEnum) -> ScoreListCall<'a, S> {
+        self._time_span = new_value.clone();
         self
     }
     /// The token returned by the previous request.
@@ -6705,12 +6705,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().list_window("leaderboardId", "collection", "timeSpan")
-///              .return_top_if_absent(true)
-///              .results_above(-100)
-///              .page_token("accusam")
-///              .max_results(-59)
-///              .language("consetetur")
+/// let result = hub.scores().list_window("leaderboardId", &Default::default(), &Default::default())
+///              .return_top_if_absent(false)
+///              .results_above(-49)
+///              .page_token("et")
+///              .max_results(-22)
+///              .language("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6719,8 +6719,8 @@ pub struct ScoreListWindowCall<'a, S>
 
    pub(super) hub: &'a Games<S>,
    pub(super) _leaderboard_id: String,
-   pub(super) _collection: String,
-   pub(super) _time_span: String,
+   pub(super) _collection: ScoreCollectionEnum,
+   pub(super) _time_span: ScoreTimeSpanEnum,
    pub(super) _return_top_if_absent: Option<bool>,
    pub(super) _results_above: Option<i32>,
    pub(super) _page_token: Option<String>,
@@ -6762,9 +6762,9 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
-        params.push("collection", self._collection);
-        params.push("timeSpan", self._time_span);
+        params.push("leaderboardId", &self._leaderboard_id);
+        params.push("collection", &self._collection);
+        params.push("timeSpan", &self._time_span);
         if let Some(value) = self._return_top_if_absent.as_ref() {
             params.push("returnTopIfAbsent", value.to_string());
         }
@@ -6900,8 +6900,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a, S> {
-        self._collection = new_value.to_string();
+    pub fn collection(mut self, new_value: &ScoreCollectionEnum) -> ScoreListWindowCall<'a, S> {
+        self._collection = new_value.clone();
         self
     }
     /// The time span for the scores and ranks you're requesting.
@@ -6910,8 +6910,8 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a, S> {
-        self._time_span = new_value.to_string();
+    pub fn time_span(mut self, new_value: &ScoreTimeSpanEnum) -> ScoreListWindowCall<'a, S> {
+        self._time_span = new_value.clone();
         self
     }
     /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.
@@ -7051,9 +7051,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().submit("leaderboardId", -72)
-///              .score_tag("erat")
-///              .language("consetetur")
+/// let result = hub.scores().submit("leaderboardId", -99)
+///              .score_tag("duo")
+///              .language("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7101,8 +7101,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("leaderboardId", self._leaderboard_id);
-        params.push("score", self._score.to_string());
+        params.push("leaderboardId", &self._leaderboard_id);
+        params.push("score", &self._score.to_string());
         if let Some(value) = self._score_tag.as_ref() {
             params.push("scoreTag", value);
         }
@@ -7356,7 +7356,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().submit_multiple(req)
-///              .language("amet.")
+///              .language("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7635,7 +7635,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().get("snapshotId")
-///              .language("takimata")
+///              .language("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7681,7 +7681,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("snapshotId", self._snapshot_id);
+        params.push("snapshotId", &self._snapshot_id);
         if let Some(value) = self._language.as_ref() {
             params.push("language", value);
         }
@@ -7909,9 +7909,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().list("playerId")
-///              .page_token("gubergren")
-///              .max_results(-74)
-///              .language("accusam")
+///              .page_token("elitr")
+///              .max_results(-6)
+///              .language("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7959,7 +7959,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("playerId", self._player_id);
+        params.push("playerId", &self._player_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

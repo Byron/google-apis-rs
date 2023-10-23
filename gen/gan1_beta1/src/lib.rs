@@ -107,20 +107,20 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.links().list("role", "roleId")
-//!              .start_date_min("dolor")
-//!              .start_date_max("ea")
-//!              .search_text("ipsum")
-//!              .relationship_status("invidunt")
-//!              .add_promotion_type("amet")
-//!              .page_token("duo")
-//!              .max_results(51)
-//!              .link_type("sed")
-//!              .create_date_min("ut")
-//!              .create_date_max("gubergren")
-//!              .authorship("rebum.")
-//!              .add_asset_size("est")
-//!              .add_advertiser_id(-50)
+//! let result = hub.links().list(&Default::default(), "roleId")
+//!              .start_date_min("duo")
+//!              .start_date_max("ipsum")
+//!              .search_text("gubergren")
+//!              .relationship_status(&Default::default())
+//!              .add_promotion_type(&Default::default())
+//!              .page_token("Lorem")
+//!              .max_results(89)
+//!              .link_type(&Default::default())
+//!              .create_date_min("eos")
+//!              .create_date_max("dolor")
+//!              .authorship(&Default::default())
+//!              .add_asset_size("ea")
+//!              .add_advertiser_id(-55)
 //!              .doit().await;
 //! 
 //! match result {

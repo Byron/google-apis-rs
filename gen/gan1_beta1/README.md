@@ -106,20 +106,20 @@ let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnect
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.links().list("role", "roleId")
-             .start_date_min("no")
-             .start_date_max("ipsum")
-             .search_text("voluptua.")
-             .relationship_status("At")
-             .add_promotion_type("sanctus")
-             .page_token("sed")
-             .max_results(99)
-             .link_type("takimata")
-             .create_date_min("amet.")
-             .create_date_max("duo")
-             .authorship("ipsum")
-             .add_asset_size("gubergren")
-             .add_advertiser_id(-51)
+let result = hub.links().list(&Default::default(), "roleId")
+             .start_date_min("magna")
+             .start_date_max("no")
+             .search_text("ipsum")
+             .relationship_status(&Default::default())
+             .add_promotion_type(&Default::default())
+             .page_token("voluptua.")
+             .max_results(74)
+             .link_type(&Default::default())
+             .create_date_min("sanctus")
+             .create_date_max("sed")
+             .authorship(&Default::default())
+             .add_asset_size("amet.")
+             .add_advertiser_id(-59)
              .doit().await;
 
 match result {

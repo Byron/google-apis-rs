@@ -32,9 +32,9 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("activityId")
-///              .sort_order("takimata")
-///              .page_token("amet.")
-///              .max_results(81)
+///              .sort_order(&Default::default())
+///              .page_token("sed")
+///              .max_results(99)
 ///              .doit().await;
 /// 
 /// match result {

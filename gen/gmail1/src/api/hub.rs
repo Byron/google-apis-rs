@@ -39,10 +39,10 @@ use super::*;
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().messages_import(req, "userId")
-///              .process_for_calendar(true)
-///              .never_mark_spam(false)
-///              .internal_date_source("amet")
-///              .deleted(true)
+///              .process_for_calendar(false)
+///              .never_mark_spam(true)
+///              .internal_date_source(&Default::default())
+///              .deleted(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// 
 /// match result {

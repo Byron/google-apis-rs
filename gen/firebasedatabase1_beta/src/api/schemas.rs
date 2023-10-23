@@ -27,11 +27,11 @@ pub struct DatabaseInstance {
     pub project: Option<String>,
     /// Output only. The database's lifecycle state. Read-only.
     
-    pub state: Option<String>,
+    pub state: Option<DatabaseInstanceStateEnum>,
     /// Immutable. The database instance type. On creation only USER_DATABASE is allowed, which is also the default when omitted.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DatabaseInstanceTypeEnum>,
 }
 
 impl client::RequestValue for DatabaseInstance {}

@@ -18,13 +18,13 @@ pub struct Assignment {
     /// Which type of jobs will use the reservation.
     #[serde(rename="jobType")]
     
-    pub job_type: Option<String>,
+    pub job_type: Option<AssignmentJobTypeEnum>,
     /// Output only. Name of the resource. E.g.: `projects/myproject/locations/US/reservations/team1-prod/assignments/123`. The assignment_id must only contain lower case alphanumeric characters or dashes and the max length is 64 characters.
     
     pub name: Option<String>,
     /// Output only. State of the assignment.
     
-    pub state: Option<String>,
+    pub state: Option<AssignmentStateEnum>,
 }
 
 impl client::RequestValue for Assignment {}
@@ -99,11 +99,11 @@ pub struct CapacityCommitment {
     pub name: Option<String>,
     /// Capacity commitment commitment plan.
     
-    pub plan: Option<String>,
+    pub plan: Option<CapacityCommitmentPlanEnum>,
     /// The plan this capacity commitment is converted to after commitment_end_time passes. Once the plan is changed, committed period is extended according to commitment plan. Only applicable for ANNUAL and TRIAL commitments.
     #[serde(rename="renewalPlan")]
     
-    pub renewal_plan: Option<String>,
+    pub renewal_plan: Option<CapacityCommitmentRenewalPlanEnum>,
     /// Number of slots in this commitment.
     #[serde(rename="slotCount")]
     
@@ -111,7 +111,7 @@ pub struct CapacityCommitment {
     pub slot_count: Option<i64>,
     /// Output only. State of the commitment.
     
-    pub state: Option<String>,
+    pub state: Option<CapacityCommitmentStateEnum>,
 }
 
 impl client::RequestValue for CapacityCommitment {}

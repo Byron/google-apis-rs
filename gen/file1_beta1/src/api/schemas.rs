@@ -54,10 +54,10 @@ pub struct Backup {
     /// Output only. The service tier of the source Filestore instance that this backup is created from.
     #[serde(rename="sourceInstanceTier")]
     
-    pub source_instance_tier: Option<String>,
+    pub source_instance_tier: Option<BackupSourceInstanceTierEnum>,
     /// Output only. The backup state.
     
-    pub state: Option<String>,
+    pub state: Option<BackupStateEnum>,
     /// Output only. The size of the storage used by the backup. As backups share storage, this number is expected to change with backup creation/deletion.
     #[serde(rename="storageBytes")]
     
@@ -194,14 +194,14 @@ pub struct Instance {
     pub networks: Option<Vec<NetworkConfig>>,
     /// Immutable. The protocol indicates the access protocol for all shares in the instance. This field is immutable and it cannot be changed after the instance has been created. Default value: `NFS_V3`.
     
-    pub protocol: Option<String>,
+    pub protocol: Option<InstanceProtocolEnum>,
     /// Output only. Reserved for future use.
     #[serde(rename="satisfiesPzs")]
     
     pub satisfies_pzs: Option<bool>,
     /// Output only. The instance state.
     
-    pub state: Option<String>,
+    pub state: Option<InstanceStateEnum>,
     /// Output only. Additional information about the instance state, if available.
     #[serde(rename="statusMessage")]
     
@@ -209,10 +209,10 @@ pub struct Instance {
     /// Output only. Field indicates all the reasons the instance is in "SUSPENDED" state.
     #[serde(rename="suspensionReasons")]
     
-    pub suspension_reasons: Option<Vec<String>>,
+    pub suspension_reasons: Option<Vec<InstanceSuspensionReasonsEnum>>,
     /// The service tier of the instance.
     
-    pub tier: Option<String>,
+    pub tier: Option<InstanceTierEnum>,
 }
 
 impl client::RequestValue for Instance {}
@@ -409,14 +409,14 @@ pub struct NetworkConfig {
     /// The network connect mode of the Filestore instance. If not provided, the connect mode defaults to DIRECT_PEERING.
     #[serde(rename="connectMode")]
     
-    pub connect_mode: Option<String>,
+    pub connect_mode: Option<NetworkConfigConnectModeEnum>,
     /// Output only. IPv4 addresses in the format `{octet1}.{octet2}.{octet3}.{octet4}` or IPv6 addresses in the format `{block1}:{block2}:{block3}:{block4}:{block5}:{block6}:{block7}:{block8}`.
     #[serde(rename="ipAddresses")]
     
     pub ip_addresses: Option<Vec<String>>,
     /// Internet protocol versions for which the instance has IP addresses assigned. For this version, only MODE_IPV4 is supported.
     
-    pub modes: Option<Vec<String>>,
+    pub modes: Option<Vec<NetworkConfigModesEnum>>,
     /// The name of the Google Compute Engine [VPC network](https://cloud.google.com/vpc/docs/vpc) to which the instance is connected.
     
     pub network: Option<String>,
@@ -439,7 +439,7 @@ pub struct NfsExportOptions {
     /// Either READ_ONLY, for allowing only read requests on the exported directory, or READ_WRITE, for allowing both read and write requests. The default is READ_WRITE.
     #[serde(rename="accessMode")]
     
-    pub access_mode: Option<String>,
+    pub access_mode: Option<NfsExportOptionAccessModeEnum>,
     /// An integer representing the anonymous group id with a default value of 65534. Anon_gid may only be set with squash_mode of ROOT_SQUASH. An error will be returned if this field is specified for other squash_mode settings.
     #[serde(rename="anonGid")]
     
@@ -457,7 +457,7 @@ pub struct NfsExportOptions {
     /// Either NO_ROOT_SQUASH, for allowing root access on the exported directory, or ROOT_SQUASH, for not allowing root access. The default is NO_ROOT_SQUASH.
     #[serde(rename="squashMode")]
     
-    pub squash_mode: Option<String>,
+    pub squash_mode: Option<NfsExportOptionSquashModeEnum>,
 }
 
 impl client::Part for NfsExportOptions {}
@@ -597,7 +597,7 @@ pub struct Share {
     pub nfs_export_options: Option<Vec<NfsExportOptions>>,
     /// Output only. The share state.
     
-    pub state: Option<String>,
+    pub state: Option<ShareStateEnum>,
 }
 
 impl client::RequestValue for Share {}
@@ -637,7 +637,7 @@ pub struct Snapshot {
     pub name: Option<String>,
     /// Output only. The snapshot state.
     
-    pub state: Option<String>,
+    pub state: Option<SnapshotStateEnum>,
 }
 
 impl client::RequestValue for Snapshot {}

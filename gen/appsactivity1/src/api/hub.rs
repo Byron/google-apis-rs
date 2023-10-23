@@ -32,13 +32,13 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list()
-///              .user_id("Lorem")
+///              .user_id("ipsum")
 ///              .source("gubergren")
-///              .page_token("eos")
-///              .page_size(-4)
-///              .grouping_strategy("ea")
-///              .drive_file_id("ipsum")
-///              .drive_ancestor_id("invidunt")
+///              .page_token("Lorem")
+///              .page_size(-12)
+///              .grouping_strategy(&Default::default())
+///              .drive_file_id("eos")
+///              .drive_ancestor_id("dolor")
 ///              .doit().await;
 /// 
 /// match result {

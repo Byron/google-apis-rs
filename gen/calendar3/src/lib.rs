@@ -150,10 +150,10 @@
 //!              .q("ipsum")
 //!              .add_private_extended_property("est")
 //!              .page_token("gubergren")
-//!              .order_by("ea")
-//!              .max_results(-99)
-//!              .max_attendees(-56)
-//!              .i_cal_uid("eos")
+//!              .order_by(&Default::default())
+//!              .max_results(-17)
+//!              .max_attendees(-99)
+//!              .i_cal_uid("Lorem")
 //!              .always_include_email(false)
 //!              .doit().await;
 //! 

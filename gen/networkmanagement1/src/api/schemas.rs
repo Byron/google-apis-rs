@@ -8,7 +8,7 @@ use super::*;
 pub struct AbortInfo {
     /// Causes that the analysis is aborted.
     
-    pub cause: Option<String>,
+    pub cause: Option<AbortInfoCauseEnum>,
     /// List of project IDs that the user has specified in the request but does not have permission to access network configs. Analysis is aborted in this case with the PERMISSION_DENIED cause.
     #[serde(rename="projectsMissingPermission")]
     
@@ -95,7 +95,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -324,7 +324,7 @@ pub struct DeliverInfo {
     pub resource_uri: Option<String>,
     /// Target type where the packet is delivered to.
     
-    pub target: Option<String>,
+    pub target: Option<DeliverInfoTargetEnum>,
 }
 
 impl client::Part for DeliverInfo {}
@@ -339,7 +339,7 @@ impl client::Part for DeliverInfo {}
 pub struct DropInfo {
     /// Cause that the packet is dropped.
     
-    pub cause: Option<String>,
+    pub cause: Option<DropInfoCauseEnum>,
     /// URI of the resource that caused the drop.
     #[serde(rename="resourceUri")]
     
@@ -405,7 +405,7 @@ pub struct Endpoint {
     /// Type of the network where the endpoint is located. Applicable only to source endpoint, as destination network type can be inferred from the source.
     #[serde(rename="networkType")]
     
-    pub network_type: Option<String>,
+    pub network_type: Option<EndpointNetworkTypeEnum>,
     /// The IP protocol port of the endpoint. Only applicable when protocol is TCP or UDP.
     
     pub port: Option<i32>,
@@ -501,7 +501,7 @@ pub struct FirewallInfo {
     /// The firewall rule's type.
     #[serde(rename="firewallRuleType")]
     
-    pub firewall_rule_type: Option<String>,
+    pub firewall_rule_type: Option<FirewallInfoFirewallRuleTypeEnum>,
     /// The URI of the VPC network that the firewall rule is associated with. This field is not applicable to hierarchical firewall policy rules.
     #[serde(rename="networkUri")]
     
@@ -541,7 +541,7 @@ pub struct ForwardInfo {
     pub resource_uri: Option<String>,
     /// Target type where this packet is forwarded to.
     
-    pub target: Option<String>,
+    pub target: Option<ForwardInfoTargetEnum>,
 }
 
 impl client::Part for ForwardInfo {}
@@ -748,7 +748,7 @@ pub struct LoadBalancerBackend {
     /// State of the health check firewall configuration.
     #[serde(rename="healthCheckFirewallState")]
     
-    pub health_check_firewall_state: Option<String>,
+    pub health_check_firewall_state: Option<LoadBalancerBackendHealthCheckFirewallStateEnum>,
     /// URI of a Compute Engine instance or network endpoint.
     
     pub uri: Option<String>,
@@ -767,7 +767,7 @@ pub struct LoadBalancerInfo {
     /// Type of load balancer's backend configuration.
     #[serde(rename="backendType")]
     
-    pub backend_type: Option<String>,
+    pub backend_type: Option<LoadBalancerInfoBackendTypeEnum>,
     /// Backend configuration URI.
     #[serde(rename="backendUri")]
     
@@ -782,7 +782,7 @@ pub struct LoadBalancerInfo {
     /// Type of the load balancer.
     #[serde(rename="loadBalancerType")]
     
-    pub load_balancer_type: Option<String>,
+    pub load_balancer_type: Option<LoadBalancerInfoLoadBalancerTypeEnum>,
 }
 
 impl client::Part for LoadBalancerInfo {}
@@ -922,7 +922,7 @@ pub struct ReachabilityDetails {
     pub error: Option<Status>,
     /// The overall result of the test's configuration analysis.
     
-    pub result: Option<String>,
+    pub result: Option<ReachabilityDetailResultEnum>,
     /// Result may contain a list of traces if a test has multiple possible paths in the network, such as when destination endpoint is a load balancer with multiple backends.
     
     pub traces: Option<Vec<Trace>>,
@@ -984,7 +984,7 @@ pub struct RouteInfo {
     /// Type of next hop.
     #[serde(rename="nextHopType")]
     
-    pub next_hop_type: Option<String>,
+    pub next_hop_type: Option<RouteInfoNextHopTypeEnum>,
     /// Priority of the route.
     
     pub priority: Option<i32>,
@@ -994,7 +994,7 @@ pub struct RouteInfo {
     /// Type of route.
     #[serde(rename="routeType")]
     
-    pub route_type: Option<String>,
+    pub route_type: Option<RouteInfoRouteTypeEnum>,
     /// Source IP address range of the route. Policy based routes only.
     #[serde(rename="srcIpRange")]
     
@@ -1130,7 +1130,7 @@ pub struct Step {
     pub route: Option<RouteInfo>,
     /// Each step is in one of the pre-defined states.
     
-    pub state: Option<String>,
+    pub state: Option<StepStateEnum>,
     /// Display information of a VPC connector.
     #[serde(rename="vpcConnector")]
     
@@ -1290,7 +1290,7 @@ pub struct VpnTunnelInfo {
     /// Type of the routing policy.
     #[serde(rename="routingType")]
     
-    pub routing_type: Option<String>,
+    pub routing_type: Option<VpnTunnelInfoRoutingTypeEnum>,
     /// URI of the VPN gateway at local end of the tunnel.
     #[serde(rename="sourceGateway")]
     

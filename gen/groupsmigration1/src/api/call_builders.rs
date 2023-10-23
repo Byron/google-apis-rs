@@ -72,7 +72,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("groupId", self._group_id);
+        params.push("groupId", &self._group_id);
 
         params.extend(self._additional_params.iter());
 

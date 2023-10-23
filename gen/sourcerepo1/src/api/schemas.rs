@@ -32,7 +32,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -244,7 +244,7 @@ pub struct PubsubConfig {
     /// The format of the Cloud Pub/Sub messages.
     #[serde(rename="messageFormat")]
     
-    pub message_format: Option<String>,
+    pub message_format: Option<PubsubConfigMessageFormatEnum>,
     /// Email address of the service account used for publishing Cloud Pub/Sub messages. This service account needs to be in the same project as the PubsubConfig. When added, the caller needs to have iam.serviceAccounts.actAs permission on this service account. If unspecified, it defaults to the compute engine default service account.
     #[serde(rename="serviceAccountEmail")]
     

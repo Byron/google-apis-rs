@@ -66,7 +66,7 @@ pub struct AggregationResultBatch {
     /// The state of the query after the current batch. Only COUNT(*) aggregations are supported in the initial launch. Therefore, expected result type is limited to `NO_MORE_RESULTS`.
     #[serde(rename="moreResults")]
     
-    pub more_results: Option<String>,
+    pub more_results: Option<AggregationResultBatchMoreResultsEnum>,
     /// Read timestamp this batch was returned from. In a single transaction, subsequent query result batches for the same query can have a greater timestamp. Each batch's read timestamp is valid for all preceding batches.
     #[serde(rename="readTime")]
     
@@ -194,7 +194,7 @@ pub struct CommitRequest {
     pub database_id: Option<String>,
     /// The type of commit to perform. Defaults to `TRANSACTIONAL`.
     
-    pub mode: Option<String>,
+    pub mode: Option<CommitRequestModeEnum>,
     /// The mutations to perform. When mode is `TRANSACTIONAL`, mutations affecting a single entity are applied in order. The following sequences of mutations affecting a single entity are not permitted in a single `Commit` request: - `insert` followed by `insert` - `update` followed by `insert` - `upsert` followed by `insert` - `delete` followed by `update` When mode is `NON_TRANSACTIONAL`, no two mutations may affect a single entity.
     
     pub mutations: Option<Vec<Mutation>>,
@@ -251,7 +251,7 @@ pub struct CompositeFilter {
     pub filters: Option<Vec<Filter>>,
     /// The operator for combining multiple filters.
     
-    pub op: Option<String>,
+    pub op: Option<CompositeFilterOpEnum>,
 }
 
 impl client::Part for CompositeFilter {}
@@ -446,7 +446,7 @@ impl client::RequestValue for GoogleDatastoreAdminV1ImportEntitiesRequest {}
 pub struct GoogleDatastoreAdminV1Index {
     /// Required. The index's ancestor mode. Must not be ANCESTOR_MODE_UNSPECIFIED.
     
-    pub ancestor: Option<String>,
+    pub ancestor: Option<GoogleDatastoreAdminV1IndexAncestorEnum>,
     /// Output only. The resource ID of the index.
     #[serde(rename="indexId")]
     
@@ -463,7 +463,7 @@ pub struct GoogleDatastoreAdminV1Index {
     pub properties: Option<Vec<GoogleDatastoreAdminV1IndexedProperty>>,
     /// Output only. The state of the index.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleDatastoreAdminV1IndexStateEnum>,
 }
 
 impl client::RequestValue for GoogleDatastoreAdminV1Index {}
@@ -479,7 +479,7 @@ impl client::ResponseResult for GoogleDatastoreAdminV1Index {}
 pub struct GoogleDatastoreAdminV1IndexedProperty {
     /// Required. The indexed property's direction. Must not be DIRECTION_UNSPECIFIED.
     
-    pub direction: Option<String>,
+    pub direction: Option<GoogleDatastoreAdminV1IndexedPropertyDirectionEnum>,
     /// Required. The property name to index.
     
     pub name: Option<String>,
@@ -862,7 +862,7 @@ impl client::Part for Projection {}
 pub struct PropertyFilter {
     /// The operator to filter by.
     
-    pub op: Option<String>,
+    pub op: Option<PropertyFilterOpEnum>,
     /// The property to filter by.
     
     pub property: Option<PropertyReference>,
@@ -883,7 +883,7 @@ impl client::Part for PropertyFilter {}
 pub struct PropertyOrder {
     /// The direction to order by. Defaults to `ASCENDING`.
     
-    pub direction: Option<String>,
+    pub direction: Option<PropertyOrderDirectionEnum>,
     /// The property to order by.
     
     pub property: Option<PropertyReference>,
@@ -966,7 +966,7 @@ pub struct QueryResultBatch {
     /// The result type for every entity in `entity_results`.
     #[serde(rename="entityResultType")]
     
-    pub entity_result_type: Option<String>,
+    pub entity_result_type: Option<QueryResultBatchEntityResultTypeEnum>,
     /// The results for this batch.
     #[serde(rename="entityResults")]
     
@@ -974,7 +974,7 @@ pub struct QueryResultBatch {
     /// The state of the query after the current batch.
     #[serde(rename="moreResults")]
     
-    pub more_results: Option<String>,
+    pub more_results: Option<QueryResultBatchMoreResultsEnum>,
     /// Read timestamp this batch was returned from. This applies to the range of results from the query's `start_cursor` (or the beginning of the query if no cursor was given) to this batch's `end_cursor` (not the query's `end_cursor`). In a single transaction, subsequent query result batches for the same query can have a greater timestamp. Each batch's read timestamp is valid for all preceding batches. This value will not be set for eventually consistent queries in Cloud Datastore.
     #[serde(rename="readTime")]
     
@@ -1028,7 +1028,7 @@ pub struct ReadOptions {
     /// The non-transactional read consistency to use.
     #[serde(rename="readConsistency")]
     
-    pub read_consistency: Option<String>,
+    pub read_consistency: Option<ReadOptionReadConsistencyEnum>,
     /// Reads entities as they were at the given time. This may not be older than 270 seconds. This value is only supported for Cloud Firestore in Datastore mode.
     #[serde(rename="readTime")]
     
@@ -1351,7 +1351,7 @@ pub struct Value {
     /// A null value.
     #[serde(rename="nullValue")]
     
-    pub null_value: Option<String>,
+    pub null_value: Option<ValueNullValueEnum>,
     /// A UTF-8 encoded string value. When `exclude_from_indexes` is false (it is indexed) , may have at most 1500 bytes. Otherwise, may be set to at most 1,000,000 bytes.
     #[serde(rename="stringValue")]
     

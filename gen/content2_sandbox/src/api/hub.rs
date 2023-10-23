@@ -31,14 +31,14 @@ use super::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().list(97)
-///              .add_statuses("ea")
-///              .placed_date_start("ipsum")
-///              .placed_date_end("invidunt")
-///              .page_token("amet")
-///              .order_by("duo")
-///              .max_results(51)
-///              .acknowledged(false)
+/// let result = hub.orders().list(50)
+///              .add_statuses(&Default::default())
+///              .placed_date_start("gubergren")
+///              .placed_date_end("eos")
+///              .page_token("dolor")
+///              .order_by(&Default::default())
+///              .max_results(84)
+///              .acknowledged(true)
 ///              .doit().await;
 /// 
 /// match result {

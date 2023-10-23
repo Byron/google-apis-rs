@@ -235,7 +235,7 @@ pub struct Node {
     /// Output only. The API version that created this Node.
     #[serde(rename="apiVersion")]
     
-    pub api_version: Option<String>,
+    pub api_version: Option<NodeApiVersionEnum>,
     /// The CIDR block that the TPU node will use when selecting an IP address. This CIDR block must be a /29 block; the Compute Engine networks API forbids a smaller block, and using a larger block would be wasteful (a node can only consume one IP address). Errors will occur if the CIDR block has already been used for a currently existing TPU node, the CIDR block conflicts with any subnetworks in the user's provided network, or the provided network is peered with another network that is using that CIDR block.
     #[serde(rename="cidrBlock")]
     
@@ -249,7 +249,7 @@ pub struct Node {
     pub description: Option<String>,
     /// The health status of the TPU node.
     
-    pub health: Option<String>,
+    pub health: Option<NodeHealthEnum>,
     /// Output only. If this field is populated, it contains a description of why the TPU Node is unhealthy.
     #[serde(rename="healthDescription")]
     
@@ -284,7 +284,7 @@ pub struct Node {
     pub service_account: Option<String>,
     /// Output only. The current state for the TPU Node.
     
-    pub state: Option<String>,
+    pub state: Option<NodeStateEnum>,
     /// Output only. The Symptoms that have occurred to the TPU Node.
     
     pub symptoms: Option<Vec<Symptom>>,
@@ -444,7 +444,7 @@ pub struct Symptom {
     /// Type of the Symptom.
     #[serde(rename="symptomType")]
     
-    pub symptom_type: Option<String>,
+    pub symptom_type: Option<SymptomSymptomTypeEnum>,
     /// A string used to uniquely distinguish a worker within a TPU node.
     #[serde(rename="workerId")]
     

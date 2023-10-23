@@ -34,7 +34,7 @@ pub struct ClaimDeviceRequest {
     /// Required. The section type of the device's provisioning record.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<ClaimDeviceRequestSectionTypeEnum>,
     /// Optional. Must and can only be set when DeviceProvisioningSectionType is SECTION_TYPE_SIM_LOCK. The unique identifier of the SimLock profile (go/simlock/profiles).
     #[serde(rename="simlockProfileId")]
     
@@ -135,7 +135,7 @@ pub struct Company {
     /// Output only. Whether any user from the company has accepted the latest Terms of Service (ToS). See TermsStatus.
     #[serde(rename="termsStatus")]
     
-    pub terms_status: Option<String>,
+    pub terms_status: Option<CompanyTermsStatusEnum>,
 }
 
 impl client::ResponseResult for Company {}
@@ -411,7 +411,7 @@ pub struct DeviceClaim {
     /// The Additional service registered for the device.
     #[serde(rename="additionalService")]
     
-    pub additional_service: Option<String>,
+    pub additional_service: Option<DeviceClaimAdditionalServiceEnum>,
     /// The ID of the Google Workspace account that owns the Chrome OS device.
     #[serde(rename="googleWorkspaceCustomerId")]
     
@@ -429,7 +429,7 @@ pub struct DeviceClaim {
     /// Output only. The type of claim made on the device.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<DeviceClaimSectionTypeEnum>,
     /// The timestamp when the device will exit ‘vacation mode’. This value is present iff the device is in 'vacation mode'.
     #[serde(rename="vacationModeExpireTime")]
     
@@ -457,7 +457,7 @@ pub struct DeviceIdentifier {
     /// The type of the device
     #[serde(rename="deviceType")]
     
-    pub device_type: Option<String>,
+    pub device_type: Option<DeviceIdentifierDeviceTypeEnum>,
     /// The device’s IMEI number. Validated on input.
     
     pub imei: Option<String>,
@@ -647,7 +647,7 @@ pub struct FindDevicesByOwnerRequest {
     /// Required. The section type of the device's provisioning record.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<FindDevicesByOwnerRequestSectionTypeEnum>,
 }
 
 impl client::RequestValue for FindDevicesByOwnerRequest {}
@@ -847,7 +847,7 @@ pub struct PartnerClaim {
     /// Required. The section type of the device's provisioning record.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<PartnerClaimSectionTypeEnum>,
 }
 
 impl client::Part for PartnerClaim {}
@@ -872,7 +872,7 @@ pub struct PartnerUnclaim {
     /// Required. The section type of the device's provisioning record.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<PartnerUnclaimSectionTypeEnum>,
     /// Optional. The duration of the vacation unlock starting from when the request is processed. (1 day is treated as 24 hours)
     #[serde(rename="vacationModeDays")]
     
@@ -930,7 +930,7 @@ pub struct UnclaimDeviceRequest {
     /// Required. The section type of the device's provisioning record.
     #[serde(rename="sectionType")]
     
-    pub section_type: Option<String>,
+    pub section_type: Option<UnclaimDeviceRequestSectionTypeEnum>,
     /// The duration of the vacation unlock starting from when the request is processed. (1 day is treated as 24 hours)
     #[serde(rename="vacationModeDays")]
     

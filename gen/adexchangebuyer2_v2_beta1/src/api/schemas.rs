@@ -54,7 +54,7 @@ pub struct AdSize {
     /// The size type of the ad slot.
     #[serde(rename="sizeType")]
     
-    pub size_type: Option<String>,
+    pub size_type: Option<AdSizeSizeTypeEnum>,
     /// The width of the ad slot in pixels. This field will be present only when size type is `PIXEL`.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -133,7 +133,7 @@ pub struct AppContext {
     /// The app types this restriction applies to.
     #[serde(rename="appTypes")]
     
-    pub app_types: Option<Vec<String>>,
+    pub app_types: Option<Vec<AppContextAppTypesEnum>>,
 }
 
 impl client::Part for AppContext {}
@@ -149,7 +149,7 @@ pub struct AuctionContext {
     /// The auction types this restriction applies to.
     #[serde(rename="auctionTypes")]
     
-    pub auction_types: Option<Vec<String>>,
+    pub auction_types: Option<Vec<AuctionContextAuctionTypesEnum>>,
 }
 
 impl client::Part for AuctionContext {}
@@ -215,7 +215,7 @@ pub struct BidResponseWithoutBidsStatusRow {
     pub row_dimensions: Option<RowDimensions>,
     /// The status specifying why the bid responses were considered to have no applicable bids.
     
-    pub status: Option<String>,
+    pub status: Option<BidResponseWithoutBidsStatusRowStatusEnum>,
 }
 
 impl client::Part for BidResponseWithoutBidsStatusRow {}
@@ -310,17 +310,17 @@ pub struct Client {
     /// An optional field for specifying the type of the client entity: `ADVERTISER`, `BRAND`, or `AGENCY`.
     #[serde(rename="entityType")]
     
-    pub entity_type: Option<String>,
+    pub entity_type: Option<ClientEntityTypeEnum>,
     /// Optional arbitrary unique identifier of this client buyer from the standpoint of its Ad Exchange sponsor buyer. This field can be used to associate a client buyer with the identifier in the namespace of its sponsor buyer, lookup client buyers by that identifier and verify whether an Ad Exchange counterpart of a given client buyer already exists. If present, must be unique among all the client buyers for its Ad Exchange sponsor buyer.
     #[serde(rename="partnerClientId")]
     
     pub partner_client_id: Option<String>,
     /// The role which is assigned to the client buyer. Each role implies a set of permissions granted to the client. Must be one of `CLIENT_DEAL_VIEWER`, `CLIENT_DEAL_NEGOTIATOR` or `CLIENT_DEAL_APPROVER`.
     
-    pub role: Option<String>,
+    pub role: Option<ClientRoleEnum>,
     /// The status of the client buyer.
     
-    pub status: Option<String>,
+    pub status: Option<ClientStatusEnum>,
     /// Whether the client buyer will be visible to sellers.
     #[serde(rename="visibleToSeller")]
     
@@ -353,7 +353,7 @@ pub struct ClientUser {
     pub email: Option<String>,
     /// The status of the client user.
     
-    pub status: Option<String>,
+    pub status: Option<ClientUserStatusEnum>,
     /// The unique numerical ID of the client user that has accepted an invitation. The value of this field is ignored in an update operation.
     #[serde(rename="userId")]
     
@@ -445,7 +445,7 @@ pub struct Correction {
     /// The type of correction that was applied to the creative.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CorrectionTypeEnum>,
 }
 
 impl client::Part for Correction {}
@@ -491,7 +491,7 @@ pub struct Creative {
     pub api_update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// All attributes for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method.
     
-    pub attributes: Option<Vec<String>>,
+    pub attributes: Option<Vec<CreativeAttributesEnum>>,
     /// The set of destination URLs for the creative.
     #[serde(rename="clickThroughUrls")]
     
@@ -506,7 +506,7 @@ pub struct Creative {
     /// Output only. The top-level deals status of this creative. If disapproved, an entry for 'auctionType=DIRECT_DEALS' (or 'ALL') in serving_restrictions will also exist. Note that this may be nuanced with other contextual restrictions, in which case, it may be preferable to read from serving_restrictions directly. Can be used to filter the response of the creatives.list method.
     #[serde(rename="dealsStatus")]
     
-    pub deals_status: Option<String>,
+    pub deals_status: Option<CreativeDealsStatusEnum>,
     /// The set of declared destination URLs for the creative.
     #[serde(rename="declaredClickThroughUrls")]
     
@@ -545,11 +545,11 @@ pub struct Creative {
     /// Output only. The top-level open auction status of this creative. If disapproved, an entry for 'auctionType = OPEN_AUCTION' (or 'ALL') in serving_restrictions will also exist. Note that this may be nuanced with other contextual restrictions, in which case, it may be preferable to read from serving_restrictions directly. Can be used to filter the response of the creatives.list method.
     #[serde(rename="openAuctionStatus")]
     
-    pub open_auction_status: Option<String>,
+    pub open_auction_status: Option<CreativeOpenAuctionStatusEnum>,
     /// All restricted categories for the ads that may be shown from this creative.
     #[serde(rename="restrictedCategories")]
     
-    pub restricted_categories: Option<Vec<String>>,
+    pub restricted_categories: Option<Vec<CreativeRestrictedCategoriesEnum>>,
     /// Output only. The granular status of this ad in specific contexts. A context here relates to where something ultimately serves (for example, a physical location, a platform, an HTTPS versus HTTP request, or the type of auction).
     #[serde(rename="servingRestrictions")]
     
@@ -604,7 +604,7 @@ pub struct CreativeRestrictions {
     /// The format of the environment that the creatives will be displayed in.
     #[serde(rename="creativeFormat")]
     
-    pub creative_format: Option<String>,
+    pub creative_format: Option<CreativeRestrictionCreativeFormatEnum>,
     /// no description provided
     #[serde(rename="creativeSpecifications")]
     
@@ -612,7 +612,7 @@ pub struct CreativeRestrictions {
     /// Skippable video ads allow viewers to skip ads after 5 seconds.
     #[serde(rename="skippableAdType")]
     
-    pub skippable_ad_type: Option<String>,
+    pub skippable_ad_type: Option<CreativeRestrictionSkippableAdTypeEnum>,
 }
 
 impl client::Part for CreativeRestrictions {}
@@ -628,7 +628,7 @@ pub struct CreativeSize {
     /// What formats are allowed by the publisher. If this repeated field is empty then all formats are allowed. For example, if this field contains AllowedFormatType.AUDIO then the publisher only allows an audio ad (without any video).
     #[serde(rename="allowedFormats")]
     
-    pub allowed_formats: Option<Vec<String>>,
+    pub allowed_formats: Option<Vec<CreativeSizeAllowedFormatsEnum>>,
     /// For video creatives specifies the sizes of companion ads (if present). Companion sizes may be filled in only when creative_size_type = VIDEO
     #[serde(rename="companionSizes")]
     
@@ -636,18 +636,18 @@ pub struct CreativeSize {
     /// The creative size type.
     #[serde(rename="creativeSizeType")]
     
-    pub creative_size_type: Option<String>,
+    pub creative_size_type: Option<CreativeSizeCreativeSizeTypeEnum>,
     /// Output only. The native template for this creative. It will have a value only if creative_size_type = CreativeSizeType.NATIVE.
     #[serde(rename="nativeTemplate")]
     
-    pub native_template: Option<String>,
+    pub native_template: Option<CreativeSizeNativeTemplateEnum>,
     /// For regular or video creative size type, specifies the size of the creative
     
     pub size: Option<Size>,
     /// The type of skippable ad for this creative. It will have a value only if creative_size_type = CreativeSizeType.VIDEO.
     #[serde(rename="skippableAdType")]
     
-    pub skippable_ad_type: Option<String>,
+    pub skippable_ad_type: Option<CreativeSizeSkippableAdTypeEnum>,
 }
 
 impl client::Part for CreativeSize {}
@@ -750,7 +750,7 @@ pub struct DayPart {
     /// The day of the week to target. If unspecified, applicable to all days.
     #[serde(rename="dayOfWeek")]
     
-    pub day_of_week: Option<String>,
+    pub day_of_week: Option<DayPartDayOfWeekEnum>,
     /// The ending time of the day for the ad to show (minute level granularity). The end time is exclusive. This field is not available for filtering in PQL queries.
     #[serde(rename="endTime")]
     
@@ -778,7 +778,7 @@ pub struct DayPartTargeting {
     /// The timezone to use for interpreting the day part targeting.
     #[serde(rename="timeZoneType")]
     
-    pub time_zone_type: Option<String>,
+    pub time_zone_type: Option<DayPartTargetingTimeZoneTypeEnum>,
 }
 
 impl client::Part for DayPartTargeting {}
@@ -819,7 +819,7 @@ pub struct Deal {
     /// Output only. Specifies the creative pre-approval policy.
     #[serde(rename="creativePreApprovalPolicy")]
     
-    pub creative_pre_approval_policy: Option<String>,
+    pub creative_pre_approval_policy: Option<DealCreativePreApprovalPolicyEnum>,
     /// Output only. Restricitions about the creatives associated with the deal (for example, size) This is available for Programmatic Guaranteed/Preferred Deals in Ad Manager.
     #[serde(rename="creativeRestrictions")]
     
@@ -827,7 +827,7 @@ pub struct Deal {
     /// Output only. Specifies whether the creative is safeFrame compatible.
     #[serde(rename="creativeSafeFrameCompatibility")]
     
-    pub creative_safe_frame_compatibility: Option<String>,
+    pub creative_safe_frame_compatibility: Option<DealCreativeSafeFrameCompatibilityEnum>,
     /// Output only. A unique deal ID for the deal (server-assigned).
     #[serde(rename="dealId")]
     
@@ -862,7 +862,7 @@ pub struct Deal {
     /// Output only. Specifies the creative source for programmatic deals. PUBLISHER means creative is provided by seller and ADVERTISER means creative is provided by buyer.
     #[serde(rename="programmaticCreativeSource")]
     
-    pub programmatic_creative_source: Option<String>,
+    pub programmatic_creative_source: Option<DealProgrammaticCreativeSourceEnum>,
     /// Output only. ID of the proposal that this deal is part of.
     #[serde(rename="proposalId")]
     
@@ -874,7 +874,7 @@ pub struct Deal {
     /// The syndication product associated with the deal. Note: This field may be set only when creating the resource. Modifying this field while updating the resource will result in an error.
     #[serde(rename="syndicationProduct")]
     
-    pub syndication_product: Option<String>,
+    pub syndication_product: Option<DealSyndicationProductEnum>,
     /// Output only. Specifies the subset of inventory targeted by the deal.
     
     pub targeting: Option<MarketplaceTargeting>,
@@ -909,7 +909,7 @@ pub struct DealPauseStatus {
     /// The role of the person who first paused this deal.
     #[serde(rename="firstPausedBy")]
     
-    pub first_paused_by: Option<String>,
+    pub first_paused_by: Option<DealPauseStatuFirstPausedByEnum>,
     /// True, if the buyer has paused the deal unilaterally.
     #[serde(rename="hasBuyerPaused")]
     
@@ -953,7 +953,7 @@ pub struct DealTerms {
     /// Visibility of the URL in bid requests. (default: BRANDED)
     #[serde(rename="brandingType")]
     
-    pub branding_type: Option<String>,
+    pub branding_type: Option<DealTermBrandingTypeEnum>,
     /// Publisher provided description for the terms.
     
     pub description: Option<String>,
@@ -997,11 +997,11 @@ pub struct DeliveryControl {
     /// Output only. Specified the creative blocking levels to be applied.
     #[serde(rename="creativeBlockingLevel")]
     
-    pub creative_blocking_level: Option<String>,
+    pub creative_blocking_level: Option<DeliveryControlCreativeBlockingLevelEnum>,
     /// Output only. Specifies how the impression delivery will be paced.
     #[serde(rename="deliveryRateType")]
     
-    pub delivery_rate_type: Option<String>,
+    pub delivery_rate_type: Option<DeliveryControlDeliveryRateTypeEnum>,
     /// Output only. Specifies any frequency caps.
     #[serde(rename="frequencyCaps")]
     
@@ -1023,7 +1023,7 @@ pub struct Disapproval {
     pub details: Option<Vec<String>>,
     /// The categorized reason for disapproval.
     
-    pub reason: Option<String>,
+    pub reason: Option<DisapprovalReasonEnum>,
 }
 
 impl client::Part for Disapproval {}
@@ -1070,7 +1070,7 @@ pub struct FilterSet {
     /// The set of dimensions along which to break down the response; may be empty. If multiple dimensions are requested, the breakdown is along the Cartesian product of the requested dimensions.
     #[serde(rename="breakdownDimensions")]
     
-    pub breakdown_dimensions: Option<Vec<String>>,
+    pub breakdown_dimensions: Option<Vec<FilterSetBreakdownDimensionsEnum>>,
     /// The ID of the creative on which to filter; optional. This field may be set only for a filter set that accesses account-level troubleshooting data, for example, one whose name matches the `bidders/*/accounts/*/filterSets/*` pattern.
     #[serde(rename="creativeId")]
     
@@ -1082,19 +1082,19 @@ pub struct FilterSet {
     pub deal_id: Option<i64>,
     /// The environment on which to filter; optional.
     
-    pub environment: Option<String>,
+    pub environment: Option<FilterSetEnvironmentEnum>,
     /// Creative format bidded on or allowed to bid on, can be empty.
     
-    pub format: Option<String>,
+    pub format: Option<FilterSetFormatEnum>,
     /// Creative formats bidded on or allowed to bid on, can be empty. Although this field is a list, it can only be populated with a single item. A HTTP 400 bad request error will be returned in the response if you specify multiple items.
     
-    pub formats: Option<Vec<String>>,
+    pub formats: Option<Vec<FilterSetFormatsEnum>>,
     /// A user-defined name of the filter set. Filter set names must be unique globally and match one of the patterns: - `bidders/*/filterSets/*` (for accessing bidder-level troubleshooting data) - `bidders/*/accounts/*/filterSets/*` (for accessing account-level troubleshooting data) This field is required in create operations.
     
     pub name: Option<String>,
     /// The list of platforms on which to filter; may be empty. The filters represented by multiple platforms are ORed together (for example, if non-empty, results must match any one of the platforms).
     
-    pub platforms: Option<Vec<String>>,
+    pub platforms: Option<Vec<FilterSetPlatformsEnum>>,
     /// For Open Bidding partners only. The list of publisher identifiers on which to filter; may be empty. The filters represented by multiple publisher identifiers are ORed together.
     #[serde(rename="publisherIdentifiers")]
     
@@ -1114,7 +1114,7 @@ pub struct FilterSet {
     /// The granularity of time intervals if a time series breakdown is preferred; optional.
     #[serde(rename="timeSeriesGranularity")]
     
-    pub time_series_granularity: Option<String>,
+    pub time_series_granularity: Option<FilterSetTimeSeriesGranularityEnum>,
 }
 
 impl client::RequestValue for FilterSet {}
@@ -1210,7 +1210,7 @@ pub struct FrequencyCap {
     /// The time unit. Along with num_time_units defines the amount of time over which impressions per user are counted and capped.
     #[serde(rename="timeUnitType")]
     
-    pub time_unit_type: Option<String>,
+    pub time_unit_type: Option<FrequencyCapTimeUnitTypeEnum>,
 }
 
 impl client::Part for FrequencyCap {}
@@ -1255,7 +1255,7 @@ pub struct GuaranteedFixedPriceTerms {
     /// The reservation type for a Programmatic Guaranteed deal. This indicates whether the number of impressions is fixed, or a percent of available impressions. If not specified, the default reservation type is STANDARD.
     #[serde(rename="reservationType")]
     
-    pub reservation_type: Option<String>,
+    pub reservation_type: Option<GuaranteedFixedPriceTermReservationTypeEnum>,
 }
 
 impl client::Part for GuaranteedFixedPriceTerms {}
@@ -1543,7 +1543,7 @@ pub struct ListCreativeStatusBreakdownByDetailResponse {
     /// The type of detail that the detail IDs represent.
     #[serde(rename="detailType")]
     
-    pub detail_type: Option<String>,
+    pub detail_type: Option<ListCreativeStatusBreakdownByDetailResponseDetailTypeEnum>,
     /// List of rows, with counts of bids with a given creative status aggregated by detail.
     #[serde(rename="filteredBidDetailRows")]
     
@@ -2008,7 +2008,7 @@ pub struct NonBillableWinningBidStatusRow {
     pub row_dimensions: Option<RowDimensions>,
     /// The status specifying why the winning bids were not billed.
     
-    pub status: Option<String>,
+    pub status: Option<NonBillableWinningBidStatusRowStatusEnum>,
 }
 
 impl client::Part for NonBillableWinningBidStatusRow {}
@@ -2068,7 +2068,7 @@ pub struct Note {
     /// Output only. The role of the person (buyer/seller) creating the note.
     #[serde(rename="creatorRole")]
     
-    pub creator_role: Option<String>,
+    pub creator_role: Option<NoteCreatorRoleEnum>,
     /// The actual note to attach. (max-length: 1024 unicode code units) Note: This field may be set only when creating the resource. Modifying this field while updating the resource will result in an error.
     
     pub note: Option<String>,
@@ -2177,7 +2177,7 @@ impl client::Part for PlacementTargeting {}
 pub struct PlatformContext {
     /// The platforms this restriction applies to.
     
-    pub platforms: Option<Vec<String>>,
+    pub platforms: Option<Vec<PlatformContextPlatformsEnum>>,
 }
 
 impl client::Part for PlatformContext {}
@@ -2196,7 +2196,7 @@ pub struct Price {
     /// The pricing type for the deal/product. (default: CPM)
     #[serde(rename="pricingType")]
     
-    pub pricing_type: Option<String>,
+    pub pricing_type: Option<PricePricingTypeEnum>,
 }
 
 impl client::Part for Price {}
@@ -2294,7 +2294,7 @@ pub struct Product {
     /// The syndication product associated with the deal.
     #[serde(rename="syndicationProduct")]
     
-    pub syndication_product: Option<String>,
+    pub syndication_product: Option<ProductSyndicationProductEnum>,
     /// Targeting that is shared between the buyer and the seller. Each targeting criterion has a specified key and for each key there is a list of inclusion value or exclusion values.
     #[serde(rename="targetingCriterion")]
     
@@ -2368,14 +2368,14 @@ pub struct Proposal {
     /// Output only. The role of the last user that either updated the proposal or left a comment.
     #[serde(rename="lastUpdaterOrCommentorRole")]
     
-    pub last_updater_or_commentor_role: Option<String>,
+    pub last_updater_or_commentor_role: Option<ProposalLastUpdaterOrCommentorRoleEnum>,
     /// Output only. The notes associated with this proposal.
     
     pub notes: Option<Vec<Note>>,
     /// Output only. Indicates whether the buyer/seller created the proposal.
     #[serde(rename="originatorRole")]
     
-    pub originator_role: Option<String>,
+    pub originator_role: Option<ProposalOriginatorRoleEnum>,
     /// Output only. Private auction ID if this proposal is a private auction proposal.
     #[serde(rename="privateAuctionId")]
     
@@ -2392,7 +2392,7 @@ pub struct Proposal {
     /// Output only. The current state of the proposal.
     #[serde(rename="proposalState")]
     
-    pub proposal_state: Option<String>,
+    pub proposal_state: Option<ProposalProposalStateEnum>,
     /// Reference to the seller on the proposal. Note: This field may be set only when creating the resource. Modifying this field while updating the resource will result in an error.
     
     pub seller: Option<Seller>,
@@ -2505,7 +2505,7 @@ pub struct PublisherProfileMobileApplication {
     /// The app store the app belongs to.
     #[serde(rename="appStore")]
     
-    pub app_store: Option<String>,
+    pub app_store: Option<PublisherProfileMobileApplicationAppStoreEnum>,
     /// The external ID for the app from its app store.
     #[serde(rename="externalAppId")]
     
@@ -2637,7 +2637,7 @@ impl client::Part for RowDimensions {}
 pub struct SecurityContext {
     /// The security types in this context.
     
-    pub securities: Option<Vec<String>>,
+    pub securities: Option<Vec<SecurityContextSecuritiesEnum>>,
 }
 
 impl client::Part for SecurityContext {}
@@ -2672,7 +2672,7 @@ impl client::Part for Seller {}
 pub struct ServingContext {
     /// Matches all contexts.
     
-    pub all: Option<String>,
+    pub all: Option<ServingContextAllEnum>,
     /// Matches impressions for a particular app type.
     #[serde(rename="appType")]
     
@@ -2715,7 +2715,7 @@ pub struct ServingRestriction {
     pub disapproval_reasons: Option<Vec<Disapproval>>,
     /// The status of the creative in this context (for example, it has been explicitly disapproved or is pending review).
     
-    pub status: Option<String>,
+    pub status: Option<ServingRestrictionStatusEnum>,
 }
 
 impl client::Part for ServingRestriction {}
@@ -2922,11 +2922,11 @@ pub struct VideoTargeting {
     /// A list of video positions to be excluded. Position types can either be included or excluded (XOR).
     #[serde(rename="excludedPositionTypes")]
     
-    pub excluded_position_types: Option<Vec<String>>,
+    pub excluded_position_types: Option<Vec<VideoTargetingExcludedPositionTypesEnum>>,
     /// A list of video positions to be included. When the included list is present, the excluded list must be empty. When the excluded list is present, the included list must be empty.
     #[serde(rename="targetedPositionTypes")]
     
-    pub targeted_position_types: Option<Vec<String>>,
+    pub targeted_position_types: Option<Vec<VideoTargetingTargetedPositionTypesEnum>>,
 }
 
 impl client::Part for VideoTargeting {}

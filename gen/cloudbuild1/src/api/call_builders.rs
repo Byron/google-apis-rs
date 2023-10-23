@@ -318,7 +318,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("location", self._location);
+        params.push("location", &self._location);
         if let Some(value) = self._webhook_key.as_ref() {
             params.push("webhookKey", value);
         }
@@ -576,7 +576,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -861,7 +861,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1130,7 +1130,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1423,8 +1423,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("id", self._id);
+        params.push("projectId", &self._project_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -1728,7 +1728,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -2026,8 +2026,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("id", self._id);
+        params.push("projectId", &self._project_id);
+        params.push("id", &self._id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -2317,7 +2317,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -2627,8 +2627,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("id", self._id);
+        params.push("projectId", &self._project_id);
+        params.push("id", &self._id);
 
         params.extend(self._additional_params.iter());
 
@@ -2934,7 +2934,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -3243,7 +3243,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -3529,7 +3529,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -3813,7 +3813,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -4094,7 +4094,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -4396,7 +4396,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -4685,7 +4685,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4976,7 +4976,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._bitbucket_server_config_id.as_ref() {
             params.push("bitbucketServerConfigId", value);
         }
@@ -5271,7 +5271,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5533,7 +5533,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -5799,7 +5799,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6090,7 +6090,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -6392,7 +6392,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("config", self._config);
+        params.push("config", &self._config);
 
         params.extend(self._additional_params.iter());
 
@@ -6684,7 +6684,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -6976,7 +6976,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -7270,7 +7270,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -7569,7 +7569,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -7859,7 +7859,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -8168,7 +8168,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -8460,7 +8460,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -8749,7 +8749,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -9040,7 +9040,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._gitlab_config_id.as_ref() {
             params.push("gitlabConfigId", value);
         }
@@ -9335,7 +9335,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9597,7 +9597,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -9863,7 +9863,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10154,7 +10154,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -10456,7 +10456,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("config", self._config);
+        params.push("config", &self._config);
 
         params.extend(self._additional_params.iter());
 
@@ -10752,7 +10752,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -11061,7 +11061,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -11347,7 +11347,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -11631,7 +11631,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -11912,7 +11912,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._update_mask.as_ref() {
             params.push("updateMask", value.to_string());
         }
@@ -12214,7 +12214,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12499,7 +12499,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -12770,7 +12770,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -13069,7 +13069,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._trigger_id.as_ref() {
             params.push("triggerId", value);
         }
@@ -13355,7 +13355,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._trigger_id.as_ref() {
             params.push("triggerId", value);
         }
@@ -13643,7 +13643,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
@@ -13946,7 +13946,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("resourceName", self._resource_name);
+        params.push("resourceName", &self._resource_name);
         if let Some(value) = self._trigger_id.as_ref() {
             params.push("triggerId", value);
         }
@@ -14258,7 +14258,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -14555,7 +14555,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._trigger.as_ref() {
             params.push("trigger", value);
         }
@@ -14837,7 +14837,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._worker_pool_id.as_ref() {
             params.push("workerPoolId", value);
         }
@@ -15148,7 +15148,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -15440,7 +15440,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -15706,7 +15706,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -15999,7 +15999,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._validate_only.as_ref() {
             params.push("validateOnly", value.to_string());
         }
@@ -16313,7 +16313,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -16611,8 +16611,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("projectId", &self._project_id);
+        params.push("triggerId", &self._trigger_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -16897,8 +16897,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("projectId", &self._project_id);
+        params.push("triggerId", &self._trigger_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -17186,7 +17186,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
+        params.push("projectId", &self._project_id);
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
         }
@@ -17486,8 +17486,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("projectId", &self._project_id);
+        params.push("triggerId", &self._trigger_id);
 
         params.extend(self._additional_params.iter());
 
@@ -17792,8 +17792,8 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("triggerId", self._trigger_id);
+        params.push("projectId", &self._project_id);
+        params.push("triggerId", &self._trigger_id);
         if let Some(value) = self._name.as_ref() {
             params.push("name", value);
         }
@@ -18109,8 +18109,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("projectId", self._project_id);
-        params.push("trigger", self._trigger);
+        params.push("projectId", &self._project_id);
+        params.push("trigger", &self._trigger);
         if let Some(value) = self._secret.as_ref() {
             params.push("secret", value);
         }

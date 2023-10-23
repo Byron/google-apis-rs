@@ -12,7 +12,7 @@ use super::*;
 pub struct GoogleCloudVideointelligenceV1_AnnotateVideoRequest {
     /// Required. Requested video annotation features.
     
-    pub features: Option<Vec<String>>,
+    pub features: Option<Vec<GoogleCloudVideointelligenceV1AnnotateVideoRequestFeaturesEnum>>,
     /// The video data bytes. If unset, the input video(s) should be specified via the `input_uri`. If set, `input_uri` must be unset.
     #[serde(rename="inputContent")]
     
@@ -91,7 +91,7 @@ pub struct GoogleCloudVideointelligenceV1_LabelDetectionConfig {
     /// What labels should be detected with LABEL_DETECTION, in addition to video-level labels or segment-level labels. If unspecified, defaults to `SHOT_MODE`.
     #[serde(rename="labelDetectionMode")]
     
-    pub label_detection_mode: Option<String>,
+    pub label_detection_mode: Option<GoogleCloudVideointelligenceV1LabelDetectionConfigLabelDetectionModeEnum>,
     /// Model to use for label detection. Supported values: "builtin/stable" (the default if unset) and "builtin/latest".
     
     pub model: Option<String>,

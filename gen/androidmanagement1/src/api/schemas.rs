@@ -9,15 +9,15 @@ pub struct AdvancedSecurityOverrides {
     /// Controls Common Criteria Mode—security standards defined in the Common Criteria for Information Technology Security Evaluation (https://www.commoncriteriaportal.org/) (CC). Enabling Common Criteria Mode increases certain security components on a device, including AES-GCM encryption of Bluetooth Long Term Keys, and Wi-Fi configuration stores.Warning: Common Criteria Mode enforces a strict security model typically only required for IT products used in national security systems and other highly sensitive organizations. Standard device use may be affected. Only enabled if required.
     #[serde(rename="commonCriteriaMode")]
     
-    pub common_criteria_mode: Option<String>,
+    pub common_criteria_mode: Option<AdvancedSecurityOverrideCommonCriteriaModeEnum>,
     /// Controls access to developer settings: developer options and safe boot. Replaces safeBootDisabled (deprecated) and debuggingFeaturesAllowed (deprecated).
     #[serde(rename="developerSettings")]
     
-    pub developer_settings: Option<String>,
+    pub developer_settings: Option<AdvancedSecurityOverrideDeveloperSettingsEnum>,
     /// Whether Google Play Protect verification (https://support.google.com/accounts/answer/2812853) is enforced. Replaces ensureVerifyAppsEnabled (deprecated).
     #[serde(rename="googlePlayProtectVerifyApps")]
     
-    pub google_play_protect_verify_apps: Option<String>,
+    pub google_play_protect_verify_apps: Option<AdvancedSecurityOverrideGooglePlayProtectVerifyAppsEnum>,
     /// Personal apps that can read work profile notifications using a NotificationListenerService (https://developer.android.com/reference/android/service/notification/NotificationListenerService). By default, no personal apps (aside from system apps) can read work notifications. Each value in the list must be a package name.
     #[serde(rename="personalAppsThatCanReadWorkNotifications")]
     
@@ -25,7 +25,7 @@ pub struct AdvancedSecurityOverrides {
     /// The policy for untrusted apps (apps from unknown sources) enforced on the device. Replaces install_unknown_sources_allowed (deprecated).
     #[serde(rename="untrustedAppsPolicy")]
     
-    pub untrusted_apps_policy: Option<String>,
+    pub untrusted_apps_policy: Option<AdvancedSecurityOverrideUntrustedAppsPolicyEnum>,
 }
 
 impl client::Part for AdvancedSecurityOverrides {}
@@ -128,7 +128,7 @@ pub struct Application {
     /// Whether this app is free, free with in-app purchases, or paid. If the pricing is unspecified, this means the app is not generally available anymore (even though it might still be available to people who own it).
     #[serde(rename="appPricing")]
     
-    pub app_pricing: Option<String>,
+    pub app_pricing: Option<ApplicationAppPricingEnum>,
     /// Application tracks visible to the enterprise.
     #[serde(rename="appTracks")]
     
@@ -150,17 +150,17 @@ pub struct Application {
     /// The content rating for this app.
     #[serde(rename="contentRating")]
     
-    pub content_rating: Option<String>,
+    pub content_rating: Option<ApplicationContentRatingEnum>,
     /// The localized promotional description, if available.
     
     pub description: Option<String>,
     /// How and to whom the package is made available.
     #[serde(rename="distributionChannel")]
     
-    pub distribution_channel: Option<String>,
+    pub distribution_channel: Option<ApplicationDistributionChannelEnum>,
     /// Noteworthy features (if any) of this app.
     
-    pub features: Option<Vec<String>>,
+    pub features: Option<Vec<ApplicationFeaturesEnum>>,
     /// Full app description, if available.
     #[serde(rename="fullDescription")]
     
@@ -225,7 +225,7 @@ pub struct ApplicationEvent {
     /// App event type.
     #[serde(rename="eventType")]
     
-    pub event_type: Option<String>,
+    pub event_type: Option<ApplicationEventEventTypeEnum>,
 }
 
 impl client::Part for ApplicationEvent {}
@@ -267,23 +267,23 @@ pub struct ApplicationPolicy {
     /// Specifies whether the app is allowed networking when the VPN is not connected and alwaysOnVpnPackage.lockdownEnabled is enabled. If set to VPN_LOCKDOWN_ENFORCED, the app is not allowed networking, and if set to VPN_LOCKDOWN_EXEMPTION, the app is allowed networking. Only supported on devices running Android 10 and above. If this is not supported by the device, the device will contain a NonComplianceDetail with non_compliance_reason set to API_LEVEL and a fieldPath. If this is not applicable to the app, the device will contain a NonComplianceDetail with non_compliance_reason set to UNSUPPORTED and a fieldPath. The fieldPath is set to applications[i].alwaysOnVpnLockdownExemption, where i is the index of the package in the applications policy.
     #[serde(rename="alwaysOnVpnLockdownExemption")]
     
-    pub always_on_vpn_lockdown_exemption: Option<String>,
+    pub always_on_vpn_lockdown_exemption: Option<ApplicationPolicyAlwaysOnVpnLockdownExemptionEnum>,
     /// Controls the auto-update mode for the app.
     #[serde(rename="autoUpdateMode")]
     
-    pub auto_update_mode: Option<String>,
+    pub auto_update_mode: Option<ApplicationPolicyAutoUpdateModeEnum>,
     /// Controls whether the app can communicate with itself across a device’s work and personal profiles, subject to user consent.
     #[serde(rename="connectedWorkAndPersonalApp")]
     
-    pub connected_work_and_personal_app: Option<String>,
+    pub connected_work_and_personal_app: Option<ApplicationPolicyConnectedWorkAndPersonalAppEnum>,
     /// The default policy for all permissions requested by the app. If specified, this overrides the policy-level default_permission_policy which applies to all apps. It does not override the permission_grants which applies to all apps.
     #[serde(rename="defaultPermissionPolicy")]
     
-    pub default_permission_policy: Option<String>,
+    pub default_permission_policy: Option<ApplicationPolicyDefaultPermissionPolicyEnum>,
     /// The scopes delegated to the app from Android Device Policy.
     #[serde(rename="delegatedScopes")]
     
-    pub delegated_scopes: Option<Vec<String>>,
+    pub delegated_scopes: Option<Vec<ApplicationPolicyDelegatedScopesEnum>>,
     /// Whether the app is disabled. When disabled, the app data is still preserved.
     
     pub disabled: Option<bool>,
@@ -294,7 +294,7 @@ pub struct ApplicationPolicy {
     /// The type of installation to perform.
     #[serde(rename="installType")]
     
-    pub install_type: Option<String>,
+    pub install_type: Option<ApplicationPolicyInstallTypeEnum>,
     /// Whether the app is allowed to lock itself in full-screen mode. DEPRECATED. Use InstallType KIOSK or kioskCustomLauncherEnabled to configure a dedicated device.
     #[serde(rename="lockTaskAllowed")]
     
@@ -322,7 +322,7 @@ pub struct ApplicationPolicy {
     /// Specifies whether the app installed in the work profile is allowed to add widgets to the home screen.
     #[serde(rename="workProfileWidgets")]
     
-    pub work_profile_widgets: Option<String>,
+    pub work_profile_widgets: Option<ApplicationPolicyWorkProfileWidgetsEnum>,
 }
 
 impl client::Part for ApplicationPolicy {}
@@ -338,7 +338,7 @@ pub struct ApplicationReport {
     /// The source of the package.
     #[serde(rename="applicationSource")]
     
-    pub application_source: Option<String>,
+    pub application_source: Option<ApplicationReportApplicationSourceEnum>,
     /// The display name of the app.
     #[serde(rename="displayName")]
     
@@ -368,7 +368,7 @@ pub struct ApplicationReport {
     pub signing_key_cert_fingerprints: Option<Vec<String>>,
     /// Application state.
     
-    pub state: Option<String>,
+    pub state: Option<ApplicationReportStateEnum>,
     /// The app version code, which can be used to determine whether one version is more recent than another.
     #[serde(rename="versionCode")]
     
@@ -412,7 +412,7 @@ pub struct BlockAction {
     /// Specifies the scope of this BlockAction. Only applicable to devices that are company-owned.
     #[serde(rename="blockScope")]
     
-    pub block_scope: Option<String>,
+    pub block_scope: Option<BlockActionBlockScopeEnum>,
 }
 
 impl client::Part for BlockAction {}
@@ -503,7 +503,7 @@ pub struct Command {
     /// If the command failed, an error code explaining the failure. This is not set when the command is cancelled by the caller.
     #[serde(rename="errorCode")]
     
-    pub error_code: Option<String>,
+    pub error_code: Option<CommandErrorCodeEnum>,
     /// For commands of type RESET_PASSWORD, optionally specifies the new password.
     #[serde(rename="newPassword")]
     
@@ -511,11 +511,11 @@ pub struct Command {
     /// For commands of type RESET_PASSWORD, optionally specifies flags.
     #[serde(rename="resetPasswordFlags")]
     
-    pub reset_password_flags: Option<Vec<String>>,
+    pub reset_password_flags: Option<Vec<CommandResetPasswordFlagsEnum>>,
     /// The type of the command.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<CommandTypeEnum>,
     /// The resource name of the user that owns the device in the form enterprises/{enterpriseId}/users/{userId}. This is automatically generated by the server based on the device the command is sent to.
     #[serde(rename="userName")]
     
@@ -535,7 +535,7 @@ pub struct CommonCriteriaModeInfo {
     /// Whether Common Criteria Mode is enabled.
     #[serde(rename="commonCriteriaModeStatus")]
     
-    pub common_criteria_mode_status: Option<String>,
+    pub common_criteria_mode_status: Option<CommonCriteriaModeInfoCommonCriteriaModeStatusEnum>,
 }
 
 impl client::Part for CommonCriteriaModeInfo {}
@@ -642,19 +642,19 @@ pub struct CrossProfilePolicies {
     /// Whether text copied from one profile (personal or work) can be pasted in the other profile.
     #[serde(rename="crossProfileCopyPaste")]
     
-    pub cross_profile_copy_paste: Option<String>,
+    pub cross_profile_copy_paste: Option<CrossProfilePolicyCrossProfileCopyPasteEnum>,
     /// Whether data from one profile (personal or work) can be shared with apps in the other profile. Specifically controls simple data sharing via intents. Management of other cross-profile communication channels, such as contact search, copy/paste, or connected work & personal apps, are configured separately.
     #[serde(rename="crossProfileDataSharing")]
     
-    pub cross_profile_data_sharing: Option<String>,
+    pub cross_profile_data_sharing: Option<CrossProfilePolicyCrossProfileDataSharingEnum>,
     /// Whether contacts stored in the work profile can be shown in personal profile contact searches and incoming calls.
     #[serde(rename="showWorkContactsInPersonalProfile")]
     
-    pub show_work_contacts_in_personal_profile: Option<String>,
+    pub show_work_contacts_in_personal_profile: Option<CrossProfilePolicyShowWorkContactsInPersonalProfileEnum>,
     /// Specifies the default behaviour for work profile widgets. If the policy does not specify work_profile_widgets for a specific application, it will behave according to the value specified here.
     #[serde(rename="workProfileWidgetsDefault")]
     
-    pub work_profile_widgets_default: Option<String>,
+    pub work_profile_widgets_default: Option<CrossProfilePolicyWorkProfileWidgetsDefaultEnum>,
 }
 
 impl client::Part for CrossProfilePolicies {}
@@ -717,7 +717,7 @@ pub struct Device {
     /// The state currently applied to the device.
     #[serde(rename="appliedState")]
     
-    pub applied_state: Option<String>,
+    pub applied_state: Option<DeviceAppliedStateEnum>,
     /// Information about Common Criteria Mode—security standards defined in the Common Criteria for Information Technology Security Evaluation (https://www.commoncriteriaportal.org/) (CC).This information is only available if statusReportingSettings.commonCriteriaModeEnabled is true in the device's policy.
     #[serde(rename="commonCriteriaModeInfo")]
     
@@ -768,7 +768,7 @@ pub struct Device {
     /// The type of management mode Android Device Policy takes on the device. This influences which policy settings are supported.
     #[serde(rename="managementMode")]
     
-    pub management_mode: Option<String>,
+    pub management_mode: Option<DeviceManagementModeEnum>,
     /// Events related to memory and storage measurements in chronological order. This information is only available if memoryInfoEnabled is true in the device's policy.
     #[serde(rename="memoryEvents")]
     
@@ -790,7 +790,7 @@ pub struct Device {
     pub non_compliance_details: Option<Vec<NonComplianceDetail>>,
     /// Ownership of the managed device.
     
-    pub ownership: Option<String>,
+    pub ownership: Option<DeviceOwnershipEnum>,
     /// Whether the device is compliant with its policy.
     #[serde(rename="policyCompliant")]
     
@@ -817,7 +817,7 @@ pub struct Device {
     pub software_info: Option<SoftwareInfo>,
     /// The state to be applied to the device. This field can be modified by a patch request. Note that when calling enterprises.devices.patch, ACTIVE and DISABLED are the only allowable values. To enter the device into a DELETED state, call enterprises.devices.delete.
     
-    pub state: Option<String>,
+    pub state: Option<DeviceStateEnum>,
     /// Map of selected system properties name and value related to the device. This information is only available if systemPropertiesEnabled is true in the device's policy.
     #[serde(rename="systemProperties")]
     
@@ -853,7 +853,7 @@ pub struct DeviceSettings {
     /// Encryption status from DevicePolicyManager.
     #[serde(rename="encryptionStatus")]
     
-    pub encryption_status: Option<String>,
+    pub encryption_status: Option<DeviceSettingEncryptionStatusEnum>,
     /// Whether the device is secured with PIN/password.
     #[serde(rename="isDeviceSecure")]
     
@@ -901,7 +901,7 @@ pub struct Display {
     pub refresh_rate: Option<i32>,
     /// State of the display.
     
-    pub state: Option<String>,
+    pub state: Option<DisplayStateEnum>,
     /// Display width in pixels.
     
     pub width: Option<i32>,
@@ -950,7 +950,7 @@ pub struct EnrollmentToken {
     /// Controls whether personal usage is allowed on a device provisioned with this enrollment token.For company-owned devices: Enabling personal usage allows the user to set up a work profile on the device. Disabling personal usage requires the user provision the device as a fully managed device.For personally-owned devices: Enabling personal usage allows the user to set up a work profile on the device. Disabling personal usage will prevent the device from provisioning. Personal usage cannot be disabled on personally-owned device.
     #[serde(rename="allowPersonalUsage")]
     
-    pub allow_personal_usage: Option<String>,
+    pub allow_personal_usage: Option<EnrollmentTokenAllowPersonalUsageEnum>,
     /// The length of time the enrollment token is valid, ranging from 1 minute to Durations.MAX_VALUE (https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/util/Durations.html#MAX_VALUE), approximately 10,000 years. If not specified, the default duration is 1 hour. Please note that if requested duration causes the resulting expiration_timestamp to exceed Timestamps.MAX_VALUE (https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/util/Timestamps.html#MAX_VALUE), then expiration_timestamp is coerced to Timestamps.MAX_VALUE.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -1036,7 +1036,7 @@ pub struct Enterprise {
     /// The types of Google Pub/Sub notifications enabled for the enterprise.
     #[serde(rename="enabledNotificationTypes")]
     
-    pub enabled_notification_types: Option<Vec<String>>,
+    pub enabled_notification_types: Option<Vec<EnterpriseEnabledNotificationTypesEnum>>,
     /// The name of the enterprise displayed to users.
     #[serde(rename="enterpriseDisplayName")]
     
@@ -1263,7 +1263,7 @@ pub struct KeyedAppState {
     pub message: Option<String>,
     /// The severity of the app state.
     
-    pub severity: Option<String>,
+    pub severity: Option<KeyedAppStateSeverityEnum>,
 }
 
 impl client::Part for KeyedAppState {}
@@ -1279,23 +1279,23 @@ pub struct KioskCustomization {
     /// Specifies whether the Settings app is allowed in kiosk mode.
     #[serde(rename="deviceSettings")]
     
-    pub device_settings: Option<String>,
+    pub device_settings: Option<KioskCustomizationDeviceSettingsEnum>,
     /// Sets the behavior of a device in kiosk mode when a user presses and holds (long-presses) the Power button.
     #[serde(rename="powerButtonActions")]
     
-    pub power_button_actions: Option<String>,
+    pub power_button_actions: Option<KioskCustomizationPowerButtonActionsEnum>,
     /// Specifies whether system info and notifications are disabled in kiosk mode.
     #[serde(rename="statusBar")]
     
-    pub status_bar: Option<String>,
+    pub status_bar: Option<KioskCustomizationStatusBarEnum>,
     /// Specifies whether system error dialogs for crashed or unresponsive apps are blocked in kiosk mode. When blocked, the system will force-stop the app as if the user chooses the "close app" option on the UI.
     #[serde(rename="systemErrorWarnings")]
     
-    pub system_error_warnings: Option<String>,
+    pub system_error_warnings: Option<KioskCustomizationSystemErrorWarningsEnum>,
     /// Specifies which navigation features are enabled (e.g. Home, Overview buttons) in kiosk mode.
     #[serde(rename="systemNavigation")]
     
-    pub system_navigation: Option<String>,
+    pub system_navigation: Option<KioskCustomizationSystemNavigationEnum>,
 }
 
 impl client::Part for KioskCustomization {}
@@ -1507,7 +1507,7 @@ pub struct ManagedProperty {
     /// The type of the property.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ManagedPropertyTypeEnum>,
 }
 
 impl client::Part for ManagedProperty {}
@@ -1550,7 +1550,7 @@ pub struct MemoryEvent {
     /// Event type.
     #[serde(rename="eventType")]
     
-    pub event_type: Option<String>,
+    pub event_type: Option<MemoryEventEventTypeEnum>,
 }
 
 impl client::Part for MemoryEvent {}
@@ -1626,11 +1626,11 @@ pub struct NonComplianceDetail {
     /// If package_name is set and the non-compliance reason is APP_NOT_INSTALLED or APP_NOT_UPDATED, the detailed reason the app can't be installed or updated.
     #[serde(rename="installationFailureReason")]
     
-    pub installation_failure_reason: Option<String>,
+    pub installation_failure_reason: Option<NonComplianceDetailInstallationFailureReasonEnum>,
     /// The reason the device is not in compliance with the setting.
     #[serde(rename="nonComplianceReason")]
     
-    pub non_compliance_reason: Option<String>,
+    pub non_compliance_reason: Option<NonComplianceDetailNonComplianceReasonEnum>,
     /// The package name indicating which app is out of compliance, if applicable.
     #[serde(rename="packageName")]
     
@@ -1646,7 +1646,7 @@ pub struct NonComplianceDetail {
     /// The policy-specific reason the device is not in compliance with the setting.
     #[serde(rename="specificNonComplianceReason")]
     
-    pub specific_non_compliance_reason: Option<String>,
+    pub specific_non_compliance_reason: Option<NonComplianceDetailSpecificNonComplianceReasonEnum>,
 }
 
 impl client::Part for NonComplianceDetail {}
@@ -1662,7 +1662,7 @@ pub struct NonComplianceDetailCondition {
     /// The reason the device is not in compliance with the setting. If not set, then this condition matches any reason.
     #[serde(rename="nonComplianceReason")]
     
-    pub non_compliance_reason: Option<String>,
+    pub non_compliance_reason: Option<NonComplianceDetailConditionNonComplianceReasonEnum>,
     /// The package name of the app that's out of compliance. If not set, then this condition matches any package name.
     #[serde(rename="packageName")]
     
@@ -1770,7 +1770,7 @@ pub struct PasswordPoliciesContext {
     /// The scope of non-compliant password.
     #[serde(rename="passwordPolicyScope")]
     
-    pub password_policy_scope: Option<String>,
+    pub password_policy_scope: Option<PasswordPoliciesContextPasswordPolicyScopeEnum>,
 }
 
 impl client::Part for PasswordPoliciesContext {}
@@ -1827,19 +1827,19 @@ pub struct PasswordRequirements {
     /// The required password quality.
     #[serde(rename="passwordQuality")]
     
-    pub password_quality: Option<String>,
+    pub password_quality: Option<PasswordRequirementPasswordQualityEnum>,
     /// The scope that the password requirement applies to.
     #[serde(rename="passwordScope")]
     
-    pub password_scope: Option<String>,
+    pub password_scope: Option<PasswordRequirementPasswordScopeEnum>,
     /// The length of time after a device or work profile is unlocked using a strong form of authentication (password, PIN, pattern) that it can be unlocked using any other authentication method (e.g. fingerprint, trust agents, face). After the specified time period elapses, only strong forms of authentication can be used to unlock the device or work profile.
     #[serde(rename="requirePasswordUnlock")]
     
-    pub require_password_unlock: Option<String>,
+    pub require_password_unlock: Option<PasswordRequirementRequirePasswordUnlockEnum>,
     /// Controls whether a unified lock is allowed for the device and the work profile, on devices running Android 9 and above with a work profile. This can be set only if password_scope is set to SCOPE_PROFILE, the policy will be rejected otherwise. If user has not set a separate work lock and this field is set to REQUIRE_SEPARATE_WORK_LOCK, a NonComplianceDetail is reported with nonComplianceReason set to USER_ACTION.
     #[serde(rename="unifiedLockSettings")]
     
-    pub unified_lock_settings: Option<String>,
+    pub unified_lock_settings: Option<PasswordRequirementUnifiedLockSettingsEnum>,
 }
 
 impl client::Part for PasswordRequirements {}
@@ -1855,7 +1855,7 @@ pub struct PerAppResult {
     /// The result of an attempt to clear the data of a single app.
     #[serde(rename="clearingResult")]
     
-    pub clearing_result: Option<String>,
+    pub clearing_result: Option<PerAppResultClearingResultEnum>,
 }
 
 impl client::Part for PerAppResult {}
@@ -1873,7 +1873,7 @@ pub struct PermissionGrant {
     pub permission: Option<String>,
     /// The policy for granting the permission.
     
-    pub policy: Option<String>,
+    pub policy: Option<PermissionGrantPolicyEnum>,
 }
 
 impl client::Part for PermissionGrant {}
@@ -1911,7 +1911,7 @@ pub struct PersonalApplicationPolicy {
     /// The type of installation to perform.
     #[serde(rename="installType")]
     
-    pub install_type: Option<String>,
+    pub install_type: Option<PersonalApplicationPolicyInstallTypeEnum>,
     /// The package name of the application.
     #[serde(rename="packageName")]
     
@@ -1947,7 +1947,7 @@ pub struct PersonalUsagePolicies {
     /// Used together with personalApplications to control how apps in the personal profile are allowed or blocked.
     #[serde(rename="personalPlayStoreMode")]
     
-    pub personal_play_store_mode: Option<String>,
+    pub personal_play_store_mode: Option<PersonalUsagePolicyPersonalPlayStoreModeEnum>,
     /// If true, screen capture is disabled for all users.
     #[serde(rename="screenCaptureDisabled")]
     
@@ -1992,18 +1992,18 @@ pub struct Policy {
     /// The app tracks for Android Device Policy the device can access. The device receives the latest version among all accessible tracks. If no tracks are specified, then the device only uses the production track.
     #[serde(rename="androidDevicePolicyTracks")]
     
-    pub android_device_policy_tracks: Option<Vec<String>>,
+    pub android_device_policy_tracks: Option<Vec<PolicyAndroidDevicePolicyTracksEnum>>,
     /// Deprecated. Use autoUpdateMode instead.When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect.The app auto update policy, which controls when automatic app updates can be applied.
     #[serde(rename="appAutoUpdatePolicy")]
     
-    pub app_auto_update_policy: Option<String>,
+    pub app_auto_update_policy: Option<PolicyAppAutoUpdatePolicyEnum>,
     /// Policy applied to apps.
     
     pub applications: Option<Vec<ApplicationPolicy>>,
     /// Whether auto date, time, and time zone are enabled on a company-owned device. If this is set, then autoTimeRequired is ignored.
     #[serde(rename="autoDateAndTimeZone")]
     
-    pub auto_date_and_time_zone: Option<String>,
+    pub auto_date_and_time_zone: Option<PolicyAutoDateAndTimeZoneEnum>,
     /// Whether auto time is required, which prevents the user from manually setting the date and time. If autoDateAndTimeZone is set, this field is ignored.
     #[serde(rename="autoTimeRequired")]
     
@@ -2027,7 +2027,7 @@ pub struct Policy {
     /// Controls the use of the camera and whether the user has access to the camera access toggle.
     #[serde(rename="cameraAccess")]
     
-    pub camera_access: Option<String>,
+    pub camera_access: Option<PolicyCameraAccessEnum>,
     /// If camera_access is set to any value other than CAMERA_ACCESS_UNSPECIFIED, this has no effect. Otherwise this field controls whether cameras are disabled: If true, all cameras are disabled, otherwise they are available. For fully managed devices this field applies for all apps on the device. For work profiles, this field applies only to apps in the work profile, and the camera access of apps outside the work profile is unaffected.
     #[serde(rename="cameraDisabled")]
     
@@ -2067,7 +2067,7 @@ pub struct Policy {
     /// The default permission policy for runtime permission requests.
     #[serde(rename="defaultPermissionPolicy")]
     
-    pub default_permission_policy: Option<String>,
+    pub default_permission_policy: Option<PolicyDefaultPermissionPolicyEnum>,
     /// The device owner information to be shown on the lock screen.
     #[serde(rename="deviceOwnerLockScreenInfo")]
     
@@ -2075,7 +2075,7 @@ pub struct Policy {
     /// Whether encryption is enabled
     #[serde(rename="encryptionPolicy")]
     
-    pub encryption_policy: Option<String>,
+    pub encryption_policy: Option<PolicyEncryptionPolicyEnum>,
     /// Whether app verification is force-enabled.
     #[serde(rename="ensureVerifyAppsEnabled")]
     
@@ -2107,7 +2107,7 @@ pub struct Policy {
     /// Disabled keyguard customizations, such as widgets.
     #[serde(rename="keyguardDisabledFeatures")]
     
-    pub keyguard_disabled_features: Option<Vec<String>>,
+    pub keyguard_disabled_features: Option<Vec<PolicyKeyguardDisabledFeaturesEnum>>,
     /// Whether the kiosk custom launcher is enabled. This replaces the home screen with a launcher that locks down the device to the apps installed via the applications setting. Apps appear on a single page in alphabetical order. Use kioskCustomization to further configure the kiosk device behavior.
     #[serde(rename="kioskCustomLauncherEnabled")]
     
@@ -2119,7 +2119,7 @@ pub struct Policy {
     /// The degree of location detection enabled.
     #[serde(rename="locationMode")]
     
-    pub location_mode: Option<String>,
+    pub location_mode: Option<PolicyLocationModeEnum>,
     /// A message displayed to the user in the device administators settings screen.
     #[serde(rename="longSupportMessage")]
     
@@ -2132,7 +2132,7 @@ pub struct Policy {
     /// Controls the use of the microphone and whether the user has access to the microphone access toggle. This applies only on fully managed devices.
     #[serde(rename="microphoneAccess")]
     
-    pub microphone_access: Option<String>,
+    pub microphone_access: Option<PolicyMicrophoneAccessEnum>,
     /// The minimum allowed Android API level.
     #[serde(rename="minimumApiLevel")]
     
@@ -2207,7 +2207,7 @@ pub struct Policy {
     /// This mode controls which apps are available to the user in the Play Store and the behavior on the device when apps are removed from the policy.
     #[serde(rename="playStoreMode")]
     
-    pub play_store_mode: Option<String>,
+    pub play_store_mode: Option<PolicyPlayStoreModeEnum>,
     /// Rules that define the behavior when a particular policy can not be applied on device
     #[serde(rename="policyEnforcementRules")]
     
@@ -2215,7 +2215,7 @@ pub struct Policy {
     /// Controls whether preferential network service is enabled on the work profile. For example, an organization may have an agreement with a carrier that all of the work data from its employees' devices will be sent via a network service dedicated for enterprise use. An example of a supported preferential network service is the enterprise slice on 5G networks. This has no effect on fully managed devices.
     #[serde(rename="preferentialNetworkService")]
     
-    pub preferential_network_service: Option<String>,
+    pub preferential_network_service: Option<PolicyPreferentialNetworkServiceEnum>,
     /// Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.
     #[serde(rename="privateKeySelectionEnabled")]
     
@@ -2275,7 +2275,7 @@ pub struct Policy {
     /// The battery plugged in modes for which the device stays on. When using this setting, it is recommended to clear maximum_time_to_lock so that the device doesn't lock itself while it stays on.
     #[serde(rename="stayOnPluggedModes")]
     
-    pub stay_on_plugged_modes: Option<Vec<String>>,
+    pub stay_on_plugged_modes: Option<Vec<PolicyStayOnPluggedModesEnum>>,
     /// The system update policy, which controls how OS updates are applied. If the update type is WINDOWED, the update window will automatically apply to Play app updates as well.
     #[serde(rename="systemUpdate")]
     
@@ -2363,7 +2363,7 @@ pub struct PostureDetail {
     /// A specific security risk that negatively affects the security posture of the device.
     #[serde(rename="securityRisk")]
     
-    pub security_risk: Option<String>,
+    pub security_risk: Option<PostureDetailSecurityRiskEnum>,
 }
 
 impl client::Part for PostureDetail {}
@@ -2387,7 +2387,7 @@ pub struct PowerManagementEvent {
     /// Event type.
     #[serde(rename="eventType")]
     
-    pub event_type: Option<String>,
+    pub event_type: Option<PowerManagementEventEventTypeEnum>,
 }
 
 impl client::Part for PowerManagementEvent {}
@@ -2429,7 +2429,7 @@ pub struct SecurityPosture {
     /// Device's security posture value.
     #[serde(rename="devicePosture")]
     
-    pub device_posture: Option<String>,
+    pub device_posture: Option<SecurityPostureDevicePostureEnum>,
     /// Additional details regarding the security posture of the device.
     #[serde(rename="postureDetails")]
     
@@ -2471,7 +2471,7 @@ pub struct SigninDetail {
     /// Controls whether personal usage is allowed on a device provisioned with this enrollment token.For company-owned devices: Enabling personal usage allows the user to set up a work profile on the device. Disabling personal usage requires the user provision the device as a fully managed device.For personally-owned devices: Enabling personal usage allows the user to set up a work profile on the device. Disabling personal usage will prevent the device from provisioning. Personal usage cannot be disabled on personally-owned device.
     #[serde(rename="allowPersonalUsage")]
     
-    pub allow_personal_usage: Option<String>,
+    pub allow_personal_usage: Option<SigninDetailAllowPersonalUsageEnum>,
     /// A JSON string whose UTF-8 representation can be used to generate a QR code to enroll a device with this enrollment token. To enroll a device using NFC, the NFC record must contain a serialized java.util.Properties representation of the properties in the JSON. This is a read-only field generated by the server.
     #[serde(rename="qrCode")]
     
@@ -2687,7 +2687,7 @@ pub struct SystemUpdate {
     /// The type of system update to configure.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<SystemUpdateTypeEnum>,
 }
 
 impl client::Part for SystemUpdate {}
@@ -2707,7 +2707,7 @@ pub struct SystemUpdateInfo {
     /// The status of an update: whether an update exists and what type it is.
     #[serde(rename="updateStatus")]
     
-    pub update_status: Option<String>,
+    pub update_status: Option<SystemUpdateInfoUpdateStatusEnum>,
 }
 
 impl client::Part for SystemUpdateInfo {}
@@ -2761,11 +2761,11 @@ pub struct UsageLog {
     /// Specifies which log types are enabled. Note that users will receive on-device messaging when usage logging is enabled.
     #[serde(rename="enabledLogTypes")]
     
-    pub enabled_log_types: Option<Vec<String>>,
+    pub enabled_log_types: Option<Vec<UsageLogEnabledLogTypesEnum>>,
     /// Specifies which of the enabled log types can be uploaded over mobile data. By default logs are queued for upload when the device connects to WiFi.
     #[serde(rename="uploadOnCellularAllowed")]
     
-    pub upload_on_cellular_allowed: Option<Vec<String>>,
+    pub upload_on_cellular_allowed: Option<Vec<UsageLogUploadOnCellularAllowedEnum>>,
 }
 
 impl client::Part for UsageLog {}
@@ -2823,7 +2823,7 @@ pub struct WebApp {
     /// The display mode of the web app.
     #[serde(rename="displayMode")]
     
-    pub display_mode: Option<String>,
+    pub display_mode: Option<WebAppDisplayModeEnum>,
     /// A list of icons for the web app. Must have at least one element.
     
     pub icons: Option<Vec<WebAppIcon>>,
@@ -2878,7 +2878,7 @@ pub struct WebToken {
     /// The features to enable. Use this if you want to control exactly which feature(s) will be activated; leave empty to allow all features.Restrictions / things to note: - If no features are listed here, all features are enabled — this is the default behavior where you give access to all features to your admins. - This must not contain any FEATURE_UNSPECIFIED values. - Repeated values are ignored 
     #[serde(rename="enabledFeatures")]
     
-    pub enabled_features: Option<Vec<String>>,
+    pub enabled_features: Option<Vec<WebTokenEnabledFeaturesEnum>>,
     /// The name of the web token, which is generated by the server during creation in the form enterprises/{enterpriseId}/webTokens/{webTokenId}.
     
     pub name: Option<String>,
@@ -2888,7 +2888,7 @@ pub struct WebToken {
     pub parent_frame_url: Option<String>,
     /// Permissions available to an admin in the embedded UI. An admin must have all of these permissions in order to view the UI. This field is deprecated.
     
-    pub permissions: Option<Vec<String>>,
+    pub permissions: Option<Vec<WebTokenPermissionsEnum>>,
     /// The token value which is used in the hosting page to generate the iframe with the embedded UI. This is a read-only field generated by the server.
     
     pub value: Option<String>,

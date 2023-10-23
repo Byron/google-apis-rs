@@ -31,7 +31,7 @@ pub struct GoogleCloudWebriskV1ComputeThreatListDiffResponse {
     /// The type of response. This may indicate that an action must be taken by the client when the response is received.
     #[serde(rename="responseType")]
     
-    pub response_type: Option<String>,
+    pub response_type: Option<GoogleCloudWebriskV1ComputeThreatListDiffResponseResponseTypeEnum>,
 }
 
 impl client::ResponseResult for GoogleCloudWebriskV1ComputeThreatListDiffResponse {}
@@ -160,7 +160,7 @@ pub struct GoogleCloudWebriskV1SearchHashesResponseThreatHash {
     /// The ThreatList this threat belongs to. This must contain at least one entry.
     #[serde(rename="threatTypes")]
     
-    pub threat_types: Option<Vec<String>>,
+    pub threat_types: Option<Vec<GoogleCloudWebriskV1SearchHashesResponseThreatHashThreatTypesEnum>>,
 }
 
 impl client::Part for GoogleCloudWebriskV1SearchHashesResponseThreatHash {}
@@ -199,7 +199,7 @@ pub struct GoogleCloudWebriskV1SearchUrisResponseThreatUri {
     /// The ThreatList this threat belongs to.
     #[serde(rename="threatTypes")]
     
-    pub threat_types: Option<Vec<String>>,
+    pub threat_types: Option<Vec<GoogleCloudWebriskV1SearchUrisResponseThreatUriThreatTypesEnum>>,
 }
 
 impl client::Part for GoogleCloudWebriskV1SearchUrisResponseThreatUri {}
@@ -219,7 +219,7 @@ pub struct GoogleCloudWebriskV1Submission {
     /// ThreatTypes found to be associated with the submitted URI after reviewing it. This might be empty if the URI was not added to any list.
     #[serde(rename="threatTypes")]
     
-    pub threat_types: Option<Vec<String>>,
+    pub threat_types: Option<Vec<GoogleCloudWebriskV1SubmissionThreatTypesEnum>>,
     /// Required. The URI that is being reported for malicious content to be analyzed.
     
     pub uri: Option<String>,

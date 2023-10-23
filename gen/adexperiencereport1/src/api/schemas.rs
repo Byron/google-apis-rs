@@ -9,7 +9,7 @@ pub struct PlatformSummary {
     /// The site's Ad Experience Report status on this platform.
     #[serde(rename="betterAdsStatus")]
     
-    pub better_ads_status: Option<String>,
+    pub better_ads_status: Option<PlatformSummaryBetterAdsStatusEnum>,
     /// The time at which [enforcement](https://support.google.com/webtools/answer/7308033) against the site began or will begin on this platform. Not set when the filter_status is OFF.
     #[serde(rename="enforcementTime")]
     
@@ -17,14 +17,14 @@ pub struct PlatformSummary {
     /// The site's [enforcement status](https://support.google.com/webtools/answer/7308033) on this platform.
     #[serde(rename="filterStatus")]
     
-    pub filter_status: Option<String>,
+    pub filter_status: Option<PlatformSummaryFilterStatusEnum>,
     /// The time at which the site's status last changed on this platform.
     #[serde(rename="lastChangeTime")]
     
     pub last_change_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The site's regions on this platform. No longer populated, because there is no longer any semantic difference between sites in different regions.
     
-    pub region: Option<Vec<String>>,
+    pub region: Option<Vec<PlatformSummaryRegionEnum>>,
     /// A link to the full Ad Experience Report for the site on this platform.. Not set in ViolatingSitesResponse. Note that you must complete the [Search Console verification process](https://support.google.com/webmasters/answer/9008080) for the site before you can access the full report.
     #[serde(rename="reportUrl")]
     

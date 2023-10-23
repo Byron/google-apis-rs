@@ -77,7 +77,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -369,7 +369,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -661,7 +661,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
 
         params.extend(self._additional_params.iter());
 
@@ -908,7 +908,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().rows_create(req, "parent")
-///              .view("duo")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -918,7 +918,7 @@ pub struct TableRowCreateCall<'a, S>
    pub(super) hub: &'a Area120Tables<S>,
    pub(super) _request: Row,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<TableViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -955,7 +955,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1099,8 +1099,8 @@ where
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowCreateCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &TableViewEnum) -> TableRowCreateCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1250,7 +1250,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1468,7 +1468,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().rows_get("name")
-///              .view("ut")
+///              .view(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1477,7 +1477,7 @@ pub struct TableRowGetCall<'a, S>
 
    pub(super) hub: &'a Area120Tables<S>,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<TableViewEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1514,7 +1514,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1635,8 +1635,8 @@ where
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowGetCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &TableViewEnum) -> TableRowGetCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1742,11 +1742,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().rows_list("parent")
-///              .view("rebum.")
-///              .page_token("est")
+///              .view(&Default::default())
+///              .page_token("duo")
 ///              .page_size(-50)
-///              .order_by("ipsum")
-///              .filter("est")
+///              .order_by("sed")
+///              .filter("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1755,7 +1755,7 @@ pub struct TableRowListCall<'a, S>
 
    pub(super) hub: &'a Area120Tables<S>,
    pub(super) _parent: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<TableViewEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
    pub(super) _order_by: Option<String>,
@@ -1796,7 +1796,7 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("parent", self._parent);
+        params.push("parent", &self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -1929,8 +1929,8 @@ where
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowListCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &TableViewEnum) -> TableRowListCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// A page token, received from a previous `ListRows` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListRows` must match the call that provided the page token.
@@ -2070,7 +2070,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().rows_patch(req, "name")
-///              .view("ea")
+///              .view(&Default::default())
 ///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
@@ -2081,7 +2081,7 @@ pub struct TableRowPatchCall<'a, S>
    pub(super) hub: &'a Area120Tables<S>,
    pub(super) _request: Row,
    pub(super) _name: String,
-   pub(super) _view: Option<String>,
+   pub(super) _view: Option<TableViewEnum>,
    pub(super) _update_mask: Option<client::FieldMask>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
@@ -2119,7 +2119,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
         }
@@ -2266,8 +2266,8 @@ where
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowPatchCall<'a, S> {
-        self._view = Some(new_value.to_string());
+    pub fn view(mut self, new_value: &TableViewEnum) -> TableRowPatchCall<'a, S> {
+        self._view = Some(new_value.clone());
         self
     }
     /// The list of fields to update.
@@ -2424,7 +2424,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -2642,9 +2642,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().list()
-///              .page_token("Lorem")
-///              .page_size(-25)
-///              .order_by("labore")
+///              .page_token("est")
+///              .page_size(-50)
+///              .order_by("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2965,7 +2965,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -3183,8 +3183,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.workspaces().list()
-///              .page_token("duo")
-///              .page_size(-80)
+///              .page_token("gubergren")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```

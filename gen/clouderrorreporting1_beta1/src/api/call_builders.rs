@@ -26,13 +26,13 @@ use super::*;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().events_list("projectName")
-///              .time_range_period("voluptua.")
-///              .service_filter_version("At")
-///              .service_filter_service("sanctus")
-///              .service_filter_resource_type("sed")
-///              .page_token("amet.")
-///              .page_size(-59)
-///              .group_id("amet.")
+///              .time_range_period(&Default::default())
+///              .service_filter_version("voluptua.")
+///              .service_filter_service("At")
+///              .service_filter_resource_type("sanctus")
+///              .page_token("sed")
+///              .page_size(-2)
+///              .group_id("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -41,7 +41,7 @@ pub struct ProjectEventListCall<'a, S>
 
    pub(super) hub: &'a Clouderrorreporting<S>,
    pub(super) _project_name: String,
-   pub(super) _time_range_period: Option<String>,
+   pub(super) _time_range_period: Option<ProjectTimeRangePeriodEnum>,
    pub(super) _service_filter_version: Option<String>,
    pub(super) _service_filter_service: Option<String>,
    pub(super) _service_filter_resource_type: Option<String>,
@@ -84,7 +84,7 @@ where
         }
 
         let mut params = Params::with_capacity(10 + self._additional_params.len());
-        params.push("projectName", self._project_name);
+        params.push("projectName", &self._project_name);
         if let Some(value) = self._time_range_period.as_ref() {
             params.push("timeRange.period", value);
         }
@@ -223,8 +223,8 @@ where
     /// Restricts the query to the specified time range.
     ///
     /// Sets the *time range.period* query property to the given value.
-    pub fn time_range_period(mut self, new_value: &str) -> ProjectEventListCall<'a, S> {
-        self._time_range_period = Some(new_value.to_string());
+    pub fn time_range_period(mut self, new_value: &ProjectTimeRangePeriodEnum) -> ProjectEventListCall<'a, S> {
+        self._time_range_period = Some(new_value.clone());
         self
     }
     /// Optional. The exact value to match against [`ServiceContext.version`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
@@ -423,7 +423,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("projectName", self._project_name);
+        params.push("projectName", &self._project_name);
 
         params.extend(self._additional_params.iter());
 
@@ -664,17 +664,17 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().group_stats_list("projectName")
-///              .timed_count_duration(chrono::Duration::seconds(5161231))
-///              .time_range_period("Lorem")
+///              .timed_count_duration(chrono::Duration::seconds(6037203))
+///              .time_range_period(&Default::default())
 ///              .service_filter_version("gubergren")
-///              .service_filter_service("eos")
-///              .service_filter_resource_type("dolor")
-///              .page_token("ea")
-///              .page_size(-55)
-///              .order("invidunt")
-///              .add_group_id("amet")
+///              .service_filter_service("Lorem")
+///              .service_filter_resource_type("gubergren")
+///              .page_token("eos")
+///              .page_size(-4)
+///              .order(&Default::default())
+///              .add_group_id("ea")
 ///              .alignment_time(chrono::Utc::now())
-///              .alignment("duo")
+///              .alignment(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -684,16 +684,16 @@ pub struct ProjectGroupStatListCall<'a, S>
    pub(super) hub: &'a Clouderrorreporting<S>,
    pub(super) _project_name: String,
    pub(super) _timed_count_duration: Option<client::chrono::Duration>,
-   pub(super) _time_range_period: Option<String>,
+   pub(super) _time_range_period: Option<ProjectTimeRangePeriodEnum>,
    pub(super) _service_filter_version: Option<String>,
    pub(super) _service_filter_service: Option<String>,
    pub(super) _service_filter_resource_type: Option<String>,
    pub(super) _page_token: Option<String>,
    pub(super) _page_size: Option<i32>,
-   pub(super) _order: Option<String>,
+   pub(super) _order: Option<ProjectOrderEnum>,
    pub(super) _group_id: Vec<String>,
    pub(super) _alignment_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-   pub(super) _alignment: Option<String>,
+   pub(super) _alignment: Option<ProjectAlignmentEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -730,7 +730,7 @@ where
         }
 
         let mut params = Params::with_capacity(14 + self._additional_params.len());
-        params.push("projectName", self._project_name);
+        params.push("projectName", &self._project_name);
         if let Some(value) = self._timed_count_duration.as_ref() {
             params.push("timedCountDuration", ::client::serde::duration::to_string(&value));
         }
@@ -890,8 +890,8 @@ where
     /// Restricts the query to the specified time range.
     ///
     /// Sets the *time range.period* query property to the given value.
-    pub fn time_range_period(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, S> {
-        self._time_range_period = Some(new_value.to_string());
+    pub fn time_range_period(mut self, new_value: &ProjectTimeRangePeriodEnum) -> ProjectGroupStatListCall<'a, S> {
+        self._time_range_period = Some(new_value.clone());
         self
     }
     /// Optional. The exact value to match against [`ServiceContext.version`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
@@ -932,8 +932,8 @@ where
     /// Optional. The sort order in which the results are returned. Default is `COUNT_DESC`.
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, S> {
-        self._order = Some(new_value.to_string());
+    pub fn order(mut self, new_value: &ProjectOrderEnum) -> ProjectGroupStatListCall<'a, S> {
+        self._order = Some(new_value.clone());
         self
     }
     /// Optional. List all ErrorGroupStats with these IDs.
@@ -954,8 +954,8 @@ where
     /// Optional. The alignment of the timed counts to be returned. Default is `ALIGNMENT_EQUAL_AT_END`.
     ///
     /// Sets the *alignment* query property to the given value.
-    pub fn alignment(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, S> {
-        self._alignment = Some(new_value.to_string());
+    pub fn alignment(mut self, new_value: &ProjectAlignmentEnum) -> ProjectGroupStatListCall<'a, S> {
+        self._alignment = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1105,7 +1105,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("groupName", self._group_name);
+        params.push("groupName", &self._group_name);
 
         params.extend(self._additional_params.iter());
 
@@ -1374,7 +1374,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("name", self._name);
+        params.push("name", &self._name);
 
         params.extend(self._additional_params.iter());
 
@@ -1659,7 +1659,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("projectName", self._project_name);
+        params.push("projectName", &self._project_name);
 
         params.extend(self._additional_params.iter());
 

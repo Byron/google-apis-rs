@@ -72,7 +72,7 @@ pub struct AnimationFade {
     /// Required. Type of fade animation: `FADE_IN` or `FADE_OUT`.
     #[serde(rename="fadeType")]
     
-    pub fade_type: Option<String>,
+    pub fade_type: Option<AnimationFadeFadeTypeEnum>,
     /// The time to start the fade animation, in seconds. Default: 0
     #[serde(rename="startTimeOffset")]
     
@@ -660,7 +660,7 @@ pub struct Job {
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The current state of the job.
     
-    pub state: Option<String>,
+    pub state: Option<JobStateEnum>,
     /// Input only. Specify the `template_id` to use for populating `Job.config`. The default is `preset/web-hd`. Preset Transcoder templates: - `preset/{preset_id}` - User defined JobTemplate: `{job_template_id}`
     #[serde(rename="templateId")]
     
@@ -821,7 +821,7 @@ pub struct Manifest {
     /// Required. Type of the manifest, can be `HLS` or `DASH`.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<ManifestTypeEnum>,
 }
 
 impl client::Part for Manifest {}

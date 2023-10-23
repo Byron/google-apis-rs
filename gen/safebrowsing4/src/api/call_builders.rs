@@ -73,7 +73,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("encodedRequest", ::client::serde::urlsafe_base64::to_string(&self._encoded_request));
+        params.push("encodedRequest", &::client::serde::urlsafe_base64::to_string(&self._encoded_request));
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }
@@ -314,7 +314,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("encodedRequest", ::client::serde::urlsafe_base64::to_string(&self._encoded_request));
+        params.push("encodedRequest", &::client::serde::urlsafe_base64::to_string(&self._encoded_request));
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }

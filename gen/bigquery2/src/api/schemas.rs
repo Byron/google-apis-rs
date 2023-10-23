@@ -45,14 +45,14 @@ pub struct Argument {
     /// Optional. Defaults to FIXED_TYPE.
     #[serde(rename="argumentKind")]
     
-    pub argument_kind: Option<String>,
+    pub argument_kind: Option<ArgumentArgumentKindEnum>,
     /// Required unless argument_kind = ANY_TYPE.
     #[serde(rename="dataType")]
     
     pub data_type: Option<StandardSqlDataType>,
     /// Optional. Specifies whether the argument is input or output. Can be set for procedures only.
     
-    pub mode: Option<String>,
+    pub mode: Option<ArgumentModeEnum>,
     /// Optional. The name of this argument. Can be absent for function return argument.
     
     pub name: Option<String>,
@@ -109,7 +109,7 @@ pub struct ArimaForecastingMetrics {
     /// Seasonal periods. Repeated because multiple periods are supported for one time series.
     #[serde(rename="seasonalPeriods")]
     
-    pub seasonal_periods: Option<Vec<String>>,
+    pub seasonal_periods: Option<Vec<ArimaForecastingMetricSeasonalPeriodsEnum>>,
     /// Id to differentiate different time series for the large-scale case.
     #[serde(rename="timeSeriesId")]
     
@@ -177,7 +177,7 @@ pub struct ArimaSingleModelForecastingMetrics {
     /// Seasonal periods. Repeated because multiple periods are supported for one time series.
     #[serde(rename="seasonalPeriods")]
     
-    pub seasonal_periods: Option<Vec<String>>,
+    pub seasonal_periods: Option<Vec<ArimaSingleModelForecastingMetricSeasonalPeriodsEnum>>,
     /// The time_series_id value for this time series. It will be one of the unique values from the time_series_id_column specified during ARIMA model training. Only present when time_series_id_column training option was used.
     #[serde(rename="timeSeriesId")]
     
@@ -224,7 +224,7 @@ pub struct AuditLogConfig {
     /// The log type that this config enables.
     #[serde(rename="logType")]
     
-    pub log_type: Option<String>,
+    pub log_type: Option<AuditLogConfigLogTypeEnum>,
 }
 
 impl client::Part for AuditLogConfig {}
@@ -910,7 +910,7 @@ pub struct DatasetAccessEntry {
     /// no description provided
     #[serde(rename="targetTypes")]
     
-    pub target_types: Option<Vec<String>>,
+    pub target_types: Option<Vec<DatasetAccessEntryTargetTypesEnum>>,
 }
 
 impl client::Part for DatasetAccessEntry {}
@@ -1816,7 +1816,7 @@ pub struct HparamTuningTrial {
     pub start_time_ms: Option<i64>,
     /// The status of the trial.
     
-    pub status: Option<String>,
+    pub status: Option<HparamTuningTrialStatusEnum>,
     /// Loss computed on the training data at the end of trial.
     #[serde(rename="trainingLoss")]
     
@@ -3064,7 +3064,7 @@ pub struct Model {
     /// Output only. Type of the model resource.
     #[serde(rename="modelType")]
     
-    pub model_type: Option<String>,
+    pub model_type: Option<ModelModelTypeEnum>,
     /// Output only. For single-objective [hyperparameter tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it only contains the best trial. For multi-objective [hyperparameter tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it contains all Pareto optimal trials sorted by trial_id.
     #[serde(rename="optimalTrialIds")]
     
@@ -3645,7 +3645,7 @@ pub struct Routine {
     /// Optional. The determinism level of the JavaScript UDF, if defined.
     #[serde(rename="determinismLevel")]
     
-    pub determinism_level: Option<String>,
+    pub determinism_level: Option<RoutineDeterminismLevelEnum>,
     /// Output only. A hash of this resource.
     
     pub etag: Option<String>,
@@ -3655,7 +3655,7 @@ pub struct Routine {
     pub imported_libraries: Option<Vec<String>>,
     /// Optional. Defaults to "SQL" if remote_function_options field is absent, not set otherwise.
     
-    pub language: Option<String>,
+    pub language: Option<RoutineLanguageEnum>,
     /// Output only. The time when this routine was last modified, in milliseconds since the epoch.
     #[serde(rename="lastModifiedTime")]
     
@@ -3680,7 +3680,7 @@ pub struct Routine {
     /// Required. The type of routine.
     #[serde(rename="routineType")]
     
-    pub routine_type: Option<String>,
+    pub routine_type: Option<RoutineRoutineTypeEnum>,
     /// Optional. Spark specific options.
     #[serde(rename="sparkOptions")]
     
@@ -4055,7 +4055,7 @@ pub struct StandardSqlDataType {
     /// Required. The top level type of this field. Can be any standard SQL data type (e.g., "INT64", "DATE", "ARRAY").
     #[serde(rename="typeKind")]
     
-    pub type_kind: Option<String>,
+    pub type_kind: Option<StandardSqlDataTypeTypeKindEnum>,
 }
 
 impl client::Part for StandardSqlDataType {}
@@ -4680,7 +4680,7 @@ pub struct TrainingOptions {
     /// Booster type for boosted tree models.
     #[serde(rename="boosterType")]
     
-    pub booster_type: Option<String>,
+    pub booster_type: Option<TrainingOptionBoosterTypeEnum>,
     /// Whether or not p-value test should be computed for this model. Only available for linear and logistic regression models.
     #[serde(rename="calculatePValues")]
     
@@ -4692,7 +4692,7 @@ pub struct TrainingOptions {
     /// Enums for color space, used for processing images in Object Table. See more details at https://www.tensorflow.org/io/tutorials/colorspace.
     #[serde(rename="colorSpace")]
     
-    pub color_space: Option<String>,
+    pub color_space: Option<TrainingOptionColorSpaceEnum>,
     /// Subsample ratio of columns for each level for boosted tree models.
     #[serde(rename="colsampleBylevel")]
     
@@ -4708,11 +4708,11 @@ pub struct TrainingOptions {
     /// Type of normalization algorithm for boosted tree models using dart booster.
     #[serde(rename="dartNormalizeType")]
     
-    pub dart_normalize_type: Option<String>,
+    pub dart_normalize_type: Option<TrainingOptionDartNormalizeTypeEnum>,
     /// The data frequency of a time series.
     #[serde(rename="dataFrequency")]
     
-    pub data_frequency: Option<String>,
+    pub data_frequency: Option<TrainingOptionDataFrequencyEnum>,
     /// The column to split data with. This column won't be used as a feature. 1. When data_split_method is CUSTOM, the corresponding column should be boolean. The rows with true value tag are eval data, and the false are training data. 2. When data_split_method is SEQ, the first DATA_SPLIT_EVAL_FRACTION rows (from smallest to largest) in the corresponding column are used as training data, and the rest are eval data. It respects the order in Orderable data types: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data-type-properties
     #[serde(rename="dataSplitColumn")]
     
@@ -4724,7 +4724,7 @@ pub struct TrainingOptions {
     /// The data split type for training and evaluation, e.g. RANDOM.
     #[serde(rename="dataSplitMethod")]
     
-    pub data_split_method: Option<String>,
+    pub data_split_method: Option<TrainingOptionDataSplitMethodEnum>,
     /// If true, perform decompose time series and save the results.
     #[serde(rename="decomposeTimeSeries")]
     
@@ -4732,7 +4732,7 @@ pub struct TrainingOptions {
     /// Distance type for clustering models.
     #[serde(rename="distanceType")]
     
-    pub distance_type: Option<String>,
+    pub distance_type: Option<TrainingOptionDistanceTypeEnum>,
     /// Dropout probability for dnn models.
     
     pub dropout: Option<f64>,
@@ -4747,7 +4747,7 @@ pub struct TrainingOptions {
     /// Feedback type that specifies which algorithm to run for matrix factorization.
     #[serde(rename="feedbackType")]
     
-    pub feedback_type: Option<String>,
+    pub feedback_type: Option<TrainingOptionFeedbackTypeEnum>,
     /// Hidden units for dnn models.
     #[serde(rename="hiddenUnits")]
     
@@ -4756,7 +4756,7 @@ pub struct TrainingOptions {
     /// The geographical region based on which the holidays are considered in time series modeling. If a valid value is specified, then holiday effects modeling is enabled.
     #[serde(rename="holidayRegion")]
     
-    pub holiday_region: Option<String>,
+    pub holiday_region: Option<TrainingOptionHolidayRegionEnum>,
     /// The number of periods ahead that need to be forecasted.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -4764,7 +4764,7 @@ pub struct TrainingOptions {
     /// The target evaluation metrics to optimize the hyperparameters for.
     #[serde(rename="hparamTuningObjectives")]
     
-    pub hparam_tuning_objectives: Option<Vec<String>>,
+    pub hparam_tuning_objectives: Option<Vec<TrainingOptionHparamTuningObjectivesEnum>>,
     /// Include drift when fitting an ARIMA model.
     #[serde(rename="includeDrift")]
     
@@ -4793,7 +4793,7 @@ pub struct TrainingOptions {
     /// The method used to initialize the centroids for kmeans algorithm.
     #[serde(rename="kmeansInitializationMethod")]
     
-    pub kmeans_initialization_method: Option<String>,
+    pub kmeans_initialization_method: Option<TrainingOptionKmeansInitializationMethodEnum>,
     /// L1 regularization coefficient.
     #[serde(rename="l1Regularization")]
     
@@ -4813,11 +4813,11 @@ pub struct TrainingOptions {
     /// The strategy to determine learn rate for the current iteration.
     #[serde(rename="learnRateStrategy")]
     
-    pub learn_rate_strategy: Option<String>,
+    pub learn_rate_strategy: Option<TrainingOptionLearnRateStrategyEnum>,
     /// Type of loss function used during training run.
     #[serde(rename="lossType")]
     
-    pub loss_type: Option<String>,
+    pub loss_type: Option<TrainingOptionLossTypeEnum>,
     /// The maximum number of iterations in training. Used only for iterative training algorithms.
     #[serde(rename="maxIterations")]
     
@@ -4887,7 +4887,7 @@ pub struct TrainingOptions {
     /// Optimization strategy for training linear regression models.
     #[serde(rename="optimizationStrategy")]
     
-    pub optimization_strategy: Option<String>,
+    pub optimization_strategy: Option<TrainingOptionOptimizationStrategyEnum>,
     /// Whether to preserve the input structs in output feature names. Suppose there is a struct A with field b. When false (default), the output feature name is A_b. When true, the output feature name is A.b.
     #[serde(rename="preserveInputStructs")]
     
@@ -4923,7 +4923,7 @@ pub struct TrainingOptions {
     /// Tree construction algorithm for boosted tree models.
     #[serde(rename="treeMethod")]
     
-    pub tree_method: Option<String>,
+    pub tree_method: Option<TrainingOptionTreeMethodEnum>,
     /// The smoothing window size for the trend component of the time series.
     #[serde(rename="trendSmoothingWindowSize")]
     

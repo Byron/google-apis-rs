@@ -71,8 +71,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
 
         params.extend(self._additional_params.iter());
 
@@ -341,8 +341,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
 
         params.extend(self._additional_params.iter());
 
@@ -617,7 +617,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
 
         params.extend(self._additional_params.iter());
 
@@ -854,9 +854,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().list("project")
-///              .page_token("amet")
-///              .max_results(81)
-///              .filter("ipsum")
+///              .page_token("ipsum")
+///              .max_results(39)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -904,7 +904,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1162,9 +1162,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().patch(req, "project", "deployment")
-///              .update_policy("gubergren")
-///              .delete_policy("rebum.")
-///              .create_policy("est")
+///              .update_policy(&Default::default())
+///              .delete_policy(&Default::default())
+///              .create_policy(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1175,9 +1175,9 @@ pub struct DeploymentPatchCall<'a, S>
    pub(super) _request: Deployment,
    pub(super) _project: String,
    pub(super) _deployment: String,
-   pub(super) _update_policy: Option<String>,
-   pub(super) _delete_policy: Option<String>,
-   pub(super) _create_policy: Option<String>,
+   pub(super) _update_policy: Option<DeploymentUpdatePolicyEnum>,
+   pub(super) _delete_policy: Option<DeploymentDeletePolicyEnum>,
+   pub(super) _create_policy: Option<DeploymentCreatePolicyEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1214,8 +1214,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
         if let Some(value) = self._update_policy.as_ref() {
             params.push("updatePolicy", value);
         }
@@ -1375,22 +1375,22 @@ where
     /// Sets the policy to use for updating resources.
     ///
     /// Sets the *update policy* query property to the given value.
-    pub fn update_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
-        self._update_policy = Some(new_value.to_string());
+    pub fn update_policy(mut self, new_value: &DeploymentUpdatePolicyEnum) -> DeploymentPatchCall<'a, S> {
+        self._update_policy = Some(new_value.clone());
         self
     }
     /// Sets the policy to use for deleting resources.
     ///
     /// Sets the *delete policy* query property to the given value.
-    pub fn delete_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
-        self._delete_policy = Some(new_value.to_string());
+    pub fn delete_policy(mut self, new_value: &DeploymentDeletePolicyEnum) -> DeploymentPatchCall<'a, S> {
+        self._delete_policy = Some(new_value.clone());
         self
     }
     /// Sets the policy to use for creating new resources.
     ///
     /// Sets the *create policy* query property to the given value.
-    pub fn create_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
-        self._create_policy = Some(new_value.to_string());
+    pub fn create_policy(mut self, new_value: &DeploymentCreatePolicyEnum) -> DeploymentPatchCall<'a, S> {
+        self._create_policy = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1498,9 +1498,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().update(req, "project", "deployment")
-///              .update_policy("est")
-///              .delete_policy("gubergren")
-///              .create_policy("ea")
+///              .update_policy(&Default::default())
+///              .delete_policy(&Default::default())
+///              .create_policy(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -1511,9 +1511,9 @@ pub struct DeploymentUpdateCall<'a, S>
    pub(super) _request: Deployment,
    pub(super) _project: String,
    pub(super) _deployment: String,
-   pub(super) _update_policy: Option<String>,
-   pub(super) _delete_policy: Option<String>,
-   pub(super) _create_policy: Option<String>,
+   pub(super) _update_policy: Option<DeploymentUpdatePolicyEnum>,
+   pub(super) _delete_policy: Option<DeploymentDeletePolicyEnum>,
+   pub(super) _create_policy: Option<DeploymentCreatePolicyEnum>,
    pub(super) _delegate: Option<&'a mut dyn client::Delegate>,
    pub(super) _additional_params: HashMap<String, String>,
    pub(super) _scopes: BTreeSet<String>
@@ -1550,8 +1550,8 @@ where
         }
 
         let mut params = Params::with_capacity(8 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
         if let Some(value) = self._update_policy.as_ref() {
             params.push("updatePolicy", value);
         }
@@ -1711,22 +1711,22 @@ where
     /// Sets the policy to use for updating resources.
     ///
     /// Sets the *update policy* query property to the given value.
-    pub fn update_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
-        self._update_policy = Some(new_value.to_string());
+    pub fn update_policy(mut self, new_value: &DeploymentUpdatePolicyEnum) -> DeploymentUpdateCall<'a, S> {
+        self._update_policy = Some(new_value.clone());
         self
     }
     /// Sets the policy to use for deleting resources.
     ///
     /// Sets the *delete policy* query property to the given value.
-    pub fn delete_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
-        self._delete_policy = Some(new_value.to_string());
+    pub fn delete_policy(mut self, new_value: &DeploymentDeletePolicyEnum) -> DeploymentUpdateCall<'a, S> {
+        self._delete_policy = Some(new_value.clone());
         self
     }
     /// Sets the policy to use for creating new resources.
     ///
     /// Sets the *create policy* query property to the given value.
-    pub fn create_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
-        self._create_policy = Some(new_value.to_string());
+    pub fn create_policy(mut self, new_value: &DeploymentCreatePolicyEnum) -> DeploymentUpdateCall<'a, S> {
+        self._create_policy = Some(new_value.clone());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1874,9 +1874,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
-        params.push("manifest", self._manifest);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
+        params.push("manifest", &self._manifest);
 
         params.extend(self._additional_params.iter());
 
@@ -2110,9 +2110,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.manifests().list("project", "deployment")
-///              .page_token("duo")
-///              .max_results(21)
-///              .filter("no")
+///              .page_token("sed")
+///              .max_results(64)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2161,8 +2161,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2469,8 +2469,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("operation", self._operation);
+        params.push("project", &self._project);
+        params.push("operation", &self._operation);
 
         params.extend(self._additional_params.iter());
 
@@ -2694,9 +2694,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list("project")
-///              .page_token("sed")
-///              .max_results(77)
-///              .filter("et")
+///              .page_token("ipsum")
+///              .max_results(94)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2744,7 +2744,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3042,9 +3042,9 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
-        params.push("resource", self._resource);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
+        params.push("resource", &self._resource);
 
         params.extend(self._additional_params.iter());
 
@@ -3278,9 +3278,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resources().list("project", "deployment")
-///              .page_token("et")
-///              .max_results(73)
-///              .filter("amet.")
+///              .page_token("sed")
+///              .max_results(31)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3329,8 +3329,8 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("project", self._project);
-        params.push("deployment", self._deployment);
+        params.push("project", &self._project);
+        params.push("deployment", &self._deployment);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3592,8 +3592,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.types().list("project")
-///              .page_token("diam")
-///              .max_results(52)
+///              .page_token("Stet")
+///              .max_results(88)
 ///              .filter("et")
 ///              .doit().await;
 /// # }
@@ -3642,7 +3642,7 @@ where
         }
 
         let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push("project", self._project);
+        params.push("project", &self._project);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }

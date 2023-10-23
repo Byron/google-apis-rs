@@ -28,7 +28,7 @@ pub struct AggregateBucket {
     /// The type of a bucket signifies how the data aggregation is performed in the bucket.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<AggregateBucketTypeEnum>,
 }
 
 impl client::Part for AggregateBucket {}
@@ -93,7 +93,7 @@ pub struct AggregateRequest {
     /// DO NOT POPULATE THIS FIELD. It is ignored.
     #[serde(rename="filteredDataQualityStandard")]
     
-    pub filtered_data_quality_standard: Option<Vec<String>>,
+    pub filtered_data_quality_standard: Option<Vec<AggregateRequestFilteredDataQualityStandardEnum>>,
     /// The start of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.
     #[serde(rename="startTimeMillis")]
     
@@ -221,7 +221,7 @@ pub struct BucketByTimePeriod {
     /// no description provided
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<BucketByTimePeriodTypeEnum>,
     /// no description provided
     
     pub value: Option<i32>,
@@ -298,7 +298,7 @@ pub struct DataSource {
     /// DO NOT POPULATE THIS FIELD. It is never populated in responses from the platform, and is ignored in queries. It will be removed in a future version entirely.
     #[serde(rename="dataQualityStandard")]
     
-    pub data_quality_standard: Option<Vec<String>>,
+    pub data_quality_standard: Option<Vec<DataSourceDataQualityStandardEnum>>,
     /// A unique identifier for the data stream produced by this data source. The identifier includes: - The physical device's manufacturer, model, and serial number (UID). - The application's package name or name. Package name is used when the data source was created by an Android application. The developer project number is used when the data source was created by a REST client. - The data source's type. - The data source's stream name. Note that not all attributes of the data source are used as part of the stream identifier. In particular, the version of the hardware/the application isn't used. This allows us to preserve the same stream through version updates. This also means that two DataSource objects may represent the same data stream even if they're not equal. The exact format of the data stream ID created by an Android application is: type:dataType.name:application.packageName:device.manufacturer:device.model:device.uid:dataStreamName The exact format of the data stream ID created by a REST client is: type:dataType.name:developer project number:device.manufacturer:device.model:device.uid:dataStreamName When any of the optional fields that make up the data stream ID are absent, they will be omitted from the data stream ID. The minimum viable data stream ID would be: type:dataType.name:developer project number Finally, the developer project number and device UID are obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form. This means a client will see a different set of data_stream_ids than another client with different credentials.
     #[serde(rename="dataStreamId")]
     
@@ -320,7 +320,7 @@ pub struct DataSource {
     /// A constant describing the type of this data source. Indicates whether this data source produces raw or derived data.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DataSourceTypeEnum>,
 }
 
 impl client::RequestValue for DataSource {}
@@ -354,7 +354,7 @@ impl client::Part for DataType {}
 pub struct DataTypeField {
     /// The different supported formats for each field in a data type.
     
-    pub format: Option<String>,
+    pub format: Option<DataTypeFieldFormatEnum>,
     /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.
     
     pub name: Option<String>,
@@ -421,7 +421,7 @@ pub struct Device {
     /// A constant representing the type of the device.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<DeviceTypeEnum>,
     /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form. The obfuscation preserves equality; that is, given two IDs, if id1 == id2, obfuscated(id1) == obfuscated(id2).
     
     pub uid: Option<String>,

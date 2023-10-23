@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -574,7 +574,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -862,7 +862,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1143,7 +1143,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1641,8 +1641,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("billingId", self._billing_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("billingId", &self._billing_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -1918,8 +1918,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("billingId", self._billing_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("billingId", &self._billing_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2218,8 +2218,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("billingId", self._billing_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("billingId", &self._billing_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2511,8 +2511,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("buyerCreativeId", self._buyer_creative_id);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("buyerCreativeId", &self._buyer_creative_id);
 
         params.extend(self._additional_params.iter());
 
@@ -3005,11 +3005,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.creatives().list()
-///              .status_filter("ea")
-///              .page_token("ipsum")
-///              .max_results(13)
-///              .add_buyer_creative_id("amet")
-///              .add_account_id(-20)
+///              .status_filter(&Default::default())
+///              .page_token("ea")
+///              .max_results(46)
+///              .add_buyer_creative_id("invidunt")
+///              .add_account_id(-47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3017,7 +3017,7 @@ pub struct CreativeListCall<'a, S>
     where S: 'a {
 
    pub(super) hub: &'a AdExchangeBuyer<S>,
-   pub(super) _status_filter: Option<String>,
+   pub(super) _status_filter: Option<CreativeStatusFilterEnum>,
    pub(super) _page_token: Option<String>,
    pub(super) _max_results: Option<u32>,
    pub(super) _buyer_creative_id: Vec<String>,
@@ -3177,8 +3177,8 @@ where
     /// When specified, only creatives having the given status are returned.
     ///
     /// Sets the *status filter* query property to the given value.
-    pub fn status_filter(mut self, new_value: &str) -> CreativeListCall<'a, S> {
-        self._status_filter = Some(new_value.to_string());
+    pub fn status_filter(mut self, new_value: &CreativeStatusFilterEnum) -> CreativeListCall<'a, S> {
+        self._status_filter = Some(new_value.clone());
         self
     }
     /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response. Optional.
@@ -3309,7 +3309,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.direct_deals().get(-50)
+/// let result = hub.direct_deals().get(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3354,7 +3354,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("id", self._id.to_string());
+        params.push("id", &self._id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -3806,9 +3806,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.performance_report().list(-93, "endDateTime", "startDateTime")
-///              .page_token("rebum.")
-///              .max_results(44)
+/// let result = hub.performance_report().list(-50, "endDateTime", "startDateTime")
+///              .page_token("gubergren")
+///              .max_results(85)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3857,9 +3857,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("endDateTime", self._end_date_time);
-        params.push("startDateTime", self._start_date_time);
+        params.push("accountId", &self._account_id.to_string());
+        params.push("endDateTime", &self._end_date_time);
+        params.push("startDateTime", &self._start_date_time);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4105,7 +4105,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().delete(-50, -50)
+/// let result = hub.pretargeting_config().delete(-57, -50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4151,8 +4151,8 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4364,7 +4364,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().get(-7, -62)
+/// let result = hub.pretargeting_config().get(-50, -7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4410,8 +4410,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4640,7 +4640,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().insert(req, -17)
+/// let result = hub.pretargeting_config().insert(req, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4686,7 +4686,7 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -4922,7 +4922,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().list(-99)
+/// let result = hub.pretargeting_config().list(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4967,7 +4967,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -5186,7 +5186,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().patch(req, -56, -25)
+/// let result = hub.pretargeting_config().patch(req, -99, -56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5233,8 +5233,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -5486,7 +5486,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.pretargeting_config().update(req, -86, -43)
+/// let result = hub.pretargeting_config().update(req, -25, -86)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5533,8 +5533,8 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("accountId", self._account_id.to_string());
-        params.push("configId", self._config_id.to_string());
+        params.push("accountId", &self._account_id.to_string());
+        params.push("configId", &self._config_id.to_string());
 
         params.extend(self._additional_params.iter());
 

@@ -457,7 +457,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageAnchorPageRef {
     /// Optional. The type of the layout element that is being referenced if any.
     #[serde(rename="layoutType")]
     
-    pub layout_type: Option<String>,
+    pub layout_type: Option<GoogleCloudDocumentaiV1DocumentPageAnchorPageRefLayoutTypeEnum>,
     /// Required. Index into the Document.pages element, for example using `Document.pages` to locate the related page element. This field is skipped when its value is the default `0`. See https://developers.google.com/protocol-buffers/docs/proto3#json.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -671,7 +671,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageLayout {
     pub confidence: Option<f32>,
     /// Detected orientation for the Layout.
     
-    pub orientation: Option<String>,
+    pub orientation: Option<GoogleCloudDocumentaiV1DocumentPageLayoutOrientationEnum>,
     /// Text anchor indexing into the Document.text.
     #[serde(rename="textAnchor")]
     
@@ -878,7 +878,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageTokenDetectedBreak {
     /// Detected break type.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDocumentaiV1DocumentPageTokenDetectedBreakTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1DocumentPageTokenDetectedBreak {}
@@ -926,7 +926,7 @@ pub struct GoogleCloudDocumentaiV1DocumentProvenance {
     /// The type of provenance operation.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<GoogleCloudDocumentaiV1DocumentProvenanceTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1DocumentProvenance {}
@@ -1092,7 +1092,7 @@ pub struct GoogleCloudDocumentaiV1DocumentSchemaEntityTypeProperty {
     /// Occurrence type limits the number of instances an entity type appears in the document.
     #[serde(rename="occurrenceType")]
     
-    pub occurrence_type: Option<String>,
+    pub occurrence_type: Option<GoogleCloudDocumentaiV1DocumentSchemaEntityTypePropertyOccurrenceTypeEnum>,
     /// A reference to the value type of the property. This type is subject to the same conventions as the `Entity.base_types` field.
     #[serde(rename="valueType")]
     
@@ -1494,7 +1494,7 @@ pub struct GoogleCloudDocumentaiV1EvaluationMultiConfidenceMetrics {
     /// The metrics type for the label.
     #[serde(rename="metricsType")]
     
-    pub metrics_type: Option<String>,
+    pub metrics_type: Option<GoogleCloudDocumentaiV1EvaluationMultiConfidenceMetricMetricsTypeEnum>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1EvaluationMultiConfidenceMetrics {}
@@ -1610,7 +1610,7 @@ pub struct GoogleCloudDocumentaiV1HumanReviewStatus {
     pub human_review_operation: Option<String>,
     /// The state of human review on the processing request.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDocumentaiV1HumanReviewStatuStateEnum>,
     /// A message providing more details about the human review state.
     #[serde(rename="stateMessage")]
     
@@ -1826,7 +1826,7 @@ pub struct GoogleCloudDocumentaiV1Processor {
     pub process_endpoint: Option<String>,
     /// Output only. The state of the processor.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDocumentaiV1ProcessorStateEnum>,
     /// The processor type, e.g., `OCR_PROCESSOR`, `INVOICE_PROCESSOR`, etc. To get a list of processors types, see FetchProcessorTypes.
     #[serde(rename="type")]
     
@@ -1862,7 +1862,7 @@ pub struct GoogleCloudDocumentaiV1ProcessorType {
     /// Launch stage of the processor type
     #[serde(rename="launchStage")]
     
-    pub launch_stage: Option<String>,
+    pub launch_stage: Option<GoogleCloudDocumentaiV1ProcessorTypeLaunchStageEnum>,
     /// The resource name of the processor type. Format: `projects/{project}/processorTypes/{processor_type}`
     
     pub name: Option<String>,
@@ -1943,7 +1943,7 @@ pub struct GoogleCloudDocumentaiV1ProcessorVersion {
     pub name: Option<String>,
     /// The state of the processor version.
     
-    pub state: Option<String>,
+    pub state: Option<GoogleCloudDocumentaiV1ProcessorVersionStateEnum>,
 }
 
 impl client::ResponseResult for GoogleCloudDocumentaiV1ProcessorVersion {}
@@ -2014,7 +2014,7 @@ pub struct GoogleCloudDocumentaiV1ReviewDocumentRequest {
     pub inline_document: Option<GoogleCloudDocumentaiV1Document>,
     /// The priority of the human review task.
     
-    pub priority: Option<String>,
+    pub priority: Option<GoogleCloudDocumentaiV1ReviewDocumentRequestPriorityEnum>,
 }
 
 impl client::RequestValue for GoogleCloudDocumentaiV1ReviewDocumentRequest {}

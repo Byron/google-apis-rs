@@ -28,7 +28,7 @@ impl client::Part for ActivationOptions {}
 pub struct ActivationStatus {
     /// no description provided
     
-    pub state: Option<String>,
+    pub state: Option<ActivationStatuStateEnum>,
 }
 
 impl client::Part for ActivationStatus {}
@@ -195,7 +195,7 @@ pub struct Barcode {
     /// The render encoding for the barcode. When specified, barcode is rendered in the given encoding. Otherwise best known encoding is chosen by Google.
     #[serde(rename="renderEncoding")]
     
-    pub render_encoding: Option<String>,
+    pub render_encoding: Option<BarcodeRenderEncodingEnum>,
     /// Optional text that will be shown when the barcode is hidden behind a click action. This happens in cases where a pass has Smart Tap enabled. If not specified, a default is chosen by Google.
     #[serde(rename="showCodeText")]
     
@@ -203,7 +203,7 @@ pub struct Barcode {
     /// The type of barcode.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<BarcodeTypeEnum>,
     /// The value encoded in the barcode.
     
     pub value: Option<String>,
@@ -273,7 +273,7 @@ pub struct BoardingAndSeatingInfo {
     /// Set this field only if this flight boards through more than one door or bridge and you want to explicitly print the door location on the boarding pass. Most airlines route their passengers to the right door or bridge by refering to doors/bridges by the `seatClass`. In those cases `boardingDoor` should not be set.
     #[serde(rename="boardingDoor")]
     
-    pub boarding_door: Option<String>,
+    pub boarding_door: Option<BoardingAndSeatingInfoBoardingDoorEnum>,
     /// The value of boarding group (or zone) this passenger shall board with. eg: "B" The label for this value will be determined by the `boardingPolicy` field in the `flightClass` referenced by this object.
     #[serde(rename="boardingGroup")]
     
@@ -320,14 +320,14 @@ pub struct BoardingAndSeatingPolicy {
     /// Indicates the policy the airline uses for boarding. If unset, Google will default to `zoneBased`.
     #[serde(rename="boardingPolicy")]
     
-    pub boarding_policy: Option<String>,
+    pub boarding_policy: Option<BoardingAndSeatingPolicyBoardingPolicyEnum>,
     /// Identifies what kind of resource this is. Value: the fixed string `"walletobjects#boardingAndSeatingPolicy"`.
     
     pub kind: Option<String>,
     /// Seating policy which dictates how we display the seat class. If unset, Google will default to `cabinBased`.
     #[serde(rename="seatClassPolicy")]
     
-    pub seat_class_policy: Option<String>,
+    pub seat_class_policy: Option<BoardingAndSeatingPolicySeatClassPolicyEnum>,
 }
 
 impl client::Part for BoardingAndSeatingPolicy {}
@@ -551,7 +551,7 @@ pub struct CompositeMedia {
     /// Describes what the field reference contains.
     #[serde(rename="referenceType")]
     
-    pub reference_type: Option<String>,
+    pub reference_type: Option<CompositeMediaReferenceTypeEnum>,
     /// SHA-1 hash for the payload.
     #[serde(rename="sha1Hash")]
     
@@ -788,7 +788,7 @@ pub struct DiscoverableProgram {
     pub merchant_signup_info: Option<DiscoverableProgramMerchantSignupInfo>,
     /// Visibility state of the discoverable program.
     
-    pub state: Option<String>,
+    pub state: Option<DiscoverableProgramStateEnum>,
 }
 
 impl client::Part for DiscoverableProgram {}
@@ -820,7 +820,7 @@ pub struct DiscoverableProgramMerchantSignupInfo {
     ///  User data that is sent in a POST request to the signup website URL. This information is encoded and then shared so that the merchant's website can prefill fields used to enroll the user for the discoverable program.
     #[serde(rename="signupSharedDatas")]
     
-    pub signup_shared_datas: Option<Vec<String>>,
+    pub signup_shared_datas: Option<Vec<DiscoverableProgramMerchantSignupInfoSignupSharedDatasEnum>>,
     /// The URL to direct the user to for the merchant's signup site.
     #[serde(rename="signupWebsite")]
     
@@ -868,7 +868,7 @@ pub struct EventDateTime {
     /// The label to use for the doors open value (`doorsOpen`) on the card detail view. Each available option maps to a set of localized strings, so that translations are shown to the user based on their locale. Both `doorsOpenLabel` and `customDoorsOpenLabel` may not be set. If neither is set, the label will default to "Doors Open", localized. If the doors open field is unset, this label will not be used.
     #[serde(rename="doorsOpenLabel")]
     
-    pub doors_open_label: Option<String>,
+    pub doors_open_label: Option<EventDateTimeDoorsOpenLabelEnum>,
     /// The date/time when the event ends. If the event spans multiple days, it should be the end date/time on the last day. This is an ISO 8601 extended format date/time, with or without an offset. Time may be specified up to nanosecond precision. Offsets may be specified with seconds precision (even though offset seconds is not part of ISO 8601). For example: `1985-04-12T23:20:50.52Z` would be 20 minutes and 50.52 seconds after the 23rd hour of April 12th, 1985 in UTC. `1985-04-12T19:20:50.52-04:00` would be 20 minutes and 50.52 seconds after the 19th hour of April 12th, 1985, 4 hours before UTC (same instant in time as the above example). If the event were in New York, this would be the equivalent of Eastern Daylight Time (EDT). Remember that offset varies in regions that observe Daylight Saving Time (or Summer Time), depending on the time of the year. `1985-04-12T19:20:50.52` would be 20 minutes and 50.52 seconds after the 19th hour of April 12th, 1985 with no offset information. The portion of the date/time without the offset is considered the "local date/time". This should be the local date/time at the venue. For example, if the event occurs at the 20th hour of June 5th, 2018 at the venue, the local date/time portion should be `2018-06-05T20:00:00`. If the local date/time at the venue is 4 hours before UTC, an offset of `-04:00` may be appended. Without offset information, some rich features may not be available.
     
     pub end: Option<String>,
@@ -958,7 +958,7 @@ pub struct EventTicketClass {
     /// The label to use for the confirmation code value (`eventTicketObject.reservationInfo.confirmationCode`) on the card detail view. Each available option maps to a set of localized strings, so that translations are shown to the user based on their locale. Both `confirmationCodeLabel` and `customConfirmationCodeLabel` may not be set. If neither is set, the label will default to "Confirmation Code", localized. If the confirmation code field is unset, this label will not be used.
     #[serde(rename="confirmationCodeLabel")]
     
-    pub confirmation_code_label: Option<String>,
+    pub confirmation_code_label: Option<EventTicketClasConfirmationCodeLabelEnum>,
     /// Country code used to display the card's country (when the user is not in that country), as well as to display localized content when content is not available in the user's locale.
     #[serde(rename="countryCode")]
     
@@ -1006,7 +1006,7 @@ pub struct EventTicketClass {
     /// The label to use for the gate value (`eventTicketObject.seatInfo.gate`) on the card detail view. Each available option maps to a set of localized strings, so that translations are shown to the user based on their locale. Both `gateLabel` and `customGateLabel` may not be set. If neither is set, the label will default to "Gate", localized. If the gate field is unset, this label will not be used.
     #[serde(rename="gateLabel")]
     
-    pub gate_label: Option<String>,
+    pub gate_label: Option<EventTicketClasGateLabelEnum>,
     /// Optional banner image displayed on the front of the card. If none is present, nothing will be displayed. The image will display at 100% width.
     #[serde(rename="heroImage")]
     
@@ -1057,7 +1057,7 @@ pub struct EventTicketClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<EventTicketClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// Identifies which redemption issuers can redeem the pass over Smart Tap. Redemption issuers are identified by their issuer ID. Redemption issuers must have at least one Smart Tap key configured. The `enableSmartTap` and object level `smartTapRedemptionLevel` fields must also be set up correctly in order for a pass to support Smart Tap.
     #[serde(rename="redemptionIssuers")]
     
@@ -1069,19 +1069,19 @@ pub struct EventTicketClass {
     /// Required. The status of the class. This field can be set to `draft` or `underReview` using the insert, patch, or update API calls. Once the review state is changed from `draft` it may not be changed back to `draft`. You should keep this field to `draft` when the class is under development. A `draft` class cannot be used to create any object. You should set this field to `underReview` when you believe the class is ready for use. The platform will automatically set this field to `approved` and it can be immediately used to create or migrate objects. When updating an already `approved` class you should keep setting this field to `underReview`.
     #[serde(rename="reviewStatus")]
     
-    pub review_status: Option<String>,
+    pub review_status: Option<EventTicketClasReviewStatusEnum>,
     /// The label to use for the row value (`eventTicketObject.seatInfo.row`) on the card detail view. Each available option maps to a set of localized strings, so that translations are shown to the user based on their locale. Both `rowLabel` and `customRowLabel` may not be set. If neither is set, the label will default to "Row", localized. If the row field is unset, this label will not be used.
     #[serde(rename="rowLabel")]
     
-    pub row_label: Option<String>,
+    pub row_label: Option<EventTicketClasRowLabelEnum>,
     /// The label to use for the seat value (`eventTicketObject.seatInfo.seat`) on the card detail view. Each available option maps to a set of localized strings, so that translations are shown to the user based on their locale. Both `seatLabel` and `customSeatLabel` may not be set. If neither is set, the label will default to "Seat", localized. If the seat field is unset, this label will not be used.
     #[serde(rename="seatLabel")]
     
-    pub seat_label: Option<String>,
+    pub seat_label: Option<EventTicketClasSeatLabelEnum>,
     /// The label to use for the section value (`eventTicketObject.seatInfo.section`) on the card detail view. Each available option maps to a set of localized strings, so that translations are shown to the user based on their locale. Both `sectionLabel` and `customSectionLabel` may not be set. If neither is set, the label will default to "Section", localized. If the section field is unset, this label will not be used.
     #[serde(rename="sectionLabel")]
     
-    pub section_label: Option<String>,
+    pub section_label: Option<EventTicketClasSectionLabelEnum>,
     /// Optional information about the security animation. If this is set a security animation will be rendered on pass details.
     #[serde(rename="securityAnimation")]
     
@@ -1100,7 +1100,7 @@ pub struct EventTicketClass {
     /// View Unlock Requirement options for the event ticket.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<EventTicketClasViewUnlockRequirementEnum>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -1256,7 +1256,7 @@ pub struct EventTicketObject {
     pub smart_tap_redemption_value: Option<String>,
     /// Required. The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section.
     
-    pub state: Option<String>,
+    pub state: Option<EventTicketObjectStateEnum>,
     /// Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.
     #[serde(rename="textModulesData")]
     
@@ -1375,7 +1375,7 @@ pub struct FieldReference {
     /// Only valid if the `fieldPath` references a date field. Chooses how the date field will be formatted and displayed in the UI.
     #[serde(rename="dateFormat")]
     
-    pub date_format: Option<String>,
+    pub date_format: Option<FieldReferenceDateFormatEnum>,
     /// Path to the field being referenced, prefixed with "object" or "class" and separated with dots. For example, it may be the string "object.purchaseDetails.purchasePrice".
     #[serde(rename="fieldPath")]
     
@@ -1414,7 +1414,7 @@ pub struct FirstRowOption {
     /// no description provided
     #[serde(rename="transitOption")]
     
-    pub transit_option: Option<String>,
+    pub transit_option: Option<FirstRowOptionTransitOptionEnum>,
 }
 
 impl client::Part for FirstRowOption {}
@@ -1503,7 +1503,7 @@ pub struct FlightClass {
     /// Status of this flight. If unset, Google will compute status based on data from other sources, such as FlightStats, etc. Note: Google-computed status will not be returned in API responses.
     #[serde(rename="flightStatus")]
     
-    pub flight_status: Option<String>,
+    pub flight_status: Option<FlightClasFlightStatusEnum>,
     /// Optional banner image displayed on the front of the card. If none is present, nothing will be displayed. The image will display at 100% width.
     #[serde(rename="heroImage")]
     
@@ -1579,7 +1579,7 @@ pub struct FlightClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<FlightClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// Required. Origin airport.
     
     pub origin: Option<AirportInfo>,
@@ -1594,7 +1594,7 @@ pub struct FlightClass {
     /// Required. The status of the class. This field can be set to `draft` or `underReview` using the insert, patch, or update API calls. Once the review state is changed from `draft` it may not be changed back to `draft`. You should keep this field to `draft` when the class is under development. A `draft` class cannot be used to create any object. You should set this field to `underReview` when you believe the class is ready for use. The platform will automatically set this field to `approved` and it can be immediately used to create or migrate objects. When updating an already `approved` class you should keep setting this field to `underReview`.
     #[serde(rename="reviewStatus")]
     
-    pub review_status: Option<String>,
+    pub review_status: Option<FlightClasReviewStatusEnum>,
     /// Optional information about the security animation. If this is set a security animation will be rendered on pass details.
     #[serde(rename="securityAnimation")]
     
@@ -1610,7 +1610,7 @@ pub struct FlightClass {
     /// View Unlock Requirement options for the boarding pass.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<FlightClasViewUnlockRequirementEnum>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -1799,7 +1799,7 @@ pub struct FlightObject {
     pub smart_tap_redemption_value: Option<String>,
     /// Required. The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section.
     
-    pub state: Option<String>,
+    pub state: Option<FlightObjectStateEnum>,
     /// Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.
     #[serde(rename="textModulesData")]
     
@@ -1922,7 +1922,7 @@ pub struct GenericClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<GenericClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// Identifies which redemption issuers can redeem the pass over Smart Tap. Redemption issuers are identified by their issuer ID. Redemption issuers must have at least one Smart Tap key configured. The `enableSmartTap` and object level `smartTapRedemptionLevel` fields must also be set up correctly in order for a pass to support Smart Tap.
     #[serde(rename="redemptionIssuers")]
     
@@ -1939,7 +1939,7 @@ pub struct GenericClass {
     /// View Unlock Requirement options for the generic pass.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<GenericClasViewUnlockRequirementEnum>,
 }
 
 impl client::RequestValue for GenericClass {}
@@ -2000,7 +2000,7 @@ pub struct GenericObject {
     /// Specify which `GenericType` the card belongs to. Deprecated.
     #[serde(rename="genericType")]
     
-    pub generic_type: Option<String>,
+    pub generic_type: Option<GenericObjectGenericTypeEnum>,
     /// Information that controls how passes are grouped together.
     #[serde(rename="groupingInfo")]
     
@@ -2047,7 +2047,7 @@ pub struct GenericObject {
     pub smart_tap_redemption_value: Option<String>,
     /// The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section. If this is not provided, the object would be considered `ACTIVE`.
     
-    pub state: Option<String>,
+    pub state: Option<GenericObjectStateEnum>,
     /// The title label of the pass, such as location where this pass can be used. Appears right above the title in the title row in the pass detail view.
     
     pub subheader: Option<LocalizedString>,
@@ -2200,7 +2200,7 @@ pub struct GiftCardClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<GiftCardClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// The label to display for the PIN, such as "4-digit PIN".
     #[serde(rename="pinLabel")]
     
@@ -2220,7 +2220,7 @@ pub struct GiftCardClass {
     /// Required. The status of the class. This field can be set to `draft` or `underReview` using the insert, patch, or update API calls. Once the review state is changed from `draft` it may not be changed back to `draft`. You should keep this field to `draft` when the class is under development. A `draft` class cannot be used to create any object. You should set this field to `underReview` when you believe the class is ready for use. The platform will automatically set this field to `approved` and it can be immediately used to create or migrate objects. When updating an already `approved` class you should keep setting this field to `underReview`.
     #[serde(rename="reviewStatus")]
     
-    pub review_status: Option<String>,
+    pub review_status: Option<GiftCardClasReviewStatusEnum>,
     /// Optional information about the security animation. If this is set a security animation will be rendered on pass details.
     #[serde(rename="securityAnimation")]
     
@@ -2236,7 +2236,7 @@ pub struct GiftCardClass {
     /// View Unlock Requirement options for the gift card.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<GiftCardClasViewUnlockRequirementEnum>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -2389,7 +2389,7 @@ pub struct GiftCardObject {
     pub smart_tap_redemption_value: Option<String>,
     /// Required. The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section.
     
-    pub state: Option<String>,
+    pub state: Option<GiftCardObjectStateEnum>,
     /// Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.
     #[serde(rename="textModulesData")]
     
@@ -2646,7 +2646,7 @@ impl client::ResponseResult for IssuerListResponse {}
 pub struct IssuerToUserInfo {
     /// no description provided
     
-    pub action: Option<String>,
+    pub action: Option<IssuerToUserInfoActionEnum>,
     /// no description provided
     #[serde(rename="signUpInfo")]
     
@@ -2949,7 +2949,7 @@ pub struct LoyaltyClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<LoyaltyClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// Required. The logo of the loyalty program or company. This logo is displayed in both the details and list views of the app.
     #[serde(rename="programLogo")]
     
@@ -2969,7 +2969,7 @@ pub struct LoyaltyClass {
     /// Required. The status of the class. This field can be set to `draft` or `underReview` using the insert, patch, or update API calls. Once the review state is changed from `draft` it may not be changed back to `draft`. You should keep this field to `draft` when the class is under development. A `draft` class cannot be used to create any object. You should set this field to `underReview` when you believe the class is ready for use. The platform will automatically set this field to `approved` and it can be immediately used to create or migrate objects. When updating an already `approved` class you should keep setting this field to `underReview`.
     #[serde(rename="reviewStatus")]
     
-    pub review_status: Option<String>,
+    pub review_status: Option<LoyaltyClasReviewStatusEnum>,
     /// The rewards tier, such as "Gold" or "Platinum." Recommended maximum length is 7 characters to ensure full string is displayed on smaller screens.
     #[serde(rename="rewardsTier")]
     
@@ -3001,7 +3001,7 @@ pub struct LoyaltyClass {
     /// View Unlock Requirement options for the loyalty card.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<LoyaltyClasViewUnlockRequirementEnum>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -3157,7 +3157,7 @@ pub struct LoyaltyObject {
     pub smart_tap_redemption_value: Option<String>,
     /// Required. The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section.
     
-    pub state: Option<String>,
+    pub state: Option<LoyaltyObjectStateEnum>,
     /// Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.
     #[serde(rename="textModulesData")]
     
@@ -3374,7 +3374,7 @@ pub struct Media {
     /// Describes what the field reference contains.
     #[serde(rename="referenceType")]
     
-    pub reference_type: Option<String>,
+    pub reference_type: Option<MediaReferenceTypeEnum>,
     /// Scotty-provided SHA1 hash for an upload.
     #[serde(rename="sha1Hash")]
     
@@ -3424,7 +3424,7 @@ pub struct MediaRequestInfo {
     /// The type of notification received from Scotty.
     #[serde(rename="notificationType")]
     
-    pub notification_type: Option<String>,
+    pub notification_type: Option<MediaRequestInfoNotificationTypeEnum>,
     /// The Scotty request ID.
     #[serde(rename="requestId")]
     
@@ -3477,7 +3477,7 @@ pub struct Message {
     /// The type of the message. Currently, this can only be set for offers.
     #[serde(rename="messageType")]
     
-    pub message_type: Option<String>,
+    pub message_type: Option<MessageMessageTypeEnum>,
 }
 
 impl client::Part for Message {}
@@ -3703,14 +3703,14 @@ pub struct OfferClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<OfferClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// Required. The offer provider (either the aggregator name or merchant name). Recommended maximum length is 12 characters to ensure full string is displayed on smaller screens.
     
     pub provider: Option<String>,
     /// Required. The redemption channels applicable to this offer.
     #[serde(rename="redemptionChannel")]
     
-    pub redemption_channel: Option<String>,
+    pub redemption_channel: Option<OfferClasRedemptionChannelEnum>,
     /// Identifies which redemption issuers can redeem the pass over Smart Tap. Redemption issuers are identified by their issuer ID. Redemption issuers must have at least one Smart Tap key configured. The `enableSmartTap` and object level `smartTapRedemptionLevel` fields must also be set up correctly in order for a pass to support Smart Tap.
     #[serde(rename="redemptionIssuers")]
     
@@ -3722,7 +3722,7 @@ pub struct OfferClass {
     /// Required. The status of the class. This field can be set to `draft` or The status of the class. This field can be set to `draft` or `underReview` using the insert, patch, or update API calls. Once the review state is changed from `draft` it may not be changed back to `draft`. You should keep this field to `draft` when the class is under development. A `draft` class cannot be used to create any object. You should set this field to `underReview` when you believe the class is ready for use. The platform will automatically set this field to `approved` and it can be immediately used to create or migrate objects. When updating an already `approved` class you should keep setting this field to `underReview`.
     #[serde(rename="reviewStatus")]
     
-    pub review_status: Option<String>,
+    pub review_status: Option<OfferClasReviewStatusEnum>,
     /// Optional information about the security animation. If this is set a security animation will be rendered on pass details.
     #[serde(rename="securityAnimation")]
     
@@ -3749,7 +3749,7 @@ pub struct OfferClass {
     /// View Unlock Requirement options for the offer.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<OfferClasViewUnlockRequirementEnum>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -3884,7 +3884,7 @@ pub struct OfferObject {
     pub smart_tap_redemption_value: Option<String>,
     /// Required. The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section.
     
-    pub state: Option<String>,
+    pub state: Option<OfferObjectStateEnum>,
     /// Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.
     #[serde(rename="textModulesData")]
     
@@ -3985,7 +3985,7 @@ pub struct Permission {
     pub email_address: Option<String>,
     /// The role granted by this permission.
     
-    pub role: Option<String>,
+    pub role: Option<PermissionRoleEnum>,
 }
 
 impl client::Resource for Permission {}
@@ -4201,7 +4201,7 @@ pub struct RotatingBarcode {
     /// The render encoding for the barcode. When specified, barcode is rendered in the given encoding. Otherwise best known encoding is chosen by Google.
     #[serde(rename="renderEncoding")]
     
-    pub render_encoding: Option<String>,
+    pub render_encoding: Option<RotatingBarcodeRenderEncodingEnum>,
     /// Optional text that will be shown when the barcode is hidden behind a click action. This happens in cases where a pass has Smart Tap enabled. If not specified, a default is chosen by Google.
     #[serde(rename="showCodeText")]
     
@@ -4213,7 +4213,7 @@ pub struct RotatingBarcode {
     /// The type of this barcode.
     #[serde(rename="type")]
     
-    pub type_: Option<String>,
+    pub type_: Option<RotatingBarcodeTypeEnum>,
     /// String encoded barcode value. This string supports the following substitutions: * {totp_value_n}: Replaced with the TOTP value (see TotpDetails.parameters). * {totp_timestamp_millis}: Replaced with the timestamp (millis since epoch) at which the barcode was generated. * {totp_timestamp_seconds}: Replaced with the timestamp (seconds since epoch) at which the barcode was generated.
     #[serde(rename="valuePattern")]
     
@@ -4232,7 +4232,7 @@ impl client::Part for RotatingBarcode {}
 pub struct RotatingBarcodeTotpDetails {
     /// The TOTP algorithm used to generate the OTP.
     
-    pub algorithm: Option<String>,
+    pub algorithm: Option<RotatingBarcodeTotpDetailAlgorithmEnum>,
     /// The TOTP parameters for each of the {totp_value_*} substitutions. The TotpParameters at index n is used for the {totp_value_n} substitution.
     
     pub parameters: Option<Vec<RotatingBarcodeTotpDetailsTotpParameters>>,
@@ -4275,7 +4275,7 @@ pub struct SecurityAnimation {
     /// Type of animation.
     #[serde(rename="animationType")]
     
-    pub animation_type: Option<String>,
+    pub animation_type: Option<SecurityAnimationAnimationTypeEnum>,
 }
 
 impl client::Part for SecurityAnimation {}
@@ -4363,7 +4363,7 @@ pub struct TemplateItem {
     /// A predefined item to display. Only one of `firstValue` or `predefinedItem` may be set.
     #[serde(rename="predefinedItem")]
     
-    pub predefined_item: Option<String>,
+    pub predefined_item: Option<TemplateItemPredefinedItemEnum>,
     /// A reference to a field to display. This may only be populated if the `firstValue` field is populated.
     #[serde(rename="secondValue")]
     
@@ -4536,7 +4536,7 @@ pub struct TicketSeat {
     /// The fare class of the ticketed seat.
     #[serde(rename="fareClass")]
     
-    pub fare_class: Option<String>,
+    pub fare_class: Option<TicketSeatFareClassEnum>,
     /// The identifier of where the ticketed seat is located. Eg. "42". If there is no specific identifier, use `seatAssigment` instead.
     
     pub seat: Option<String>,
@@ -4739,7 +4739,7 @@ pub struct TransitClass {
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
-    pub multiple_devices_and_holders_allowed_status: Option<String>,
+    pub multiple_devices_and_holders_allowed_status: Option<TransitClasMultipleDevicesAndHoldersAllowedStatusEnum>,
     /// Identifies which redemption issuers can redeem the pass over Smart Tap. Redemption issuers are identified by their issuer ID. Redemption issuers must have at least one Smart Tap key configured. The `enableSmartTap` and object level `smartTapRedemptionLevel` fields must also be set up correctly in order for a pass to support Smart Tap.
     #[serde(rename="redemptionIssuers")]
     
@@ -4751,7 +4751,7 @@ pub struct TransitClass {
     /// Required. The status of the class. This field can be set to `draft` or `underReview` using the insert, patch, or update API calls. Once the review state is changed from `draft` it may not be changed back to `draft`. You should keep this field to `draft` when the class is under development. A `draft` class cannot be used to create any object. You should set this field to `underReview` when you believe the class is ready for use. The platform will automatically set this field to `approved` and it can be immediately used to create or migrate objects. When updating an already `approved` class you should keep setting this field to `underReview`.
     #[serde(rename="reviewStatus")]
     
-    pub review_status: Option<String>,
+    pub review_status: Option<TransitClasReviewStatusEnum>,
     /// Optional information about the security animation. If this is set a security animation will be rendered on pass details.
     #[serde(rename="securityAnimation")]
     
@@ -4767,7 +4767,7 @@ pub struct TransitClass {
     /// Required. The type of transit this class represents, such as "bus".
     #[serde(rename="transitType")]
     
-    pub transit_type: Option<String>,
+    pub transit_type: Option<TransitClasTransitTypeEnum>,
     /// Deprecated
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -4775,7 +4775,7 @@ pub struct TransitClass {
     /// View Unlock Requirement options for the transit ticket.
     #[serde(rename="viewUnlockRequirement")]
     
-    pub view_unlock_requirement: Option<String>,
+    pub view_unlock_requirement: Option<TransitClasViewUnlockRequirementEnum>,
     /// Watermark image to display on the user's device.
     
     pub watermark: Option<Image>,
@@ -4866,7 +4866,7 @@ pub struct TransitObject {
     /// The concession category for the ticket.
     #[serde(rename="concessionCategory")]
     
-    pub concession_category: Option<String>,
+    pub concession_category: Option<TransitObjectConcessionCategoryEnum>,
     /// A custom concession category to use when `concessionCategory` does not provide the right option. Both `concessionCategory` and `customConcessionCategory` may not be set.
     #[serde(rename="customConcessionCategory")]
     
@@ -4931,7 +4931,7 @@ pub struct TransitObject {
     /// The number of passengers.
     #[serde(rename="passengerType")]
     
-    pub passenger_type: Option<String>,
+    pub passenger_type: Option<TransitObjectPassengerTypeEnum>,
     /// Purchase details for this ticket.
     #[serde(rename="purchaseDetails")]
     
@@ -4946,7 +4946,7 @@ pub struct TransitObject {
     pub smart_tap_redemption_value: Option<String>,
     /// Required. The state of the object. This field is used to determine how an object is displayed in the app. For example, an `inactive` object is moved to the "Expired passes" section.
     
-    pub state: Option<String>,
+    pub state: Option<TransitObjectStateEnum>,
     /// Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.
     #[serde(rename="textModulesData")]
     
@@ -4970,7 +4970,7 @@ pub struct TransitObject {
     /// The status of the ticket. For states which affect display, use the `state` field instead.
     #[serde(rename="ticketStatus")]
     
-    pub ticket_status: Option<String>,
+    pub ticket_status: Option<TransitObjectTicketStatusEnum>,
     /// This id is used to group tickets together if the user has saved multiple tickets for the same trip.
     #[serde(rename="tripId")]
     
@@ -4978,7 +4978,7 @@ pub struct TransitObject {
     /// Required. The type of trip this transit object represents. Used to determine the pass title and/or which symbol to use between the origin and destination.
     #[serde(rename="tripType")]
     
-    pub trip_type: Option<String>,
+    pub trip_type: Option<TransitObjectTripTypeEnum>,
     /// The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed.
     #[serde(rename="validTimeInterval")]
     

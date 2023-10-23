@@ -123,13 +123,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.orders().list(99)
-//!              .add_statuses("takimata")
-//!              .placed_date_start("amet.")
-//!              .placed_date_end("duo")
-//!              .page_token("ipsum")
-//!              .order_by("gubergren")
-//!              .max_results(50)
-//!              .acknowledged(false)
+//!              .add_statuses(&Default::default())
+//!              .placed_date_start("takimata")
+//!              .placed_date_end("amet.")
+//!              .page_token("duo")
+//!              .order_by(&Default::default())
+//!              .max_results(46)
+//!              .acknowledged(true)
 //!              .doit().await;
 //! 
 //! match result {

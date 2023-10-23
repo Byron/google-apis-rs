@@ -70,7 +70,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("teamId", self._team_id);
+        params.push("teamId", &self._team_id);
 
         params.extend(self._additional_params.iter());
 
@@ -283,7 +283,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().get("teamId", 21)
+/// let result = hub.jobs().get("teamId", 58)
 ///              .doit().await;
 /// # }
 /// ```
@@ -329,8 +329,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("jobId", self._job_id.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("jobId", &self._job_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -559,12 +559,12 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().insert(req, "teamId", "address", 0.6905413711203235, 0.9150999978526841, "title")
+/// let result = hub.jobs().insert(req, "teamId", "address", 0.7957202632117738, 0.31372789799617684, "title")
 ///              .note("et")
-///              .customer_phone_number("et")
-///              .customer_name("vero")
-///              .add_custom_field("erat")
-///              .assignee("sed")
+///              .customer_phone_number("sed")
+///              .customer_name("et")
+///              .add_custom_field("et")
+///              .assignee("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -619,11 +619,11 @@ where
         }
 
         let mut params = Params::with_capacity(13 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("address", self._address);
-        params.push("lat", self._lat.to_string());
-        params.push("lng", self._lng.to_string());
-        params.push("title", self._title);
+        params.push("teamId", &self._team_id);
+        params.push("address", &self._address);
+        params.push("lat", &self._lat.to_string());
+        params.push("lng", &self._lng.to_string());
+        params.push("title", &self._title);
         if let Some(value) = self._note.as_ref() {
             params.push("note", value);
         }
@@ -953,7 +953,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("teamId")
-///              .page_token("dolore")
+///              .page_token("sed")
 ///              .omit_job_changes(false)
 ///              .min_modified_timestamp_ms(9)
 ///              .max_results(52)
@@ -1005,7 +1005,7 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("teamId", self._team_id);
+        params.push("teamId", &self._team_id);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1266,15 +1266,15 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().patch(req, "teamId", 79)
 ///              .title("sadipscing")
-///              .progress("Stet")
-///              .note("dolor")
-///              .lng(0.6349978834153693)
-///              .lat(0.1970220513983837)
-///              .customer_phone_number("Stet")
-///              .customer_name("vero")
-///              .add_custom_field("elitr")
-///              .assignee("Lorem")
-///              .address("diam")
+///              .progress(&Default::default())
+///              .note("Stet")
+///              .lng(0.017140519879742522)
+///              .lat(0.19681975392268636)
+///              .customer_phone_number("invidunt")
+///              .customer_name("Stet")
+///              .add_custom_field("vero")
+///              .assignee("elitr")
+///              .address("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1286,7 +1286,7 @@ pub struct JobPatchCall<'a, S>
    pub(super) _team_id: String,
    pub(super) _job_id: u64,
    pub(super) _title: Option<String>,
-   pub(super) _progress: Option<String>,
+   pub(super) _progress: Option<JobProgressEnum>,
    pub(super) _note: Option<String>,
    pub(super) _lng: Option<f64>,
    pub(super) _lat: Option<f64>,
@@ -1331,8 +1331,8 @@ where
         }
 
         let mut params = Params::with_capacity(15 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("jobId", self._job_id.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("jobId", &self._job_id.to_string());
         if let Some(value) = self._title.as_ref() {
             params.push("title", value);
         }
@@ -1522,8 +1522,8 @@ where
     /// Job progress
     ///
     /// Sets the *progress* query property to the given value.
-    pub fn progress(mut self, new_value: &str) -> JobPatchCall<'a, S> {
-        self._progress = Some(new_value.to_string());
+    pub fn progress(mut self, new_value: &JobProgressEnum) -> JobPatchCall<'a, S> {
+        self._progress = Some(new_value.clone());
         self
     }
     /// Job note as newline (Unix) separated string
@@ -1687,17 +1687,17 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().update(req, "teamId", 1)
-///              .title("accusam")
-///              .progress("takimata")
-///              .note("consetetur")
-///              .lng(0.5721089079262882)
-///              .lat(0.22880530766851637)
-///              .customer_phone_number("consetetur")
-///              .customer_name("amet.")
-///              .add_custom_field("sed")
-///              .assignee("takimata")
-///              .address("dolores")
+/// let result = hub.jobs().update(req, "teamId", 40)
+///              .title("ipsum")
+///              .progress(&Default::default())
+///              .note("accusam")
+///              .lng(0.333591971041029)
+///              .lat(0.5721089079262882)
+///              .customer_phone_number("et")
+///              .customer_name("erat")
+///              .add_custom_field("consetetur")
+///              .assignee("amet.")
+///              .address("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1709,7 +1709,7 @@ pub struct JobUpdateCall<'a, S>
    pub(super) _team_id: String,
    pub(super) _job_id: u64,
    pub(super) _title: Option<String>,
-   pub(super) _progress: Option<String>,
+   pub(super) _progress: Option<JobProgressEnum>,
    pub(super) _note: Option<String>,
    pub(super) _lng: Option<f64>,
    pub(super) _lat: Option<f64>,
@@ -1754,8 +1754,8 @@ where
         }
 
         let mut params = Params::with_capacity(15 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("jobId", self._job_id.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("jobId", &self._job_id.to_string());
         if let Some(value) = self._title.as_ref() {
             params.push("title", value);
         }
@@ -1945,8 +1945,8 @@ where
     /// Job progress
     ///
     /// Sets the *progress* query property to the given value.
-    pub fn progress(mut self, new_value: &str) -> JobUpdateCall<'a, S> {
-        self._progress = Some(new_value.to_string());
+    pub fn progress(mut self, new_value: &JobProgressEnum) -> JobUpdateCall<'a, S> {
+        self._progress = Some(new_value.clone());
         self
     }
     /// Job note as newline (Unix) separated string
@@ -2104,9 +2104,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.location().list("teamId", "workerEmail", 78)
-///              .page_token("voluptua.")
-///              .max_results(67)
+/// let result = hub.location().list("teamId", "workerEmail", 39)
+///              .page_token("et")
+///              .max_results(78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2155,9 +2155,9 @@ where
         }
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("workerEmail", self._worker_email);
-        params.push("startTimestampMs", self._start_timestamp_ms.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("workerEmail", &self._worker_email);
+        params.push("startTimestampMs", &self._start_timestamp_ms.to_string());
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -2456,8 +2456,8 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("jobId", self._job_id.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("jobId", &self._job_id.to_string());
 
         params.extend(self._additional_params.iter());
 
@@ -2686,11 +2686,11 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().patch(req, "teamId", 99)
-///              .start_time(84)
-///              .end_time(6)
-///              .duration(95)
-///              .all_day(true)
+/// let result = hub.schedule().patch(req, "teamId", 67)
+///              .start_time(23)
+///              .end_time(99)
+///              .duration(84)
+///              .all_day(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2741,8 +2741,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("jobId", self._job_id.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("jobId", &self._job_id.to_string());
         if let Some(value) = self._start_time.as_ref() {
             params.push("startTime", value.to_string());
         }
@@ -3034,10 +3034,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().update(req, "teamId", 94)
-///              .start_time(74)
-///              .end_time(58)
-///              .duration(3)
+/// let result = hub.schedule().update(req, "teamId", 63)
+///              .start_time(90)
+///              .end_time(94)
+///              .duration(74)
 ///              .all_day(true)
 ///              .doit().await;
 /// # }
@@ -3089,8 +3089,8 @@ where
         }
 
         let mut params = Params::with_capacity(9 + self._additional_params.len());
-        params.push("teamId", self._team_id);
-        params.push("jobId", self._job_id.to_string());
+        params.push("teamId", &self._team_id);
+        params.push("jobId", &self._job_id.to_string());
         if let Some(value) = self._start_time.as_ref() {
             params.push("startTime", value.to_string());
         }
@@ -3377,7 +3377,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.team().list()
-///              .worker(true)
+///              .worker(false)
 ///              .dispatcher(true)
 ///              .admin(true)
 ///              .doit().await;
@@ -3696,7 +3696,7 @@ where
         }
 
         let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("teamId", self._team_id);
+        params.push("teamId", &self._team_id);
 
         params.extend(self._additional_params.iter());
 
