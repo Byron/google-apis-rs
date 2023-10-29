@@ -85,6 +85,7 @@ pub enum ${enum_type} {
     % endif\
     /// value:
     /// "${variant_name}"
+    #[serde(rename="${variant_name}")]
     ${to_enum_variant_name(variant_name)},
 % endfor
 }

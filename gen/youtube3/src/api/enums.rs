@@ -7,9 +7,11 @@ use super::*;
 pub enum ActivityContentDetailsPromotedItemCtaTypeEnum {
     
     /// "ctaTypeUnspecified"
+    #[serde(rename="ctaTypeUnspecified")]
     CtaTypeUnspecified,
     
     /// "visitAdvertiserSite"
+    #[serde(rename="visitAdvertiserSite")]
     VisitAdvertiserSite,
 }
 
@@ -34,15 +36,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ActivityContentDetailsPromotedI
 pub enum ActivityContentDetailsRecommendationReasonEnum {
     
     /// "reasonUnspecified"
+    #[serde(rename="reasonUnspecified")]
     ReasonUnspecified,
     
     /// "videoFavorited"
+    #[serde(rename="videoFavorited")]
     VideoFavorited,
     
     /// "videoLiked"
+    #[serde(rename="videoLiked")]
     VideoLiked,
     
     /// "videoWatched"
+    #[serde(rename="videoWatched")]
     VideoWatched,
 }
 
@@ -69,15 +75,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ActivityContentDetailsRecommend
 pub enum ActivityContentDetailsSocialTypeEnum {
     
     /// "unspecified"
+    #[serde(rename="unspecified")]
     Unspecified,
     
     /// "googlePlus"
+    #[serde(rename="googlePlus")]
     GooglePlus,
     
     /// "facebook"
+    #[serde(rename="facebook")]
     Facebook,
     
     /// "twitter"
+    #[serde(rename="twitter")]
     Twitter,
 }
 
@@ -104,39 +114,51 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ActivityContentDetailsSocialTyp
 pub enum ActivitySnippetTypeEnum {
     
     /// "typeUnspecified"
+    #[serde(rename="typeUnspecified")]
     TypeUnspecified,
     
     /// "upload"
+    #[serde(rename="upload")]
     Upload,
     
     /// "like"
+    #[serde(rename="like")]
     Like,
     
     /// "favorite"
+    #[serde(rename="favorite")]
     Favorite,
     
     /// "comment"
+    #[serde(rename="comment")]
     Comment,
     
     /// "subscription"
+    #[serde(rename="subscription")]
     Subscription,
     
     /// "playlistItem"
+    #[serde(rename="playlistItem")]
     PlaylistItem,
     
     /// "recommendation"
+    #[serde(rename="recommendation")]
     Recommendation,
     
     /// "bulletin"
+    #[serde(rename="bulletin")]
     Bulletin,
     
     /// "social"
+    #[serde(rename="social")]
     Social,
     
     /// "channelItem"
+    #[serde(rename="channelItem")]
     ChannelItem,
     
     /// "promotedItem"
+    #[serde(rename="promotedItem")]
     PromotedItem,
 }
 
@@ -171,15 +193,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ActivitySnippetTypeEnum {
 pub enum CaptionSnippetAudioTrackTypeEnum {
     
     /// "unknown"
+    #[serde(rename="unknown")]
     Unknown,
     
     /// "primary"
+    #[serde(rename="primary")]
     Primary,
     
     /// "commentary"
+    #[serde(rename="commentary")]
     Commentary,
     
     /// "descriptive"
+    #[serde(rename="descriptive")]
     Descriptive,
 }
 
@@ -206,12 +232,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CaptionSnippetAudioTrackTypeEnu
 pub enum CaptionSnippetFailureReasonEnum {
     
     /// "unknownFormat"
+    #[serde(rename="unknownFormat")]
     UnknownFormat,
     
     /// "unsupportedFormat"
+    #[serde(rename="unsupportedFormat")]
     UnsupportedFormat,
     
     /// "processingFailed"
+    #[serde(rename="processingFailed")]
     ProcessingFailed,
 }
 
@@ -237,12 +266,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CaptionSnippetFailureReasonEnum
 pub enum CaptionSnippetStatusEnum {
     
     /// "serving"
+    #[serde(rename="serving")]
     Serving,
     
     /// "syncing"
+    #[serde(rename="syncing")]
     Syncing,
     
     /// "failed"
+    #[serde(rename="failed")]
     Failed,
 }
 
@@ -268,12 +300,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CaptionSnippetStatusEnum {
 pub enum CaptionSnippetTrackKindEnum {
     
     /// "standard"
+    #[serde(rename="standard")]
     Standard,
     
     /// "ASR"
+    #[serde(rename="ASR")]
     ASR,
     
     /// "forced"
+    #[serde(rename="forced")]
     Forced,
 }
 
@@ -299,12 +334,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CaptionSnippetTrackKindEnum {
 pub enum CdnSettingFrameRateEnum {
     
     /// "30fps"
+    #[serde(rename="30fps")]
     _30fps,
     
     /// "60fps"
+    #[serde(rename="60fps")]
     _60fps,
     
     /// "variable"
+    #[serde(rename="variable")]
     Variable,
 }
 
@@ -330,15 +368,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CdnSettingFrameRateEnum {
 pub enum CdnSettingIngestionTypeEnum {
     
     /// "rtmp"
+    #[serde(rename="rtmp")]
     Rtmp,
     
     /// "dash"
+    #[serde(rename="dash")]
     Dash,
     
     /// "webrtc"
+    #[serde(rename="webrtc")]
     Webrtc,
     
     /// "hls"
+    #[serde(rename="hls")]
     Hls,
 }
 
@@ -365,27 +407,35 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CdnSettingIngestionTypeEnum {
 pub enum CdnSettingResolutionEnum {
     
     /// "240p"
+    #[serde(rename="240p")]
     _240p,
     
     /// "360p"
+    #[serde(rename="360p")]
     _360p,
     
     /// "480p"
+    #[serde(rename="480p")]
     _480p,
     
     /// "720p"
+    #[serde(rename="720p")]
     _720p,
     
     /// "1080p"
+    #[serde(rename="1080p")]
     _1080p,
     
     /// "1440p"
+    #[serde(rename="1440p")]
     _1440p,
     
     /// "2160p"
+    #[serde(rename="2160p")]
     _2160p,
     
     /// "variable"
+    #[serde(rename="variable")]
     Variable,
 }
 
@@ -416,12 +466,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CdnSettingResolutionEnum {
 pub enum ChannelConversionPingContextEnum {
     
     /// "subscribe"
+    #[serde(rename="subscribe")]
     Subscribe,
     
     /// "unsubscribe"
+    #[serde(rename="unsubscribe")]
     Unsubscribe,
     
     /// "cview"
+    #[serde(rename="cview")]
     Cview,
 }
 
@@ -447,12 +500,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ChannelConversionPingContextEnu
 pub enum ChannelSectionSnippetStyleEnum {
     
     /// "channelsectionStyleUnspecified"
+    #[serde(rename="channelsectionStyleUnspecified")]
     ChannelsectionStyleUnspecified,
     
     /// "horizontalRow"
+    #[serde(rename="horizontalRow")]
     HorizontalRow,
     
     /// "verticalList"
+    #[serde(rename="verticalList")]
     VerticalList,
 }
 
@@ -478,54 +534,71 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ChannelSectionSnippetStyleEnum 
 pub enum ChannelSectionSnippetTypeEnum {
     
     /// "channelsectionTypeUndefined"
+    #[serde(rename="channelsectionTypeUndefined")]
     ChannelsectionTypeUndefined,
     
     /// "singlePlaylist"
+    #[serde(rename="singlePlaylist")]
     SinglePlaylist,
     
     /// "multiplePlaylists"
+    #[serde(rename="multiplePlaylists")]
     MultiplePlaylists,
     
     /// "popularUploads"
+    #[serde(rename="popularUploads")]
     PopularUploads,
     
     /// "recentUploads"
+    #[serde(rename="recentUploads")]
     RecentUploads,
     
     /// "likes"
+    #[serde(rename="likes")]
     Likes,
     
     /// "allPlaylists"
+    #[serde(rename="allPlaylists")]
     AllPlaylists,
     
     /// "likedPlaylists"
+    #[serde(rename="likedPlaylists")]
     LikedPlaylists,
     
     /// "recentPosts"
+    #[serde(rename="recentPosts")]
     RecentPosts,
     
     /// "recentActivity"
+    #[serde(rename="recentActivity")]
     RecentActivity,
     
     /// "liveEvents"
+    #[serde(rename="liveEvents")]
     LiveEvents,
     
     /// "upcomingEvents"
+    #[serde(rename="upcomingEvents")]
     UpcomingEvents,
     
     /// "completedEvents"
+    #[serde(rename="completedEvents")]
     CompletedEvents,
     
     /// "multipleChannels"
+    #[serde(rename="multipleChannels")]
     MultipleChannels,
     
     /// "postedVideos"
+    #[serde(rename="postedVideos")]
     PostedVideos,
     
     /// "postedPlaylists"
+    #[serde(rename="postedPlaylists")]
     PostedPlaylists,
     
     /// "subscriptions"
+    #[serde(rename="subscriptions")]
     Subscriptions,
 }
 
@@ -565,15 +638,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ChannelSectionSnippetTypeEnum {
 pub enum ChannelStatuLongUploadsStatusEnum {
     
     /// "longUploadsUnspecified"
+    #[serde(rename="longUploadsUnspecified")]
     LongUploadsUnspecified,
     
     /// "allowed"
+    #[serde(rename="allowed")]
     Allowed,
     
     /// "eligible"
+    #[serde(rename="eligible")]
     Eligible,
     
     /// "disallowed"
+    #[serde(rename="disallowed")]
     Disallowed,
 }
 
@@ -600,12 +677,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ChannelStatuLongUploadsStatusEn
 pub enum ChannelStatuPrivacyStatusEnum {
     
     /// "public"
+    #[serde(rename="public")]
     Public,
     
     /// "unlisted"
+    #[serde(rename="unlisted")]
     Unlisted,
     
     /// "private"
+    #[serde(rename="private")]
     Private,
 }
 
@@ -634,21 +714,25 @@ pub enum CommentSnippetModerationStatusEnum {
     /// The comment is available for public display.
     ///
     /// "published"
+    #[serde(rename="published")]
     Published,
     
 
     /// The comment is awaiting review by a moderator.
     ///
     /// "heldForReview"
+    #[serde(rename="heldForReview")]
     HeldForReview,
     
     /// "likelySpam"
+    #[serde(rename="likelySpam")]
     LikelySpam,
     
 
     /// The comment is unfit for display.
     ///
     /// "rejected"
+    #[serde(rename="rejected")]
     Rejected,
 }
 
@@ -675,18 +759,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CommentSnippetModerationStatusE
 pub enum CommentSnippetViewerRatingEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The entity is liked.
     ///
     /// "like"
+    #[serde(rename="like")]
     Like,
     
 
     /// The entity is disliked.
     ///
     /// "dislike"
+    #[serde(rename="dislike")]
     Dislike,
 }
 
@@ -712,57 +799,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CommentSnippetViewerRatingEnum 
 pub enum ContentRatingAcbRatingEnum {
     
     /// "acbUnspecified"
+    #[serde(rename="acbUnspecified")]
     AcbUnspecified,
     
 
     /// E
     ///
     /// "acbE"
+    #[serde(rename="acbE")]
     AcbE,
     
 
     /// Programs that have been given a P classification by the Australian Communications and Media Authority. These programs are intended for preschool children.
     ///
     /// "acbP"
+    #[serde(rename="acbP")]
     AcbP,
     
 
     /// Programs that have been given a C classification by the Australian Communications and Media Authority. These programs are intended for children (other than preschool children) who are younger than 14 years of age.
     ///
     /// "acbC"
+    #[serde(rename="acbC")]
     AcbC,
     
 
     /// G
     ///
     /// "acbG"
+    #[serde(rename="acbG")]
     AcbG,
     
 
     /// PG
     ///
     /// "acbPg"
+    #[serde(rename="acbPg")]
     AcbPg,
     
 
     /// M
     ///
     /// "acbM"
+    #[serde(rename="acbM")]
     AcbM,
     
 
     /// MA15+
     ///
     /// "acbMa15plus"
+    #[serde(rename="acbMa15plus")]
     AcbMa15plus,
     
 
     /// R18+
     ///
     /// "acbR18plus"
+    #[serde(rename="acbR18plus")]
     AcbR18plus,
     
     /// "acbUnrated"
+    #[serde(rename="acbUnrated")]
     AcbUnrated,
 }
 
@@ -795,27 +892,32 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingAcbRatingEnum {
 pub enum ContentRatingAgcomRatingEnum {
     
     /// "agcomUnspecified"
+    #[serde(rename="agcomUnspecified")]
     AgcomUnspecified,
     
 
     /// T
     ///
     /// "agcomT"
+    #[serde(rename="agcomT")]
     AgcomT,
     
 
     /// VM14
     ///
     /// "agcomVm14"
+    #[serde(rename="agcomVm14")]
     AgcomVm14,
     
 
     /// VM18
     ///
     /// "agcomVm18"
+    #[serde(rename="agcomVm18")]
     AgcomVm18,
     
     /// "agcomUnrated"
+    #[serde(rename="agcomUnrated")]
     AgcomUnrated,
 }
 
@@ -843,51 +945,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingAgcomRatingEnum {
 pub enum ContentRatingAnatelRatingEnum {
     
     /// "anatelUnspecified"
+    #[serde(rename="anatelUnspecified")]
     AnatelUnspecified,
     
 
     /// F
     ///
     /// "anatelF"
+    #[serde(rename="anatelF")]
     AnatelF,
     
 
     /// I
     ///
     /// "anatelI"
+    #[serde(rename="anatelI")]
     AnatelI,
     
 
     /// I-7
     ///
     /// "anatelI7"
+    #[serde(rename="anatelI7")]
     AnatelI7,
     
 
     /// I-10
     ///
     /// "anatelI10"
+    #[serde(rename="anatelI10")]
     AnatelI10,
     
 
     /// I-12
     ///
     /// "anatelI12"
+    #[serde(rename="anatelI12")]
     AnatelI12,
     
 
     /// R
     ///
     /// "anatelR"
+    #[serde(rename="anatelR")]
     AnatelR,
     
 
     /// A
     ///
     /// "anatelA"
+    #[serde(rename="anatelA")]
     AnatelA,
     
     /// "anatelUnrated"
+    #[serde(rename="anatelUnrated")]
     AnatelUnrated,
 }
 
@@ -919,51 +1030,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingAnatelRatingEnum {
 pub enum ContentRatingBbfcRatingEnum {
     
     /// "bbfcUnspecified"
+    #[serde(rename="bbfcUnspecified")]
     BbfcUnspecified,
     
 
     /// U
     ///
     /// "bbfcU"
+    #[serde(rename="bbfcU")]
     BbfcU,
     
 
     /// PG
     ///
     /// "bbfcPg"
+    #[serde(rename="bbfcPg")]
     BbfcPg,
     
 
     /// 12A
     ///
     /// "bbfc12a"
+    #[serde(rename="bbfc12a")]
     Bbfc12a,
     
 
     /// 12
     ///
     /// "bbfc12"
+    #[serde(rename="bbfc12")]
     Bbfc12,
     
 
     /// 15
     ///
     /// "bbfc15"
+    #[serde(rename="bbfc15")]
     Bbfc15,
     
 
     /// 18
     ///
     /// "bbfc18"
+    #[serde(rename="bbfc18")]
     Bbfc18,
     
 
     /// R18
     ///
     /// "bbfcR18"
+    #[serde(rename="bbfcR18")]
     BbfcR18,
     
     /// "bbfcUnrated"
+    #[serde(rename="bbfcUnrated")]
     BbfcUnrated,
 }
 
@@ -995,51 +1115,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingBbfcRatingEnum {
 pub enum ContentRatingBfvcRatingEnum {
     
     /// "bfvcUnspecified"
+    #[serde(rename="bfvcUnspecified")]
     BfvcUnspecified,
     
 
     /// G
     ///
     /// "bfvcG"
+    #[serde(rename="bfvcG")]
     BfvcG,
     
 
     /// E
     ///
     /// "bfvcE"
+    #[serde(rename="bfvcE")]
     BfvcE,
     
 
     /// 13
     ///
     /// "bfvc13"
+    #[serde(rename="bfvc13")]
     Bfvc13,
     
 
     /// 15
     ///
     /// "bfvc15"
+    #[serde(rename="bfvc15")]
     Bfvc15,
     
 
     /// 18
     ///
     /// "bfvc18"
+    #[serde(rename="bfvc18")]
     Bfvc18,
     
 
     /// 20
     ///
     /// "bfvc20"
+    #[serde(rename="bfvc20")]
     Bfvc20,
     
 
     /// B
     ///
     /// "bfvcB"
+    #[serde(rename="bfvcB")]
     BfvcB,
     
     /// "bfvcUnrated"
+    #[serde(rename="bfvcUnrated")]
     BfvcUnrated,
 }
 
@@ -1071,51 +1200,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingBfvcRatingEnum {
 pub enum ContentRatingBmukkRatingEnum {
     
     /// "bmukkUnspecified"
+    #[serde(rename="bmukkUnspecified")]
     BmukkUnspecified,
     
 
     /// Unrestricted
     ///
     /// "bmukkAa"
+    #[serde(rename="bmukkAa")]
     BmukkAa,
     
 
     /// 6+
     ///
     /// "bmukk6"
+    #[serde(rename="bmukk6")]
     Bmukk6,
     
 
     /// 8+
     ///
     /// "bmukk8"
+    #[serde(rename="bmukk8")]
     Bmukk8,
     
 
     /// 10+
     ///
     /// "bmukk10"
+    #[serde(rename="bmukk10")]
     Bmukk10,
     
 
     /// 12+
     ///
     /// "bmukk12"
+    #[serde(rename="bmukk12")]
     Bmukk12,
     
 
     /// 14+
     ///
     /// "bmukk14"
+    #[serde(rename="bmukk14")]
     Bmukk14,
     
 
     /// 16+
     ///
     /// "bmukk16"
+    #[serde(rename="bmukk16")]
     Bmukk16,
     
     /// "bmukkUnrated"
+    #[serde(rename="bmukkUnrated")]
     BmukkUnrated,
 }
 
@@ -1147,48 +1285,57 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingBmukkRatingEnum {
 pub enum ContentRatingCatvRatingEnum {
     
     /// "catvUnspecified"
+    #[serde(rename="catvUnspecified")]
     CatvUnspecified,
     
 
     /// C
     ///
     /// "catvC"
+    #[serde(rename="catvC")]
     CatvC,
     
 
     /// C8
     ///
     /// "catvC8"
+    #[serde(rename="catvC8")]
     CatvC8,
     
 
     /// G
     ///
     /// "catvG"
+    #[serde(rename="catvG")]
     CatvG,
     
 
     /// PG
     ///
     /// "catvPg"
+    #[serde(rename="catvPg")]
     CatvPg,
     
 
     /// 14+
     ///
     /// "catv14plus"
+    #[serde(rename="catv14plus")]
     Catv14plus,
     
 
     /// 18+
     ///
     /// "catv18plus"
+    #[serde(rename="catv18plus")]
     Catv18plus,
     
     /// "catvUnrated"
+    #[serde(rename="catvUnrated")]
     CatvUnrated,
     
     /// "catvE"
+    #[serde(rename="catvE")]
     CatvE,
 }
 
@@ -1220,42 +1367,50 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCatvRatingEnum {
 pub enum ContentRatingCatvfrRatingEnum {
     
     /// "catvfrUnspecified"
+    #[serde(rename="catvfrUnspecified")]
     CatvfrUnspecified,
     
 
     /// G
     ///
     /// "catvfrG"
+    #[serde(rename="catvfrG")]
     CatvfrG,
     
 
     /// 8+
     ///
     /// "catvfr8plus"
+    #[serde(rename="catvfr8plus")]
     Catvfr8plus,
     
 
     /// 13+
     ///
     /// "catvfr13plus"
+    #[serde(rename="catvfr13plus")]
     Catvfr13plus,
     
 
     /// 16+
     ///
     /// "catvfr16plus"
+    #[serde(rename="catvfr16plus")]
     Catvfr16plus,
     
 
     /// 18+
     ///
     /// "catvfr18plus"
+    #[serde(rename="catvfr18plus")]
     Catvfr18plus,
     
     /// "catvfrUnrated"
+    #[serde(rename="catvfrUnrated")]
     CatvfrUnrated,
     
     /// "catvfrE"
+    #[serde(rename="catvfrE")]
     CatvfrE,
 }
 
@@ -1286,51 +1441,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCatvfrRatingEnum {
 pub enum ContentRatingCbfcRatingEnum {
     
     /// "cbfcUnspecified"
+    #[serde(rename="cbfcUnspecified")]
     CbfcUnspecified,
     
 
     /// U
     ///
     /// "cbfcU"
+    #[serde(rename="cbfcU")]
     CbfcU,
     
 
     /// U/A
     ///
     /// "cbfcUA"
+    #[serde(rename="cbfcUA")]
     CbfcUA,
     
 
     /// U/A 7+
     ///
     /// "cbfcUA7plus"
+    #[serde(rename="cbfcUA7plus")]
     CbfcUA7plus,
     
 
     /// U/A 13+
     ///
     /// "cbfcUA13plus"
+    #[serde(rename="cbfcUA13plus")]
     CbfcUA13plus,
     
 
     /// U/A 16+
     ///
     /// "cbfcUA16plus"
+    #[serde(rename="cbfcUA16plus")]
     CbfcUA16plus,
     
 
     /// A
     ///
     /// "cbfcA"
+    #[serde(rename="cbfcA")]
     CbfcA,
     
 
     /// S
     ///
     /// "cbfcS"
+    #[serde(rename="cbfcS")]
     CbfcS,
     
     /// "cbfcUnrated"
+    #[serde(rename="cbfcUnrated")]
     CbfcUnrated,
 }
 
@@ -1362,45 +1526,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCbfcRatingEnum {
 pub enum ContentRatingCccRatingEnum {
     
     /// "cccUnspecified"
+    #[serde(rename="cccUnspecified")]
     CccUnspecified,
     
 
     /// Todo espectador
     ///
     /// "cccTe"
+    #[serde(rename="cccTe")]
     CccTe,
     
 
     /// 6+ - Inconveniente para menores de 7 años
     ///
     /// "ccc6"
+    #[serde(rename="ccc6")]
     Ccc6,
     
 
     /// 14+
     ///
     /// "ccc14"
+    #[serde(rename="ccc14")]
     Ccc14,
     
 
     /// 18+
     ///
     /// "ccc18"
+    #[serde(rename="ccc18")]
     Ccc18,
     
 
     /// 18+ - contenido excesivamente violento
     ///
     /// "ccc18v"
+    #[serde(rename="ccc18v")]
     Ccc18v,
     
 
     /// 18+ - contenido pornográfico
     ///
     /// "ccc18s"
+    #[serde(rename="ccc18s")]
     Ccc18s,
     
     /// "cccUnrated"
+    #[serde(rename="cccUnrated")]
     CccUnrated,
 }
 
@@ -1431,45 +1603,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCccRatingEnum {
 pub enum ContentRatingCceRatingEnum {
     
     /// "cceUnspecified"
+    #[serde(rename="cceUnspecified")]
     CceUnspecified,
     
 
     /// 4
     ///
     /// "cceM4"
+    #[serde(rename="cceM4")]
     CceM4,
     
 
     /// 6
     ///
     /// "cceM6"
+    #[serde(rename="cceM6")]
     CceM6,
     
 
     /// 12
     ///
     /// "cceM12"
+    #[serde(rename="cceM12")]
     CceM12,
     
 
     /// 16
     ///
     /// "cceM16"
+    #[serde(rename="cceM16")]
     CceM16,
     
 
     /// 18
     ///
     /// "cceM18"
+    #[serde(rename="cceM18")]
     CceM18,
     
     /// "cceUnrated"
+    #[serde(rename="cceUnrated")]
     CceUnrated,
     
 
     /// 14
     ///
     /// "cceM14"
+    #[serde(rename="cceM14")]
     CceM14,
 }
 
@@ -1500,39 +1680,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCceRatingEnum {
 pub enum ContentRatingChfilmRatingEnum {
     
     /// "chfilmUnspecified"
+    #[serde(rename="chfilmUnspecified")]
     ChfilmUnspecified,
     
 
     /// 0
     ///
     /// "chfilm0"
+    #[serde(rename="chfilm0")]
     Chfilm0,
     
 
     /// 6
     ///
     /// "chfilm6"
+    #[serde(rename="chfilm6")]
     Chfilm6,
     
 
     /// 12
     ///
     /// "chfilm12"
+    #[serde(rename="chfilm12")]
     Chfilm12,
     
 
     /// 16
     ///
     /// "chfilm16"
+    #[serde(rename="chfilm16")]
     Chfilm16,
     
 
     /// 18
     ///
     /// "chfilm18"
+    #[serde(rename="chfilm18")]
     Chfilm18,
     
     /// "chfilmUnrated"
+    #[serde(rename="chfilmUnrated")]
     ChfilmUnrated,
 }
 
@@ -1562,45 +1749,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingChfilmRatingEnum {
 pub enum ContentRatingChvrsRatingEnum {
     
     /// "chvrsUnspecified"
+    #[serde(rename="chvrsUnspecified")]
     ChvrsUnspecified,
     
 
     /// G
     ///
     /// "chvrsG"
+    #[serde(rename="chvrsG")]
     ChvrsG,
     
 
     /// PG
     ///
     /// "chvrsPg"
+    #[serde(rename="chvrsPg")]
     ChvrsPg,
     
 
     /// 14A
     ///
     /// "chvrs14a"
+    #[serde(rename="chvrs14a")]
     Chvrs14a,
     
 
     /// 18A
     ///
     /// "chvrs18a"
+    #[serde(rename="chvrs18a")]
     Chvrs18a,
     
 
     /// R
     ///
     /// "chvrsR"
+    #[serde(rename="chvrsR")]
     ChvrsR,
     
 
     /// E
     ///
     /// "chvrsE"
+    #[serde(rename="chvrsE")]
     ChvrsE,
     
     /// "chvrsUnrated"
+    #[serde(rename="chvrsUnrated")]
     ChvrsUnrated,
 }
 
@@ -1631,27 +1826,32 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingChvrsRatingEnum {
 pub enum ContentRatingCicfRatingEnum {
     
     /// "cicfUnspecified"
+    #[serde(rename="cicfUnspecified")]
     CicfUnspecified,
     
 
     /// E
     ///
     /// "cicfE"
+    #[serde(rename="cicfE")]
     CicfE,
     
 
     /// KT/EA
     ///
     /// "cicfKtEa"
+    #[serde(rename="cicfKtEa")]
     CicfKtEa,
     
 
     /// KNT/ENA
     ///
     /// "cicfKntEna"
+    #[serde(rename="cicfKntEna")]
     CicfKntEna,
     
     /// "cicfUnrated"
+    #[serde(rename="cicfUnrated")]
     CicfUnrated,
 }
 
@@ -1679,39 +1879,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCicfRatingEnum {
 pub enum ContentRatingCnaRatingEnum {
     
     /// "cnaUnspecified"
+    #[serde(rename="cnaUnspecified")]
     CnaUnspecified,
     
 
     /// AP
     ///
     /// "cnaAp"
+    #[serde(rename="cnaAp")]
     CnaAp,
     
 
     /// 12
     ///
     /// "cna12"
+    #[serde(rename="cna12")]
     Cna12,
     
 
     /// 15
     ///
     /// "cna15"
+    #[serde(rename="cna15")]
     Cna15,
     
 
     /// 18
     ///
     /// "cna18"
+    #[serde(rename="cna18")]
     Cna18,
     
 
     /// 18+
     ///
     /// "cna18plus"
+    #[serde(rename="cna18plus")]
     Cna18plus,
     
     /// "cnaUnrated"
+    #[serde(rename="cnaUnrated")]
     CnaUnrated,
 }
 
@@ -1741,51 +1948,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCnaRatingEnum {
 pub enum ContentRatingCncRatingEnum {
     
     /// "cncUnspecified"
+    #[serde(rename="cncUnspecified")]
     CncUnspecified,
     
 
     /// T
     ///
     /// "cncT"
+    #[serde(rename="cncT")]
     CncT,
     
 
     /// 10
     ///
     /// "cnc10"
+    #[serde(rename="cnc10")]
     Cnc10,
     
 
     /// 12
     ///
     /// "cnc12"
+    #[serde(rename="cnc12")]
     Cnc12,
     
 
     /// 16
     ///
     /// "cnc16"
+    #[serde(rename="cnc16")]
     Cnc16,
     
 
     /// 18
     ///
     /// "cnc18"
+    #[serde(rename="cnc18")]
     Cnc18,
     
 
     /// E
     ///
     /// "cncE"
+    #[serde(rename="cncE")]
     CncE,
     
 
     /// interdiction
     ///
     /// "cncInterdiction"
+    #[serde(rename="cncInterdiction")]
     CncInterdiction,
     
     /// "cncUnrated"
+    #[serde(rename="cncUnrated")]
     CncUnrated,
 }
 
@@ -1817,45 +2033,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCncRatingEnum {
 pub enum ContentRatingCsaRatingEnum {
     
     /// "csaUnspecified"
+    #[serde(rename="csaUnspecified")]
     CsaUnspecified,
     
 
     /// T
     ///
     /// "csaT"
+    #[serde(rename="csaT")]
     CsaT,
     
 
     /// 10
     ///
     /// "csa10"
+    #[serde(rename="csa10")]
     Csa10,
     
 
     /// 12
     ///
     /// "csa12"
+    #[serde(rename="csa12")]
     Csa12,
     
 
     /// 16
     ///
     /// "csa16"
+    #[serde(rename="csa16")]
     Csa16,
     
 
     /// 18
     ///
     /// "csa18"
+    #[serde(rename="csa18")]
     Csa18,
     
 
     /// Interdiction
     ///
     /// "csaInterdiction"
+    #[serde(rename="csaInterdiction")]
     CsaInterdiction,
     
     /// "csaUnrated"
+    #[serde(rename="csaUnrated")]
     CsaUnrated,
 }
 
@@ -1886,51 +2110,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCsaRatingEnum {
 pub enum ContentRatingCscfRatingEnum {
     
     /// "cscfUnspecified"
+    #[serde(rename="cscfUnspecified")]
     CscfUnspecified,
     
 
     /// AL
     ///
     /// "cscfAl"
+    #[serde(rename="cscfAl")]
     CscfAl,
     
 
     /// A
     ///
     /// "cscfA"
+    #[serde(rename="cscfA")]
     CscfA,
     
 
     /// 6
     ///
     /// "cscf6"
+    #[serde(rename="cscf6")]
     Cscf6,
     
 
     /// 9
     ///
     /// "cscf9"
+    #[serde(rename="cscf9")]
     Cscf9,
     
 
     /// 12
     ///
     /// "cscf12"
+    #[serde(rename="cscf12")]
     Cscf12,
     
 
     /// 16
     ///
     /// "cscf16"
+    #[serde(rename="cscf16")]
     Cscf16,
     
 
     /// 18
     ///
     /// "cscf18"
+    #[serde(rename="cscf18")]
     Cscf18,
     
     /// "cscfUnrated"
+    #[serde(rename="cscfUnrated")]
     CscfUnrated,
 }
 
@@ -1962,33 +2195,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCscfRatingEnum {
 pub enum ContentRatingCzfilmRatingEnum {
     
     /// "czfilmUnspecified"
+    #[serde(rename="czfilmUnspecified")]
     CzfilmUnspecified,
     
 
     /// U
     ///
     /// "czfilmU"
+    #[serde(rename="czfilmU")]
     CzfilmU,
     
 
     /// 12
     ///
     /// "czfilm12"
+    #[serde(rename="czfilm12")]
     Czfilm12,
     
 
     /// 14
     ///
     /// "czfilm14"
+    #[serde(rename="czfilm14")]
     Czfilm14,
     
 
     /// 18
     ///
     /// "czfilm18"
+    #[serde(rename="czfilm18")]
     Czfilm18,
     
     /// "czfilmUnrated"
+    #[serde(rename="czfilmUnrated")]
     CzfilmUnrated,
 }
 
@@ -2017,93 +2256,117 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingCzfilmRatingEnum {
 pub enum ContentRatingDjctqRatingEnum {
     
     /// "djctqUnspecified"
+    #[serde(rename="djctqUnspecified")]
     DjctqUnspecified,
     
 
     /// L
     ///
     /// "djctqL"
+    #[serde(rename="djctqL")]
     DjctqL,
     
 
     /// 10
     ///
     /// "djctq10"
+    #[serde(rename="djctq10")]
     Djctq10,
     
 
     /// 12
     ///
     /// "djctq12"
+    #[serde(rename="djctq12")]
     Djctq12,
     
 
     /// 14
     ///
     /// "djctq14"
+    #[serde(rename="djctq14")]
     Djctq14,
     
 
     /// 16
     ///
     /// "djctq16"
+    #[serde(rename="djctq16")]
     Djctq16,
     
 
     /// 18
     ///
     /// "djctq18"
+    #[serde(rename="djctq18")]
     Djctq18,
     
     /// "djctqEr"
+    #[serde(rename="djctqEr")]
     DjctqEr,
     
     /// "djctqL10"
+    #[serde(rename="djctqL10")]
     DjctqL10,
     
     /// "djctqL12"
+    #[serde(rename="djctqL12")]
     DjctqL12,
     
     /// "djctqL14"
+    #[serde(rename="djctqL14")]
     DjctqL14,
     
     /// "djctqL16"
+    #[serde(rename="djctqL16")]
     DjctqL16,
     
     /// "djctqL18"
+    #[serde(rename="djctqL18")]
     DjctqL18,
     
     /// "djctq1012"
+    #[serde(rename="djctq1012")]
     Djctq1012,
     
     /// "djctq1014"
+    #[serde(rename="djctq1014")]
     Djctq1014,
     
     /// "djctq1016"
+    #[serde(rename="djctq1016")]
     Djctq1016,
     
     /// "djctq1018"
+    #[serde(rename="djctq1018")]
     Djctq1018,
     
     /// "djctq1214"
+    #[serde(rename="djctq1214")]
     Djctq1214,
     
     /// "djctq1216"
+    #[serde(rename="djctq1216")]
     Djctq1216,
     
     /// "djctq1218"
+    #[serde(rename="djctq1218")]
     Djctq1218,
     
     /// "djctq1416"
+    #[serde(rename="djctq1416")]
     Djctq1416,
     
     /// "djctq1418"
+    #[serde(rename="djctq1418")]
     Djctq1418,
     
     /// "djctq1618"
+    #[serde(rename="djctq1618")]
     Djctq1618,
     
     /// "djctqUnrated"
+    #[serde(rename="djctqUnrated")]
     DjctqUnrated,
 }
 
@@ -2149,78 +2412,91 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingDjctqRatingEnum {
 pub enum ContentRatingDjctqRatingReasonsEnum {
     
     /// "djctqRatingReasonUnspecified"
+    #[serde(rename="djctqRatingReasonUnspecified")]
     DjctqRatingReasonUnspecified,
     
 
     /// Brazil rating content descriptors. See http://go/brazilratings section F. Violência (Violence)
     ///
     /// "djctqViolence"
+    #[serde(rename="djctqViolence")]
     DjctqViolence,
     
 
     /// Violência extrema (Extreme violence)
     ///
     /// "djctqExtremeViolence"
+    #[serde(rename="djctqExtremeViolence")]
     DjctqExtremeViolence,
     
 
     /// Conteúdo sexual (Sexual content)
     ///
     /// "djctqSexualContent"
+    #[serde(rename="djctqSexualContent")]
     DjctqSexualContent,
     
 
     /// Nudez (Nudity)
     ///
     /// "djctqNudity"
+    #[serde(rename="djctqNudity")]
     DjctqNudity,
     
 
     /// Sexo (Sex)
     ///
     /// "djctqSex"
+    #[serde(rename="djctqSex")]
     DjctqSex,
     
 
     /// Sexo Explícito (Explicit sex)
     ///
     /// "djctqExplicitSex"
+    #[serde(rename="djctqExplicitSex")]
     DjctqExplicitSex,
     
 
     /// Drogas (Drugs)
     ///
     /// "djctqDrugs"
+    #[serde(rename="djctqDrugs")]
     DjctqDrugs,
     
 
     /// Drogas Lícitas (Legal drugs)
     ///
     /// "djctqLegalDrugs"
+    #[serde(rename="djctqLegalDrugs")]
     DjctqLegalDrugs,
     
 
     /// Drogas Ilícitas (Illegal drugs)
     ///
     /// "djctqIllegalDrugs"
+    #[serde(rename="djctqIllegalDrugs")]
     DjctqIllegalDrugs,
     
 
     /// Linguagem Imprópria (Inappropriate language)
     ///
     /// "djctqInappropriateLanguage"
+    #[serde(rename="djctqInappropriateLanguage")]
     DjctqInappropriateLanguage,
     
 
     /// Atos Criminosos (Criminal Acts)
     ///
     /// "djctqCriminalActs"
+    #[serde(rename="djctqCriminalActs")]
     DjctqCriminalActs,
     
 
     /// Conteúdo Impactante (Impacting content)
     ///
     /// "djctqImpactingContent"
+    #[serde(rename="djctqImpactingContent")]
     DjctqImpactingContent,
 }
 
@@ -2256,57 +2532,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingDjctqRatingReasons
 pub enum ContentRatingEcbmctRatingEnum {
     
     /// "ecbmctUnspecified"
+    #[serde(rename="ecbmctUnspecified")]
     EcbmctUnspecified,
     
 
     /// G
     ///
     /// "ecbmctG"
+    #[serde(rename="ecbmctG")]
     EcbmctG,
     
 
     /// 7A
     ///
     /// "ecbmct7a"
+    #[serde(rename="ecbmct7a")]
     Ecbmct7a,
     
 
     /// 7+
     ///
     /// "ecbmct7plus"
+    #[serde(rename="ecbmct7plus")]
     Ecbmct7plus,
     
 
     /// 13A
     ///
     /// "ecbmct13a"
+    #[serde(rename="ecbmct13a")]
     Ecbmct13a,
     
 
     /// 13+
     ///
     /// "ecbmct13plus"
+    #[serde(rename="ecbmct13plus")]
     Ecbmct13plus,
     
 
     /// 15A
     ///
     /// "ecbmct15a"
+    #[serde(rename="ecbmct15a")]
     Ecbmct15a,
     
 
     /// 15+
     ///
     /// "ecbmct15plus"
+    #[serde(rename="ecbmct15plus")]
     Ecbmct15plus,
     
 
     /// 18+
     ///
     /// "ecbmct18plus"
+    #[serde(rename="ecbmct18plus")]
     Ecbmct18plus,
     
     /// "ecbmctUnrated"
+    #[serde(rename="ecbmctUnrated")]
     EcbmctUnrated,
 }
 
@@ -2339,57 +2625,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingEcbmctRatingEnum {
 pub enum ContentRatingEefilmRatingEnum {
     
     /// "eefilmUnspecified"
+    #[serde(rename="eefilmUnspecified")]
     EefilmUnspecified,
     
 
     /// Pere
     ///
     /// "eefilmPere"
+    #[serde(rename="eefilmPere")]
     EefilmPere,
     
 
     /// L
     ///
     /// "eefilmL"
+    #[serde(rename="eefilmL")]
     EefilmL,
     
 
     /// MS-6
     ///
     /// "eefilmMs6"
+    #[serde(rename="eefilmMs6")]
     EefilmMs6,
     
 
     /// K-6
     ///
     /// "eefilmK6"
+    #[serde(rename="eefilmK6")]
     EefilmK6,
     
 
     /// MS-12
     ///
     /// "eefilmMs12"
+    #[serde(rename="eefilmMs12")]
     EefilmMs12,
     
 
     /// K-12
     ///
     /// "eefilmK12"
+    #[serde(rename="eefilmK12")]
     EefilmK12,
     
 
     /// K-14
     ///
     /// "eefilmK14"
+    #[serde(rename="eefilmK14")]
     EefilmK14,
     
 
     /// K-16
     ///
     /// "eefilmK16"
+    #[serde(rename="eefilmK16")]
     EefilmK16,
     
     /// "eefilmUnrated"
+    #[serde(rename="eefilmUnrated")]
     EefilmUnrated,
 }
 
@@ -2422,27 +2718,32 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingEefilmRatingEnum {
 pub enum ContentRatingEgfilmRatingEnum {
     
     /// "egfilmUnspecified"
+    #[serde(rename="egfilmUnspecified")]
     EgfilmUnspecified,
     
 
     /// GN
     ///
     /// "egfilmGn"
+    #[serde(rename="egfilmGn")]
     EgfilmGn,
     
 
     /// 18
     ///
     /// "egfilm18"
+    #[serde(rename="egfilm18")]
     Egfilm18,
     
 
     /// BN
     ///
     /// "egfilmBn"
+    #[serde(rename="egfilmBn")]
     EgfilmBn,
     
     /// "egfilmUnrated"
+    #[serde(rename="egfilmUnrated")]
     EgfilmUnrated,
 }
 
@@ -2470,33 +2771,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingEgfilmRatingEnum {
 pub enum ContentRatingEirinRatingEnum {
     
     /// "eirinUnspecified"
+    #[serde(rename="eirinUnspecified")]
     EirinUnspecified,
     
 
     /// G
     ///
     /// "eirinG"
+    #[serde(rename="eirinG")]
     EirinG,
     
 
     /// PG-12
     ///
     /// "eirinPg12"
+    #[serde(rename="eirinPg12")]
     EirinPg12,
     
 
     /// R15+
     ///
     /// "eirinR15plus"
+    #[serde(rename="eirinR15plus")]
     EirinR15plus,
     
 
     /// R18+
     ///
     /// "eirinR18plus"
+    #[serde(rename="eirinR18plus")]
     EirinR18plus,
     
     /// "eirinUnrated"
+    #[serde(rename="eirinUnrated")]
     EirinUnrated,
 }
 
@@ -2525,57 +2832,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingEirinRatingEnum {
 pub enum ContentRatingFcbmRatingEnum {
     
     /// "fcbmUnspecified"
+    #[serde(rename="fcbmUnspecified")]
     FcbmUnspecified,
     
 
     /// U
     ///
     /// "fcbmU"
+    #[serde(rename="fcbmU")]
     FcbmU,
     
 
     /// PG13
     ///
     /// "fcbmPg13"
+    #[serde(rename="fcbmPg13")]
     FcbmPg13,
     
 
     /// P13
     ///
     /// "fcbmP13"
+    #[serde(rename="fcbmP13")]
     FcbmP13,
     
 
     /// 18
     ///
     /// "fcbm18"
+    #[serde(rename="fcbm18")]
     Fcbm18,
     
 
     /// 18SX
     ///
     /// "fcbm18sx"
+    #[serde(rename="fcbm18sx")]
     Fcbm18sx,
     
 
     /// 18PA
     ///
     /// "fcbm18pa"
+    #[serde(rename="fcbm18pa")]
     Fcbm18pa,
     
 
     /// 18SG
     ///
     /// "fcbm18sg"
+    #[serde(rename="fcbm18sg")]
     Fcbm18sg,
     
 
     /// 18PL
     ///
     /// "fcbm18pl"
+    #[serde(rename="fcbm18pl")]
     Fcbm18pl,
     
     /// "fcbmUnrated"
+    #[serde(rename="fcbmUnrated")]
     FcbmUnrated,
 }
 
@@ -2608,39 +2925,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingFcbmRatingEnum {
 pub enum ContentRatingFcoRatingEnum {
     
     /// "fcoUnspecified"
+    #[serde(rename="fcoUnspecified")]
     FcoUnspecified,
     
 
     /// I
     ///
     /// "fcoI"
+    #[serde(rename="fcoI")]
     FcoI,
     
 
     /// IIA
     ///
     /// "fcoIia"
+    #[serde(rename="fcoIia")]
     FcoIia,
     
 
     /// IIB
     ///
     /// "fcoIib"
+    #[serde(rename="fcoIib")]
     FcoIib,
     
 
     /// II
     ///
     /// "fcoIi"
+    #[serde(rename="fcoIi")]
     FcoIi,
     
 
     /// III
     ///
     /// "fcoIii"
+    #[serde(rename="fcoIii")]
     FcoIii,
     
     /// "fcoUnrated"
+    #[serde(rename="fcoUnrated")]
     FcoUnrated,
 }
 
@@ -2670,45 +2994,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingFcoRatingEnum {
 pub enum ContentRatingFmocRatingEnum {
     
     /// "fmocUnspecified"
+    #[serde(rename="fmocUnspecified")]
     FmocUnspecified,
     
 
     /// U
     ///
     /// "fmocU"
+    #[serde(rename="fmocU")]
     FmocU,
     
 
     /// 10
     ///
     /// "fmoc10"
+    #[serde(rename="fmoc10")]
     Fmoc10,
     
 
     /// 12
     ///
     /// "fmoc12"
+    #[serde(rename="fmoc12")]
     Fmoc12,
     
 
     /// 16
     ///
     /// "fmoc16"
+    #[serde(rename="fmoc16")]
     Fmoc16,
     
 
     /// 18
     ///
     /// "fmoc18"
+    #[serde(rename="fmoc18")]
     Fmoc18,
     
 
     /// E
     ///
     /// "fmocE"
+    #[serde(rename="fmocE")]
     FmocE,
     
     /// "fmocUnrated"
+    #[serde(rename="fmocUnrated")]
     FmocUnrated,
 }
 
@@ -2739,69 +3071,81 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingFmocRatingEnum {
 pub enum ContentRatingFpbRatingEnum {
     
     /// "fpbUnspecified"
+    #[serde(rename="fpbUnspecified")]
     FpbUnspecified,
     
 
     /// A
     ///
     /// "fpbA"
+    #[serde(rename="fpbA")]
     FpbA,
     
 
     /// PG
     ///
     /// "fpbPg"
+    #[serde(rename="fpbPg")]
     FpbPg,
     
 
     /// 7-9PG
     ///
     /// "fpb79Pg"
+    #[serde(rename="fpb79Pg")]
     Fpb79Pg,
     
 
     /// 10-12PG
     ///
     /// "fpb1012Pg"
+    #[serde(rename="fpb1012Pg")]
     Fpb1012Pg,
     
 
     /// 13
     ///
     /// "fpb13"
+    #[serde(rename="fpb13")]
     Fpb13,
     
 
     /// 16
     ///
     /// "fpb16"
+    #[serde(rename="fpb16")]
     Fpb16,
     
 
     /// 18
     ///
     /// "fpb18"
+    #[serde(rename="fpb18")]
     Fpb18,
     
 
     /// X18
     ///
     /// "fpbX18"
+    #[serde(rename="fpbX18")]
     FpbX18,
     
 
     /// XX
     ///
     /// "fpbXx"
+    #[serde(rename="fpbXx")]
     FpbXx,
     
     /// "fpbUnrated"
+    #[serde(rename="fpbUnrated")]
     FpbUnrated,
     
 
     /// 10
     ///
     /// "fpb10"
+    #[serde(rename="fpb10")]
     Fpb10,
 }
 
@@ -2835,42 +3179,54 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingFpbRatingEnum {
 pub enum ContentRatingFpbRatingReasonsEnum {
     
     /// "fpbRatingReasonUnspecified"
+    #[serde(rename="fpbRatingReasonUnspecified")]
     FpbRatingReasonUnspecified,
     
 
     /// South Africa rating content descriptors.
     ///
     /// "fpbBlasphemy"
+    #[serde(rename="fpbBlasphemy")]
     FpbBlasphemy,
     
     /// "fpbLanguage"
+    #[serde(rename="fpbLanguage")]
     FpbLanguage,
     
     /// "fpbNudity"
+    #[serde(rename="fpbNudity")]
     FpbNudity,
     
     /// "fpbPrejudice"
+    #[serde(rename="fpbPrejudice")]
     FpbPrejudice,
     
     /// "fpbSex"
+    #[serde(rename="fpbSex")]
     FpbSex,
     
     /// "fpbViolence"
+    #[serde(rename="fpbViolence")]
     FpbViolence,
     
     /// "fpbDrugs"
+    #[serde(rename="fpbDrugs")]
     FpbDrugs,
     
     /// "fpbSexualViolence"
+    #[serde(rename="fpbSexualViolence")]
     FpbSexualViolence,
     
     /// "fpbHorror"
+    #[serde(rename="fpbHorror")]
     FpbHorror,
     
     /// "fpbCriminalTechniques"
+    #[serde(rename="fpbCriminalTechniques")]
     FpbCriminalTechniques,
     
     /// "fpbImitativeActsTechniques"
+    #[serde(rename="fpbImitativeActsTechniques")]
     FpbImitativeActsTechniques,
 }
 
@@ -2905,39 +3261,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingFpbRatingReasonsEn
 pub enum ContentRatingFskRatingEnum {
     
     /// "fskUnspecified"
+    #[serde(rename="fskUnspecified")]
     FskUnspecified,
     
 
     /// FSK 0
     ///
     /// "fsk0"
+    #[serde(rename="fsk0")]
     Fsk0,
     
 
     /// FSK 6
     ///
     /// "fsk6"
+    #[serde(rename="fsk6")]
     Fsk6,
     
 
     /// FSK 12
     ///
     /// "fsk12"
+    #[serde(rename="fsk12")]
     Fsk12,
     
 
     /// FSK 16
     ///
     /// "fsk16"
+    #[serde(rename="fsk16")]
     Fsk16,
     
 
     /// FSK 18
     ///
     /// "fsk18"
+    #[serde(rename="fsk18")]
     Fsk18,
     
     /// "fskUnrated"
+    #[serde(rename="fskUnrated")]
     FskUnrated,
 }
 
@@ -2967,51 +3330,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingFskRatingEnum {
 pub enum ContentRatingGrfilmRatingEnum {
     
     /// "grfilmUnspecified"
+    #[serde(rename="grfilmUnspecified")]
     GrfilmUnspecified,
     
 
     /// K
     ///
     /// "grfilmK"
+    #[serde(rename="grfilmK")]
     GrfilmK,
     
 
     /// E
     ///
     /// "grfilmE"
+    #[serde(rename="grfilmE")]
     GrfilmE,
     
 
     /// K-12
     ///
     /// "grfilmK12"
+    #[serde(rename="grfilmK12")]
     GrfilmK12,
     
 
     /// K-13
     ///
     /// "grfilmK13"
+    #[serde(rename="grfilmK13")]
     GrfilmK13,
     
 
     /// K-15
     ///
     /// "grfilmK15"
+    #[serde(rename="grfilmK15")]
     GrfilmK15,
     
 
     /// K-17
     ///
     /// "grfilmK17"
+    #[serde(rename="grfilmK17")]
     GrfilmK17,
     
 
     /// K-18
     ///
     /// "grfilmK18"
+    #[serde(rename="grfilmK18")]
     GrfilmK18,
     
     /// "grfilmUnrated"
+    #[serde(rename="grfilmUnrated")]
     GrfilmUnrated,
 }
 
@@ -3043,51 +3415,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingGrfilmRatingEnum {
 pub enum ContentRatingIcaaRatingEnum {
     
     /// "icaaUnspecified"
+    #[serde(rename="icaaUnspecified")]
     IcaaUnspecified,
     
 
     /// APTA
     ///
     /// "icaaApta"
+    #[serde(rename="icaaApta")]
     IcaaApta,
     
 
     /// 7
     ///
     /// "icaa7"
+    #[serde(rename="icaa7")]
     Icaa7,
     
 
     /// 12
     ///
     /// "icaa12"
+    #[serde(rename="icaa12")]
     Icaa12,
     
 
     /// 13
     ///
     /// "icaa13"
+    #[serde(rename="icaa13")]
     Icaa13,
     
 
     /// 16
     ///
     /// "icaa16"
+    #[serde(rename="icaa16")]
     Icaa16,
     
 
     /// 18
     ///
     /// "icaa18"
+    #[serde(rename="icaa18")]
     Icaa18,
     
 
     /// X
     ///
     /// "icaaX"
+    #[serde(rename="icaaX")]
     IcaaX,
     
     /// "icaaUnrated"
+    #[serde(rename="icaaUnrated")]
     IcaaUnrated,
 }
 
@@ -3119,57 +3500,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingIcaaRatingEnum {
 pub enum ContentRatingIfcoRatingEnum {
     
     /// "ifcoUnspecified"
+    #[serde(rename="ifcoUnspecified")]
     IfcoUnspecified,
     
 
     /// G
     ///
     /// "ifcoG"
+    #[serde(rename="ifcoG")]
     IfcoG,
     
 
     /// PG
     ///
     /// "ifcoPg"
+    #[serde(rename="ifcoPg")]
     IfcoPg,
     
 
     /// 12
     ///
     /// "ifco12"
+    #[serde(rename="ifco12")]
     Ifco12,
     
 
     /// 12A
     ///
     /// "ifco12a"
+    #[serde(rename="ifco12a")]
     Ifco12a,
     
 
     /// 15
     ///
     /// "ifco15"
+    #[serde(rename="ifco15")]
     Ifco15,
     
 
     /// 15A
     ///
     /// "ifco15a"
+    #[serde(rename="ifco15a")]
     Ifco15a,
     
 
     /// 16
     ///
     /// "ifco16"
+    #[serde(rename="ifco16")]
     Ifco16,
     
 
     /// 18
     ///
     /// "ifco18"
+    #[serde(rename="ifco18")]
     Ifco18,
     
     /// "ifcoUnrated"
+    #[serde(rename="ifcoUnrated")]
     IfcoUnrated,
 }
 
@@ -3202,39 +3593,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingIfcoRatingEnum {
 pub enum ContentRatingIlfilmRatingEnum {
     
     /// "ilfilmUnspecified"
+    #[serde(rename="ilfilmUnspecified")]
     IlfilmUnspecified,
     
 
     /// AA
     ///
     /// "ilfilmAa"
+    #[serde(rename="ilfilmAa")]
     IlfilmAa,
     
 
     /// 12
     ///
     /// "ilfilm12"
+    #[serde(rename="ilfilm12")]
     Ilfilm12,
     
 
     /// 14
     ///
     /// "ilfilm14"
+    #[serde(rename="ilfilm14")]
     Ilfilm14,
     
 
     /// 16
     ///
     /// "ilfilm16"
+    #[serde(rename="ilfilm16")]
     Ilfilm16,
     
 
     /// 18
     ///
     /// "ilfilm18"
+    #[serde(rename="ilfilm18")]
     Ilfilm18,
     
     /// "ilfilmUnrated"
+    #[serde(rename="ilfilmUnrated")]
     IlfilmUnrated,
 }
 
@@ -3264,39 +3662,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingIlfilmRatingEnum {
 pub enum ContentRatingIncaaRatingEnum {
     
     /// "incaaUnspecified"
+    #[serde(rename="incaaUnspecified")]
     IncaaUnspecified,
     
 
     /// ATP (Apta para todo publico)
     ///
     /// "incaaAtp"
+    #[serde(rename="incaaAtp")]
     IncaaAtp,
     
 
     /// 13 (Solo apta para mayores de 13 años)
     ///
     /// "incaaSam13"
+    #[serde(rename="incaaSam13")]
     IncaaSam13,
     
 
     /// 16 (Solo apta para mayores de 16 años)
     ///
     /// "incaaSam16"
+    #[serde(rename="incaaSam16")]
     IncaaSam16,
     
 
     /// 18 (Solo apta para mayores de 18 años)
     ///
     /// "incaaSam18"
+    #[serde(rename="incaaSam18")]
     IncaaSam18,
     
 
     /// X (Solo apta para mayores de 18 años, de exhibición condicionada)
     ///
     /// "incaaC"
+    #[serde(rename="incaaC")]
     IncaaC,
     
     /// "incaaUnrated"
+    #[serde(rename="incaaUnrated")]
     IncaaUnrated,
 }
 
@@ -3326,33 +3731,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingIncaaRatingEnum {
 pub enum ContentRatingKfcbRatingEnum {
     
     /// "kfcbUnspecified"
+    #[serde(rename="kfcbUnspecified")]
     KfcbUnspecified,
     
 
     /// GE
     ///
     /// "kfcbG"
+    #[serde(rename="kfcbG")]
     KfcbG,
     
 
     /// PG
     ///
     /// "kfcbPg"
+    #[serde(rename="kfcbPg")]
     KfcbPg,
     
 
     /// 16
     ///
     /// "kfcb16plus"
+    #[serde(rename="kfcb16plus")]
     Kfcb16plus,
     
 
     /// 18
     ///
     /// "kfcbR"
+    #[serde(rename="kfcbR")]
     KfcbR,
     
     /// "kfcbUnrated"
+    #[serde(rename="kfcbUnrated")]
     KfcbUnrated,
 }
 
@@ -3381,42 +3792,50 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingKfcbRatingEnum {
 pub enum ContentRatingKijkwijzerRatingEnum {
     
     /// "kijkwijzerUnspecified"
+    #[serde(rename="kijkwijzerUnspecified")]
     KijkwijzerUnspecified,
     
 
     /// AL
     ///
     /// "kijkwijzerAl"
+    #[serde(rename="kijkwijzerAl")]
     KijkwijzerAl,
     
 
     /// 6
     ///
     /// "kijkwijzer6"
+    #[serde(rename="kijkwijzer6")]
     Kijkwijzer6,
     
 
     /// 9
     ///
     /// "kijkwijzer9"
+    #[serde(rename="kijkwijzer9")]
     Kijkwijzer9,
     
 
     /// 12
     ///
     /// "kijkwijzer12"
+    #[serde(rename="kijkwijzer12")]
     Kijkwijzer12,
     
 
     /// 16
     ///
     /// "kijkwijzer16"
+    #[serde(rename="kijkwijzer16")]
     Kijkwijzer16,
     
     /// "kijkwijzer18"
+    #[serde(rename="kijkwijzer18")]
     Kijkwijzer18,
     
     /// "kijkwijzerUnrated"
+    #[serde(rename="kijkwijzerUnrated")]
     KijkwijzerUnrated,
 }
 
@@ -3447,36 +3866,43 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingKijkwijzerRatingEn
 pub enum ContentRatingKmrbRatingEnum {
     
     /// "kmrbUnspecified"
+    #[serde(rename="kmrbUnspecified")]
     KmrbUnspecified,
     
 
     /// 전체관람가
     ///
     /// "kmrbAll"
+    #[serde(rename="kmrbAll")]
     KmrbAll,
     
 
     /// 12세 이상 관람가
     ///
     /// "kmrb12plus"
+    #[serde(rename="kmrb12plus")]
     Kmrb12plus,
     
 
     /// 15세 이상 관람가
     ///
     /// "kmrb15plus"
+    #[serde(rename="kmrb15plus")]
     Kmrb15plus,
     
     /// "kmrbTeenr"
+    #[serde(rename="kmrbTeenr")]
     KmrbTeenr,
     
 
     /// 청소년 관람불가
     ///
     /// "kmrbR"
+    #[serde(rename="kmrbR")]
     KmrbR,
     
     /// "kmrbUnrated"
+    #[serde(rename="kmrbUnrated")]
     KmrbUnrated,
 }
 
@@ -3506,57 +3932,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingKmrbRatingEnum {
 pub enum ContentRatingLsfRatingEnum {
     
     /// "lsfUnspecified"
+    #[serde(rename="lsfUnspecified")]
     LsfUnspecified,
     
 
     /// SU
     ///
     /// "lsfSu"
+    #[serde(rename="lsfSu")]
     LsfSu,
     
 
     /// A
     ///
     /// "lsfA"
+    #[serde(rename="lsfA")]
     LsfA,
     
 
     /// BO
     ///
     /// "lsfBo"
+    #[serde(rename="lsfBo")]
     LsfBo,
     
 
     /// 13
     ///
     /// "lsf13"
+    #[serde(rename="lsf13")]
     Lsf13,
     
 
     /// R
     ///
     /// "lsfR"
+    #[serde(rename="lsfR")]
     LsfR,
     
 
     /// 17
     ///
     /// "lsf17"
+    #[serde(rename="lsf17")]
     Lsf17,
     
 
     /// D
     ///
     /// "lsfD"
+    #[serde(rename="lsfD")]
     LsfD,
     
 
     /// 21
     ///
     /// "lsf21"
+    #[serde(rename="lsf21")]
     Lsf21,
     
     /// "lsfUnrated"
+    #[serde(rename="lsfUnrated")]
     LsfUnrated,
 }
 
@@ -3589,57 +4025,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingLsfRatingEnum {
 pub enum ContentRatingMccaaRatingEnum {
     
     /// "mccaaUnspecified"
+    #[serde(rename="mccaaUnspecified")]
     MccaaUnspecified,
     
 
     /// U
     ///
     /// "mccaaU"
+    #[serde(rename="mccaaU")]
     MccaaU,
     
 
     /// PG
     ///
     /// "mccaaPg"
+    #[serde(rename="mccaaPg")]
     MccaaPg,
     
 
     /// 12A
     ///
     /// "mccaa12a"
+    #[serde(rename="mccaa12a")]
     Mccaa12a,
     
 
     /// 12
     ///
     /// "mccaa12"
+    #[serde(rename="mccaa12")]
     Mccaa12,
     
 
     /// 14 - this rating was removed from the new classification structure introduced in 2013.
     ///
     /// "mccaa14"
+    #[serde(rename="mccaa14")]
     Mccaa14,
     
 
     /// 15
     ///
     /// "mccaa15"
+    #[serde(rename="mccaa15")]
     Mccaa15,
     
 
     /// 16 - this rating was removed from the new classification structure introduced in 2013.
     ///
     /// "mccaa16"
+    #[serde(rename="mccaa16")]
     Mccaa16,
     
 
     /// 18
     ///
     /// "mccaa18"
+    #[serde(rename="mccaa18")]
     Mccaa18,
     
     /// "mccaaUnrated"
+    #[serde(rename="mccaaUnrated")]
     MccaaUnrated,
 }
 
@@ -3672,33 +4118,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMccaaRatingEnum {
 pub enum ContentRatingMccypRatingEnum {
     
     /// "mccypUnspecified"
+    #[serde(rename="mccypUnspecified")]
     MccypUnspecified,
     
 
     /// A
     ///
     /// "mccypA"
+    #[serde(rename="mccypA")]
     MccypA,
     
 
     /// 7
     ///
     /// "mccyp7"
+    #[serde(rename="mccyp7")]
     Mccyp7,
     
 
     /// 11
     ///
     /// "mccyp11"
+    #[serde(rename="mccyp11")]
     Mccyp11,
     
 
     /// 15
     ///
     /// "mccyp15"
+    #[serde(rename="mccyp15")]
     Mccyp15,
     
     /// "mccypUnrated"
+    #[serde(rename="mccypUnrated")]
     MccypUnrated,
 }
 
@@ -3727,51 +4179,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMccypRatingEnum {
 pub enum ContentRatingMcstRatingEnum {
     
     /// "mcstUnspecified"
+    #[serde(rename="mcstUnspecified")]
     McstUnspecified,
     
 
     /// P
     ///
     /// "mcstP"
+    #[serde(rename="mcstP")]
     McstP,
     
 
     /// 0
     ///
     /// "mcst0"
+    #[serde(rename="mcst0")]
     Mcst0,
     
 
     /// C13
     ///
     /// "mcstC13"
+    #[serde(rename="mcstC13")]
     McstC13,
     
 
     /// C16
     ///
     /// "mcstC16"
+    #[serde(rename="mcstC16")]
     McstC16,
     
 
     /// 16+
     ///
     /// "mcst16plus"
+    #[serde(rename="mcst16plus")]
     Mcst16plus,
     
 
     /// C18
     ///
     /// "mcstC18"
+    #[serde(rename="mcstC18")]
     McstC18,
     
 
     /// MCST_G_PG
     ///
     /// "mcstGPg"
+    #[serde(rename="mcstGPg")]
     McstGPg,
     
     /// "mcstUnrated"
+    #[serde(rename="mcstUnrated")]
     McstUnrated,
 }
 
@@ -3803,45 +4264,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMcstRatingEnum {
 pub enum ContentRatingMdaRatingEnum {
     
     /// "mdaUnspecified"
+    #[serde(rename="mdaUnspecified")]
     MdaUnspecified,
     
 
     /// G
     ///
     /// "mdaG"
+    #[serde(rename="mdaG")]
     MdaG,
     
 
     /// PG
     ///
     /// "mdaPg"
+    #[serde(rename="mdaPg")]
     MdaPg,
     
 
     /// PG13
     ///
     /// "mdaPg13"
+    #[serde(rename="mdaPg13")]
     MdaPg13,
     
 
     /// NC16
     ///
     /// "mdaNc16"
+    #[serde(rename="mdaNc16")]
     MdaNc16,
     
 
     /// M18
     ///
     /// "mdaM18"
+    #[serde(rename="mdaM18")]
     MdaM18,
     
 
     /// R21
     ///
     /// "mdaR21"
+    #[serde(rename="mdaR21")]
     MdaR21,
     
     /// "mdaUnrated"
+    #[serde(rename="mdaUnrated")]
     MdaUnrated,
 }
 
@@ -3872,57 +4341,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMdaRatingEnum {
 pub enum ContentRatingMedietilsynetRatingEnum {
     
     /// "medietilsynetUnspecified"
+    #[serde(rename="medietilsynetUnspecified")]
     MedietilsynetUnspecified,
     
 
     /// A
     ///
     /// "medietilsynetA"
+    #[serde(rename="medietilsynetA")]
     MedietilsynetA,
     
 
     /// 6
     ///
     /// "medietilsynet6"
+    #[serde(rename="medietilsynet6")]
     Medietilsynet6,
     
 
     /// 7
     ///
     /// "medietilsynet7"
+    #[serde(rename="medietilsynet7")]
     Medietilsynet7,
     
 
     /// 9
     ///
     /// "medietilsynet9"
+    #[serde(rename="medietilsynet9")]
     Medietilsynet9,
     
 
     /// 11
     ///
     /// "medietilsynet11"
+    #[serde(rename="medietilsynet11")]
     Medietilsynet11,
     
 
     /// 12
     ///
     /// "medietilsynet12"
+    #[serde(rename="medietilsynet12")]
     Medietilsynet12,
     
 
     /// 15
     ///
     /// "medietilsynet15"
+    #[serde(rename="medietilsynet15")]
     Medietilsynet15,
     
 
     /// 18
     ///
     /// "medietilsynet18"
+    #[serde(rename="medietilsynet18")]
     Medietilsynet18,
     
     /// "medietilsynetUnrated"
+    #[serde(rename="medietilsynetUnrated")]
     MedietilsynetUnrated,
 }
 
@@ -3955,39 +4434,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMedietilsynetRatin
 pub enum ContentRatingMekuRatingEnum {
     
     /// "mekuUnspecified"
+    #[serde(rename="mekuUnspecified")]
     MekuUnspecified,
     
 
     /// S
     ///
     /// "mekuS"
+    #[serde(rename="mekuS")]
     MekuS,
     
 
     /// 7
     ///
     /// "meku7"
+    #[serde(rename="meku7")]
     Meku7,
     
 
     /// 12
     ///
     /// "meku12"
+    #[serde(rename="meku12")]
     Meku12,
     
 
     /// 16
     ///
     /// "meku16"
+    #[serde(rename="meku16")]
     Meku16,
     
 
     /// 18
     ///
     /// "meku18"
+    #[serde(rename="meku18")]
     Meku18,
     
     /// "mekuUnrated"
+    #[serde(rename="mekuUnrated")]
     MekuUnrated,
 }
 
@@ -4017,36 +4503,42 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMekuRatingEnum {
 pub enum ContentRatingMenaMpaaRatingEnum {
     
     /// "menaMpaaUnspecified"
+    #[serde(rename="menaMpaaUnspecified")]
     MenaMpaaUnspecified,
     
 
     /// G
     ///
     /// "menaMpaaG"
+    #[serde(rename="menaMpaaG")]
     MenaMpaaG,
     
 
     /// PG
     ///
     /// "menaMpaaPg"
+    #[serde(rename="menaMpaaPg")]
     MenaMpaaPg,
     
 
     /// PG-13
     ///
     /// "menaMpaaPg13"
+    #[serde(rename="menaMpaaPg13")]
     MenaMpaaPg13,
     
 
     /// R
     ///
     /// "menaMpaaR"
+    #[serde(rename="menaMpaaR")]
     MenaMpaaR,
     
 
     /// To keep the same enum values as MPAA's items have, skip NC_17.
     ///
     /// "menaMpaaUnrated"
+    #[serde(rename="menaMpaaUnrated")]
     MenaMpaaUnrated,
 }
 
@@ -4075,30 +4567,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMenaMpaaRatingEnum
 pub enum ContentRatingMibacRatingEnum {
     
     /// "mibacUnspecified"
+    #[serde(rename="mibacUnspecified")]
     MibacUnspecified,
     
     /// "mibacT"
+    #[serde(rename="mibacT")]
     MibacT,
     
     /// "mibacVap"
+    #[serde(rename="mibacVap")]
     MibacVap,
     
     /// "mibacVm6"
+    #[serde(rename="mibacVm6")]
     MibacVm6,
     
     /// "mibacVm12"
+    #[serde(rename="mibacVm12")]
     MibacVm12,
     
     /// "mibacVm14"
+    #[serde(rename="mibacVm14")]
     MibacVm14,
     
     /// "mibacVm16"
+    #[serde(rename="mibacVm16")]
     MibacVm16,
     
     /// "mibacVm18"
+    #[serde(rename="mibacVm18")]
     MibacVm18,
     
     /// "mibacUnrated"
+    #[serde(rename="mibacUnrated")]
     MibacUnrated,
 }
 
@@ -4130,57 +4631,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMibacRatingEnum {
 pub enum ContentRatingMocRatingEnum {
     
     /// "mocUnspecified"
+    #[serde(rename="mocUnspecified")]
     MocUnspecified,
     
 
     /// E
     ///
     /// "mocE"
+    #[serde(rename="mocE")]
     MocE,
     
 
     /// T
     ///
     /// "mocT"
+    #[serde(rename="mocT")]
     MocT,
     
 
     /// 7
     ///
     /// "moc7"
+    #[serde(rename="moc7")]
     Moc7,
     
 
     /// 12
     ///
     /// "moc12"
+    #[serde(rename="moc12")]
     Moc12,
     
 
     /// 15
     ///
     /// "moc15"
+    #[serde(rename="moc15")]
     Moc15,
     
 
     /// 18
     ///
     /// "moc18"
+    #[serde(rename="moc18")]
     Moc18,
     
 
     /// X
     ///
     /// "mocX"
+    #[serde(rename="mocX")]
     MocX,
     
 
     /// Banned
     ///
     /// "mocBanned"
+    #[serde(rename="mocBanned")]
     MocBanned,
     
     /// "mocUnrated"
+    #[serde(rename="mocUnrated")]
     MocUnrated,
 }
 
@@ -4213,45 +4724,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMocRatingEnum {
 pub enum ContentRatingMoctwRatingEnum {
     
     /// "moctwUnspecified"
+    #[serde(rename="moctwUnspecified")]
     MoctwUnspecified,
     
 
     /// G
     ///
     /// "moctwG"
+    #[serde(rename="moctwG")]
     MoctwG,
     
 
     /// P
     ///
     /// "moctwP"
+    #[serde(rename="moctwP")]
     MoctwP,
     
 
     /// PG
     ///
     /// "moctwPg"
+    #[serde(rename="moctwPg")]
     MoctwPg,
     
 
     /// R
     ///
     /// "moctwR"
+    #[serde(rename="moctwR")]
     MoctwR,
     
     /// "moctwUnrated"
+    #[serde(rename="moctwUnrated")]
     MoctwUnrated,
     
 
     /// R-12
     ///
     /// "moctwR12"
+    #[serde(rename="moctwR12")]
     MoctwR12,
     
 
     /// R-15
     ///
     /// "moctwR15"
+    #[serde(rename="moctwR15")]
     MoctwR15,
 }
 
@@ -4282,45 +4801,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMoctwRatingEnum {
 pub enum ContentRatingMpaaRatingEnum {
     
     /// "mpaaUnspecified"
+    #[serde(rename="mpaaUnspecified")]
     MpaaUnspecified,
     
 
     /// G
     ///
     /// "mpaaG"
+    #[serde(rename="mpaaG")]
     MpaaG,
     
 
     /// PG
     ///
     /// "mpaaPg"
+    #[serde(rename="mpaaPg")]
     MpaaPg,
     
 
     /// PG-13
     ///
     /// "mpaaPg13"
+    #[serde(rename="mpaaPg13")]
     MpaaPg13,
     
 
     /// R
     ///
     /// "mpaaR"
+    #[serde(rename="mpaaR")]
     MpaaR,
     
 
     /// NC-17
     ///
     /// "mpaaNc17"
+    #[serde(rename="mpaaNc17")]
     MpaaNc17,
     
 
     /// ! X
     ///
     /// "mpaaX"
+    #[serde(rename="mpaaX")]
     MpaaX,
     
     /// "mpaaUnrated"
+    #[serde(rename="mpaaUnrated")]
     MpaaUnrated,
 }
 
@@ -4351,18 +4878,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMpaaRatingEnum {
 pub enum ContentRatingMpaatRatingEnum {
     
     /// "mpaatUnspecified"
+    #[serde(rename="mpaatUnspecified")]
     MpaatUnspecified,
     
 
     /// GB
     ///
     /// "mpaatGb"
+    #[serde(rename="mpaatGb")]
     MpaatGb,
     
 
     /// RB
     ///
     /// "mpaatRb"
+    #[serde(rename="mpaatRb")]
     MpaatRb,
 }
 
@@ -4388,45 +4918,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMpaatRatingEnum {
 pub enum ContentRatingMtrcbRatingEnum {
     
     /// "mtrcbUnspecified"
+    #[serde(rename="mtrcbUnspecified")]
     MtrcbUnspecified,
     
 
     /// G
     ///
     /// "mtrcbG"
+    #[serde(rename="mtrcbG")]
     MtrcbG,
     
 
     /// PG
     ///
     /// "mtrcbPg"
+    #[serde(rename="mtrcbPg")]
     MtrcbPg,
     
 
     /// R-13
     ///
     /// "mtrcbR13"
+    #[serde(rename="mtrcbR13")]
     MtrcbR13,
     
 
     /// R-16
     ///
     /// "mtrcbR16"
+    #[serde(rename="mtrcbR16")]
     MtrcbR16,
     
 
     /// R-18
     ///
     /// "mtrcbR18"
+    #[serde(rename="mtrcbR18")]
     MtrcbR18,
     
 
     /// X
     ///
     /// "mtrcbX"
+    #[serde(rename="mtrcbX")]
     MtrcbX,
     
     /// "mtrcbUnrated"
+    #[serde(rename="mtrcbUnrated")]
     MtrcbUnrated,
 }
 
@@ -4457,51 +4995,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingMtrcbRatingEnum {
 pub enum ContentRatingNbcRatingEnum {
     
     /// "nbcUnspecified"
+    #[serde(rename="nbcUnspecified")]
     NbcUnspecified,
     
 
     /// G
     ///
     /// "nbcG"
+    #[serde(rename="nbcG")]
     NbcG,
     
 
     /// PG
     ///
     /// "nbcPg"
+    #[serde(rename="nbcPg")]
     NbcPg,
     
 
     /// 12+
     ///
     /// "nbc12plus"
+    #[serde(rename="nbc12plus")]
     Nbc12plus,
     
 
     /// 15+
     ///
     /// "nbc15plus"
+    #[serde(rename="nbc15plus")]
     Nbc15plus,
     
 
     /// 18+
     ///
     /// "nbc18plus"
+    #[serde(rename="nbc18plus")]
     Nbc18plus,
     
 
     /// 18+R
     ///
     /// "nbc18plusr"
+    #[serde(rename="nbc18plusr")]
     Nbc18plusr,
     
 
     /// PU
     ///
     /// "nbcPu"
+    #[serde(rename="nbcPu")]
     NbcPu,
     
     /// "nbcUnrated"
+    #[serde(rename="nbcUnrated")]
     NbcUnrated,
 }
 
@@ -4533,24 +5080,31 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingNbcRatingEnum {
 pub enum ContentRatingNbcplRatingEnum {
     
     /// "nbcplUnspecified"
+    #[serde(rename="nbcplUnspecified")]
     NbcplUnspecified,
     
     /// "nbcplI"
+    #[serde(rename="nbcplI")]
     NbcplI,
     
     /// "nbcplIi"
+    #[serde(rename="nbcplIi")]
     NbcplIi,
     
     /// "nbcplIii"
+    #[serde(rename="nbcplIii")]
     NbcplIii,
     
     /// "nbcplIv"
+    #[serde(rename="nbcplIv")]
     NbcplIv,
     
     /// "nbcpl18plus"
+    #[serde(rename="nbcpl18plus")]
     Nbcpl18plus,
     
     /// "nbcplUnrated"
+    #[serde(rename="nbcplUnrated")]
     NbcplUnrated,
 }
 
@@ -4580,39 +5134,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingNbcplRatingEnum {
 pub enum ContentRatingNfrcRatingEnum {
     
     /// "nfrcUnspecified"
+    #[serde(rename="nfrcUnspecified")]
     NfrcUnspecified,
     
 
     /// A
     ///
     /// "nfrcA"
+    #[serde(rename="nfrcA")]
     NfrcA,
     
 
     /// B
     ///
     /// "nfrcB"
+    #[serde(rename="nfrcB")]
     NfrcB,
     
 
     /// C
     ///
     /// "nfrcC"
+    #[serde(rename="nfrcC")]
     NfrcC,
     
 
     /// D
     ///
     /// "nfrcD"
+    #[serde(rename="nfrcD")]
     NfrcD,
     
 
     /// X
     ///
     /// "nfrcX"
+    #[serde(rename="nfrcX")]
     NfrcX,
     
     /// "nfrcUnrated"
+    #[serde(rename="nfrcUnrated")]
     NfrcUnrated,
 }
 
@@ -4642,51 +5203,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingNfrcRatingEnum {
 pub enum ContentRatingNfvcbRatingEnum {
     
     /// "nfvcbUnspecified"
+    #[serde(rename="nfvcbUnspecified")]
     NfvcbUnspecified,
     
 
     /// G
     ///
     /// "nfvcbG"
+    #[serde(rename="nfvcbG")]
     NfvcbG,
     
 
     /// PG
     ///
     /// "nfvcbPg"
+    #[serde(rename="nfvcbPg")]
     NfvcbPg,
     
 
     /// 12
     ///
     /// "nfvcb12"
+    #[serde(rename="nfvcb12")]
     Nfvcb12,
     
 
     /// 12A
     ///
     /// "nfvcb12a"
+    #[serde(rename="nfvcb12a")]
     Nfvcb12a,
     
 
     /// 15
     ///
     /// "nfvcb15"
+    #[serde(rename="nfvcb15")]
     Nfvcb15,
     
 
     /// 18
     ///
     /// "nfvcb18"
+    #[serde(rename="nfvcb18")]
     Nfvcb18,
     
 
     /// RE
     ///
     /// "nfvcbRe"
+    #[serde(rename="nfvcbRe")]
     NfvcbRe,
     
     /// "nfvcbUnrated"
+    #[serde(rename="nfvcbUnrated")]
     NfvcbUnrated,
 }
 
@@ -4718,39 +5288,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingNfvcbRatingEnum {
 pub enum ContentRatingNkclvRatingEnum {
     
     /// "nkclvUnspecified"
+    #[serde(rename="nkclvUnspecified")]
     NkclvUnspecified,
     
 
     /// U
     ///
     /// "nkclvU"
+    #[serde(rename="nkclvU")]
     NkclvU,
     
 
     /// 7+
     ///
     /// "nkclv7plus"
+    #[serde(rename="nkclv7plus")]
     Nkclv7plus,
     
 
     /// 12+
     ///
     /// "nkclv12plus"
+    #[serde(rename="nkclv12plus")]
     Nkclv12plus,
     
 
     /// ! 16+
     ///
     /// "nkclv16plus"
+    #[serde(rename="nkclv16plus")]
     Nkclv16plus,
     
 
     /// 18+
     ///
     /// "nkclv18plus"
+    #[serde(rename="nkclv18plus")]
     Nkclv18plus,
     
     /// "nkclvUnrated"
+    #[serde(rename="nkclvUnrated")]
     NkclvUnrated,
 }
 
@@ -4780,51 +5357,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingNkclvRatingEnum {
 pub enum ContentRatingNmcRatingEnum {
     
     /// "nmcUnspecified"
+    #[serde(rename="nmcUnspecified")]
     NmcUnspecified,
     
 
     /// G
     ///
     /// "nmcG"
+    #[serde(rename="nmcG")]
     NmcG,
     
 
     /// PG
     ///
     /// "nmcPg"
+    #[serde(rename="nmcPg")]
     NmcPg,
     
 
     /// PG-13
     ///
     /// "nmcPg13"
+    #[serde(rename="nmcPg13")]
     NmcPg13,
     
 
     /// PG-15
     ///
     /// "nmcPg15"
+    #[serde(rename="nmcPg15")]
     NmcPg15,
     
 
     /// 15+
     ///
     /// "nmc15plus"
+    #[serde(rename="nmc15plus")]
     Nmc15plus,
     
 
     /// 18+
     ///
     /// "nmc18plus"
+    #[serde(rename="nmc18plus")]
     Nmc18plus,
     
 
     /// 18TC
     ///
     /// "nmc18tc"
+    #[serde(rename="nmc18tc")]
     Nmc18tc,
     
     /// "nmcUnrated"
+    #[serde(rename="nmcUnrated")]
     NmcUnrated,
 }
 
@@ -4856,69 +5442,81 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingNmcRatingEnum {
 pub enum ContentRatingOflcRatingEnum {
     
     /// "oflcUnspecified"
+    #[serde(rename="oflcUnspecified")]
     OflcUnspecified,
     
 
     /// G
     ///
     /// "oflcG"
+    #[serde(rename="oflcG")]
     OflcG,
     
 
     /// PG
     ///
     /// "oflcPg"
+    #[serde(rename="oflcPg")]
     OflcPg,
     
 
     /// M
     ///
     /// "oflcM"
+    #[serde(rename="oflcM")]
     OflcM,
     
 
     /// R13
     ///
     /// "oflcR13"
+    #[serde(rename="oflcR13")]
     OflcR13,
     
 
     /// R15
     ///
     /// "oflcR15"
+    #[serde(rename="oflcR15")]
     OflcR15,
     
 
     /// R16
     ///
     /// "oflcR16"
+    #[serde(rename="oflcR16")]
     OflcR16,
     
 
     /// R18
     ///
     /// "oflcR18"
+    #[serde(rename="oflcR18")]
     OflcR18,
     
     /// "oflcUnrated"
+    #[serde(rename="oflcUnrated")]
     OflcUnrated,
     
 
     /// RP13
     ///
     /// "oflcRp13"
+    #[serde(rename="oflcRp13")]
     OflcRp13,
     
 
     /// RP16
     ///
     /// "oflcRp16"
+    #[serde(rename="oflcRp16")]
     OflcRp16,
     
 
     /// RP18
     ///
     /// "oflcRp18"
+    #[serde(rename="oflcRp18")]
     OflcRp18,
 }
 
@@ -4953,33 +5551,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingOflcRatingEnum {
 pub enum ContentRatingPefilmRatingEnum {
     
     /// "pefilmUnspecified"
+    #[serde(rename="pefilmUnspecified")]
     PefilmUnspecified,
     
 
     /// PT
     ///
     /// "pefilmPt"
+    #[serde(rename="pefilmPt")]
     PefilmPt,
     
 
     /// PG
     ///
     /// "pefilmPg"
+    #[serde(rename="pefilmPg")]
     PefilmPg,
     
 
     /// 14
     ///
     /// "pefilm14"
+    #[serde(rename="pefilm14")]
     Pefilm14,
     
 
     /// 18
     ///
     /// "pefilm18"
+    #[serde(rename="pefilm18")]
     Pefilm18,
     
     /// "pefilmUnrated"
+    #[serde(rename="pefilmUnrated")]
     PefilmUnrated,
 }
 
@@ -5008,27 +5612,35 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingPefilmRatingEnum {
 pub enum ContentRatingRcnofRatingEnum {
     
     /// "rcnofUnspecified"
+    #[serde(rename="rcnofUnspecified")]
     RcnofUnspecified,
     
     /// "rcnofI"
+    #[serde(rename="rcnofI")]
     RcnofI,
     
     /// "rcnofIi"
+    #[serde(rename="rcnofIi")]
     RcnofIi,
     
     /// "rcnofIii"
+    #[serde(rename="rcnofIii")]
     RcnofIii,
     
     /// "rcnofIv"
+    #[serde(rename="rcnofIv")]
     RcnofIv,
     
     /// "rcnofV"
+    #[serde(rename="rcnofV")]
     RcnofV,
     
     /// "rcnofVi"
+    #[serde(rename="rcnofVi")]
     RcnofVi,
     
     /// "rcnofUnrated"
+    #[serde(rename="rcnofUnrated")]
     RcnofUnrated,
 }
 
@@ -5059,39 +5671,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingRcnofRatingEnum {
 pub enum ContentRatingResorteviolenciaRatingEnum {
     
     /// "resorteviolenciaUnspecified"
+    #[serde(rename="resorteviolenciaUnspecified")]
     ResorteviolenciaUnspecified,
     
 
     /// A
     ///
     /// "resorteviolenciaA"
+    #[serde(rename="resorteviolenciaA")]
     ResorteviolenciaA,
     
 
     /// B
     ///
     /// "resorteviolenciaB"
+    #[serde(rename="resorteviolenciaB")]
     ResorteviolenciaB,
     
 
     /// C
     ///
     /// "resorteviolenciaC"
+    #[serde(rename="resorteviolenciaC")]
     ResorteviolenciaC,
     
 
     /// D
     ///
     /// "resorteviolenciaD"
+    #[serde(rename="resorteviolenciaD")]
     ResorteviolenciaD,
     
 
     /// E
     ///
     /// "resorteviolenciaE"
+    #[serde(rename="resorteviolenciaE")]
     ResorteviolenciaE,
     
     /// "resorteviolenciaUnrated"
+    #[serde(rename="resorteviolenciaUnrated")]
     ResorteviolenciaUnrated,
 }
 
@@ -5121,45 +5740,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingResorteviolenciaRa
 pub enum ContentRatingRtcRatingEnum {
     
     /// "rtcUnspecified"
+    #[serde(rename="rtcUnspecified")]
     RtcUnspecified,
     
 
     /// AA
     ///
     /// "rtcAa"
+    #[serde(rename="rtcAa")]
     RtcAa,
     
 
     /// A
     ///
     /// "rtcA"
+    #[serde(rename="rtcA")]
     RtcA,
     
 
     /// B
     ///
     /// "rtcB"
+    #[serde(rename="rtcB")]
     RtcB,
     
 
     /// B15
     ///
     /// "rtcB15"
+    #[serde(rename="rtcB15")]
     RtcB15,
     
 
     /// C
     ///
     /// "rtcC"
+    #[serde(rename="rtcC")]
     RtcC,
     
 
     /// D
     ///
     /// "rtcD"
+    #[serde(rename="rtcD")]
     RtcD,
     
     /// "rtcUnrated"
+    #[serde(rename="rtcUnrated")]
     RtcUnrated,
 }
 
@@ -5190,33 +5817,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingRtcRatingEnum {
 pub enum ContentRatingRteRatingEnum {
     
     /// "rteUnspecified"
+    #[serde(rename="rteUnspecified")]
     RteUnspecified,
     
 
     /// GA
     ///
     /// "rteGa"
+    #[serde(rename="rteGa")]
     RteGa,
     
 
     /// CH
     ///
     /// "rteCh"
+    #[serde(rename="rteCh")]
     RteCh,
     
 
     /// PS
     ///
     /// "rtePs"
+    #[serde(rename="rtePs")]
     RtePs,
     
 
     /// MA
     ///
     /// "rteMa"
+    #[serde(rename="rteMa")]
     RteMa,
     
     /// "rteUnrated"
+    #[serde(rename="rteUnrated")]
     RteUnrated,
 }
 
@@ -5245,39 +5878,46 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingRteRatingEnum {
 pub enum ContentRatingRussiaRatingEnum {
     
     /// "russiaUnspecified"
+    #[serde(rename="russiaUnspecified")]
     RussiaUnspecified,
     
 
     /// 0+
     ///
     /// "russia0"
+    #[serde(rename="russia0")]
     Russia0,
     
 
     /// 6+
     ///
     /// "russia6"
+    #[serde(rename="russia6")]
     Russia6,
     
 
     /// 12+
     ///
     /// "russia12"
+    #[serde(rename="russia12")]
     Russia12,
     
 
     /// 16+
     ///
     /// "russia16"
+    #[serde(rename="russia16")]
     Russia16,
     
 
     /// 18+
     ///
     /// "russia18"
+    #[serde(rename="russia18")]
     Russia18,
     
     /// "russiaUnrated"
+    #[serde(rename="russiaUnrated")]
     RussiaUnrated,
 }
 
@@ -5307,33 +5947,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingRussiaRatingEnum {
 pub enum ContentRatingSkfilmRatingEnum {
     
     /// "skfilmUnspecified"
+    #[serde(rename="skfilmUnspecified")]
     SkfilmUnspecified,
     
 
     /// G
     ///
     /// "skfilmG"
+    #[serde(rename="skfilmG")]
     SkfilmG,
     
 
     /// P2
     ///
     /// "skfilmP2"
+    #[serde(rename="skfilmP2")]
     SkfilmP2,
     
 
     /// P5
     ///
     /// "skfilmP5"
+    #[serde(rename="skfilmP5")]
     SkfilmP5,
     
 
     /// P8
     ///
     /// "skfilmP8"
+    #[serde(rename="skfilmP8")]
     SkfilmP8,
     
     /// "skfilmUnrated"
+    #[serde(rename="skfilmUnrated")]
     SkfilmUnrated,
 }
 
@@ -5362,45 +6008,53 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingSkfilmRatingEnum {
 pub enum ContentRatingSmaisRatingEnum {
     
     /// "smaisUnspecified"
+    #[serde(rename="smaisUnspecified")]
     SmaisUnspecified,
     
 
     /// L
     ///
     /// "smaisL"
+    #[serde(rename="smaisL")]
     SmaisL,
     
 
     /// 7
     ///
     /// "smais7"
+    #[serde(rename="smais7")]
     Smais7,
     
 
     /// 12
     ///
     /// "smais12"
+    #[serde(rename="smais12")]
     Smais12,
     
 
     /// 14
     ///
     /// "smais14"
+    #[serde(rename="smais14")]
     Smais14,
     
 
     /// 16
     ///
     /// "smais16"
+    #[serde(rename="smais16")]
     Smais16,
     
 
     /// 18
     ///
     /// "smais18"
+    #[serde(rename="smais18")]
     Smais18,
     
     /// "smaisUnrated"
+    #[serde(rename="smaisUnrated")]
     SmaisUnrated,
 }
 
@@ -5431,33 +6085,39 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingSmaisRatingEnum {
 pub enum ContentRatingSmsaRatingEnum {
     
     /// "smsaUnspecified"
+    #[serde(rename="smsaUnspecified")]
     SmsaUnspecified,
     
 
     /// All ages
     ///
     /// "smsaA"
+    #[serde(rename="smsaA")]
     SmsaA,
     
 
     /// 7
     ///
     /// "smsa7"
+    #[serde(rename="smsa7")]
     Smsa7,
     
 
     /// 11
     ///
     /// "smsa11"
+    #[serde(rename="smsa11")]
     Smsa11,
     
 
     /// 15
     ///
     /// "smsa15"
+    #[serde(rename="smsa15")]
     Smsa15,
     
     /// "smsaUnrated"
+    #[serde(rename="smsaUnrated")]
     SmsaUnrated,
 }
 
@@ -5486,51 +6146,60 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingSmsaRatingEnum {
 pub enum ContentRatingTvpgRatingEnum {
     
     /// "tvpgUnspecified"
+    #[serde(rename="tvpgUnspecified")]
     TvpgUnspecified,
     
 
     /// TV-Y
     ///
     /// "tvpgY"
+    #[serde(rename="tvpgY")]
     TvpgY,
     
 
     /// TV-Y7
     ///
     /// "tvpgY7"
+    #[serde(rename="tvpgY7")]
     TvpgY7,
     
 
     /// TV-Y7-FV
     ///
     /// "tvpgY7Fv"
+    #[serde(rename="tvpgY7Fv")]
     TvpgY7Fv,
     
 
     /// TV-G
     ///
     /// "tvpgG"
+    #[serde(rename="tvpgG")]
     TvpgG,
     
 
     /// TV-PG
     ///
     /// "tvpgPg"
+    #[serde(rename="tvpgPg")]
     TvpgPg,
     
 
     /// TV-14
     ///
     /// "pg14"
+    #[serde(rename="pg14")]
     Pg14,
     
 
     /// TV-MA
     ///
     /// "tvpgMa"
+    #[serde(rename="tvpgMa")]
     TvpgMa,
     
     /// "tvpgUnrated"
+    #[serde(rename="tvpgUnrated")]
     TvpgUnrated,
 }
 
@@ -5562,9 +6231,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingTvpgRatingEnum {
 pub enum ContentRatingYtRatingEnum {
     
     /// "ytUnspecified"
+    #[serde(rename="ytUnspecified")]
     YtUnspecified,
     
     /// "ytAgeRestricted"
+    #[serde(rename="ytAgeRestricted")]
     YtAgeRestricted,
 }
 
@@ -5588,9 +6259,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ContentRatingYtRatingEnum {
 pub enum CuepointCueTypeEnum {
     
     /// "cueTypeUnspecified"
+    #[serde(rename="cueTypeUnspecified")]
     CueTypeUnspecified,
     
     /// "cueTypeAd"
+    #[serde(rename="cueTypeAd")]
     CueTypeAd,
 }
 
@@ -5615,15 +6288,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CuepointCueTypeEnum {
 pub enum InvideoPositionCornerPositionEnum {
     
     /// "topLeft"
+    #[serde(rename="topLeft")]
     TopLeft,
     
     /// "topRight"
+    #[serde(rename="topRight")]
     TopRight,
     
     /// "bottomLeft"
+    #[serde(rename="bottomLeft")]
     BottomLeft,
     
     /// "bottomRight"
+    #[serde(rename="bottomRight")]
     BottomRight,
 }
 
@@ -5650,6 +6327,7 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a InvideoPositionCornerPositionEn
 pub enum InvideoPositionTypeEnum {
     
     /// "corner"
+    #[serde(rename="corner")]
     Corner,
 }
 
@@ -5673,9 +6351,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a InvideoPositionTypeEnum {
 pub enum InvideoTimingTypeEnum {
     
     /// "offsetFromStart"
+    #[serde(rename="offsetFromStart")]
     OffsetFromStart,
     
     /// "offsetFromEnd"
+    #[serde(rename="offsetFromEnd")]
     OffsetFromEnd,
 }
 
@@ -5699,15 +6379,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a InvideoTimingTypeEnum {
 pub enum LiveBroadcastContentDetailClosedCaptionsTypeEnum {
     
     /// "closedCaptionsTypeUnspecified"
+    #[serde(rename="closedCaptionsTypeUnspecified")]
     ClosedCaptionsTypeUnspecified,
     
     /// "closedCaptionsDisabled"
+    #[serde(rename="closedCaptionsDisabled")]
     ClosedCaptionsDisabled,
     
     /// "closedCaptionsHttpPost"
+    #[serde(rename="closedCaptionsHttpPost")]
     ClosedCaptionsHttpPost,
     
     /// "closedCaptionsEmbedded"
+    #[serde(rename="closedCaptionsEmbedded")]
     ClosedCaptionsEmbedded,
 }
 
@@ -5734,24 +6418,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveBroadcastContentDetailClose
 pub enum LiveBroadcastContentDetailLatencyPreferenceEnum {
     
     /// "latencyPreferenceUnspecified"
+    #[serde(rename="latencyPreferenceUnspecified")]
     LatencyPreferenceUnspecified,
     
 
     /// Best for: highest quality viewer playbacks and higher resolutions.
     ///
     /// "normal"
+    #[serde(rename="normal")]
     Normal,
     
 
     /// Best for: near real-time interaction, with minimal playback buffering.
     ///
     /// "low"
+    #[serde(rename="low")]
     Low,
     
 
     /// Best for: real-time interaction Does not support: Closed captions, 1440p, and 4k resolutions
     ///
     /// "ultraLow"
+    #[serde(rename="ultraLow")]
     UltraLow,
 }
 
@@ -5778,15 +6466,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveBroadcastContentDetailLaten
 pub enum LiveBroadcastContentDetailProjectionEnum {
     
     /// "projectionUnspecified"
+    #[serde(rename="projectionUnspecified")]
     ProjectionUnspecified,
     
     /// "rectangular"
+    #[serde(rename="rectangular")]
     Rectangular,
     
     /// "360"
+    #[serde(rename="360")]
     _360,
     
     /// "mesh"
+    #[serde(rename="mesh")]
     Mesh,
 }
 
@@ -5813,15 +6505,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveBroadcastContentDetailProje
 pub enum LiveBroadcastContentDetailStereoLayoutEnum {
     
     /// "stereoLayoutUnspecified"
+    #[serde(rename="stereoLayoutUnspecified")]
     StereoLayoutUnspecified,
     
     /// "mono"
+    #[serde(rename="mono")]
     Mono,
     
     /// "leftRight"
+    #[serde(rename="leftRight")]
     LeftRight,
     
     /// "topBottom"
+    #[serde(rename="topBottom")]
     TopBottom,
 }
 
@@ -5851,54 +6547,63 @@ pub enum LiveBroadcastStatuLifeCycleStatusEnum {
     /// No value or the value is unknown.
     ///
     /// "lifeCycleStatusUnspecified"
+    #[serde(rename="lifeCycleStatusUnspecified")]
     LifeCycleStatusUnspecified,
     
 
     /// Incomplete settings, but otherwise valid
     ///
     /// "created"
+    #[serde(rename="created")]
     Created,
     
 
     /// Complete settings
     ///
     /// "ready"
+    #[serde(rename="ready")]
     Ready,
     
 
     /// Visible only to partner, may need special UI treatment
     ///
     /// "testing"
+    #[serde(rename="testing")]
     Testing,
     
 
     /// Viper is recording; this means the "clock" is running
     ///
     /// "live"
+    #[serde(rename="live")]
     Live,
     
 
     /// The broadcast is finished.
     ///
     /// "complete"
+    #[serde(rename="complete")]
     Complete,
     
 
     /// This broadcast was removed by admin action
     ///
     /// "revoked"
+    #[serde(rename="revoked")]
     Revoked,
     
 
     /// Transition into TESTING has been requested
     ///
     /// "testStarting"
+    #[serde(rename="testStarting")]
     TestStarting,
     
 
     /// Transition into LIVE has been requested
     ///
     /// "liveStarting"
+    #[serde(rename="liveStarting")]
     LiveStarting,
 }
 
@@ -5930,24 +6635,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveBroadcastStatuLifeCycleStat
 pub enum LiveBroadcastStatuLiveBroadcastPriorityEnum {
     
     /// "liveBroadcastPriorityUnspecified"
+    #[serde(rename="liveBroadcastPriorityUnspecified")]
     LiveBroadcastPriorityUnspecified,
     
 
     /// Low priority broadcast: for low view count HoAs or other low priority broadcasts.
     ///
     /// "low"
+    #[serde(rename="low")]
     Low,
     
 
     /// Normal priority broadcast: for regular HoAs and broadcasts.
     ///
     /// "normal"
+    #[serde(rename="normal")]
     Normal,
     
 
     /// High priority broadcast: for high profile HoAs, like PixelCorp ones.
     ///
     /// "high"
+    #[serde(rename="high")]
     High,
 }
 
@@ -5974,12 +6683,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveBroadcastStatuLiveBroadcast
 pub enum LiveBroadcastStatuPrivacyStatusEnum {
     
     /// "public"
+    #[serde(rename="public")]
     Public,
     
     /// "unlisted"
+    #[serde(rename="unlisted")]
     Unlisted,
     
     /// "private"
+    #[serde(rename="private")]
     Private,
 }
 
@@ -6008,24 +6720,28 @@ pub enum LiveBroadcastStatuRecordingStatusEnum {
     /// No value or the value is unknown.
     ///
     /// "liveBroadcastRecordingStatusUnspecified"
+    #[serde(rename="liveBroadcastRecordingStatusUnspecified")]
     LiveBroadcastRecordingStatusUnspecified,
     
 
     /// The recording has not yet been started.
     ///
     /// "notRecording"
+    #[serde(rename="notRecording")]
     NotRecording,
     
 
     /// The recording is currently on.
     ///
     /// "recording"
+    #[serde(rename="recording")]
     Recording,
     
 
     /// The recording is completed, and cannot be started again.
     ///
     /// "recorded"
+    #[serde(rename="recorded")]
     Recorded,
 }
 
@@ -6055,18 +6771,21 @@ pub enum LiveChatBanSnippetTypeEnum {
     /// An invalid ban type.
     ///
     /// "liveChatBanTypeUnspecified"
+    #[serde(rename="liveChatBanTypeUnspecified")]
     LiveChatBanTypeUnspecified,
     
 
     /// A permanent ban.
     ///
     /// "permanent"
+    #[serde(rename="permanent")]
     Permanent,
     
 
     /// A temporary ban.
     ///
     /// "temporary"
+    #[serde(rename="temporary")]
     Temporary,
 }
 
@@ -6092,51 +6811,67 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveChatBanSnippetTypeEnum {
 pub enum LiveChatMessageSnippetTypeEnum {
     
     /// "invalidType"
+    #[serde(rename="invalidType")]
     InvalidType,
     
     /// "textMessageEvent"
+    #[serde(rename="textMessageEvent")]
     TextMessageEvent,
     
     /// "tombstone"
+    #[serde(rename="tombstone")]
     Tombstone,
     
     /// "fanFundingEvent"
+    #[serde(rename="fanFundingEvent")]
     FanFundingEvent,
     
     /// "chatEndedEvent"
+    #[serde(rename="chatEndedEvent")]
     ChatEndedEvent,
     
     /// "sponsorOnlyModeStartedEvent"
+    #[serde(rename="sponsorOnlyModeStartedEvent")]
     SponsorOnlyModeStartedEvent,
     
     /// "sponsorOnlyModeEndedEvent"
+    #[serde(rename="sponsorOnlyModeEndedEvent")]
     SponsorOnlyModeEndedEvent,
     
     /// "newSponsorEvent"
+    #[serde(rename="newSponsorEvent")]
     NewSponsorEvent,
     
     /// "memberMilestoneChatEvent"
+    #[serde(rename="memberMilestoneChatEvent")]
     MemberMilestoneChatEvent,
     
     /// "membershipGiftingEvent"
+    #[serde(rename="membershipGiftingEvent")]
     MembershipGiftingEvent,
     
     /// "giftMembershipReceivedEvent"
+    #[serde(rename="giftMembershipReceivedEvent")]
     GiftMembershipReceivedEvent,
     
     /// "messageDeletedEvent"
+    #[serde(rename="messageDeletedEvent")]
     MessageDeletedEvent,
     
     /// "messageRetractedEvent"
+    #[serde(rename="messageRetractedEvent")]
     MessageRetractedEvent,
     
     /// "userBannedEvent"
+    #[serde(rename="userBannedEvent")]
     UserBannedEvent,
     
     /// "superChatEvent"
+    #[serde(rename="superChatEvent")]
     SuperChatEvent,
     
     /// "superStickerEvent"
+    #[serde(rename="superStickerEvent")]
     SuperStickerEvent,
 }
 
@@ -6175,9 +6910,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveChatMessageSnippetTypeEnum 
 pub enum LiveChatUserBannedMessageDetailBanTypeEnum {
     
     /// "permanent"
+    #[serde(rename="permanent")]
     Permanent,
     
     /// "temporary"
+    #[serde(rename="temporary")]
     Temporary,
 }
 
@@ -6202,12 +6939,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveChatUserBannedMessageDetail
 pub enum LiveStreamConfigurationIssueSeverityEnum {
     
     /// "info"
+    #[serde(rename="info")]
     Info,
     
     /// "warning"
+    #[serde(rename="warning")]
     Warning,
     
     /// "error"
+    #[serde(rename="error")]
     Error,
 }
 
@@ -6233,105 +6973,139 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveStreamConfigurationIssueSev
 pub enum LiveStreamConfigurationIssueTypeEnum {
     
     /// "gopSizeOver"
+    #[serde(rename="gopSizeOver")]
     GopSizeOver,
     
     /// "gopSizeLong"
+    #[serde(rename="gopSizeLong")]
     GopSizeLong,
     
     /// "gopSizeShort"
+    #[serde(rename="gopSizeShort")]
     GopSizeShort,
     
     /// "openGop"
+    #[serde(rename="openGop")]
     OpenGop,
     
     /// "badContainer"
+    #[serde(rename="badContainer")]
     BadContainer,
     
     /// "audioBitrateHigh"
+    #[serde(rename="audioBitrateHigh")]
     AudioBitrateHigh,
     
     /// "audioBitrateLow"
+    #[serde(rename="audioBitrateLow")]
     AudioBitrateLow,
     
     /// "audioSampleRate"
+    #[serde(rename="audioSampleRate")]
     AudioSampleRate,
     
     /// "bitrateHigh"
+    #[serde(rename="bitrateHigh")]
     BitrateHigh,
     
     /// "bitrateLow"
+    #[serde(rename="bitrateLow")]
     BitrateLow,
     
     /// "audioCodec"
+    #[serde(rename="audioCodec")]
     AudioCodec,
     
     /// "videoCodec"
+    #[serde(rename="videoCodec")]
     VideoCodec,
     
     /// "noAudioStream"
+    #[serde(rename="noAudioStream")]
     NoAudioStream,
     
     /// "noVideoStream"
+    #[serde(rename="noVideoStream")]
     NoVideoStream,
     
     /// "multipleVideoStreams"
+    #[serde(rename="multipleVideoStreams")]
     MultipleVideoStreams,
     
     /// "multipleAudioStreams"
+    #[serde(rename="multipleAudioStreams")]
     MultipleAudioStreams,
     
     /// "audioTooManyChannels"
+    #[serde(rename="audioTooManyChannels")]
     AudioTooManyChannels,
     
     /// "interlacedVideo"
+    #[serde(rename="interlacedVideo")]
     InterlacedVideo,
     
     /// "frameRateHigh"
+    #[serde(rename="frameRateHigh")]
     FrameRateHigh,
     
     /// "resolutionMismatch"
+    #[serde(rename="resolutionMismatch")]
     ResolutionMismatch,
     
     /// "videoCodecMismatch"
+    #[serde(rename="videoCodecMismatch")]
     VideoCodecMismatch,
     
     /// "videoInterlaceMismatch"
+    #[serde(rename="videoInterlaceMismatch")]
     VideoInterlaceMismatch,
     
     /// "videoProfileMismatch"
+    #[serde(rename="videoProfileMismatch")]
     VideoProfileMismatch,
     
     /// "videoBitrateMismatch"
+    #[serde(rename="videoBitrateMismatch")]
     VideoBitrateMismatch,
     
     /// "framerateMismatch"
+    #[serde(rename="framerateMismatch")]
     FramerateMismatch,
     
     /// "gopMismatch"
+    #[serde(rename="gopMismatch")]
     GopMismatch,
     
     /// "audioSampleRateMismatch"
+    #[serde(rename="audioSampleRateMismatch")]
     AudioSampleRateMismatch,
     
     /// "audioStereoMismatch"
+    #[serde(rename="audioStereoMismatch")]
     AudioStereoMismatch,
     
     /// "audioCodecMismatch"
+    #[serde(rename="audioCodecMismatch")]
     AudioCodecMismatch,
     
     /// "audioBitrateMismatch"
+    #[serde(rename="audioBitrateMismatch")]
     AudioBitrateMismatch,
     
     /// "videoResolutionSuboptimal"
+    #[serde(rename="videoResolutionSuboptimal")]
     VideoResolutionSuboptimal,
     
     /// "videoResolutionUnsupported"
+    #[serde(rename="videoResolutionUnsupported")]
     VideoResolutionUnsupported,
     
     /// "videoIngestionStarved"
+    #[serde(rename="videoIngestionStarved")]
     VideoIngestionStarved,
     
     /// "videoIngestionFasterThanRealtime"
+    #[serde(rename="videoIngestionFasterThanRealtime")]
     VideoIngestionFasterThanRealtime,
 }
 
@@ -6388,18 +7162,23 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveStreamConfigurationIssueTyp
 pub enum LiveStreamHealthStatuStatusEnum {
     
     /// "good"
+    #[serde(rename="good")]
     Good,
     
     /// "ok"
+    #[serde(rename="ok")]
     Ok,
     
     /// "bad"
+    #[serde(rename="bad")]
     Bad,
     
     /// "noData"
+    #[serde(rename="noData")]
     NoData,
     
     /// "revoked"
+    #[serde(rename="revoked")]
     Revoked,
 }
 
@@ -6426,18 +7205,23 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveStreamHealthStatuStatusEnum
 pub enum LiveStreamStatuStreamStatusEnum {
     
     /// "created"
+    #[serde(rename="created")]
     Created,
     
     /// "ready"
+    #[serde(rename="ready")]
     Ready,
     
     /// "active"
+    #[serde(rename="active")]
     Active,
     
     /// "inactive"
+    #[serde(rename="inactive")]
     Inactive,
     
     /// "error"
+    #[serde(rename="error")]
     Error,
 }
 
@@ -6465,12 +7249,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveStreamStatuStreamStatusEnum
 pub enum PlaylistItemStatuPrivacyStatusEnum {
     
     /// "public"
+    #[serde(rename="public")]
     Public,
     
     /// "unlisted"
+    #[serde(rename="unlisted")]
     Unlisted,
     
     /// "private"
+    #[serde(rename="private")]
     Private,
 }
 
@@ -6496,12 +7283,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a PlaylistItemStatuPrivacyStatusE
 pub enum PlaylistStatuPrivacyStatusEnum {
     
     /// "public"
+    #[serde(rename="public")]
     Public,
     
     /// "unlisted"
+    #[serde(rename="unlisted")]
     Unlisted,
     
     /// "private"
+    #[serde(rename="private")]
     Private,
 }
 
@@ -6527,24 +7317,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a PlaylistStatuPrivacyStatusEnum 
 pub enum SearchResultSnippetLiveBroadcastContentEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The live broadcast is upcoming.
     ///
     /// "upcoming"
+    #[serde(rename="upcoming")]
     Upcoming,
     
 
     /// The live broadcast is active.
     ///
     /// "live"
+    #[serde(rename="live")]
     Live,
     
 
     /// The live broadcast has been completed.
     ///
     /// "completed"
+    #[serde(rename="completed")]
     Completed,
 }
 
@@ -6571,12 +7365,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchResultSnippetLiveBroadcas
 pub enum SubscriptionContentDetailActivityTypeEnum {
     
     /// "subscriptionActivityTypeUnspecified"
+    #[serde(rename="subscriptionActivityTypeUnspecified")]
     SubscriptionActivityTypeUnspecified,
     
     /// "all"
+    #[serde(rename="all")]
     All,
     
     /// "uploads"
+    #[serde(rename="uploads")]
     Uploads,
 }
 
@@ -6602,12 +7399,14 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SubscriptionContentDetailActivi
 pub enum ThirdPartyLinkSnippetTypeEnum {
     
     /// "linkUnspecified"
+    #[serde(rename="linkUnspecified")]
     LinkUnspecified,
     
 
     /// A link that is connecting (or about to connect) a channel with a store on a merchandising platform in order to enable retail commerce capabilities for that channel on YouTube.
     ///
     /// "channelToStoreLink"
+    #[serde(rename="channelToStoreLink")]
     ChannelToStoreLink,
 }
 
@@ -6631,15 +7430,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ThirdPartyLinkSnippetTypeEnum {
 pub enum ThirdPartyLinkStatuLinkStatusEnum {
     
     /// "unknown"
+    #[serde(rename="unknown")]
     Unknown,
     
     /// "failed"
+    #[serde(rename="failed")]
     Failed,
     
     /// "pending"
+    #[serde(rename="pending")]
     Pending,
     
     /// "linked"
+    #[serde(rename="linked")]
     Linked,
 }
 
@@ -6666,15 +7469,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ThirdPartyLinkStatuLinkStatusEn
 pub enum VideoAgeGatingVideoGameRatingEnum {
     
     /// "anyone"
+    #[serde(rename="anyone")]
     Anyone,
     
     /// "m15Plus"
+    #[serde(rename="m15Plus")]
     M15Plus,
     
     /// "m16Plus"
+    #[serde(rename="m16Plus")]
     M16Plus,
     
     /// "m17Plus"
+    #[serde(rename="m17Plus")]
     M17Plus,
 }
 
@@ -6701,9 +7508,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoAgeGatingVideoGameRatingEn
 pub enum VideoContentDetailCaptionEnum {
     
     /// "true"
+    #[serde(rename="true")]
     True,
     
     /// "false"
+    #[serde(rename="false")]
     False,
 }
 
@@ -6731,12 +7540,14 @@ pub enum VideoContentDetailDefinitionEnum {
     /// sd
     ///
     /// "sd"
+    #[serde(rename="sd")]
     Sd,
     
 
     /// hd
     ///
     /// "hd"
+    #[serde(rename="hd")]
     Hd,
 }
 
@@ -6761,9 +7572,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoContentDetailDefinitionEnu
 pub enum VideoContentDetailProjectionEnum {
     
     /// "rectangular"
+    #[serde(rename="rectangular")]
     Rectangular,
     
     /// "360"
+    #[serde(rename="360")]
     _360,
 }
 
@@ -6791,42 +7604,49 @@ pub enum VideoFileDetailFileTypeEnum {
     /// Known video file (e.g., an MP4 file).
     ///
     /// "video"
+    #[serde(rename="video")]
     Video,
     
 
     /// Audio only file (e.g., an MP3 file).
     ///
     /// "audio"
+    #[serde(rename="audio")]
     Audio,
     
 
     /// Image file (e.g., a JPEG image).
     ///
     /// "image"
+    #[serde(rename="image")]
     Image,
     
 
     /// Archive file (e.g., a ZIP archive).
     ///
     /// "archive"
+    #[serde(rename="archive")]
     Archive,
     
 
     /// Document or text file (e.g., MS Word document).
     ///
     /// "document"
+    #[serde(rename="document")]
     Document,
     
 
     /// Movie project file (e.g., Microsoft Windows Movie Maker project).
     ///
     /// "project"
+    #[serde(rename="project")]
     Project,
     
 
     /// Other non-video file type.
     ///
     /// "other"
+    #[serde(rename="other")]
     Other,
 }
 
@@ -6856,18 +7676,23 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoFileDetailFileTypeEnum {
 pub enum VideoFileDetailsVideoStreamRotationEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
     /// "clockwise"
+    #[serde(rename="clockwise")]
     Clockwise,
     
     /// "upsideDown"
+    #[serde(rename="upsideDown")]
     UpsideDown,
     
     /// "counterClockwise"
+    #[serde(rename="counterClockwise")]
     CounterClockwise,
     
     /// "other"
+    #[serde(rename="other")]
     Other,
 }
 
@@ -6895,15 +7720,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoFileDetailsVideoStreamRota
 pub enum VideoProcessingDetailProcessingFailureReasonEnum {
     
     /// "uploadFailed"
+    #[serde(rename="uploadFailed")]
     UploadFailed,
     
     /// "transcodeFailed"
+    #[serde(rename="transcodeFailed")]
     TranscodeFailed,
     
     /// "streamingFailed"
+    #[serde(rename="streamingFailed")]
     StreamingFailed,
     
     /// "other"
+    #[serde(rename="other")]
     Other,
 }
 
@@ -6930,15 +7759,19 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoProcessingDetailProcessing
 pub enum VideoProcessingDetailProcessingStatusEnum {
     
     /// "processing"
+    #[serde(rename="processing")]
     Processing,
     
     /// "succeeded"
+    #[serde(rename="succeeded")]
     Succeeded,
     
     /// "failed"
+    #[serde(rename="failed")]
     Failed,
     
     /// "terminated"
+    #[serde(rename="terminated")]
     Terminated,
 }
 
@@ -6965,18 +7798,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoProcessingDetailProcessing
 pub enum VideoRatingRatingEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The entity is liked.
     ///
     /// "like"
+    #[serde(rename="like")]
     Like,
     
 
     /// The entity is disliked.
     ///
     /// "dislike"
+    #[serde(rename="dislike")]
     Dislike,
 }
 
@@ -7002,24 +7838,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoRatingRatingEnum {
 pub enum VideoSnippetLiveBroadcastContentEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The live broadcast is upcoming.
     ///
     /// "upcoming"
+    #[serde(rename="upcoming")]
     Upcoming,
     
 
     /// The live broadcast is active.
     ///
     /// "live"
+    #[serde(rename="live")]
     Live,
     
 
     /// The live broadcast has been completed.
     ///
     /// "completed"
+    #[serde(rename="completed")]
     Completed,
 }
 
@@ -7049,36 +7889,42 @@ pub enum VideoStatuFailureReasonEnum {
     /// Unable to convert video content.
     ///
     /// "conversion"
+    #[serde(rename="conversion")]
     Conversion,
     
 
     /// Invalid file format.
     ///
     /// "invalidFile"
+    #[serde(rename="invalidFile")]
     InvalidFile,
     
 
     /// Empty file.
     ///
     /// "emptyFile"
+    #[serde(rename="emptyFile")]
     EmptyFile,
     
 
     /// File was too small.
     ///
     /// "tooSmall"
+    #[serde(rename="tooSmall")]
     TooSmall,
     
 
     /// Unsupported codec.
     ///
     /// "codec"
+    #[serde(rename="codec")]
     Codec,
     
 
     /// Upload wasn't finished.
     ///
     /// "uploadAborted"
+    #[serde(rename="uploadAborted")]
     UploadAborted,
 }
 
@@ -7107,9 +7953,11 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoStatuFailureReasonEnum {
 pub enum VideoStatuLicenseEnum {
     
     /// "youtube"
+    #[serde(rename="youtube")]
     Youtube,
     
     /// "creativeCommon"
+    #[serde(rename="creativeCommon")]
     CreativeCommon,
 }
 
@@ -7134,12 +7982,15 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoStatuLicenseEnum {
 pub enum VideoStatuPrivacyStatusEnum {
     
     /// "public"
+    #[serde(rename="public")]
     Public,
     
     /// "unlisted"
+    #[serde(rename="unlisted")]
     Unlisted,
     
     /// "private"
+    #[serde(rename="private")]
     Private,
 }
 
@@ -7168,60 +8019,70 @@ pub enum VideoStatuRejectionReasonEnum {
     /// Copyright infringement.
     ///
     /// "copyright"
+    #[serde(rename="copyright")]
     Copyright,
     
 
     /// Inappropriate video content.
     ///
     /// "inappropriate"
+    #[serde(rename="inappropriate")]
     Inappropriate,
     
 
     /// Duplicate upload in the same channel.
     ///
     /// "duplicate"
+    #[serde(rename="duplicate")]
     Duplicate,
     
 
     /// Terms of use violation.
     ///
     /// "termsOfUse"
+    #[serde(rename="termsOfUse")]
     TermsOfUse,
     
 
     /// Uploader account was suspended.
     ///
     /// "uploaderAccountSuspended"
+    #[serde(rename="uploaderAccountSuspended")]
     UploaderAccountSuspended,
     
 
     /// Video duration was too long.
     ///
     /// "length"
+    #[serde(rename="length")]
     Length,
     
 
     /// Blocked by content owner.
     ///
     /// "claim"
+    #[serde(rename="claim")]
     Claim,
     
 
     /// Uploader closed his/her account.
     ///
     /// "uploaderAccountClosed"
+    #[serde(rename="uploaderAccountClosed")]
     UploaderAccountClosed,
     
 
     /// Trademark infringement.
     ///
     /// "trademark"
+    #[serde(rename="trademark")]
     Trademark,
     
 
     /// An unspecified legal reason.
     ///
     /// "legal"
+    #[serde(rename="legal")]
     Legal,
 }
 
@@ -7257,30 +8118,35 @@ pub enum VideoStatuUploadStatusEnum {
     /// Video has been uploaded but not processed yet.
     ///
     /// "uploaded"
+    #[serde(rename="uploaded")]
     Uploaded,
     
 
     /// Video has been successfully processed.
     ///
     /// "processed"
+    #[serde(rename="processed")]
     Processed,
     
 
     /// Processing has failed. See FailureReason.
     ///
     /// "failed"
+    #[serde(rename="failed")]
     Failed,
     
 
     /// Video has been rejected. See RejectionReason.
     ///
     /// "rejected"
+    #[serde(rename="rejected")]
     Rejected,
     
 
     /// Video has been deleted.
     ///
     /// "deleted"
+    #[serde(rename="deleted")]
     Deleted,
 }
 
@@ -7310,24 +8176,28 @@ pub enum VideoSuggestionEditorSuggestionsEnum {
     /// Picture brightness levels seem off and could be corrected.
     ///
     /// "videoAutoLevels"
+    #[serde(rename="videoAutoLevels")]
     VideoAutoLevels,
     
 
     /// The video appears shaky and could be stabilized.
     ///
     /// "videoStabilize"
+    #[serde(rename="videoStabilize")]
     VideoStabilize,
     
 
     /// Margins (mattes) detected around the picture could be cropped.
     ///
     /// "videoCrop"
+    #[serde(rename="videoCrop")]
     VideoCrop,
     
 
     /// The audio track appears silent and could be swapped with a better quality one.
     ///
     /// "audioQuietAudioSwap"
+    #[serde(rename="audioQuietAudioSwap")]
     AudioQuietAudioSwap,
 }
 
@@ -7356,42 +8226,49 @@ pub enum VideoSuggestionProcessingErrorsEnum {
     /// File contains audio only (e.g., an MP3 file).
     ///
     /// "audioFile"
+    #[serde(rename="audioFile")]
     AudioFile,
     
 
     /// Image file (e.g., a JPEG image).
     ///
     /// "imageFile"
+    #[serde(rename="imageFile")]
     ImageFile,
     
 
     /// Movie project file (e.g., Microsoft Windows Movie Maker project).
     ///
     /// "projectFile"
+    #[serde(rename="projectFile")]
     ProjectFile,
     
 
     /// Other non-video file.
     ///
     /// "notAVideoFile"
+    #[serde(rename="notAVideoFile")]
     NotAVideoFile,
     
 
     /// Document or text file (e.g., MS Word document).
     ///
     /// "docFile"
+    #[serde(rename="docFile")]
     DocFile,
     
 
     /// An archive file (e.g., a ZIP archive).
     ///
     /// "archiveFile"
+    #[serde(rename="archiveFile")]
     ArchiveFile,
     
 
     /// Unsupported spatial audio layout type.
     ///
     /// "unsupportedSpatialAudioLayout"
+    #[serde(rename="unsupportedSpatialAudioLayout")]
     UnsupportedSpatialAudioLayout,
 }
 
@@ -7423,36 +8300,42 @@ pub enum VideoSuggestionProcessingHintsEnum {
     /// The MP4 file is not streamable, this will slow down the processing. MOOV atom was not found at the beginning of the file.
     ///
     /// "nonStreamableMov"
+    #[serde(rename="nonStreamableMov")]
     NonStreamableMov,
     
 
     /// Probably a better quality version of the video exists. The video has wide screen aspect ratio, but is not an HD video.
     ///
     /// "sendBestQualityVideo"
+    #[serde(rename="sendBestQualityVideo")]
     SendBestQualityVideo,
     
 
     /// Uploaded video is spherical video.
     ///
     /// "sphericalVideo"
+    #[serde(rename="sphericalVideo")]
     SphericalVideo,
     
 
     /// Uploaded video has spatial audio.
     ///
     /// "spatialAudio"
+    #[serde(rename="spatialAudio")]
     SpatialAudio,
     
 
     /// Uploaded video is VR video.
     ///
     /// "vrVideo"
+    #[serde(rename="vrVideo")]
     VrVideo,
     
 
     /// Uploaded video is HDR video.
     ///
     /// "hdrVideo"
+    #[serde(rename="hdrVideo")]
     HdrVideo,
 }
 
@@ -7483,72 +8366,84 @@ pub enum VideoSuggestionProcessingWarningsEnum {
     /// Unrecognized file format, transcoding is likely to fail.
     ///
     /// "unknownContainer"
+    #[serde(rename="unknownContainer")]
     UnknownContainer,
     
 
     /// Unrecognized video codec, transcoding is likely to fail.
     ///
     /// "unknownVideoCodec"
+    #[serde(rename="unknownVideoCodec")]
     UnknownVideoCodec,
     
 
     /// Unrecognized audio codec, transcoding is likely to fail.
     ///
     /// "unknownAudioCodec"
+    #[serde(rename="unknownAudioCodec")]
     UnknownAudioCodec,
     
 
     /// Conflicting container and stream resolutions.
     ///
     /// "inconsistentResolution"
+    #[serde(rename="inconsistentResolution")]
     InconsistentResolution,
     
 
     /// Edit lists are not currently supported.
     ///
     /// "hasEditlist"
+    #[serde(rename="hasEditlist")]
     HasEditlist,
     
 
     /// Video codec that is known to cause problems was used.
     ///
     /// "problematicVideoCodec"
+    #[serde(rename="problematicVideoCodec")]
     ProblematicVideoCodec,
     
 
     /// Audio codec that is known to cause problems was used.
     ///
     /// "problematicAudioCodec"
+    #[serde(rename="problematicAudioCodec")]
     ProblematicAudioCodec,
     
 
     /// Unsupported VR video stereo mode.
     ///
     /// "unsupportedVrStereoMode"
+    #[serde(rename="unsupportedVrStereoMode")]
     UnsupportedVrStereoMode,
     
 
     /// Unsupported spherical video projection type.
     ///
     /// "unsupportedSphericalProjectionType"
+    #[serde(rename="unsupportedSphericalProjectionType")]
     UnsupportedSphericalProjectionType,
     
 
     /// Unsupported HDR pixel format.
     ///
     /// "unsupportedHdrPixelFormat"
+    #[serde(rename="unsupportedHdrPixelFormat")]
     UnsupportedHdrPixelFormat,
     
 
     /// Unspecified HDR color metadata.
     ///
     /// "unsupportedHdrColorMetadata"
+    #[serde(rename="unsupportedHdrColorMetadata")]
     UnsupportedHdrColorMetadata,
     
 
     /// Problematic HDR lookup table attached.
     ///
     /// "problematicHdrLookupTable"
+    #[serde(rename="problematicHdrLookupTable")]
     ProblematicHdrLookupTable,
 }
 
@@ -7586,21 +8481,25 @@ pub enum CommentThreadModerationStatusEnum {
     /// The comment is available for public display.
     ///
     /// "published"
+    #[serde(rename="published")]
     Published,
     
 
     /// The comment is awaiting review by a moderator.
     ///
     /// "heldForReview"
+    #[serde(rename="heldForReview")]
     HeldForReview,
     
     /// "likelySpam"
+    #[serde(rename="likelySpam")]
     LikelySpam,
     
 
     /// The comment is unfit for display.
     ///
     /// "rejected"
+    #[serde(rename="rejected")]
     Rejected,
 }
 
@@ -7631,18 +8530,21 @@ impl Default for CommentThreadModerationStatusEnum {
 pub enum CommentThreadOrderEnum {
     
     /// "orderUnspecified"
+    #[serde(rename="orderUnspecified")]
     OrderUnspecified,
     
 
     /// Order by time.
     ///
     /// "time"
+    #[serde(rename="time")]
     Time,
     
 
     /// Order by relevance.
     ///
     /// "relevance"
+    #[serde(rename="relevance")]
     Relevance,
 }
 
@@ -7673,18 +8575,21 @@ impl Default for CommentThreadOrderEnum {
 pub enum CommentThreadTextFormatEnum {
     
     /// "textFormatUnspecified"
+    #[serde(rename="textFormatUnspecified")]
     TextFormatUnspecified,
     
 
     /// Returns the comments in HTML format. This is the default value.
     ///
     /// "html"
+    #[serde(rename="html")]
     Html,
     
 
     /// Returns the comments in plain text format.
     ///
     /// "plainText"
+    #[serde(rename="plainText")]
     PlainText,
 }
 
@@ -7715,18 +8620,21 @@ impl Default for CommentThreadTextFormatEnum {
 pub enum CommentTextFormatEnum {
     
     /// "textFormatUnspecified"
+    #[serde(rename="textFormatUnspecified")]
     TextFormatUnspecified,
     
 
     /// Returns the comments in HTML format. This is the default value.
     ///
     /// "html"
+    #[serde(rename="html")]
     Html,
     
 
     /// Returns the comments in plain text format.
     ///
     /// "plainText"
+    #[serde(rename="plainText")]
     PlainText,
 }
 
@@ -7760,21 +8668,25 @@ pub enum CommentModerationStatusEnum {
     /// The comment is available for public display.
     ///
     /// "published"
+    #[serde(rename="published")]
     Published,
     
 
     /// The comment is awaiting review by a moderator.
     ///
     /// "heldForReview"
+    #[serde(rename="heldForReview")]
     HeldForReview,
     
     /// "likelySpam"
+    #[serde(rename="likelySpam")]
     LikelySpam,
     
 
     /// The comment is unfit for display.
     ///
     /// "rejected"
+    #[serde(rename="rejected")]
     Rejected,
 }
 
@@ -7801,24 +8713,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a CommentModerationStatusEnum {
 pub enum LiveBroadcastBroadcastStatusEnum {
     
     /// "statusUnspecified"
+    #[serde(rename="statusUnspecified")]
     StatusUnspecified,
     
 
     /// Start testing the broadcast. YouTube transmits video to the broadcast's monitor stream. Note that you can only transition a broadcast to the testing state if its contentDetails.monitorStream.enableMonitorStream property is set to true.",
     ///
     /// "testing"
+    #[serde(rename="testing")]
     Testing,
     
 
     /// Return only persistent broadcasts.
     ///
     /// "live"
+    #[serde(rename="live")]
     Live,
     
 
     /// The broadcast is over. YouTube stops transmitting video.
     ///
     /// "complete"
+    #[serde(rename="complete")]
     Complete,
 }
 
@@ -7845,24 +8761,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a LiveBroadcastBroadcastStatusEnu
 pub enum LiveBroadcastBroadcastTypeEnum {
     
     /// "broadcastTypeFilterUnspecified"
+    #[serde(rename="broadcastTypeFilterUnspecified")]
     BroadcastTypeFilterUnspecified,
     
 
     /// Return all broadcasts.
     ///
     /// "all"
+    #[serde(rename="all")]
     All,
     
 
     /// Return only scheduled event broadcasts.
     ///
     /// "event"
+    #[serde(rename="event")]
     Event,
     
 
     /// Return only persistent broadcasts.
     ///
     /// "persistent"
+    #[serde(rename="persistent")]
     Persistent,
 }
 
@@ -7894,18 +8814,21 @@ impl Default for LiveBroadcastBroadcastTypeEnum {
 pub enum MemberModeEnum {
     
     /// "listMembersModeUnknown"
+    #[serde(rename="listMembersModeUnknown")]
     ListMembersModeUnknown,
     
 
     /// Return only members that joined after the first call with this mode was made.
     ///
     /// "updates"
+    #[serde(rename="updates")]
     Updates,
     
 
     /// Return all current members, from newest to oldest.
     ///
     /// "all_current"
+    #[serde(rename="all_current")]
     AllCurrent,
 }
 
@@ -7936,18 +8859,21 @@ impl Default for MemberModeEnum {
 pub enum SearchChannelTypeEnum {
     
     /// "channelTypeUnspecified"
+    #[serde(rename="channelTypeUnspecified")]
     ChannelTypeUnspecified,
     
 
     /// Return all channels.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only retrieve shows.
     ///
     /// "show"
+    #[serde(rename="show")]
     Show,
 }
 
@@ -7973,24 +8899,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchChannelTypeEnum {
 pub enum SearchEventTypeEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The live broadcast is upcoming.
     ///
     /// "upcoming"
+    #[serde(rename="upcoming")]
     Upcoming,
     
 
     /// The live broadcast is active.
     ///
     /// "live"
+    #[serde(rename="live")]
     Live,
     
 
     /// The live broadcast has been completed.
     ///
     /// "completed"
+    #[serde(rename="completed")]
     Completed,
 }
 
@@ -8017,42 +8947,49 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchEventTypeEnum {
 pub enum SearchOrderEnum {
     
     /// "searchSortUnspecified"
+    #[serde(rename="searchSortUnspecified")]
     SearchSortUnspecified,
     
 
     /// Resources are sorted in reverse chronological order based on the date they were created.
     ///
     /// "date"
+    #[serde(rename="date")]
     Date,
     
 
     /// Resources are sorted from highest to lowest rating.
     ///
     /// "rating"
+    #[serde(rename="rating")]
     Rating,
     
 
     /// Resources are sorted from highest to lowest number of views.
     ///
     /// "viewCount"
+    #[serde(rename="viewCount")]
     ViewCount,
     
 
     /// Resources are sorted based on their relevance to the search query. This is the default value for this parameter.
     ///
     /// "relevance"
+    #[serde(rename="relevance")]
     Relevance,
     
 
     /// Resources are sorted alphabetically by title.
     ///
     /// "title"
+    #[serde(rename="title")]
     Title,
     
 
     /// Channels are sorted in descending order of their number of uploaded videos.
     ///
     /// "videoCount"
+    #[serde(rename="videoCount")]
     VideoCount,
 }
 
@@ -8087,24 +9024,28 @@ impl Default for SearchOrderEnum {
 pub enum SearchSafeSearchEnum {
     
     /// "safeSearchSettingUnspecified"
+    #[serde(rename="safeSearchSettingUnspecified")]
     SafeSearchSettingUnspecified,
     
 
     /// YouTube will not filter the search result set.
     ///
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// YouTube will filter some content from search results and, at the least, will filter content that is restricted in your locale. Based on their content, search results could be removed from search results or demoted in search results. This is the default parameter value.
     ///
     /// "moderate"
+    #[serde(rename="moderate")]
     Moderate,
     
 
     /// YouTube will try to exclude all restricted content from the search result set. Based on their content, search results could be removed from search results or demoted in search results.
     ///
     /// "strict"
+    #[serde(rename="strict")]
     Strict,
 }
 
@@ -8136,24 +9077,28 @@ impl Default for SearchSafeSearchEnum {
 pub enum SearchVideoCaptionEnum {
     
     /// "videoCaptionUnspecified"
+    #[serde(rename="videoCaptionUnspecified")]
     VideoCaptionUnspecified,
     
 
     /// Do not filter results based on caption availability.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only include videos that have captions.
     ///
     /// "closedCaption"
+    #[serde(rename="closedCaption")]
     ClosedCaption,
     
 
     /// Only include videos that do not have captions.
     ///
     /// "none"
+    #[serde(rename="none")]
     None,
 }
 
@@ -8183,18 +9128,21 @@ pub enum SearchVideoDefinitionEnum {
     /// Return all videos, regardless of their resolution.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only retrieve videos in standard definition.
     ///
     /// "standard"
+    #[serde(rename="standard")]
     Standard,
     
 
     /// Only retrieve HD videos.
     ///
     /// "high"
+    #[serde(rename="high")]
     High,
 }
 
@@ -8223,18 +9171,21 @@ pub enum SearchVideoDimensionEnum {
     /// Include both 3D and non-3D videos in returned results. This is the default value.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Restrict search results to exclude 3D videos.
     ///
     /// "2d"
+    #[serde(rename="2d")]
     _2d,
     
 
     /// Restrict search results to only include 3D videos.
     ///
     /// "3d"
+    #[serde(rename="3d")]
     _3d,
 }
 
@@ -8260,30 +9211,35 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchVideoDimensionEnum {
 pub enum SearchVideoDurationEnum {
     
     /// "videoDurationUnspecified"
+    #[serde(rename="videoDurationUnspecified")]
     VideoDurationUnspecified,
     
 
     /// Do not filter video search results based on their duration. This is the default value.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only include videos that are less than four minutes long.
     ///
     /// "short"
+    #[serde(rename="short")]
     Short,
     
 
     /// Only include videos that are between four and 20 minutes long (inclusive).
     ///
     /// "medium"
+    #[serde(rename="medium")]
     Medium,
     
 
     /// Only include videos longer than 20 minutes.
     ///
     /// "long"
+    #[serde(rename="long")]
     Long,
 }
 
@@ -8311,18 +9267,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchVideoDurationEnum {
 pub enum SearchVideoEmbeddableEnum {
     
     /// "videoEmbeddableUnspecified"
+    #[serde(rename="videoEmbeddableUnspecified")]
     VideoEmbeddableUnspecified,
     
 
     /// Return all videos, embeddable or not.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only retrieve embeddable videos.
     ///
     /// "true"
+    #[serde(rename="true")]
     True,
 }
 
@@ -8351,18 +9310,21 @@ pub enum SearchVideoLicenseEnum {
     /// Return all videos, regardless of which license they have, that match the query parameters.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only return videos that have the standard YouTube license.
     ///
     /// "youtube"
+    #[serde(rename="youtube")]
     Youtube,
     
 
     /// Only return videos that have a Creative Commons license. Users can reuse videos with this license in other videos that they create. Learn more.
     ///
     /// "creativeCommon"
+    #[serde(rename="creativeCommon")]
     CreativeCommon,
 }
 
@@ -8388,18 +9350,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchVideoLicenseEnum {
 pub enum SearchVideoSyndicatedEnum {
     
     /// "videoSyndicatedUnspecified"
+    #[serde(rename="videoSyndicatedUnspecified")]
     VideoSyndicatedUnspecified,
     
 
     /// Return all videos, syndicated or not.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only retrieve syndicated videos.
     ///
     /// "true"
+    #[serde(rename="true")]
     True,
 }
 
@@ -8425,24 +9390,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchVideoSyndicatedEnum {
 pub enum SearchVideoTypeEnum {
     
     /// "videoTypeUnspecified"
+    #[serde(rename="videoTypeUnspecified")]
     VideoTypeUnspecified,
     
 
     /// Return all videos.
     ///
     /// "any"
+    #[serde(rename="any")]
     Any,
     
 
     /// Only retrieve movies.
     ///
     /// "movie"
+    #[serde(rename="movie")]
     Movie,
     
 
     /// Only retrieve episodes of shows.
     ///
     /// "episode"
+    #[serde(rename="episode")]
     Episode,
 }
 
@@ -8469,24 +9438,28 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a SearchVideoTypeEnum {
 pub enum SubscriptionOrderEnum {
     
     /// "subscriptionOrderUnspecified"
+    #[serde(rename="subscriptionOrderUnspecified")]
     SubscriptionOrderUnspecified,
     
 
     /// Sort by relevance.
     ///
     /// "relevance"
+    #[serde(rename="relevance")]
     Relevance,
     
 
     /// Sort by order of activity.
     ///
     /// "unread"
+    #[serde(rename="unread")]
     Unread,
     
 
     /// Sort alphabetically.
     ///
     /// "alphabetical"
+    #[serde(rename="alphabetical")]
     Alphabetical,
 }
 
@@ -8518,12 +9491,14 @@ impl Default for SubscriptionOrderEnum {
 pub enum ThirdPartyLinkTypeEnum {
     
     /// "linkUnspecified"
+    #[serde(rename="linkUnspecified")]
     LinkUnspecified,
     
 
     /// A link that is connecting (or about to connect) a channel with a store on a merchandising platform in order to enable retail commerce capabilities for that channel on YouTube.
     ///
     /// "channelToStoreLink"
+    #[serde(rename="channelToStoreLink")]
     ChannelToStoreLink,
 }
 
@@ -8548,12 +9523,14 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ThirdPartyLinkTypeEnum {
 pub enum VideoChartEnum {
     
     /// "chartUnspecified"
+    #[serde(rename="chartUnspecified")]
     ChartUnspecified,
     
 
     /// Return the most popular videos for the specified content region and video category.
     ///
     /// "mostPopular"
+    #[serde(rename="mostPopular")]
     MostPopular,
 }
 
@@ -8578,18 +9555,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoChartEnum {
 pub enum VideoMyRatingEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The entity is liked.
     ///
     /// "like"
+    #[serde(rename="like")]
     Like,
     
 
     /// The entity is disliked.
     ///
     /// "dislike"
+    #[serde(rename="dislike")]
     Dislike,
 }
 
@@ -8614,18 +9594,21 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a VideoMyRatingEnum {
 pub enum VideoRatingEnum {
     
     /// "none"
+    #[serde(rename="none")]
     None,
     
 
     /// The entity is liked.
     ///
     /// "like"
+    #[serde(rename="like")]
     Like,
     
 
     /// The entity is disliked.
     ///
     /// "dislike"
+    #[serde(rename="dislike")]
     Dislike,
 }
 
