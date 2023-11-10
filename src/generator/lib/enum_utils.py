@@ -84,7 +84,7 @@ def find_enums_in_context(c: Context) -> list:
     for k, v in c.fqan_map.items():
         # print(k)
         k = _parse_method_id(k, c)
-        if v.parameters:
+        if v.get('parameters'):
             for pk, pv in v.parameters.items():
                 enums = _add_enum_value(k, pk, pv, enums)
     return list(enums.values())
