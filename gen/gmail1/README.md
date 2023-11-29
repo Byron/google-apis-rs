@@ -58,7 +58,7 @@ Or specifically ...
 ```ignore
 let r = hub.users().drafts_send(...).doit().await
 let r = hub.users().messages_get(...).doit().await
-let r = hub.users().messages_import(...).doit().await
+let r = hub.users().messages_list(...).doit().await
 let r = hub.users().messages_insert(...).doit().await
 let r = hub.users().messages_modify(...).doit().await
 let r = hub.users().messages_send(...).doit().await
