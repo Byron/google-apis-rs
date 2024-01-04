@@ -29,7 +29,7 @@ TYPE_MAP = {'boolean' : 'bool',
             'double'  : 'f64',
             'float'   : 'f32',
             'int32'   : 'i32',
-            'any'     : 'String', # TODO: Figure out how to handle it. It's 'interface' in Go ...
+            'any'     : 'json::Value',
             'int64'   : 'i64',
             'uint64'  : 'u64',
             'array'   : 'Vec',
