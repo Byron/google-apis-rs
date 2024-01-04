@@ -581,15 +581,15 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push(("${p.name}", f.to_string()));
+                params.push("${p.name}", f.to_string());
             }
         }
         % elif not is_required_property(p):
         if let Some(value) = ${pname} {
-            params.push(("${p.name}", value.to_string()));
+            params.push("${p.name}", value.to_string());
         }
         % else:
-        params.push(("${p.name}", ${pname}.to_string()));
+        params.push("${p.name}", ${pname}.to_string());
         % endif
         % endfor
 
