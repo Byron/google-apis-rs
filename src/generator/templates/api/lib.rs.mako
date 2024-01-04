@@ -44,7 +44,7 @@ ${lib.docs(c)}
 pub use hyper;
 pub use hyper_rustls;
 pub extern crate google_apis_common as client;
-pub use client::chrono;
+
 pub mod api;
 
 // Re-export the hub type and some basic client structs

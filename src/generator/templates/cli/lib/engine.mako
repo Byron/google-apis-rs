@@ -5,12 +5,12 @@
                       ADD_SCOPE_FN, TREF, enclose_in)
     from generator.lib.cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
-                     call_method_ident, POD_TYPES, opt_value, ident,
+                     call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, CONFIG_DIR_FLAG, req_value, MODE_ARG,
                      opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP,
                      CTYPE_TO_ENUM_MAP)
-    from generator.lib.types import JSON_TO_RUST_DEFAULT
+
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
 
@@ -226,9 +226,8 @@ for parg in ${opt_values(VALUE_ARG)} {
     match key {
 % for p in optional_props:
 <%
-    ptype = actual_json_type(p.name, p.get("format", p.type))
-    default_value = JSON_TO_RUST_DEFAULT[ptype]
-    value_unwrap = f"value.unwrap_or({default_value})"
+    ptype = actual_json_type(p.name, p.type)
+    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_VALUE_MAP[ptype]
 %>\
         "${mangle_subcommand(p.name)}" => {
         % if p.name == 'alt':
@@ -238,7 +237,7 @@ for parg in ${opt_values(VALUE_ARG)} {
         % endif
             call = call.${mangle_ident(setter_fn_name(p))}(\
         % if ptype != 'string':
-        value.map(|v| arg_from_str(v, err, "${mangle_subcommand(p.name)}", "${ptype}")).unwrap_or(${default_value})\
+arg_from_str(${value_unwrap}, err, "${mangle_subcommand(p.name)}", "${ptype}")\
         % else:
 ${value_unwrap}\
         % endif # handle conversion

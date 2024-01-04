@@ -82,7 +82,7 @@ class UtilsTest(unittest.TestCase):
         test_properties = (
             ('Album', 'title', 'String'), # string
             ('Status', 'code', 'i32'), # numeric
-            ('Album', 'mediaItemsCount', 'i64'), # numeric via "count" keyword
+            ('Album', 'mediaItemsCount', 'String'), # numeric via "count" keyword
             ('Album', 'isWriteable', 'bool'), # boolean
             ('Album', 'shareInfo', 'ShareInfo'), # reference type
             ('SearchMediaItemsResponse', 'mediaItems', 'Vec<MediaItem>'), # array
@@ -90,7 +90,7 @@ class UtilsTest(unittest.TestCase):
         for (class_name, property_name, expected) in test_properties:
             property_value = schemas[class_name]['properties'][property_name]
             rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=False)
-            self.assertEqual(rust_type, expected, f"Parsed class: {class_name}, property: {property_name}")
+            self.assertEqual(rust_type, expected)
 
         # items reference
         class_name = 'SearchMediaItemsResponse'

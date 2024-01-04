@@ -12,7 +12,7 @@
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, size_to_bytes, method_default_scope,
                       is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
-                      CLEAR_SCOPES_FN, items, string_impl)
+                      CLEAR_SCOPES_FN, items)
 
     SIMPLE = "simple"
     RESUMABLE = "resumable"
@@ -559,7 +559,6 @@ match result {
         % for p in field_params:
 <%
     pname = 'self.' + property(p.name)    # property identifier
-    to_string_impl = string_impl(p)
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
         % if p.name == 'part' and request_value:
@@ -582,15 +581,15 @@ match result {
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
-                params.push("${p.name}", ${to_string_impl("f")});
+                params.push(("${p.name}", f.to_string()));
             }
         }
         % elif not is_required_property(p):
-        if let Some(value) = ${pname}.as_ref() {
-            params.push("${p.name}", ${to_string_impl("value")});
+        if let Some(value) = ${pname} {
+            params.push(("${p.name}", value.to_string()));
         }
         % else:
-        params.push("${p.name}", ${to_string_impl(pname)});
+        params.push(("${p.name}", ${pname}.to_string()));
         % endif
         % endfor
 

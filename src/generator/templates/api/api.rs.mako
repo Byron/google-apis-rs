@@ -31,7 +31,7 @@ use tokio::time::sleep;
 use tower_service;
 use serde::{Serialize, Deserialize};
 
-use crate::{client, client::GetToken, client::serde_with};
+use crate::{client, client::GetToken};
 
 // ##############
 // UTILITIES ###

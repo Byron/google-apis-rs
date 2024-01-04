@@ -1,8 +1,5 @@
 pub mod auth;
-pub mod field_mask;
-pub mod serde;
 pub mod url;
-
 use std::error;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
@@ -26,9 +23,6 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 
 pub use auth::{GetToken, NoToken};
-pub use chrono;
-pub use field_mask::FieldMask;
-pub use serde_with;
 #[cfg(feature = "yup-oauth2")]
 pub use yup_oauth2 as oauth2;
 
@@ -414,7 +408,7 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                //TODO: The first line ending should be omitted for the first part,
+                // TODO: The first line ending should be omitted for the first part,
                 // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
