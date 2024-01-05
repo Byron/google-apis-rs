@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 6.0.1 (2024-01-05)
 
 Added another encoding/decoding wrapper for base64.
 
@@ -13,7 +13,7 @@ Added another encoding/decoding wrapper for base64.
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release over the course of 100 calendar days.
+ - 3 commits contributed to the release over the course of 100 calendar days.
  - 135 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ Added another encoding/decoding wrapper for base64.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Prepare changelog prior to google-apis-common release. ([`3e0829c`](https://github.com/Byron/google-apis-rs/commit/3e0829caf73a3bb2f7430bb2fc8109d43d5b61d9))
     - Merge pull request #464 from andrewbaxter/standard-base64 ([`23aecc3`](https://github.com/Byron/google-apis-rs/commit/23aecc38e8b03ab3d50641e5581aca63dde76cb3))
     - Attempt to add 'standard' base64 bytes support ([`ee4ed07`](https://github.com/Byron/google-apis-rs/commit/ee4ed07af102f7ae5f685b78327737b233a4023e))
 </details>
