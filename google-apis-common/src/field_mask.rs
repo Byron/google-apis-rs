@@ -32,7 +32,13 @@ fn snakecase(source: &str) -> String {
 
 /// A `FieldMask` as defined in `https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto#L180`
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct FieldMask(pub Vec<String>);
+pub struct FieldMask(Vec<String>);
+
+impl FieldMask {
+    pub fn new<S: AsRef<str>>(values: &[S]) -> Self {
+        return Self(values.iter().map(|s| snakecase(s.as_ref())).collect());
+    }
+}
 
 impl Serialize for FieldMask {
     fn serialize<S>(&self, s: S) -> Result<S::Ok, S::Error>
