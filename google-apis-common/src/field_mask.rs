@@ -34,6 +34,14 @@ fn snakecase(source: &str) -> String {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct FieldMask(Vec<String>);
 
+impl FieldMask {
+    /// Create a new `FieldMask` from a list of paths. These are converted to snake
+    /// case if they aren't already.
+    pub fn new<S: AsRef<str>>(values: &[S]) -> Self {
+        return Self(values.iter().map(|s| snakecase(s.as_ref())).collect());
+    }
+}
+
 impl Serialize for FieldMask {
     fn serialize<S>(&self, s: S) -> Result<S::Ok, S::Error>
     where
