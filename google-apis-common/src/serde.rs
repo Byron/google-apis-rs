@@ -139,7 +139,8 @@ pub mod duration {
 pub mod standard_base64 {
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
-
+    use std::borrow::Cow;
+    
     pub struct Wrapper;
 
     pub fn to_string(bytes: &Vec<u8>) -> String {
@@ -160,8 +161,8 @@ pub mod standard_base64 {
         where
             D: Deserializer<'de>,
         {
-            let s: &str = Deserialize::deserialize(deserializer)?;
-            base64::decode_config(s, base64::STANDARD).map_err(serde::de::Error::custom)
+            let s: Cow<str> = Deserialize::deserialize(deserializer)?;
+            base64::decode_config(s.as_ref(), base64::STANDARD).map_err(serde::de::Error::custom)
         }
     }
 }
@@ -169,6 +170,7 @@ pub mod standard_base64 {
 pub mod urlsafe_base64 {
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
+    use std::borrow::Cow;
 
     pub struct Wrapper;
 
@@ -190,8 +192,8 @@ pub mod urlsafe_base64 {
         where
             D: Deserializer<'de>,
         {
-            let s: &str = Deserialize::deserialize(deserializer)?;
-            base64::decode_config(s, base64::URL_SAFE).map_err(serde::de::Error::custom)
+            let s: Cow<str> = Deserialize::deserialize(deserializer)?;
+            base64::decode_config(s.as_ref(), base64::URL_SAFE).map_err(serde::de::Error::custom)
         }
     }
 }
@@ -302,9 +304,23 @@ mod test {
     }
 
     #[test]
+    fn standard_base64_de_reader_success_cases() {
+        let standard: Base64StandardWrapper =
+            serde_json::from_reader(r#"{"bytes": "cVhabzk6U21uOkN+MylFWFRJMVFLdEh2MShmVHp9"}"#.as_bytes()).unwrap();
+        assert_eq!(Some(b"qXZo9:Smn:C~3)EXTI1QKtHv1(fTz}".as_slice()), standard.bytes.as_deref());
+    }
+
+    #[test]
     fn urlsafe_base64_de_success_cases() {
         let wrapper: Base64URLSafeWrapper =
             serde_json::from_str(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#).unwrap();
+        assert_eq!(Some(b"hello world".as_slice()), wrapper.bytes.as_deref());
+    }
+
+    #[test]
+    fn urlsafe_base64_de_reader_success_cases() {
+        let wrapper: Base64URLSafeWrapper =
+            serde_json::from_reader(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#.as_bytes()).unwrap();
         assert_eq!(Some(b"hello world".as_slice()), wrapper.bytes.as_deref());
     }
 
