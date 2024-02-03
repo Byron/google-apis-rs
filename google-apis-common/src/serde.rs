@@ -302,10 +302,26 @@ mod test {
     }
 
     #[test]
+    #[should_panic(expected = "expected a borrowed string")]
+    fn standard_base64_de_reader_success_cases() {
+        let standard: Base64StandardWrapper =
+            serde_json::from_reader(r#"{"bytes": "cVhabzk6U21uOkN+MylFWFRJMVFLdEh2MShmVHp9"}"#.as_bytes()).unwrap();
+        assert_eq!(Some(b"qXZo9:Smn:C~3)EXTI1QKtHv1(fTz}".as_slice()), standard.bytes.as_deref());
+    }
+
+    #[test]
     fn urlsafe_base64_de_success_cases() {
         let wrapper: Base64URLSafeWrapper =
             serde_json::from_str(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#).unwrap();
         assert_eq!(Some(b"hello world".as_slice()), wrapper.bytes.as_deref());
+    }
+
+    #[test]
+    #[should_panic(expected = "expected a borrowed string")]
+    fn urlsafe_base64_de_reader_success_cases() {
+        let url_safe: Base64URLSafeWrapper =
+            serde_json::from_reader(r#"{"bytes": "aGVsbG8gd29ybGQ="}"#.as_bytes()).unwrap();
+        assert_eq!(Some(b"hello world".as_slice()), url_safe.bytes.as_deref());
     }
 
     #[test]
