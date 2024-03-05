@@ -5065,7 +5065,7 @@ async fn main() {
     
     let mut app = App::new("translate3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240131")
+           .version("5.0.4+20240131")
            .about("Integrates text translation into your website or application.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_translate3_cli")
            .arg(Arg::with_name("url")

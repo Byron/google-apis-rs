@@ -1494,7 +1494,7 @@ async fn main() {
     
     let mut app = App::new("ids1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20231203")
+           .version("5.0.4+20231203")
            .about("Cloud IDS (Cloud Intrusion Detection System) detects malware, spyware, command-and-control attacks, and other network-based threats. Its security efficacy is industry leading, built with Palo Alto Networks technologies. When you use this product, your organization name and consumption levels will be shared with Palo Alto Networks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ids1_cli")
            .arg(Arg::with_name("url")

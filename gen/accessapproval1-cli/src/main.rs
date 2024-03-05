@@ -2772,7 +2772,7 @@ async fn main() {
     
     let mut app = App::new("accessapproval1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240223")
+           .version("5.0.4+20240223")
            .about("An API for controlling access to data by Google personnel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accessapproval1_cli")
            .arg(Arg::with_name("url")

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Security Command Center* API at revision *20240302*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Security Command Center* API at revision *20240302*. The CLI is at version *5.0.4*.
 
 ```bash
 securitycenter1 [options]

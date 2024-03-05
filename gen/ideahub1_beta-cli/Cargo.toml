@@ -4,7 +4,7 @@
 [package]
 
 name = "google-ideahub1_beta-cli"
-version = "5.0.3+20220305"
+version = "5.0.4+20220305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ideahub (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ideahub1_beta-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-ideahub1_beta]
 path = "../ideahub1_beta"
-version = "5.0.3+20220305"
+version = "5.0.4+20220305"
 

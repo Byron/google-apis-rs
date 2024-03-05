@@ -4,7 +4,7 @@
 [package]
 
 name = "google-chromemanagement1-cli"
-version = "5.0.3+20240303"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Chrome Management (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/chromemanagement1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-chromemanagement1]
 path = "../chromemanagement1"
-version = "5.0.3+20240303"
+version = "5.0.4+20240303"
 

@@ -224,7 +224,7 @@ async fn main() {
     
     let mut app = App::new("webfonts1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240227")
+           .version("5.0.4+20240227")
            .about("The Google Web Fonts Developer API lets you retrieve information about web fonts served by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webfonts1_cli")
            .arg(Arg::with_name("folder")

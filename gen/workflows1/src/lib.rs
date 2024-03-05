@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Workflows* crate version *5.0.3+20240207*, where *20240207* is the exact revision of the *workflows:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Workflows* crate version *5.0.4+20240207*, where *20240207* is the exact revision of the *workflows:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Workflows* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/workflows).

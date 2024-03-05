@@ -364,7 +364,7 @@ async fn main() {
     
     let mut app = App::new("chromeuxreport1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240228")
+           .version("5.0.4+20240228")
            .about("The Chrome UX Report API lets you view real user experience data for millions of websites. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_chromeuxreport1_cli")
            .arg(Arg::with_name("folder")

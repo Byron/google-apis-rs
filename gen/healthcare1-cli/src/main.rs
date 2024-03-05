@@ -13595,7 +13595,7 @@ async fn main() {
     
     let mut app = App::new("healthcare1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240228")
+           .version("5.0.4+20240228")
            .about("Manage, store, and access healthcare data in Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_healthcare1_cli")
            .arg(Arg::with_name("url")

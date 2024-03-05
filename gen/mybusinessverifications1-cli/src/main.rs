@@ -664,7 +664,7 @@ async fn main() {
     
     let mut app = App::new("mybusinessverifications1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240304")
+           .version("5.0.4+20240304")
            .about("The My Business Verifications API provides an interface for taking verifications related actions for locations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusinessverifications1_cli")
            .arg(Arg::with_name("folder")

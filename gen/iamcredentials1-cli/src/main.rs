@@ -613,7 +613,7 @@ async fn main() {
     
     let mut app = App::new("iamcredentials1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240221")
+           .version("5.0.4+20240221")
            .about("Creates short-lived credentials for impersonating IAM service accounts. To enable this API, you must enable the IAM API (iam.googleapis.com). ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iamcredentials1_cli")
            .arg(Arg::with_name("url")

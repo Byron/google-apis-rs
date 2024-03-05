@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Data Fusion* crate version *5.0.3+20240111*, where *20240111* is the exact revision of the *datafusion:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Data Fusion* crate version *5.0.4+20240111*, where *20240111* is the exact revision of the *datafusion:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Data Fusion* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/data-fusion/docs).

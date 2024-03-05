@@ -1525,7 +1525,7 @@ async fn main() {
     
     let mut app = App::new("cloudsupport2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240304")
+           .version("5.0.4+20240304")
            .about("Manages Google Cloud technical support cases for Customer Care support offerings. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli")
            .arg(Arg::with_name("url")

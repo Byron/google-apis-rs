@@ -4,12 +4,12 @@
 [package]
 
 name = "google-appsactivity1"
-version = "5.0.3+20200628"
+version = "5.0.4+20200628"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with appsactivity (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/appsactivity1"
 homepage = "https://developers.google.com/google-apps/activity/"
-documentation = "https://docs.rs/google-appsactivity1/5.0.3+20200628"
+documentation = "https://docs.rs/google-appsactivity1/5.0.4+20200628"
 license = "MIT"
 keywords = ["appsactivity", "google", "protocol", "web", "api"]
 autobins = false

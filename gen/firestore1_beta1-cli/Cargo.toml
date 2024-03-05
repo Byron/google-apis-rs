@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firestore1_beta1-cli"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firestore (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1_beta1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-firestore1_beta1]
 path = "../firestore1_beta1"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 

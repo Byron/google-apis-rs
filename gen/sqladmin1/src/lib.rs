@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *5.0.3+20240219*, where *20240219* is the exact revision of the *sqladmin:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *SQL Admin* crate version *5.0.4+20240219*, where *20240219* is the exact revision of the *sqladmin:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *SQL Admin* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/).

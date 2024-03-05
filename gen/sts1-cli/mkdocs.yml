@@ -1,4 +1,4 @@
-site_name: Cloud Security Token v5.0.3+20240222
+site_name: Cloud Security Token v5.0.4+20240222
 site_url: http://byron.github.io/google-apis-rs/google-sts1-cli
 site_description: A complete library to interact with Cloud Security Token (protocol v1)
 

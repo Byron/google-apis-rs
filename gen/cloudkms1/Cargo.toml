@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudkms1"
-version = "5.0.3+20240219"
+version = "5.0.4+20240219"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud KMS (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudkms1"
 homepage = "https://cloud.google.com/kms/"
-documentation = "https://docs.rs/google-cloudkms1/5.0.3+20240219"
+documentation = "https://docs.rs/google-cloudkms1/5.0.4+20240219"
 license = "MIT"
 keywords = ["cloudkms", "google", "protocol", "web", "api"]
 autobins = false

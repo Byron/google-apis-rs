@@ -598,7 +598,7 @@ async fn main() {
     
     let mut app = App::new("cloudprofiler2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240219")
+           .version("5.0.4+20240219")
            .about("Manages continuous profiling information.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli")
            .arg(Arg::with_name("url")

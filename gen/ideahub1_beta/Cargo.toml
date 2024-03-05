@@ -4,12 +4,12 @@
 [package]
 
 name = "google-ideahub1_beta"
-version = "5.0.3+20220305"
+version = "5.0.4+20220305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ideahub (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ideahub1_beta"
 homepage = "https://console.cloud.google.com/apis/library/ideahub.googleapis.com"
-documentation = "https://docs.rs/google-ideahub1_beta/5.0.3+20220305"
+documentation = "https://docs.rs/google-ideahub1_beta/5.0.4+20220305"
 license = "MIT"
 keywords = ["ideahub", "google", "protocol", "web", "api"]
 autobins = false

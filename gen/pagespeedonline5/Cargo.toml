@@ -4,12 +4,12 @@
 [package]
 
 name = "google-pagespeedonline5"
-version = "5.0.3+20240229"
+version = "5.0.4+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Pagespeed Insights (protocol v5)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pagespeedonline5"
 homepage = "https://developers.google.com/speed/docs/insights/v5/about"
-documentation = "https://docs.rs/google-pagespeedonline5/5.0.3+20240229"
+documentation = "https://docs.rs/google-pagespeedonline5/5.0.4+20240229"
 license = "MIT"
 keywords = ["pagespeedonline", "google", "protocol", "web", "api"]
 autobins = false

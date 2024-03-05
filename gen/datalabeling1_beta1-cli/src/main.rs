@@ -4584,7 +4584,7 @@ async fn main() {
     
     let mut app = App::new("datalabeling1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240207")
+           .version("5.0.4+20240207")
            .about("Public API for Google Cloud AI Data Labeling Service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli")
            .arg(Arg::with_name("url")

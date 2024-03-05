@@ -4136,7 +4136,7 @@ async fn main() {
     
     let mut app = App::new("authorizedbuyersmarketplace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240305")
+           .version("5.0.4+20240305")
            .about("The Authorized Buyers Marketplace API lets buyers programmatically discover inventory; propose, retrieve and negotiate deals with publishers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli")
            .arg(Arg::with_name("url")

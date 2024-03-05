@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *IDS* crate version *5.0.3+20231203*, where *20231203* is the exact revision of the *ids:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *IDS* crate version *5.0.4+20231203*, where *20231203* is the exact revision of the *ids:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *IDS* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/).

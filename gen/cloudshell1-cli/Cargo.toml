@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudshell1-cli"
-version = "5.0.3+20240212"
+version = "5.0.4+20240212"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Shell (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudshell1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudshell1]
 path = "../cloudshell1"
-version = "5.0.3+20240212"
+version = "5.0.4+20240212"
 

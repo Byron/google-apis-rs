@@ -4,7 +4,7 @@
 [package]
 
 name = "google-datapipelines1-cli"
-version = "5.0.3+20240225"
+version = "5.0.4+20240225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Datapipelines (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datapipelines1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-datapipelines1]
 path = "../datapipelines1"
-version = "5.0.3+20240225"
+version = "5.0.4+20240225"
 

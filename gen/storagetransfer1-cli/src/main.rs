@@ -2018,7 +2018,7 @@ async fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240224")
+           .version("5.0.4+20240224")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

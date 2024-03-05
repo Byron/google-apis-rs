@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *My Business Business Information* API at revision *20240304*. The CLI is at version *5.0.3*.
+This documentation was generated from the *My Business Business Information* API at revision *20240304*. The CLI is at version *5.0.4*.
 
 ```bash
 mybusinessbusinessinformation1 [options]

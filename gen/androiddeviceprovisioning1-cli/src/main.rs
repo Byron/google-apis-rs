@@ -2876,7 +2876,7 @@ async fn main() {
     
     let mut app = App::new("androiddeviceprovisioning1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240304")
+           .version("5.0.4+20240304")
            .about("Automates Android zero-touch enrollment for device resellers, customers, and EMMs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli")
            .arg(Arg::with_name("folder")

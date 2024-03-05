@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firestore1"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firestore (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1"
 homepage = "https://cloud.google.com/firestore"
-documentation = "https://docs.rs/google-firestore1/5.0.3+20240226"
+documentation = "https://docs.rs/google-firestore1/5.0.4+20240226"
 license = "MIT"
 keywords = ["firestore", "google", "protocol", "web", "api"]
 autobins = false

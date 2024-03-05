@@ -4,12 +4,12 @@
 [package]
 
 name = "google-safebrowsing4"
-version = "5.0.3+20240225"
+version = "5.0.4+20240225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Safebrowsing (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/safebrowsing4"
 homepage = "https://developers.google.com/safe-browsing/"
-documentation = "https://docs.rs/google-safebrowsing4/5.0.3+20240225"
+documentation = "https://docs.rs/google-safebrowsing4/5.0.4+20240225"
 license = "MIT"
 keywords = ["safebrowsing", "google", "protocol", "web", "api"]
 autobins = false

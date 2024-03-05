@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dataproc1-cli"
-version = "5.0.3+20240222"
+version = "5.0.4+20240222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dataproc (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dataproc1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dataproc1]
 path = "../dataproc1"
-version = "5.0.3+20240222"
+version = "5.0.4+20240222"
 

@@ -6766,7 +6766,7 @@ async fn main() {
     
     let mut app = App::new("sqladmin1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240219")
+           .version("5.0.4+20240219")
            .about("API for Cloud SQL database instance management")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_cli")
            .arg(Arg::with_name("url")

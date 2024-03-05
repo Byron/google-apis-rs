@@ -4,7 +4,7 @@
 [package]
 
 name = "google-certificatemanager1-cli"
-version = "5.0.3+20240221"
+version = "5.0.4+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Certificate Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/certificatemanager1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-certificatemanager1]
 path = "../certificatemanager1"
-version = "5.0.3+20240221"
+version = "5.0.4+20240221"
 

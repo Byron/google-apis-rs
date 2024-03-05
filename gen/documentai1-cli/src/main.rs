@@ -3284,7 +3284,7 @@ async fn main() {
     
     let mut app = App::new("documentai1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240223")
+           .version("5.0.4+20240223")
            .about("Service to parse structured information from unstructured or semi-structured documents using state-of-the-art Google AI such as natural language, computer vision, translation, and AutoML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_documentai1_cli")
            .arg(Arg::with_name("url")

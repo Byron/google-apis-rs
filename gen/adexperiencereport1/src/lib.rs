@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Experience Report* crate version *5.0.3+20240207*, where *20240207* is the exact revision of the *adexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Ad Experience Report* crate version *5.0.4+20240207*, where *20240207* is the exact revision of the *adexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Ad Experience Report* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-experience-report/).

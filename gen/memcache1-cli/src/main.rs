@@ -1659,7 +1659,7 @@ async fn main() {
     
     let mut app = App::new("memcache1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240222")
+           .version("5.0.4+20240222")
            .about("Google Cloud Memorystore for Memcached API is used for creating and managing Memcached instances in GCP.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_memcache1_cli")
            .arg(Arg::with_name("url")

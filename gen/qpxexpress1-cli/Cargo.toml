@@ -4,7 +4,7 @@
 [package]
 
 name = "google-qpxexpress1-cli"
-version = "5.0.3+20160708"
+version = "5.0.4+20160708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with QPX Express (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/qpxexpress1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-qpxexpress1]
 path = "../qpxexpress1"
-version = "5.0.3+20160708"
+version = "5.0.4+20160708"
 

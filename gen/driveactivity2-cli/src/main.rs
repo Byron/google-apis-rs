@@ -257,7 +257,7 @@ async fn main() {
     
     let mut app = App::new("driveactivity2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240302")
+           .version("5.0.4+20240302")
            .about("Provides a historical view of activity in Google Drive.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_driveactivity2_cli")
            .arg(Arg::with_name("url")

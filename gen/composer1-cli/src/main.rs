@@ -2930,7 +2930,7 @@ async fn main() {
     
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240227")
+           .version("5.0.4+20240227")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")

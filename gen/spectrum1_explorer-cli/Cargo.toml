@@ -4,7 +4,7 @@
 [package]
 
 name = "google-spectrum1_explorer-cli"
-version = "5.0.3+20170306"
+version = "5.0.4+20170306"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with spectrum (protocol v1explorer)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/spectrum1_explorer-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-spectrum1_explorer]
 path = "../spectrum1_explorer"
-version = "5.0.3+20170306"
+version = "5.0.4+20170306"
 

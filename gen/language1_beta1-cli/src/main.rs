@@ -602,7 +602,7 @@ async fn main() {
     
     let mut app = App::new("language1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20220218")
+           .version("5.0.4+20220218")
            .about("Provides natural language understanding technologies, such as sentiment analysis, entity recognition, entity sentiment analysis, and other text annotations, to developers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_language1_beta1_cli")
            .arg(Arg::with_name("url")

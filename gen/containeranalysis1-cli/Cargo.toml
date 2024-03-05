@@ -4,7 +4,7 @@
 [package]
 
 name = "google-containeranalysis1-cli"
-version = "5.0.3+20240223"
+version = "5.0.4+20240223"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container Analysis (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/containeranalysis1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-containeranalysis1]
 path = "../containeranalysis1"
-version = "5.0.3+20240223"
+version = "5.0.4+20240223"
 

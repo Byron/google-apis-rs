@@ -4,7 +4,7 @@
 [package]
 
 name = "google-domainsrdap1-cli"
-version = "5.0.3+20240304"
+version = "5.0.4+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Domains RDAP (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/domainsrdap1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-domainsrdap1]
 path = "../domainsrdap1"
-version = "5.0.3+20240304"
+version = "5.0.4+20240304"
 

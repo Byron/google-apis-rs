@@ -125,7 +125,7 @@ impl<'a, S> Cloudlatencytest<S> {
         Cloudlatencytest {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://cloudlatencytest-pa.googleapis.com/v2/statscollection/".to_string(),
             _root_url: "https://cloudlatencytest-pa.googleapis.com/".to_string(),
         }
@@ -136,7 +136,7 @@ impl<'a, S> Cloudlatencytest<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

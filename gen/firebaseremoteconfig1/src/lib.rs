@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Remote Config* crate version *5.0.3+20171129*, where *20171129* is the exact revision of the *firebaseremoteconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Firebase Remote Config* crate version *5.0.4+20171129*, where *20171129* is the exact revision of the *firebaseremoteconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Firebase Remote Config* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/remote-config/).

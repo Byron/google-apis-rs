@@ -4,7 +4,7 @@
 [package]
 
 name = "google-playablelocations3-cli"
-version = "5.0.3+20200707"
+version = "5.0.4+20200707"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Playable Locations (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/playablelocations3-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-playablelocations3]
 path = "../playablelocations3"
-version = "5.0.3+20200707"
+version = "5.0.4+20200707"
 

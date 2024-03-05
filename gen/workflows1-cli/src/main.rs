@@ -1148,7 +1148,7 @@ async fn main() {
     
     let mut app = App::new("workflows1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240207")
+           .version("5.0.4+20240207")
            .about("Manage workflow definitions. To execute workflows and manage executions, see the Workflows Executions API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflows1_cli")
            .arg(Arg::with_name("url")

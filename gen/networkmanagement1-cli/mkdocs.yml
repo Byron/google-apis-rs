@@ -1,4 +1,4 @@
-site_name: Network Management v5.0.3+20240221
+site_name: Network Management v5.0.4+20240221
 site_url: http://byron.github.io/google-apis-rs/google-networkmanagement1-cli
 site_description: A complete library to interact with Network Management (protocol v1)
 

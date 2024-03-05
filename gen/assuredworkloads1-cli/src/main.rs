@@ -1537,7 +1537,7 @@ async fn main() {
     
     let mut app = App::new("assuredworkloads1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240222")
+           .version("5.0.4+20240222")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli")
            .arg(Arg::with_name("url")

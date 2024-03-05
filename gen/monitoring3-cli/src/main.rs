@@ -5796,7 +5796,7 @@ async fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240225")
+           .version("5.0.4+20240225")
            .about("Manages your Cloud Monitoring data and configurations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")

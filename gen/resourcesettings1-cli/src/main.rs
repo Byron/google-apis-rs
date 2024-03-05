@@ -1086,7 +1086,7 @@ async fn main() {
     
     let mut app = App::new("resourcesettings1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240303")
+           .version("5.0.4+20240303")
            .about("The Resource Settings API allows users to control and modify the behavior of their GCP resources (e.g., VM, firewall, Project, etc.) across the Cloud Resource Hierarchy.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_resourcesettings1_cli")
            .arg(Arg::with_name("url")

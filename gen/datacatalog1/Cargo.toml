@@ -4,12 +4,12 @@
 [package]
 
 name = "google-datacatalog1"
-version = "5.0.3+20240222"
+version = "5.0.4+20240222"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Data Catalog (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datacatalog1"
 homepage = "https://cloud.google.com/data-catalog/docs/"
-documentation = "https://docs.rs/google-datacatalog1/5.0.3+20240222"
+documentation = "https://docs.rs/google-datacatalog1/5.0.4+20240222"
 license = "MIT"
 keywords = ["datacatalog", "google", "protocol", "web", "api"]
 autobins = false

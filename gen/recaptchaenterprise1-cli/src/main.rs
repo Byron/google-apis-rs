@@ -2123,7 +2123,7 @@ async fn main() {
     
     let mut app = App::new("recaptchaenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240303")
+           .version("5.0.4+20240303")
            .about("Help protect your website from fraudulent activity, spam, and abuse without creating friction.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli")
            .arg(Arg::with_name("url")

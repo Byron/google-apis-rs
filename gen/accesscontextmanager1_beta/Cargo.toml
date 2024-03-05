@@ -4,12 +4,12 @@
 [package]
 
 name = "google-accesscontextmanager1_beta"
-version = "5.0.3+20230123"
+version = "5.0.4+20230123"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Access Context Manager (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/accesscontextmanager1_beta"
 homepage = "https://cloud.google.com/access-context-manager/docs/reference/rest/"
-documentation = "https://docs.rs/google-accesscontextmanager1_beta/5.0.3+20230123"
+documentation = "https://docs.rs/google-accesscontextmanager1_beta/5.0.4+20230123"
 license = "MIT"
 keywords = ["accesscontextmanager", "google", "protocol", "web", "api"]
 autobins = false

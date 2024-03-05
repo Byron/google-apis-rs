@@ -4,12 +4,12 @@
 [package]
 
 name = "google-prod_tt_sasportal1_alpha1"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SAS Portal Testing (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/prod_tt_sasportal1_alpha1"
 homepage = "https://developers.google.com/spectrum-access-system/"
-documentation = "https://docs.rs/google-prod_tt_sasportal1_alpha1/5.0.3+20240226"
+documentation = "https://docs.rs/google-prod_tt_sasportal1_alpha1/5.0.4+20240226"
 license = "MIT"
 keywords = ["prod_tt_sasportal", "google", "protocol", "web", "api"]
 autobins = false

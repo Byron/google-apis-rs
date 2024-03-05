@@ -8871,7 +8871,7 @@ async fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240227")
+           .version("5.0.4+20240227")
            .about("The Google Drive API allows clients to access resources from Google Drive.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")

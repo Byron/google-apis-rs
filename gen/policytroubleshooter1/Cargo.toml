@@ -4,12 +4,12 @@
 [package]
 
 name = "google-policytroubleshooter1"
-version = "5.0.3+20240303"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Policy Troubleshooter (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/policytroubleshooter1"
 homepage = "https://cloud.google.com/iam/"
-documentation = "https://docs.rs/google-policytroubleshooter1/5.0.3+20240303"
+documentation = "https://docs.rs/google-policytroubleshooter1/5.0.4+20240303"
 license = "MIT"
 keywords = ["policytroubleshooter", "google", "protocol", "web", "api"]
 autobins = false

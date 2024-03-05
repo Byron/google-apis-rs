@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sasportal1_alpha1-cli"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with sasportal (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sasportal1_alpha1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-sasportal1_alpha1]
 path = "../sasportal1_alpha1"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 

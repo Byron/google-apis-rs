@@ -12719,7 +12719,7 @@ async fn main() {
     
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240225")
+           .version("5.0.4+20240225")
            .about("Discover and protect your sensitive data. A fully managed service designed to help you discover, classify, and protect your valuable data assets with ease.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")

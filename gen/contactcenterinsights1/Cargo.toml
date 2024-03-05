@@ -4,12 +4,12 @@
 [package]
 
 name = "google-contactcenterinsights1"
-version = "5.0.3+20240226"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Contactcenterinsights (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/contactcenterinsights1"
 homepage = "https://cloud.google.com/contact-center/insights/docs"
-documentation = "https://docs.rs/google-contactcenterinsights1/5.0.3+20240226"
+documentation = "https://docs.rs/google-contactcenterinsights1/5.0.4+20240226"
 license = "MIT"
 keywords = ["contactcenterinsight", "google", "protocol", "web", "api"]
 autobins = false

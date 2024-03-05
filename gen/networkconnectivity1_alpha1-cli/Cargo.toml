@@ -4,7 +4,7 @@
 [package]
 
 name = "google-networkconnectivity1_alpha1-cli"
-version = "5.0.3+20240221"
+version = "5.0.4+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with networkconnectivity (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/networkconnectivity1_alpha1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-networkconnectivity1_alpha1]
 path = "../networkconnectivity1_alpha1"
-version = "5.0.3+20240221"
+version = "5.0.4+20240221"
 

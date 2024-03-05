@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2-cli"
-version = "5.0.3+20220303"
+version = "5.0.4+20220303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/content2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-content2]
 path = "../content2"
-version = "5.0.3+20220303"
+version = "5.0.4+20220303"
 

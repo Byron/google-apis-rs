@@ -5075,7 +5075,7 @@ async fn main() {
     
     let mut app = App::new("baremetalsolution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240228")
+           .version("5.0.4+20240228")
            .about("Provides ways to manage Bare Metal Solution hardware installed in a regional extension located near a Google Cloud data center.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli")
            .arg(Arg::with_name("url")

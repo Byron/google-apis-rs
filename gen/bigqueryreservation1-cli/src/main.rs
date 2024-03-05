@@ -2275,7 +2275,7 @@ async fn main() {
     
     let mut app = App::new("bigqueryreservation1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240227")
+           .version("5.0.4+20240227")
            .about("A service to modify your BigQuery flat-rate reservations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli")
            .arg(Arg::with_name("url")

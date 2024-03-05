@@ -5674,7 +5674,7 @@ async fn main() {
     
     let mut app = App::new("firebaseappcheck1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20240226")
+           .version("5.0.4+20240226")
            .about("Firebase App Check works alongside other Firebase services to help protect your backend resources from abuse, such as billing fraud or phishing.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli")
            .arg(Arg::with_name("url")

@@ -129,7 +129,7 @@ impl<'a, S> YouTubeReporting<S> {
         YouTubeReporting {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://youtubereporting.googleapis.com/".to_string(),
             _root_url: "https://youtubereporting.googleapis.com/".to_string(),
         }
@@ -146,7 +146,7 @@ impl<'a, S> YouTubeReporting<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

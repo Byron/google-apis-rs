@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adsensehost4d1-cli"
-version = "5.0.3+20200930"
+version = "5.0.4+20200930"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense Host (protocol v4.1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/adsensehost4d1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-adsensehost4d1]
 path = "../adsensehost4d1"
-version = "5.0.3+20200930"
+version = "5.0.4+20200930"
 

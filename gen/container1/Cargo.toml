@@ -4,12 +4,12 @@
 [package]
 
 name = "google-container1"
-version = "5.0.3+20240214"
+version = "5.0.4+20240214"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/container1"
 homepage = "https://cloud.google.com/container-engine/"
-documentation = "https://docs.rs/google-container1/5.0.3+20240214"
+documentation = "https://docs.rs/google-container1/5.0.4+20240214"
 license = "MIT"
 keywords = ["container", "google", "protocol", "web", "api"]
 autobins = false

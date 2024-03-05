@@ -4,7 +4,7 @@
 [package]
 
 name = "google-monitoring3-cli"
-version = "5.0.3+20240225"
+version = "5.0.4+20240225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Monitoring (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-monitoring3]
 path = "../monitoring3"
-version = "5.0.3+20240225"
+version = "5.0.4+20240225"
 

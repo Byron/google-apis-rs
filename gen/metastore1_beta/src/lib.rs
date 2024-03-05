@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dataproc Metastore* crate version *5.0.3+20240228*, where *20240228* is the exact revision of the *metastore:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Dataproc Metastore* crate version *5.0.4+20240228*, where *20240228* is the exact revision of the *metastore:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Dataproc Metastore* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc-metastore/docs).
