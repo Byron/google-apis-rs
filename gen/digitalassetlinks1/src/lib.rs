@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *digitalassetlinks* crate version *5.0.3+20230117*, where *20230117* is the exact revision of the *digitalassetlinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *digitalassetlinks* crate version *5.0.3+20240224*, where *20240224* is the exact revision of the *digitalassetlinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *digitalassetlinks* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/digital-asset-links/).

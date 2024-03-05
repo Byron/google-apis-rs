@@ -1,4 +1,4 @@
-site_name: AnalyticsData v5.0.3+20230123
+site_name: AnalyticsData v5.0.3+20240304
 site_url: http://byron.github.io/google-apis-rs/google-analyticsdata1_beta-cli
 site_description: A complete library to interact with AnalyticsData (protocol v1beta)
 
@@ -10,6 +10,10 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Properties':
+    - 'Audience Exports Create': 'properties_audience-exports-create.md'
+    - 'Audience Exports Get': 'properties_audience-exports-get.md'
+    - 'Audience Exports List': 'properties_audience-exports-list.md'
+    - 'Audience Exports Query': 'properties_audience-exports-query.md'
     - 'Batch Run Pivot Reports': 'properties_batch-run-pivot-reports.md'
     - 'Batch Run Reports': 'properties_batch-run-reports.md'
     - 'Check Compatibility': 'properties_check-compatibility.md'

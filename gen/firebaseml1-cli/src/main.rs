@@ -395,7 +395,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebaseml1_cli/operations_list",
                   vec![
                     (Some(r##"name"##),
@@ -422,7 +422,7 @@ async fn main() {
     
     let mut app = App::new("firebaseml1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.3+20240221")
            .about("Access custom machine learning models hosted via Firebase ML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseml1_cli")
            .arg(Arg::with_name("url")

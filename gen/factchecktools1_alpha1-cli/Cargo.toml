@@ -4,7 +4,7 @@
 [package]
 
 name = "google-factchecktools1_alpha1-cli"
-version = "5.0.3+20230121"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Fact Check Tools (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/factchecktools1_alpha1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-factchecktools1_alpha1]
 path = "../factchecktools1_alpha1"
-version = "5.0.3+20230121"
+version = "5.0.3+20240303"
 

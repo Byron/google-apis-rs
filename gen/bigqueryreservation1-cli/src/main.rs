@@ -75,8 +75,10 @@ where
                 match &temp_cursor.to_string()[..] {
                     "commitment-end-time" => Some(("commitmentEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "commitment-start-time" => Some(("commitmentStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "edition" => Some(("edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "failure-status.code" => Some(("failureStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "failure-status.message" => Some(("failureStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-flat-rate" => Some(("isFlatRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "multi-region-auxiliary" => Some(("multiRegionAuxiliary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "plan" => Some(("plan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -84,7 +86,7 @@ where
                     "slot-count" => Some(("slotCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "commitment-end-time", "commitment-start-time", "failure-status", "message", "multi-region-auxiliary", "name", "plan", "renewal-plan", "slot-count", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "commitment-end-time", "commitment-start-time", "edition", "failure-status", "is-flat-rate", "message", "multi-region-auxiliary", "name", "plan", "renewal-plan", "slot-count", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -428,8 +430,10 @@ where
                 match &temp_cursor.to_string()[..] {
                     "commitment-end-time" => Some(("commitmentEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "commitment-start-time" => Some(("commitmentStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "edition" => Some(("edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "failure-status.code" => Some(("failureStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "failure-status.message" => Some(("failureStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-flat-rate" => Some(("isFlatRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "multi-region-auxiliary" => Some(("multiRegionAuxiliary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "plan" => Some(("plan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -437,7 +441,7 @@ where
                     "slot-count" => Some(("slotCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "commitment-end-time", "commitment-start-time", "failure-status", "message", "multi-region-auxiliary", "name", "plan", "renewal-plan", "slot-count", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "commitment-end-time", "commitment-start-time", "edition", "failure-status", "is-flat-rate", "message", "multi-region-auxiliary", "name", "plan", "renewal-plan", "slot-count", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -864,9 +868,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "assignment-id" => Some(("assignmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-id" => Some(("destinationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignment-id", "destination-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1041,15 +1046,18 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "autoscale.current-slots" => Some(("autoscale.currentSlots", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "autoscale.max-slots" => Some(("autoscale.maxSlots", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "concurrency" => Some(("concurrency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "edition" => Some(("edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignore-idle-slots" => Some(("ignoreIdleSlots", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "multi-region-auxiliary" => Some(("multiRegionAuxiliary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["concurrency", "creation-time", "ignore-idle-slots", "multi-region-auxiliary", "name", "slot-capacity", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscale", "concurrency", "creation-time", "current-slots", "edition", "ignore-idle-slots", "max-slots", "multi-region-auxiliary", "name", "slot-capacity", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1299,15 +1307,18 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "autoscale.current-slots" => Some(("autoscale.currentSlots", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "autoscale.max-slots" => Some(("autoscale.maxSlots", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "concurrency" => Some(("concurrency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "edition" => Some(("edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignore-idle-slots" => Some(("ignoreIdleSlots", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "multi-region-auxiliary" => Some(("multiRegionAuxiliary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["concurrency", "creation-time", "ignore-idle-slots", "multi-region-auxiliary", "name", "slot-capacity", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscale", "concurrency", "creation-time", "current-slots", "edition", "ignore-idle-slots", "max-slots", "multi-region-auxiliary", "name", "slot-capacity", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2264,7 +2275,7 @@ async fn main() {
     
     let mut app = App::new("bigqueryreservation1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.3+20240227")
            .about("A service to modify your BigQuery flat-rate reservations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli")
            .arg(Arg::with_name("url")

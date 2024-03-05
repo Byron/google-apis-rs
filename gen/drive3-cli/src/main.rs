@@ -102,6 +102,120 @@ where
         }
     }
 
+    async fn _apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().get(opt.value_of("app-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                "app-filter-mime-types" => {
+                    call = call.app_filter_mime_types(value.unwrap_or(""));
+                },
+                "app-filter-extensions" => {
+                    call = call.app_filter_extensions(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["app-filter-extensions", "app-filter-mime-types", "language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _changes_get_start_page_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.changes().get_start_page_token();
@@ -879,6 +993,7 @@ where
                     "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-drive-background" => Some(("capabilities.canChangeDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-drive-members-only-restriction" => Some(("capabilities.canChangeDriveMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-sharing-folders-requires-organizer-permission-restriction" => Some(("capabilities.canChangeSharingFoldersRequiresOrganizerPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -904,9 +1019,10 @@ where
                     "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.drive-members-only" => Some(("restrictions.driveMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.sharing-folders-requires-organizer-permission" => Some(("restrictions.sharingFoldersRequiresOrganizerPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-reset-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-change-sharing-folders-requires-organizer-permission-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-reset-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "sharing-folders-requires-organizer-permission", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1275,6 +1391,7 @@ where
                     "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-drive-background" => Some(("capabilities.canChangeDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-drive-members-only-restriction" => Some(("capabilities.canChangeDriveMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-sharing-folders-requires-organizer-permission-restriction" => Some(("capabilities.canChangeSharingFoldersRequiresOrganizerPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1300,9 +1417,10 @@ where
                     "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.drive-members-only" => Some(("restrictions.driveMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.sharing-folders-requires-organizer-permission" => Some(("restrictions.sharingFoldersRequiresOrganizerPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-reset-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-change-sharing-folders-requires-organizer-permission-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-reset-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "org-unit-id", "restrictions", "sharing-folders-requires-organizer-permission", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1406,7 +1524,9 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-editor-content-restriction" => Some(("capabilities.canModifyEditorContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-owner-content-restriction" => Some(("capabilities.canModifyOwnerContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1422,6 +1542,7 @@ where
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-content-restriction" => Some(("capabilities.canRemoveContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1529,7 +1650,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-security-update-enabled", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "drive-id", "duration-millis", "email-address", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "link-share-metadata", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "resource-key", "rotation", "security-update-eligible", "security-update-enabled", "sensor", "sha1-checksum", "sha256-checksum", "shared", "shared-with-me-time", "sharing-user", "shortcut-details", "size", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-security-update-enabled", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-editor-content-restriction", "can-modify-labels", "can-modify-owner-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-content-restriction", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "drive-id", "duration-millis", "email-address", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "link-share-metadata", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "resource-key", "rotation", "security-update-eligible", "security-update-enabled", "sensor", "sha1-checksum", "sha256-checksum", "shared", "shared-with-me-time", "sharing-user", "shortcut-details", "size", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1654,7 +1775,9 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-editor-content-restriction" => Some(("capabilities.canModifyEditorContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-owner-content-restriction" => Some(("capabilities.canModifyOwnerContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1670,6 +1793,7 @@ where
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-content-restriction" => Some(("capabilities.canRemoveContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1777,7 +1901,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-security-update-enabled", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "drive-id", "duration-millis", "email-address", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "link-share-metadata", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "resource-key", "rotation", "security-update-eligible", "security-update-enabled", "sensor", "sha1-checksum", "sha256-checksum", "shared", "shared-with-me-time", "sharing-user", "shortcut-details", "size", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-security-update-enabled", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-editor-content-restriction", "can-modify-labels", "can-modify-owner-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-content-restriction", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "drive-id", "duration-millis", "email-address", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "link-share-metadata", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "resource-key", "rotation", "security-update-eligible", "security-update-enabled", "sensor", "sha1-checksum", "sha256-checksum", "shared", "shared-with-me-time", "sharing-user", "shortcut-details", "size", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1931,6 +2055,9 @@ where
                 "enforce-single-parent" => {
                     call = call.enforce_single_parent(        value.map(|v| arg_from_str(v, err, "enforce-single-parent", "boolean")).unwrap_or(false));
                 },
+                "drive-id" => {
+                    call = call.drive_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1944,7 +2071,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["enforce-single-parent"].iter().map(|v|*v));
+                                                                           v.extend(["drive-id", "enforce-single-parent"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2450,7 +2577,9 @@ where
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-content-restriction" => Some(("capabilities.canModifyContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-editor-content-restriction" => Some(("capabilities.canModifyEditorContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-modify-labels" => Some(("capabilities.canModifyLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-owner-content-restriction" => Some(("capabilities.canModifyOwnerContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2466,6 +2595,7 @@ where
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-content-restriction" => Some(("capabilities.canRemoveContentRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2573,7 +2703,7 @@ where
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "writers-can-share" => Some(("writersCanShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-security-update-enabled", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-labels", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "drive-id", "duration-millis", "email-address", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "link-share-metadata", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "resource-key", "rotation", "security-update-eligible", "security-update-enabled", "sensor", "sha1-checksum", "sha256-checksum", "shared", "shared-with-me-time", "sharing-user", "shortcut-details", "size", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-accept-ownership", "can-add-children", "can-add-folder-from-another-drive", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-security-update-enabled", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-modify-content-restriction", "can-modify-editor-content-restriction", "can-modify-labels", "can-modify-owner-content-restriction", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-labels", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-content-restriction", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "drive-id", "duration-millis", "email-address", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "link-share-metadata", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "resource-key", "rotation", "security-update-eligible", "security-update-enabled", "sensor", "sha1-checksum", "sha256-checksum", "shared", "shared-with-me-time", "sharing-user", "shortcut-details", "size", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "target-resource-key", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2711,7 +2841,6 @@ where
             }
         }
         let mut request: api::Channel = json::value::from_value(object).unwrap();
-        let mut download_mode = false;
         let mut call = self.hub.files().watch(request, opt.value_of("file-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2735,9 +2864,6 @@ where
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
-                            if key == "alt" && value.unwrap_or("unset") == "media" {
-                                download_mode = true;
-                            }
                             found = true;
                             call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
                             break;
@@ -2771,16 +2897,10 @@ where
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    if !download_mode {
                     let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
-                    } else {
-                    let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
-                    ostream.write_all(&bytes).expect("write to be complete");
-                    ostream.flush().expect("io to never fail which should really be fixed one day");
-                    }
                     Ok(())
                 }
             }
@@ -3870,6 +3990,7 @@ where
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-copy-requires-writer-permission-restriction" => Some(("capabilities.canChangeCopyRequiresWriterPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-sharing-folders-requires-organizer-permission-restriction" => Some(("capabilities.canChangeSharingFoldersRequiresOrganizerPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-team-drive-background" => Some(("capabilities.canChangeTeamDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-team-members-only-restriction" => Some(("capabilities.canChangeTeamMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3896,10 +4017,11 @@ where
                     "restrictions.admin-managed-restrictions" => Some(("restrictions.adminManagedRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.sharing-folders-requires-organizer-permission" => Some(("restrictions.sharingFoldersRequiresOrganizerPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.team-members-only" => Some(("restrictions.teamMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-reset-team-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-sharing-folders-requires-organizer-permission-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-reset-team-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "sharing-folders-requires-organizer-permission", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4155,6 +4277,7 @@ where
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-copy-requires-writer-permission-restriction" => Some(("capabilities.canChangeCopyRequiresWriterPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-sharing-folders-requires-organizer-permission-restriction" => Some(("capabilities.canChangeSharingFoldersRequiresOrganizerPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-team-drive-background" => Some(("capabilities.canChangeTeamDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-team-members-only-restriction" => Some(("capabilities.canChangeTeamMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4181,10 +4304,11 @@ where
                     "restrictions.admin-managed-restrictions" => Some(("restrictions.adminManagedRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.sharing-folders-requires-organizer-permission" => Some(("restrictions.sharingFoldersRequiresOrganizerPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "restrictions.team-members-only" => Some(("restrictions.teamMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-reset-team-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-sharing-folders-requires-organizer-permission-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-reset-team-drive-restrictions", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "id", "kind", "name", "org-unit-id", "restrictions", "sharing-folders-requires-organizer-permission", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4260,6 +4384,20 @@ where
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("about".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("apps", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._apps_get(opt, dry_run, &mut err).await;
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._apps_list(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("apps".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -4519,12 +4657,15 @@ where
         let engine = Engine {
             opt: opt,
             hub: api::DriveHub::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -4552,6 +4693,47 @@ async fn main() {
             ("get",
                     Some(r##"Gets information about the user, the user's Drive, and system capabilities."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/about_get",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("apps", "methods: 'get' and 'list'", vec![
+            ("get",
+                    Some(r##"Gets a specific app."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/apps_get",
+                  vec![
+                    (Some(r##"app-id"##),
+                     None,
+                     Some(r##"The ID of the app."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Lists a user's installed apps."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/apps_list",
                   vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4638,7 +4820,7 @@ async fn main() {
         
         ("channels", "methods: 'stop'", vec![
             ("stop",
-                    Some(r##"Stop watching resources through this channel"##),
+                    Some(r##"Stops watching resources through this channel."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/channels_stop",
                   vec![
                     (Some(r##"kv"##),
@@ -4799,7 +4981,7 @@ async fn main() {
                   vec![
                     (Some(r##"request-id"##),
                      None,
-                     Some(r##"An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned."##),
+                     Some(r##"Required. An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned."##),
                      Some(true),
                      Some(false)),
         
@@ -4822,7 +5004,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Permanently deletes a shared drive for which the user is an organizer. The shared drive cannot contain any untrashed items."##),
+                    Some(r##"Permanently deletes a shared drive for which the user is an `organizer`. The shared drive cannot contain any untrashed items."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/drives_delete",
                   vec![
                     (Some(r##"drive-id"##),
@@ -4882,7 +5064,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the user's shared drives."##),
+                    Some(r##" Lists the user's shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](/drive/api/guides/search-shareddrives) guide."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/drives_list",
                   vec![
                     (Some(r##"v"##),
@@ -4951,7 +5133,7 @@ async fn main() {
         
         ("files", "methods: 'copy', 'create', 'delete', 'empty-trash', 'export', 'generate-ids', 'get', 'list', 'list-labels', 'modify-labels', 'update' and 'watch'", vec![
             ("copy",
-                    Some(r##"Creates a copy of a file and applies any requested updates with patch semantics. Folders cannot be copied."##),
+                    Some(r##"Creates a copy of a file and applies any requested updates with patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_copy",
                   vec![
                     (Some(r##"file-id"##),
@@ -4979,7 +5161,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates a file."##),
+                    Some(r##" Creates a new file. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](/drive/api/guides/manage-uploads). Apps creating shortcuts with `files.create` must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `name` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"name": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `title` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the title. In cases where the extension is missing, Drive attempts to determine the extension based on the file's MIME type."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_create",
                   vec![
                     (Some(r##"kv"##),
@@ -5007,7 +5189,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Permanently deletes a file owned by the user without moving it to the trash. If the file belongs to a shared drive the user must be an organizer on the parent. If the target is a folder, all descendants owned by the user are also deleted."##),
+                    Some(r##"Permanently deletes a file owned by the user without moving it to the trash. If the file belongs to a shared drive, the user must be an `organizer` on the parent folder. If the target is a folder, all descendants owned by the user are also deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_delete",
                   vec![
                     (Some(r##"file-id"##),
@@ -5044,7 +5226,7 @@ async fn main() {
         
                     (Some(r##"mime-type"##),
                      None,
-                     Some(r##"The MIME type of the format requested for this export."##),
+                     Some(r##"Required. The MIME type of the format requested for this export."##),
                      Some(true),
                      Some(false)),
         
@@ -5077,7 +5259,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a file's metadata or content by ID."##),
+                    Some(r##" Gets a file's metadata or content by ID. If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](/drive/api/reference/rest/v3/files/export) instead. For more information, see [Download & export files](/drive/api/guides/manage-downloads)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_get",
                   vec![
                     (Some(r##"file-id"##),
@@ -5099,7 +5281,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists or searches files."##),
+                    Some(r##" Lists the user's files. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for files & folders](/drive/api/guides/search-files) guide. *Note:* This method returns *all* files by default, including trashed files. If you don't want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_list",
                   vec![
                     (Some(r##"v"##),
@@ -5120,7 +5302,7 @@ async fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID of the file."##),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
@@ -5137,12 +5319,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("modify-labels",
-                    Some(r##"Modifies the set of labels on a file."##),
+                    Some(r##"Modifies the set of labels applied to a file. Returns a list of the labels that were added or modified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_modify-labels",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID of the file for which the labels are modified."##),
+                     Some(r##"The ID of the file to which the labels belong."##),
                      Some(true),
                      Some(false)),
         
@@ -5165,7 +5347,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might change automatically, such as modifiedDate. This method supports patch semantics."##),
+                    Some(r##" Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](/drive/api/guides/manage-uploads)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_update",
                   vec![
                     (Some(r##"file-id"##),
@@ -5199,7 +5381,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("watch",
-                    Some(r##"Subscribes to changes to a file. While you can establish a channel for changes to a file on a shared drive, a change to a shared drive file won't create a notification."##),
+                    Some(r##"Subscribes to changes to a file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/files_watch",
                   vec![
                     (Some(r##"file-id"##),
@@ -5230,7 +5412,7 @@ async fn main() {
         
         ("permissions", "methods: 'create', 'delete', 'get', 'list' and 'update'", vec![
             ("create",
-                    Some(r##"Creates a permission for a file or shared drive."##),
+                    Some(r##"Creates a permission for a file or shared drive. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/permissions_create",
                   vec![
                     (Some(r##"file-id"##),
@@ -5258,7 +5440,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a permission."##),
+                    Some(r##"Deletes a permission. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/permissions_delete",
                   vec![
                     (Some(r##"file-id"##),
@@ -5330,7 +5512,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a permission with patch semantics."##),
+                    Some(r##"Updates a permission with patch semantics. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/permissions_update",
                   vec![
                     (Some(r##"file-id"##),
@@ -5643,12 +5825,12 @@ async fn main() {
         
         ("teamdrives", "methods: 'create', 'delete', 'get', 'list' and 'update'", vec![
             ("create",
-                    Some(r##"Deprecated use drives.create instead."##),
+                    Some(r##"Deprecated: Use `drives.create` instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/teamdrives_create",
                   vec![
                     (Some(r##"request-id"##),
                      None,
-                     Some(r##"An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned."##),
+                     Some(r##"Required. An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned."##),
                      Some(true),
                      Some(false)),
         
@@ -5671,7 +5853,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deprecated use drives.delete instead."##),
+                    Some(r##"Deprecated: Use `drives.delete` instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/teamdrives_delete",
                   vec![
                     (Some(r##"team-drive-id"##),
@@ -5687,7 +5869,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Deprecated use drives.get instead."##),
+                    Some(r##"Deprecated: Use `drives.get` instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/teamdrives_get",
                   vec![
                     (Some(r##"team-drive-id"##),
@@ -5709,7 +5891,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Deprecated use drives.list instead."##),
+                    Some(r##"Deprecated: Use `drives.list` instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/teamdrives_list",
                   vec![
                     (Some(r##"v"##),
@@ -5725,7 +5907,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Deprecated use drives.update instead"##),
+                    Some(r##"Deprecated: Use `drives.update` instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive3_cli/teamdrives_update",
                   vec![
                     (Some(r##"team-drive-id"##),
@@ -5758,8 +5940,8 @@ async fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
-           .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
+           .version("5.0.3+20240227")
+           .about("The Google Drive API allows clients to access resources from Google Drive.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

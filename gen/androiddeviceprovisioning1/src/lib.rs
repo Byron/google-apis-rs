@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Provisioning Partner* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Android Provisioning Partner* crate version *5.0.3+20240304*, where *20240304* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Android Provisioning Partner* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/zero-touch/).
@@ -16,7 +16,7 @@
 //! * [operations](api::Operation)
 //!  * [*get*](api::OperationGetCall)
 //! * partners
-//!  * [*customers create*](api::PartnerCustomerCreateCall), [*customers list*](api::PartnerCustomerListCall), [*devices claim*](api::PartnerDeviceClaimCall), [*devices claim async*](api::PartnerDeviceClaimAsyncCall), [*devices find by identifier*](api::PartnerDeviceFindByIdentifierCall), [*devices find by owner*](api::PartnerDeviceFindByOwnerCall), [*devices get*](api::PartnerDeviceGetCall), [*devices metadata*](api::PartnerDeviceMetadataCall), [*devices unclaim*](api::PartnerDeviceUnclaimCall), [*devices unclaim async*](api::PartnerDeviceUnclaimAsyncCall), [*devices update metadata async*](api::PartnerDeviceUpdateMetadataAsyncCall), [*vendors customers list*](api::PartnerVendorCustomerListCall) and [*vendors list*](api::PartnerVendorListCall)
+//!  * [*customers create*](api::PartnerCustomerCreateCall), [*customers list*](api::PartnerCustomerListCall), [*devices claim*](api::PartnerDeviceClaimCall), [*devices claim async*](api::PartnerDeviceClaimAsyncCall), [*devices find by identifier*](api::PartnerDeviceFindByIdentifierCall), [*devices find by owner*](api::PartnerDeviceFindByOwnerCall), [*devices get*](api::PartnerDeviceGetCall), [*devices get sim lock state*](api::PartnerDeviceGetSimLockStateCall), [*devices metadata*](api::PartnerDeviceMetadataCall), [*devices unclaim*](api::PartnerDeviceUnclaimCall), [*devices unclaim async*](api::PartnerDeviceUnclaimAsyncCall), [*devices update metadata async*](api::PartnerDeviceUpdateMetadataAsyncCall), [*vendors customers list*](api::PartnerVendorCustomerListCall) and [*vendors list*](api::PartnerVendorListCall)
 //! 
 //! 
 //! 

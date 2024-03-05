@@ -25,11 +25,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AnalyticsData* API at revision *20230123*. The CLI is at version *5.0.3*.
+This documentation was generated from the *AnalyticsData* API at revision *20240304*. The CLI is at version *5.0.3*.
 
 ```bash
 analyticsdata1-beta [options]
         properties
+                audience-exports-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                audience-exports-get <name> [-p <v>]... [-o <out>]
+                audience-exports-list <parent> [-p <v>]... [-o <out>]
+                audience-exports-query <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 batch-run-pivot-reports <property> (-r <kv>)... [-p <v>]... [-o <out>]
                 batch-run-reports <property> (-r <kv>)... [-p <v>]... [-o <out>]
                 check-compatibility <property> (-r <kv>)... [-p <v>]... [-o <out>]

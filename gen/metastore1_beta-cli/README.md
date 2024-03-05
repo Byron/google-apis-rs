@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc Metastore* API at revision *20230111*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Dataproc Metastore* API at revision *20240228*. The CLI is at version *5.0.3*.
 
 ```bash
 metastore1-beta [options]
@@ -40,10 +40,12 @@ metastore1-beta [options]
                 locations-federations-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
                 locations-services-alter-location <service> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-alter-table-properties <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-backups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-backups-delete <name> [-p <v>]... [-o <out>]
                 locations-services-backups-get <name> [-p <v>]... [-o <out>]
@@ -67,6 +69,7 @@ metastore1-beta [options]
                 locations-services-metadata-imports-get <name> [-p <v>]... [-o <out>]
                 locations-services-metadata-imports-list <parent> [-p <v>]... [-o <out>]
                 locations-services-metadata-imports-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-migration-executions-delete <name> [-p <v>]... [-o <out>]
                 locations-services-move-table-to-database <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-query-metadata <service> (-r <kv>)... [-p <v>]... [-o <out>]

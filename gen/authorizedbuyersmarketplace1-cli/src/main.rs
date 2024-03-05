@@ -2394,11 +2394,13 @@ where
                     "delivery-control.roadblocking-type" => Some(("deliveryControl.roadblockingType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eligible-seat-ids" => Some(("eligibleSeatIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "estimated-gross-spend.currency-code" => Some(("estimatedGrossSpend.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "estimated-gross-spend.nanos" => Some(("estimatedGrossSpend.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "estimated-gross-spend.units" => Some(("estimatedGrossSpend.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-end-time" => Some(("flightEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-start-time" => Some(("flightStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-planner.account-id" => Some(("mediaPlanner.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferred-deal-terms.fixed-price.amount.currency-code" => Some(("preferredDealTerms.fixedPrice.amount.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferred-deal-terms.fixed-price.amount.nanos" => Some(("preferredDealTerms.fixedPrice.amount.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2444,7 +2446,7 @@ where
                     "targeting.video-targeting.targeted-position-types" => Some(("targeting.videoTargeting.targetedPositionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "billed-buyer", "buyer", "client", "companion-delivery-type", "create-time", "creative-format", "creative-pre-approval-policy", "creative-requirements", "creative-rotation-type", "creative-safe-frame-compatibility", "currency-code", "daypart-targeting", "deal-type", "delivery-control", "delivery-rate-type", "description", "device-capability-targeting", "device-category-targeting", "display-name", "estimated-gross-spend", "excluded-app-ids", "excluded-criteria-ids", "excluded-position-types", "excluded-uris", "first-party-targeting", "fixed-price", "flight-end-time", "flight-start-time", "floor-price", "geo-targeting", "guaranteed-looks", "id", "impression-cap", "inventory-type-targeting", "inventory-types", "max-ad-duration-ms", "minimum-daily-looks", "mobile-application-targeting", "name", "nanos", "open-auction-allowed", "operating-system-criteria", "operating-system-targeting", "operating-system-version-criteria", "percent-share-of-voice", "placement-targeting", "preferred-deal-terms", "private-auction-terms", "programmatic-creative-source", "programmatic-guaranteed-terms", "proposal-revision", "publisher-profile", "reservation-type", "roadblocking-type", "seller-time-zone", "skippable-ad-type", "targeted-app-ids", "targeted-criteria-ids", "targeted-position-types", "targeted-uris", "targeting", "technology-targeting", "time-zone-type", "type", "units", "update-time", "uri-targeting", "user-list-targeting", "version", "video-targeting"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "amount", "billed-buyer", "buyer", "client", "companion-delivery-type", "create-time", "creative-format", "creative-pre-approval-policy", "creative-requirements", "creative-rotation-type", "creative-safe-frame-compatibility", "currency-code", "daypart-targeting", "deal-type", "delivery-control", "delivery-rate-type", "description", "device-capability-targeting", "device-category-targeting", "display-name", "eligible-seat-ids", "estimated-gross-spend", "excluded-app-ids", "excluded-criteria-ids", "excluded-position-types", "excluded-uris", "first-party-targeting", "fixed-price", "flight-end-time", "flight-start-time", "floor-price", "geo-targeting", "guaranteed-looks", "id", "impression-cap", "inventory-type-targeting", "inventory-types", "max-ad-duration-ms", "media-planner", "minimum-daily-looks", "mobile-application-targeting", "name", "nanos", "open-auction-allowed", "operating-system-criteria", "operating-system-targeting", "operating-system-version-criteria", "percent-share-of-voice", "placement-targeting", "preferred-deal-terms", "private-auction-terms", "programmatic-creative-source", "programmatic-guaranteed-terms", "proposal-revision", "publisher-profile", "reservation-type", "roadblocking-type", "seller-time-zone", "skippable-ad-type", "targeted-app-ids", "targeted-criteria-ids", "targeted-position-types", "targeted-uris", "targeting", "technology-targeting", "time-zone-type", "type", "units", "update-time", "uri-targeting", "user-list-targeting", "version", "video-targeting"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3985,7 +3987,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("proposals-get",
-                    Some(r##"Gets a proposal using its name. The proposal is returned at most recent revision. revision."##),
+                    Some(r##"Gets a proposal using its resource name. The proposal is returned at the latest revision."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_proposals-get",
                   vec![
                     (Some(r##"name"##),
@@ -4007,7 +4009,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("proposals-list",
-                    Some(r##"Lists proposals. A filter expression (list filter syntax) may be specified to filter the results. This will not list finalized versions of proposals that are being renegotiated; to retrieve these use the finalizedProposals resource."##),
+                    Some(r##"Lists proposals. A filter expression using [Cloud API list filtering syntax](https://developers.google.com/authorized-buyers/apis/guides/list-filters) may be specified to filter the results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_proposals-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4029,7 +4031,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("proposals-patch",
-                    Some(r##"Updates the proposal at the given revision number. If the revision number in the request is behind the latest from the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as 'Immutable' or 'Output only' yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is not allowed and will result in an error."##),
+                    Some(r##"Updates the proposal at the given revision number. If the revision number in the request is behind the latest one kept in the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as 'Immutable' or 'Output only' yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is not allowed and will result in an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_proposals-patch",
                   vec![
                     (Some(r##"name"##),
@@ -4134,7 +4136,7 @@ async fn main() {
     
     let mut app = App::new("authorizedbuyersmarketplace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.3+20240305")
            .about("The Authorized Buyers Marketplace API lets buyers programmatically discover inventory; propose, retrieve and negotiate deals with publishers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli")
            .arg(Arg::with_name("url")

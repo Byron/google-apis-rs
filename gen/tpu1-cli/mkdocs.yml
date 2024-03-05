@@ -1,4 +1,4 @@
-site_name: TPU v5.0.3+20230105
+site_name: TPU v5.0.3+20240222
 site_url: http://byron.github.io/google-apis-rs/google-tpu1-cli
 site_description: A complete library to interact with TPU (protocol v1)
 

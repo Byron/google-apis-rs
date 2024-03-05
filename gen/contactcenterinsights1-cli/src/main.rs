@@ -84,11 +84,14 @@ where
                     "annotator-selector.run-phrase-matcher-annotator" => Some(("annotatorSelector.runPhraseMatcherAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotator-selector.run-sentiment-annotator" => Some(("annotatorSelector.runSentimentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotator-selector.run-silence-annotator" => Some(("annotatorSelector.runSilenceAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "annotator-selector.run-summarization-annotator" => Some(("annotatorSelector.runSummarizationAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "annotator-selector.summarization-config.conversation-profile" => Some(("annotatorSelector.summarizationConfig.conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotator-selector.summarization-config.summarization-model" => Some(("annotatorSelector.summarizationConfig.summarizationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-time" => Some(("requestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-result", "annotator-selector", "call-analysis-metadata", "create-time", "end-time", "issue-model", "issue-model-result", "issue-models", "name", "phrase-matchers", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-result", "annotator-selector", "call-analysis-metadata", "conversation-profile", "create-time", "end-time", "issue-model", "issue-model-result", "issue-models", "name", "phrase-matchers", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "summarization-config", "summarization-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -347,10 +350,13 @@ where
                     "annotator-selector.run-phrase-matcher-annotator" => Some(("annotatorSelector.runPhraseMatcherAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotator-selector.run-sentiment-annotator" => Some(("annotatorSelector.runSentimentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotator-selector.run-silence-annotator" => Some(("annotatorSelector.runSilenceAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "annotator-selector.run-summarization-annotator" => Some(("annotatorSelector.runSummarizationAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "annotator-selector.summarization-config.conversation-profile" => Some(("annotatorSelector.summarizationConfig.conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotator-selector.summarization-config.summarization-model" => Some(("annotatorSelector.summarizationConfig.summarizationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-percentage", "annotator-selector", "filter", "issue-models", "parent", "phrase-matchers", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-percentage", "annotator-selector", "conversation-profile", "filter", "issue-models", "parent", "phrase-matchers", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "summarization-config", "summarization-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -361,6 +367,94 @@ where
         }
         let mut request: api::GoogleCloudContactcenterinsightsV1BulkAnalyzeConversationsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_conversations_bulk_analyze(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_conversations_bulk_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "max-delete-count" => Some(("maxDeleteCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "force", "max-delete-count", "parent"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudContactcenterinsightsV1BulkDeleteConversationsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_conversations_bulk_delete(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -512,18 +606,30 @@ where
                     "latest-analysis.annotator-selector.run-phrase-matcher-annotator" => Some(("latestAnalysis.annotatorSelector.runPhraseMatcherAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "latest-analysis.annotator-selector.run-sentiment-annotator" => Some(("latestAnalysis.annotatorSelector.runSentimentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "latest-analysis.annotator-selector.run-silence-annotator" => Some(("latestAnalysis.annotatorSelector.runSilenceAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "latest-analysis.annotator-selector.run-summarization-annotator" => Some(("latestAnalysis.annotatorSelector.runSummarizationAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "latest-analysis.annotator-selector.summarization-config.conversation-profile" => Some(("latestAnalysis.annotatorSelector.summarizationConfig.conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-analysis.annotator-selector.summarization-config.summarization-model" => Some(("latestAnalysis.annotatorSelector.summarizationConfig.summarizationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.create-time" => Some(("latestAnalysis.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.name" => Some(("latestAnalysis.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.request-time" => Some(("latestAnalysis.requestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.answer-record" => Some(("latestSummary.answerRecord", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.confidence" => Some(("latestSummary.confidence", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "latest-summary.conversation-model" => Some(("latestSummary.conversationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.metadata" => Some(("latestSummary.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "latest-summary.text" => Some(("latestSummary.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.text-sections" => Some(("latestSummary.textSections", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "medium" => Some(("medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "obfuscated-user-id" => Some(("obfuscatedUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quality-metadata.customer-satisfaction-rating" => Some(("qualityMetadata.customerSatisfactionRating", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "quality-metadata.menu-path" => Some(("qualityMetadata.menuPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quality-metadata.wait-duration" => Some(("qualityMetadata.waitDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "turn-count" => Some(("turnCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "audio-uri", "call-analysis-metadata", "call-metadata", "create-time", "customer-channel", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "medium", "name", "obfuscated-user-id", "phrase-matchers", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "start-time", "transcript-uri", "ttl", "turn-count", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "phrase-matchers", "quality-metadata", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -722,12 +828,20 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "conversation-config.agent-channel" => Some(("conversationConfig.agentChannel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "conversation-config.agent-id" => Some(("conversationConfig.agentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-config.customer-channel" => Some(("conversationConfig.customerChannel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "gcs-source.bucket-object-type" => Some(("gcsSource.bucketObjectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-source.bucket-uri" => Some(("gcsSource.bucketUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-source.custom-metadata-keys" => Some(("gcsSource.customMetadataKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "gcs-source.metadata-bucket-uri" => Some(("gcsSource.metadataBucketUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redaction-config.deidentify-template" => Some(("redactionConfig.deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redaction-config.inspect-template" => Some(("redactionConfig.inspectTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "speech-config.speech-recognizer" => Some(("speechConfig.speechRecognizer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transcript-object-config.medium" => Some(("transcriptObjectConfig.medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-id", "bucket-uri", "conversation-config", "gcs-source", "medium", "parent", "transcript-object-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "bucket-object-type", "bucket-uri", "conversation-config", "custom-metadata-keys", "customer-channel", "deidentify-template", "gcs-source", "inspect-template", "medium", "metadata-bucket-uri", "parent", "redaction-config", "speech-config", "speech-recognizer", "transcript-object-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -802,6 +916,9 @@ where
                 "page-size" => {
                     call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -818,7 +935,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token", "view"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -898,18 +1015,30 @@ where
                     "latest-analysis.annotator-selector.run-phrase-matcher-annotator" => Some(("latestAnalysis.annotatorSelector.runPhraseMatcherAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "latest-analysis.annotator-selector.run-sentiment-annotator" => Some(("latestAnalysis.annotatorSelector.runSentimentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "latest-analysis.annotator-selector.run-silence-annotator" => Some(("latestAnalysis.annotatorSelector.runSilenceAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "latest-analysis.annotator-selector.run-summarization-annotator" => Some(("latestAnalysis.annotatorSelector.runSummarizationAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "latest-analysis.annotator-selector.summarization-config.conversation-profile" => Some(("latestAnalysis.annotatorSelector.summarizationConfig.conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-analysis.annotator-selector.summarization-config.summarization-model" => Some(("latestAnalysis.annotatorSelector.summarizationConfig.summarizationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.create-time" => Some(("latestAnalysis.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.name" => Some(("latestAnalysis.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.request-time" => Some(("latestAnalysis.requestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.answer-record" => Some(("latestSummary.answerRecord", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.confidence" => Some(("latestSummary.confidence", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "latest-summary.conversation-model" => Some(("latestSummary.conversationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.metadata" => Some(("latestSummary.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "latest-summary.text" => Some(("latestSummary.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-summary.text-sections" => Some(("latestSummary.textSections", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "medium" => Some(("medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "obfuscated-user-id" => Some(("obfuscatedUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quality-metadata.customer-satisfaction-rating" => Some(("qualityMetadata.customerSatisfactionRating", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "quality-metadata.menu-path" => Some(("qualityMetadata.menuPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quality-metadata.wait-duration" => Some(("qualityMetadata.waitDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "turn-count" => Some(("turnCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "audio-uri", "call-analysis-metadata", "call-metadata", "create-time", "customer-channel", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "medium", "name", "obfuscated-user-id", "phrase-matchers", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "start-time", "transcript-uri", "ttl", "turn-count", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "phrase-matchers", "quality-metadata", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -940,6 +1069,140 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_conversations_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "conversation.agent-id" => Some(("conversation.agentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.call-metadata.agent-channel" => Some(("conversation.callMetadata.agentChannel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "conversation.call-metadata.customer-channel" => Some(("conversation.callMetadata.customerChannel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "conversation.create-time" => Some(("conversation.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.data-source.dialogflow-source.audio-uri" => Some(("conversation.dataSource.dialogflowSource.audioUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.data-source.dialogflow-source.dialogflow-conversation" => Some(("conversation.dataSource.dialogflowSource.dialogflowConversation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.data-source.gcs-source.audio-uri" => Some(("conversation.dataSource.gcsSource.audioUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.data-source.gcs-source.transcript-uri" => Some(("conversation.dataSource.gcsSource.transcriptUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.duration" => Some(("conversation.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.expire-time" => Some(("conversation.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.labels" => Some(("conversation.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conversation.language-code" => Some(("conversation.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.analysis-result.call-analysis-metadata.issue-model-result.issue-model" => Some(("conversation.latestAnalysis.analysisResult.callAnalysisMetadata.issueModelResult.issueModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.analysis-result.end-time" => Some(("conversation.latestAnalysis.analysisResult.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.issue-models" => Some(("conversation.latestAnalysis.annotatorSelector.issueModels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "conversation.latest-analysis.annotator-selector.phrase-matchers" => Some(("conversation.latestAnalysis.annotatorSelector.phraseMatchers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "conversation.latest-analysis.annotator-selector.run-entity-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runEntityAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-intent-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runIntentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-interruption-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runInterruptionAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-issue-model-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runIssueModelAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-phrase-matcher-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runPhraseMatcherAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-sentiment-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runSentimentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-silence-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runSilenceAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.run-summarization-annotator" => Some(("conversation.latestAnalysis.annotatorSelector.runSummarizationAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.summarization-config.conversation-profile" => Some(("conversation.latestAnalysis.annotatorSelector.summarizationConfig.conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.annotator-selector.summarization-config.summarization-model" => Some(("conversation.latestAnalysis.annotatorSelector.summarizationConfig.summarizationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.create-time" => Some(("conversation.latestAnalysis.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.name" => Some(("conversation.latestAnalysis.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.request-time" => Some(("conversation.latestAnalysis.requestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-summary.answer-record" => Some(("conversation.latestSummary.answerRecord", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-summary.confidence" => Some(("conversation.latestSummary.confidence", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "conversation.latest-summary.conversation-model" => Some(("conversation.latestSummary.conversationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-summary.metadata" => Some(("conversation.latestSummary.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conversation.latest-summary.text" => Some(("conversation.latestSummary.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-summary.text-sections" => Some(("conversation.latestSummary.textSections", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conversation.medium" => Some(("conversation.medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.name" => Some(("conversation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.obfuscated-user-id" => Some(("conversation.obfuscatedUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.quality-metadata.customer-satisfaction-rating" => Some(("conversation.qualityMetadata.customerSatisfactionRating", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "conversation.quality-metadata.menu-path" => Some(("conversation.qualityMetadata.menuPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.quality-metadata.wait-duration" => Some(("conversation.qualityMetadata.waitDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.start-time" => Some(("conversation.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.ttl" => Some(("conversation.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.turn-count" => Some(("conversation.turnCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "conversation.update-time" => Some(("conversation.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-id" => Some(("conversationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redaction-config.deidentify-template" => Some(("redactionConfig.deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redaction-config.inspect-template" => Some(("redactionConfig.inspectTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "speech-config.speech-recognizer" => Some(("speechConfig.speechRecognizer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation", "conversation-id", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "deidentify-template", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "inspect-template", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "parent", "phrase-matchers", "quality-metadata", "redaction-config", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "speech-config", "speech-recognizer", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudContactcenterinsightsV1UploadConversationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_conversations_upload(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1197,13 +1460,15 @@ where
                     "input-data-config.medium" => Some(("inputDataConfig.medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "input-data-config.training-conversations-count" => Some(("inputDataConfig.trainingConversationsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "issue-count" => Some(("issueCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-type" => Some(("modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-stats.analyzed-conversations-count" => Some(("trainingStats.analyzedConversationsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-stats.unclassified-conversations-count" => Some(("trainingStats.unclassifiedConversationsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyzed-conversations-count", "create-time", "display-name", "filter", "input-data-config", "issue-count", "medium", "name", "state", "training-conversations-count", "training-stats", "unclassified-conversations-count", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyzed-conversations-count", "create-time", "display-name", "filter", "input-data-config", "issue-count", "language-code", "medium", "model-type", "name", "state", "training-conversations-count", "training-stats", "unclassified-conversations-count", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1400,9 +1665,182 @@ where
         }
     }
 
+    async fn _projects_locations_issue_models_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "gcs-destination.object-uri" => Some(("gcsDestination.objectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcs-destination", "name", "object-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudContactcenterinsightsV1ExportIssueModelRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_issue_models_export(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_issue_models_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_issue_models_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_issue_models_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-new-model" => Some(("createNewModel", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gcs-source.object-uri" => Some(("gcsSource.objectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-new-model", "gcs-source", "object-uri", "parent"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudContactcenterinsightsV1ImportIssueModelRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_issue_models_import(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1782,13 +2220,15 @@ where
                     "input-data-config.medium" => Some(("inputDataConfig.medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "input-data-config.training-conversations-count" => Some(("inputDataConfig.trainingConversationsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "issue-count" => Some(("issueCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-type" => Some(("modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-stats.analyzed-conversations-count" => Some(("trainingStats.analyzedConversationsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-stats.unclassified-conversations-count" => Some(("trainingStats.unclassifiedConversationsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyzed-conversations-count", "create-time", "display-name", "filter", "input-data-config", "issue-count", "medium", "name", "state", "training-conversations-count", "training-stats", "unclassified-conversations-count", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyzed-conversations-count", "create-time", "display-name", "filter", "input-data-config", "issue-count", "language-code", "medium", "model-type", "name", "state", "training-conversations-count", "training-stats", "unclassified-conversations-count", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2493,15 +2933,22 @@ where
                     "analysis-config.annotator-selector.run-phrase-matcher-annotator" => Some(("analysisConfig.annotatorSelector.runPhraseMatcherAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "analysis-config.annotator-selector.run-sentiment-annotator" => Some(("analysisConfig.annotatorSelector.runSentimentAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "analysis-config.annotator-selector.run-silence-annotator" => Some(("analysisConfig.annotatorSelector.runSilenceAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "analysis-config.annotator-selector.run-summarization-annotator" => Some(("analysisConfig.annotatorSelector.runSummarizationAnnotator", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "analysis-config.annotator-selector.summarization-config.conversation-profile" => Some(("analysisConfig.annotatorSelector.summarizationConfig.conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analysis-config.annotator-selector.summarization-config.summarization-model" => Some(("analysisConfig.annotatorSelector.summarizationConfig.summarizationModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "analysis-config.runtime-integration-analysis-percentage" => Some(("analysisConfig.runtimeIntegrationAnalysisPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "analysis-config.upload-conversation-analysis-percentage" => Some(("analysisConfig.uploadConversationAnalysisPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "conversation-ttl" => Some(("conversationTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-notification-settings" => Some(("pubsubNotificationSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "redaction-config.deidentify-template" => Some(("redactionConfig.deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redaction-config.inspect-template" => Some(("redactionConfig.inspectTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "speech-config.speech-recognizer" => Some(("speechConfig.speechRecognizer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-config", "annotator-selector", "conversation-ttl", "create-time", "issue-models", "language-code", "name", "phrase-matchers", "pubsub-notification-settings", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "runtime-integration-analysis-percentage", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-config", "annotator-selector", "conversation-profile", "conversation-ttl", "create-time", "deidentify-template", "inspect-template", "issue-models", "language-code", "name", "phrase-matchers", "pubsub-notification-settings", "redaction-config", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "runtime-integration-analysis-percentage", "speech-config", "speech-recognizer", "summarization-config", "summarization-model", "update-time", "upload-conversation-analysis-percentage"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2932,6 +3379,9 @@ where
                     ("locations-conversations-bulk-analyze", Some(opt)) => {
                         call_result = self._projects_locations_conversations_bulk_analyze(opt, dry_run, &mut err).await;
                     },
+                    ("locations-conversations-bulk-delete", Some(opt)) => {
+                        call_result = self._projects_locations_conversations_bulk_delete(opt, dry_run, &mut err).await;
+                    },
                     ("locations-conversations-calculate-stats", Some(opt)) => {
                         call_result = self._projects_locations_conversations_calculate_stats(opt, dry_run, &mut err).await;
                     },
@@ -2953,6 +3403,9 @@ where
                     ("locations-conversations-patch", Some(opt)) => {
                         call_result = self._projects_locations_conversations_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-conversations-upload", Some(opt)) => {
+                        call_result = self._projects_locations_conversations_upload(opt, dry_run, &mut err).await;
+                    },
                     ("locations-get-settings", Some(opt)) => {
                         call_result = self._projects_locations_get_settings(opt, dry_run, &mut err).await;
                     },
@@ -2971,8 +3424,14 @@ where
                     ("locations-issue-models-deploy", Some(opt)) => {
                         call_result = self._projects_locations_issue_models_deploy(opt, dry_run, &mut err).await;
                     },
+                    ("locations-issue-models-export", Some(opt)) => {
+                        call_result = self._projects_locations_issue_models_export(opt, dry_run, &mut err).await;
+                    },
                     ("locations-issue-models-get", Some(opt)) => {
                         call_result = self._projects_locations_issue_models_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-issue-models-import", Some(opt)) => {
+                        call_result = self._projects_locations_issue_models_import(opt, dry_run, &mut err).await;
                     },
                     ("locations-issue-models-issues-delete", Some(opt)) => {
                         call_result = self._projects_locations_issue_models_issues_delete(opt, dry_run, &mut err).await;
@@ -3116,7 +3575,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-conversations-analyses-create', 'locations-conversations-analyses-delete', 'locations-conversations-analyses-get', 'locations-conversations-analyses-list', 'locations-conversations-bulk-analyze', 'locations-conversations-calculate-stats', 'locations-conversations-create', 'locations-conversations-delete', 'locations-conversations-get', 'locations-conversations-ingest', 'locations-conversations-list', 'locations-conversations-patch', 'locations-get-settings', 'locations-insightsdata-export', 'locations-issue-models-calculate-issue-model-stats', 'locations-issue-models-create', 'locations-issue-models-delete', 'locations-issue-models-deploy', 'locations-issue-models-get', 'locations-issue-models-issues-delete', 'locations-issue-models-issues-get', 'locations-issue-models-issues-list', 'locations-issue-models-issues-patch', 'locations-issue-models-list', 'locations-issue-models-patch', 'locations-issue-models-undeploy', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-phrase-matchers-create', 'locations-phrase-matchers-delete', 'locations-phrase-matchers-get', 'locations-phrase-matchers-list', 'locations-phrase-matchers-patch', 'locations-update-settings', 'locations-views-create', 'locations-views-delete', 'locations-views-get', 'locations-views-list' and 'locations-views-patch'", vec![
+        ("projects", "methods: 'locations-conversations-analyses-create', 'locations-conversations-analyses-delete', 'locations-conversations-analyses-get', 'locations-conversations-analyses-list', 'locations-conversations-bulk-analyze', 'locations-conversations-bulk-delete', 'locations-conversations-calculate-stats', 'locations-conversations-create', 'locations-conversations-delete', 'locations-conversations-get', 'locations-conversations-ingest', 'locations-conversations-list', 'locations-conversations-patch', 'locations-conversations-upload', 'locations-get-settings', 'locations-insightsdata-export', 'locations-issue-models-calculate-issue-model-stats', 'locations-issue-models-create', 'locations-issue-models-delete', 'locations-issue-models-deploy', 'locations-issue-models-export', 'locations-issue-models-get', 'locations-issue-models-import', 'locations-issue-models-issues-delete', 'locations-issue-models-issues-get', 'locations-issue-models-issues-list', 'locations-issue-models-issues-patch', 'locations-issue-models-list', 'locations-issue-models-patch', 'locations-issue-models-undeploy', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-phrase-matchers-create', 'locations-phrase-matchers-delete', 'locations-phrase-matchers-get', 'locations-phrase-matchers-list', 'locations-phrase-matchers-patch', 'locations-update-settings', 'locations-views-create', 'locations-views-delete', 'locations-views-get', 'locations-views-list' and 'locations-views-patch'", vec![
             ("locations-conversations-analyses-create",
                     Some(r##"Creates an analysis. The long running operation is done when the analysis has completed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-conversations-analyses-create",
@@ -3218,6 +3677,34 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The parent resource to create analyses in."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-conversations-bulk-delete",
+                    Some(r##"Deletes multiple conversations in a single request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-conversations-bulk-delete",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource to delete conversations from. Format: projects/{project}/locations/{location}"##),
                      Some(true),
                      Some(false)),
         
@@ -3411,6 +3898,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-conversations-upload",
+                    Some(r##"Create a longrunning conversation upload operation. This method differs from CreateConversation by allowing audio transcription and optional DLP redaction."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-conversations-upload",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource of the conversation."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-get-settings",
                     Some(r##"Gets project-level settings."##),
                     "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-get-settings",
@@ -3561,6 +4076,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-issue-models-export",
+                    Some(r##"Exports an issue model to the provided destination."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-issue-models-export",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The issue model to export"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-issue-models-get",
                     Some(r##"Gets an issue model."##),
                     "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-issue-models-get",
@@ -3570,6 +4113,34 @@ async fn main() {
                      Some(r##"Required. The name of the issue model to get."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-issue-models-import",
+                    Some(r##"Imports an issue model from a Cloud Storage bucket."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-issue-models-import",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource of the issue model."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3800,7 +4371,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -4099,7 +4670,7 @@ async fn main() {
     
     let mut app = App::new("contactcenterinsights1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.3+20240226")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli")
            .arg(Arg::with_name("url")

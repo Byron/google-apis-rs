@@ -1,4 +1,4 @@
-site_name: SQL Admin v5.0.3+20221209
+site_name: SQL Admin v5.0.3+20240219
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
@@ -30,6 +30,7 @@ nav:
     - 'Add Server Ca': 'instances_add-server-ca.md'
     - 'Clone': 'instances_clone.md'
     - 'Delete': 'instances_delete.md'
+    - 'Demote': 'instances_demote.md'
     - 'Demote Master': 'instances_demote-master.md'
     - 'Export': 'instances_export.md'
     - 'Failover': 'instances_failover.md'
@@ -40,19 +41,26 @@ nav:
     - 'List Server Cas': 'instances_list-server-cas.md'
     - 'Patch': 'instances_patch.md'
     - 'Promote Replica': 'instances_promote-replica.md'
+    - 'Reencrypt': 'instances_reencrypt.md'
     - 'Reset Ssl Config': 'instances_reset-ssl-config.md'
     - 'Restart': 'instances_restart.md'
     - 'Restore Backup': 'instances_restore-backup.md'
     - 'Rotate Server Ca': 'instances_rotate-server-ca.md'
     - 'Start Replica': 'instances_start-replica.md'
     - 'Stop Replica': 'instances_stop-replica.md'
+    - 'Switchover': 'instances_switchover.md'
     - 'Truncate Log': 'instances_truncate-log.md'
     - 'Update': 'instances_update.md'
 - 'Operations':
+    - 'Cancel': 'operations_cancel.md'
     - 'Get': 'operations_get.md'
     - 'List': 'operations_list.md'
 - 'Projects':
+    - 'Instances Get Disk Shrink Config': 'projects_instances-get-disk-shrink-config.md'
+    - 'Instances Get Latest Recovery Time': 'projects_instances-get-latest-recovery-time.md'
+    - 'Instances Perform Disk Shrink': 'projects_instances-perform-disk-shrink.md'
     - 'Instances Reschedule Maintenance': 'projects_instances-reschedule-maintenance.md'
+    - 'Instances Reset Replica Size': 'projects_instances-reset-replica-size.md'
     - 'Instances Start External Sync': 'projects_instances-start-external-sync.md'
     - 'Instances Verify External Sync Settings': 'projects_instances-verify-external-sync-settings.md'
 - 'Ssl Certs':

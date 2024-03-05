@@ -2592,7 +2592,7 @@ async fn main() {
     
     let mut app = App::new("servicedirectory1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.3+20240226")
            .about("Service Directory is a platform for discovering, publishing, and connecting services. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicedirectory1_cli")
            .arg(Arg::with_name("url")

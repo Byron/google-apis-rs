@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20221209*. The CLI is at version *5.0.3*.
+This documentation was generated from the *SQL Admin* API at revision *20240219*. The CLI is at version *5.0.3*.
 
 ```bash
 sqladmin1-beta4 [options]
@@ -50,6 +50,7 @@ sqladmin1-beta4 [options]
                 add-server-ca <project> <instance> [-p <v>]... [-o <out>]
                 clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> [-p <v>]... [-o <out>]
+                demote <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 demote-master <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 export <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 failover <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -60,19 +61,26 @@ sqladmin1-beta4 [options]
                 list-server-cas <project> <instance> [-p <v>]... [-o <out>]
                 patch <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 promote-replica <project> <instance> [-p <v>]... [-o <out>]
+                reencrypt <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 reset-ssl-config <project> <instance> [-p <v>]... [-o <out>]
                 restart <project> <instance> [-p <v>]... [-o <out>]
                 restore-backup <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 rotate-server-ca <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 start-replica <project> <instance> [-p <v>]... [-o <out>]
                 stop-replica <project> <instance> [-p <v>]... [-o <out>]
+                switchover <project> <instance> [-p <v>]... [-o <out>]
                 truncate-log <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
+                cancel <project> <operation> [-p <v>]... [-o <out>]
                 get <project> <operation> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
         projects
+                instances-get-disk-shrink-config <project> <instance> [-p <v>]... [-o <out>]
+                instances-get-latest-recovery-time <project> <instance> [-p <v>]... [-o <out>]
+                instances-perform-disk-shrink <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-reschedule-maintenance <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-reset-replica-size <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-start-external-sync <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-verify-external-sync-settings <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
         ssl-certs

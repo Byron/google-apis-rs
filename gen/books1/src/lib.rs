@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *5.0.3+20230117*, where *20230117* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *books* crate version *5.0.3+20240222*, where *20240222* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://code.google.com/apis/books/docs/v1/getting_started.html).

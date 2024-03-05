@@ -4,7 +4,7 @@
 [package]
 
 name = "google-datalabeling1_beta1-cli"
-version = "5.0.3+20221205"
+version = "5.0.3+20240207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Data Labeling (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datalabeling1_beta1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-datalabeling1_beta1]
 path = "../datalabeling1_beta1"
-version = "5.0.3+20221205"
+version = "5.0.3+20240207"
 

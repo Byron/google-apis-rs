@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and modify your beacons
     UserlocationBeaconRegistry,
@@ -185,7 +185,7 @@ pub struct AdvertisedId {
     /// hex) representation thereof.
     /// Required.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub id: Option<Vec<u8>>,
     /// Specifies the identifier type.
     /// Required.
@@ -208,7 +208,7 @@ impl client::Part for AdvertisedId {}
 pub struct AttachmentInfo {
     /// An opaque data container for client-provided data.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The distance away from the beacon at which this attachment should be
     /// delivered to a mobile app.
@@ -337,7 +337,7 @@ pub struct Beacon {
     /// that this key grants nothing on the service, only on the beacon itself.
     #[serde(rename="provisioningKey")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub provisioning_key: Option<Vec<u8>>,
     /// Current status of the beacon.
     /// Required.
@@ -377,7 +377,7 @@ pub struct BeaconAttachment {
     /// requests, and will be so encoded (with padding) in responses.
     /// Required.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The distance away from the beacon at which this attachment should be
     /// delivered to a mobile app.
@@ -581,14 +581,14 @@ pub struct EphemeralIdRegistration {
     /// must also be populated, and `beacon_identity_key` must not be.
     #[serde(rename="beaconEcdhPublicKey")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub beacon_ecdh_public_key: Option<Vec<u8>>,
     /// The private key of the beacon. If this field is populated,
     /// `beacon_ecdh_public_key` and `service_ecdh_public_key` must not be
     /// populated.
     #[serde(rename="beaconIdentityKey")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub beacon_identity_key: Option<Vec<u8>>,
     /// The initial clock value of the beacon. The beacon's clock must have
     /// begun counting at this value immediately prior to transmitting this
@@ -606,7 +606,7 @@ pub struct EphemeralIdRegistration {
     /// service to confirm that the key exchange process was successful.
     #[serde(rename="initialEid")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub initial_eid: Option<Vec<u8>>,
     /// Indicates the nominal period between each rotation of the beacon's
     /// ephemeral ID. "Nominal" because the beacon should randomize the
@@ -623,7 +623,7 @@ pub struct EphemeralIdRegistration {
     /// must also be populated, and `beacon_identity_key` must not be.
     #[serde(rename="serviceEcdhPublicKey")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub service_ecdh_public_key: Option<Vec<u8>>,
 }
 
@@ -662,7 +662,7 @@ pub struct EphemeralIdRegistrationParams {
     /// Identity Key using Elliptic Curve Diffie-Hellman key exchange.
     #[serde(rename="serviceEcdhPublicKey")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub service_ecdh_public_key: Option<Vec<u8>>,
 }
 
@@ -901,7 +901,7 @@ pub struct Observation {
     /// responsible for parsing it. This field may frequently be empty, as
     /// with a beacon that transmits telemetry only occasionally.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub telemetry: Option<Vec<u8>>,
     /// Time when the beacon was observed.
     #[serde(rename="timestampMs")]

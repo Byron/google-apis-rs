@@ -99,6 +99,7 @@ where
                     "message.android.notification.local-only" => Some(("message.android.notification.localOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "message.android.notification.notification-count" => Some(("message.android.notification.notificationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "message.android.notification.notification-priority" => Some(("message.android.notification.notificationPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.android.notification.proxy" => Some(("message.android.notification.proxy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.android.notification.sound" => Some(("message.android.notification.sound", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.android.notification.sticky" => Some(("message.android.notification.sticky", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "message.android.notification.tag" => Some(("message.android.notification.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -129,7 +130,7 @@ where
                     "message.webpush.headers" => Some(("message.webpush.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "analytics-label", "android", "apns", "blue", "body", "body-loc-args", "body-loc-key", "bypass-proxy-notification", "channel-id", "click-action", "collapse-key", "color", "condition", "data", "default-light-settings", "default-sound", "default-vibrate-timings", "direct-boot-ok", "event-time", "fcm-options", "green", "headers", "icon", "image", "light-off-duration", "light-on-duration", "light-settings", "link", "local-only", "message", "name", "notification", "notification-count", "notification-priority", "priority", "red", "restricted-package-name", "sound", "sticky", "tag", "ticker", "title", "title-loc-args", "title-loc-key", "token", "topic", "ttl", "validate-only", "vibrate-timings", "visibility", "webpush"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "analytics-label", "android", "apns", "blue", "body", "body-loc-args", "body-loc-key", "bypass-proxy-notification", "channel-id", "click-action", "collapse-key", "color", "condition", "data", "default-light-settings", "default-sound", "default-vibrate-timings", "direct-boot-ok", "event-time", "fcm-options", "green", "headers", "icon", "image", "light-off-duration", "light-on-duration", "light-settings", "link", "local-only", "message", "name", "notification", "notification-count", "notification-priority", "priority", "proxy", "red", "restricted-package-name", "sound", "sticky", "tag", "ticker", "title", "title-loc-args", "title-loc-key", "token", "topic", "ttl", "validate-only", "vibrate-timings", "visibility", "webpush"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -313,7 +314,7 @@ async fn main() {
     
     let mut app = App::new("fcm1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230106")
+           .version("5.0.3+20240227")
            .about("FCM send API that provides a cross-platform messaging solution to reliably deliver messages at no cost.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fcm1_cli")
            .arg(Arg::with_name("url")

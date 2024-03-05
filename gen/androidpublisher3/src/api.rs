@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your Google Play Developer account
     Full,
@@ -88,7 +88,9 @@ impl Default for Scope {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_patch(req, "packageName", "productId")
 ///              .update_mask(&Default::default())
-///              .regions_version_version("amet.")
+///              .regions_version_version("gubergren")
+///              .latency_tolerance("eos")
+///              .allow_missing(true)
 ///              .doit().await;
 /// 
 /// match result {
@@ -136,8 +138,14 @@ impl<'a, S> AndroidPublisher<S> {
     pub fn applications(&'a self) -> ApplicationMethods<'a, S> {
         ApplicationMethods { hub: &self }
     }
+    pub fn apprecovery(&'a self) -> ApprecoveryMethods<'a, S> {
+        ApprecoveryMethods { hub: &self }
+    }
     pub fn edits(&'a self) -> EditMethods<'a, S> {
         EditMethods { hub: &self }
+    }
+    pub fn externaltransactions(&'a self) -> ExternaltransactionMethods<'a, S> {
+        ExternaltransactionMethods { hub: &self }
     }
     pub fn generatedapks(&'a self) -> GeneratedapkMethods<'a, S> {
         GeneratedapkMethods { hub: &self }
@@ -199,6 +207,39 @@ impl<'a, S> AndroidPublisher<S> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Represents an Abi.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Abi {
+    /// Alias for an abi.
+    
+    pub alias: Option<String>,
+}
+
+impl client::Part for Abi {}
+
+
+/// Targeting based on Abi.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AbiTargeting {
+    /// Targeting of other sibling directories that were in the Bundle. For main splits this is targeting of other main splits.
+    
+    pub alternatives: Option<Vec<Abi>>,
+    /// Value of an abi.
+    
+    pub value: Option<Vec<Abi>>,
+}
+
+impl client::Part for AbiTargeting {}
+
+
 /// Represents a targeting rule of the form: User never had {scope} before.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -224,7 +265,24 @@ impl client::Part for AcquisitionTargetingRule {}
 /// * [subscriptions base plans activate monetization](MonetizationSubscriptionBasePlanActivateCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ActivateBasePlanRequest { _never_set: Option<bool> }
+pub struct ActivateBasePlanRequest {
+    /// Required. The unique base plan ID of the base plan to activate.
+    #[serde(rename="basePlanId")]
+    
+    pub base_plan_id: Option<String>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. The parent app (package name) of the base plan to activate.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Required. The parent subscription (ID) of the base plan to activate.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
+}
 
 impl client::RequestValue for ActivateBasePlanRequest {}
 
@@ -239,9 +297,98 @@ impl client::RequestValue for ActivateBasePlanRequest {}
 /// * [subscriptions base plans offers activate monetization](MonetizationSubscriptionBasePlanOfferActivateCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ActivateSubscriptionOfferRequest { _never_set: Option<bool> }
+pub struct ActivateSubscriptionOfferRequest {
+    /// Required. The parent base plan (ID) of the offer to activate.
+    #[serde(rename="basePlanId")]
+    
+    pub base_plan_id: Option<String>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. The unique offer ID of the offer to activate.
+    #[serde(rename="offerId")]
+    
+    pub offer_id: Option<String>,
+    /// Required. The parent app (package name) of the offer to activate.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Required. The parent subscription (ID) of the offer to activate.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
+}
 
 impl client::RequestValue for ActivateSubscriptionOfferRequest {}
+
+
+/// Request message for AddTargeting.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [add targeting apprecovery](ApprecoveryAddTargetingCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddTargetingRequest {
+    /// Specifies targeting updates such as regions, android sdk versions etc.
+    #[serde(rename="targetingUpdate")]
+    
+    pub targeting_update: Option<TargetingUpdate>,
+}
+
+impl client::RequestValue for AddTargetingRequest {}
+
+
+/// Response message for AddTargeting.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [add targeting apprecovery](ApprecoveryAddTargetingCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddTargetingResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for AddTargetingResponse {}
+
+
+/// Object representation to describe all set of users.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AllUsers {
+    /// Required. Set to true if all set of users are needed.
+    #[serde(rename="isAllUsersRequested")]
+    
+    pub is_all_users_requested: Option<bool>,
+}
+
+impl client::Part for AllUsers {}
+
+
+/// Android api level targeting data for app recovery action targeting.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidSdks {
+    /// Android api levels of devices targeted by recovery action. See https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels for different api levels in android.
+    #[serde(rename="sdkLevels")]
+    
+    #[serde_as(as = "Option<Vec<::client::serde_with::DisplayFromStr>>")]
+    pub sdk_levels: Option<Vec<i64>>,
+}
+
+impl client::Part for AndroidSdks {}
 
 
 /// Information about an APK. The resource for ApksService.
@@ -283,6 +430,96 @@ pub struct ApkBinary {
 }
 
 impl client::Part for ApkBinary {}
+
+
+/// Description of the created apks.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApkDescription {
+    /// Set only for asset slices.
+    #[serde(rename="assetSliceMetadata")]
+    
+    pub asset_slice_metadata: Option<SplitApkMetadata>,
+    /// Set only for Instant split APKs.
+    #[serde(rename="instantApkMetadata")]
+    
+    pub instant_apk_metadata: Option<SplitApkMetadata>,
+    /// Path of the Apk, will be in the following format: .apk where DownloadId is the ID used to download the apk using GeneratedApks.Download API.
+    
+    pub path: Option<String>,
+    /// Set only for Split APKs.
+    #[serde(rename="splitApkMetadata")]
+    
+    pub split_apk_metadata: Option<SplitApkMetadata>,
+    /// Set only for standalone APKs.
+    #[serde(rename="standaloneApkMetadata")]
+    
+    pub standalone_apk_metadata: Option<StandaloneApkMetadata>,
+    /// Apk-level targeting.
+    
+    pub targeting: Option<ApkTargeting>,
+}
+
+impl client::Part for ApkDescription {}
+
+
+/// A set of apks representing a module.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApkSet {
+    /// Description of the generated apks.
+    #[serde(rename="apkDescription")]
+    
+    pub apk_description: Option<Vec<ApkDescription>>,
+    /// Metadata about the module represented by this ApkSet
+    #[serde(rename="moduleMetadata")]
+    
+    pub module_metadata: Option<ModuleMetadata>,
+}
+
+impl client::Part for ApkSet {}
+
+
+/// Represents a set of apk-level targetings.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApkTargeting {
+    /// The abi that the apk targets
+    #[serde(rename="abiTargeting")]
+    
+    pub abi_targeting: Option<AbiTargeting>,
+    /// The language that the apk targets
+    #[serde(rename="languageTargeting")]
+    
+    pub language_targeting: Option<LanguageTargeting>,
+    /// Multi-api-level targeting.
+    #[serde(rename="multiAbiTargeting")]
+    
+    pub multi_abi_targeting: Option<MultiAbiTargeting>,
+    /// The screen density that this apk supports.
+    #[serde(rename="screenDensityTargeting")]
+    
+    pub screen_density_targeting: Option<ScreenDensityTargeting>,
+    /// The sdk version that the apk targets
+    #[serde(rename="sdkVersionTargeting")]
+    
+    pub sdk_version_targeting: Option<SdkVersionTargeting>,
+    /// Texture-compression-format-level targeting
+    #[serde(rename="textureCompressionFormatTargeting")]
+    
+    pub texture_compression_format_targeting: Option<TextureCompressionFormatTargeting>,
+}
+
+impl client::Part for ApkTargeting {}
 
 
 /// Request to create a new externally hosted APK.
@@ -409,7 +646,93 @@ impl client::RequestValue for AppEdit {}
 impl client::ResponseResult for AppEdit {}
 
 
-/// Request message for ArchiveSubscription.
+/// Information about an app recovery action.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create apprecovery](ApprecoveryCreateCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppRecoveryAction {
+    /// ID corresponding to the app recovery action.
+    #[serde(rename="appRecoveryId")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub app_recovery_id: Option<i64>,
+    /// Timestamp of when the app recovery action is canceled by the developer. Only set if the recovery action has been canceled.
+    #[serde(rename="cancelTime")]
+    
+    pub cancel_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Timestamp of when the app recovery action is created by the developer. It is always set after creation of the recovery action.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Timestamp of when the app recovery action is deployed to the users. Only set if the recovery action has been deployed.
+    #[serde(rename="deployTime")]
+    
+    pub deploy_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Timestamp of when the developer last updated recovery action. In case the action is cancelled, it corresponds to cancellation time. It is always set after creation of the recovery action.
+    #[serde(rename="lastUpdateTime")]
+    
+    pub last_update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Data about the remote in-app update action such as such as recovered user base, recoverable user base etc. Set only if the recovery action type is Remote In-App Update.
+    #[serde(rename="remoteInAppUpdateData")]
+    
+    pub remote_in_app_update_data: Option<RemoteInAppUpdateData>,
+    /// The status of the recovery action.
+    
+    pub status: Option<String>,
+    /// Specifies targeting criteria for the recovery action such as regions, android sdk versions, app versions etc.
+    
+    pub targeting: Option<Targeting>,
+}
+
+impl client::ResponseResult for AppRecoveryAction {}
+
+
+/// Data format for a list of app versions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppVersionList {
+    /// List of app version codes.
+    #[serde(rename="versionCodes")]
+    
+    #[serde_as(as = "Option<Vec<::client::serde_with::DisplayFromStr>>")]
+    pub version_codes: Option<Vec<i64>>,
+}
+
+impl client::Part for AppVersionList {}
+
+
+/// Data format for a continuous range of app versions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppVersionRange {
+    /// Highest app version in the range, inclusive.
+    #[serde(rename="versionCodeEnd")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub version_code_end: Option<i64>,
+    /// Lowest app version in the range, inclusive.
+    #[serde(rename="versionCodeStart")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub version_code_start: Option<i64>,
+}
+
+impl client::Part for AppVersionRange {}
+
+
+/// Deprecated: subscription archiving is not supported.
 /// 
 /// # Activities
 /// 
@@ -424,6 +747,45 @@ pub struct ArchiveSubscriptionRequest { _never_set: Option<bool> }
 impl client::RequestValue for ArchiveSubscriptionRequest {}
 
 
+/// Metadata of an asset module.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AssetModuleMetadata {
+    /// Indicates the delivery type for persistent install.
+    #[serde(rename="deliveryType")]
+    
+    pub delivery_type: Option<String>,
+    /// Module name.
+    
+    pub name: Option<String>,
+}
+
+impl client::Part for AssetModuleMetadata {}
+
+
+/// Set of asset slices belonging to a single asset module.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AssetSliceSet {
+    /// Asset slices.
+    #[serde(rename="apkDescription")]
+    
+    pub apk_description: Option<Vec<ApkDescription>>,
+    /// Module level metadata.
+    #[serde(rename="assetModuleMetadata")]
+    
+    pub asset_module_metadata: Option<AssetModuleMetadata>,
+}
+
+impl client::Part for AssetSliceSet {}
+
+
 /// Represents a base plan that automatically renews at the end of its subscription period.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -431,6 +793,10 @@ impl client::RequestValue for ArchiveSubscriptionRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoRenewingBasePlanType {
+    /// Optional. Account hold period of the subscription, specified in ISO 8601 format. Acceptable values must be in DAYS and in the range P0D (zero days) to P30D (30 days). If not specified, the default value is P30D (30 days).
+    #[serde(rename="accountHoldDuration")]
+    
+    pub account_hold_duration: Option<String>,
     /// Required. Subscription period, specified in ISO 8601 format. For a list of acceptable billing periods, refer to the help center.
     #[serde(rename="billingPeriodDuration")]
     
@@ -519,6 +885,256 @@ pub struct BasePlan {
 impl client::Part for BasePlan {}
 
 
+/// Request message for BatchGetSubscriptionOffers endpoint.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans offers batch get monetization](MonetizationSubscriptionBasePlanOfferBatchGetCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchGetSubscriptionOffersRequest {
+    /// Required. A list of update requests of up to 100 elements. All requests must update different subscriptions.
+    
+    pub requests: Option<Vec<GetSubscriptionOfferRequest>>,
+}
+
+impl client::RequestValue for BatchGetSubscriptionOffersRequest {}
+
+
+/// Response message for BatchGetSubscriptionOffers endpoint.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans offers batch get monetization](MonetizationSubscriptionBasePlanOfferBatchGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchGetSubscriptionOffersResponse {
+    /// no description provided
+    #[serde(rename="subscriptionOffers")]
+    
+    pub subscription_offers: Option<Vec<SubscriptionOffer>>,
+}
+
+impl client::ResponseResult for BatchGetSubscriptionOffersResponse {}
+
+
+/// Response message for BatchGetSubscriptions endpoint.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions batch get monetization](MonetizationSubscriptionBatchGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchGetSubscriptionsResponse {
+    /// The list of requested subscriptions, in the same order as the request.
+    
+    pub subscriptions: Option<Vec<Subscription>>,
+}
+
+impl client::ResponseResult for BatchGetSubscriptionsResponse {}
+
+
+/// Request message for BatchMigrateBasePlanPrices.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans batch migrate prices monetization](MonetizationSubscriptionBasePlanBatchMigratePriceCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchMigrateBasePlanPricesRequest {
+    /// Required. Up to 100 price migration requests. All requests must update different base plans.
+    
+    pub requests: Option<Vec<MigrateBasePlanPricesRequest>>,
+}
+
+impl client::RequestValue for BatchMigrateBasePlanPricesRequest {}
+
+
+/// Response message for BatchMigrateBasePlanPrices.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans batch migrate prices monetization](MonetizationSubscriptionBasePlanBatchMigratePriceCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchMigrateBasePlanPricesResponse {
+    /// Contains one response per requested price migration, in the same order as the request.
+    
+    pub responses: Option<Vec<MigrateBasePlanPricesResponse>>,
+}
+
+impl client::ResponseResult for BatchMigrateBasePlanPricesResponse {}
+
+
+/// Request message for BatchUpdateBasePlanStates.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans batch update states monetization](MonetizationSubscriptionBasePlanBatchUpdateStateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateBasePlanStatesRequest {
+    /// Required. The update request list of up to 100 elements. All requests must update different base plans.
+    
+    pub requests: Option<Vec<UpdateBasePlanStateRequest>>,
+}
+
+impl client::RequestValue for BatchUpdateBasePlanStatesRequest {}
+
+
+/// Response message for BatchUpdateBasePlanStates.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans batch update states monetization](MonetizationSubscriptionBasePlanBatchUpdateStateCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateBasePlanStatesResponse {
+    /// The list of updated subscriptions. This list will match the requests one to one, in the same order.
+    
+    pub subscriptions: Option<Vec<Subscription>>,
+}
+
+impl client::ResponseResult for BatchUpdateBasePlanStatesResponse {}
+
+
+/// Request message for BatchUpdateSubscriptionOfferStates.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans offers batch update states monetization](MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateSubscriptionOfferStatesRequest {
+    /// Required. The update request list of up to 100 elements. All requests must update different offers.
+    
+    pub requests: Option<Vec<UpdateSubscriptionOfferStateRequest>>,
+}
+
+impl client::RequestValue for BatchUpdateSubscriptionOfferStatesRequest {}
+
+
+/// Response message for BatchUpdateSubscriptionOfferStates.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans offers batch update states monetization](MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateSubscriptionOfferStatesResponse {
+    /// The updated subscription offers list.
+    #[serde(rename="subscriptionOffers")]
+    
+    pub subscription_offers: Option<Vec<SubscriptionOffer>>,
+}
+
+impl client::ResponseResult for BatchUpdateSubscriptionOfferStatesResponse {}
+
+
+/// Request message for BatchUpdateSubscriptionOffers.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans offers batch update monetization](MonetizationSubscriptionBasePlanOfferBatchUpdateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateSubscriptionOffersRequest {
+    /// Required. A list of update requests of up to 100 elements. All requests must update different subscription offers.
+    
+    pub requests: Option<Vec<UpdateSubscriptionOfferRequest>>,
+}
+
+impl client::RequestValue for BatchUpdateSubscriptionOffersRequest {}
+
+
+/// Response message for BatchUpdateSubscriptionOffers.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions base plans offers batch update monetization](MonetizationSubscriptionBasePlanOfferBatchUpdateCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateSubscriptionOffersResponse {
+    /// The updated subscription offers list.
+    #[serde(rename="subscriptionOffers")]
+    
+    pub subscription_offers: Option<Vec<SubscriptionOffer>>,
+}
+
+impl client::ResponseResult for BatchUpdateSubscriptionOffersResponse {}
+
+
+/// Request message for BatchUpdateSubscription.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions batch update monetization](MonetizationSubscriptionBatchUpdateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateSubscriptionsRequest {
+    /// Required. A list of update requests of up to 100 elements. All requests must update different subscriptions.
+    
+    pub requests: Option<Vec<UpdateSubscriptionRequest>>,
+}
+
+impl client::RequestValue for BatchUpdateSubscriptionsRequest {}
+
+
+/// Response message for BatchUpdateSubscription.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions batch update monetization](MonetizationSubscriptionBatchUpdateCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateSubscriptionsResponse {
+    /// The updated subscriptions list.
+    
+    pub subscriptions: Option<Vec<Subscription>>,
+}
+
+impl client::ResponseResult for BatchUpdateSubscriptionsResponse {}
+
+
 /// Information about an app bundle. The resource for BundlesService.
 /// 
 /// # Activities
@@ -565,6 +1181,36 @@ pub struct BundlesListResponse {
 }
 
 impl client::ResponseResult for BundlesListResponse {}
+
+
+/// Request message for CancelAppRecovery.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel apprecovery](ApprecoveryCancelCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelAppRecoveryRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for CancelAppRecoveryRequest {}
+
+
+/// Response message for CancelAppRecovery.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel apprecovery](ApprecoveryCancelCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelAppRecoveryResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for CancelAppRecoveryResponse {}
 
 
 /// Result of the cancel survey when the subscription was canceled by the user.
@@ -739,6 +1385,29 @@ pub struct CountryTargeting {
 impl client::Part for CountryTargeting {}
 
 
+/// Request message for CreateDraftAppRecovery.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create apprecovery](ApprecoveryCreateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateDraftAppRecoveryRequest {
+    /// Action type is remote in-app update. As a consequence of this action, a downloadable recovery module is also created for testing purposes.
+    #[serde(rename="remoteInAppUpdate")]
+    
+    pub remote_in_app_update: Option<RemoteInAppUpdate>,
+    /// Specifies targeting criteria for the recovery action such as regions, android sdk versions, app versions etc.
+    
+    pub targeting: Option<Targeting>,
+}
+
+impl client::RequestValue for CreateDraftAppRecoveryRequest {}
+
+
 /// Request message for DeactivateBasePlan.
 /// 
 /// # Activities
@@ -749,7 +1418,24 @@ impl client::Part for CountryTargeting {}
 /// * [subscriptions base plans deactivate monetization](MonetizationSubscriptionBasePlanDeactivateCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeactivateBasePlanRequest { _never_set: Option<bool> }
+pub struct DeactivateBasePlanRequest {
+    /// Required. The unique base plan ID of the base plan to deactivate.
+    #[serde(rename="basePlanId")]
+    
+    pub base_plan_id: Option<String>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. The parent app (package name) of the base plan to deactivate.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Required. The parent subscription (ID) of the base plan to deactivate.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
+}
 
 impl client::RequestValue for DeactivateBasePlanRequest {}
 
@@ -764,9 +1450,46 @@ impl client::RequestValue for DeactivateBasePlanRequest {}
 /// * [subscriptions base plans offers deactivate monetization](MonetizationSubscriptionBasePlanOfferDeactivateCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeactivateSubscriptionOfferRequest { _never_set: Option<bool> }
+pub struct DeactivateSubscriptionOfferRequest {
+    /// Required. The parent base plan (ID) of the offer to deactivate.
+    #[serde(rename="basePlanId")]
+    
+    pub base_plan_id: Option<String>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. The unique offer ID of the offer to deactivate.
+    #[serde(rename="offerId")]
+    
+    pub offer_id: Option<String>,
+    /// Required. The parent app (package name) of the offer to deactivate.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Required. The parent subscription (ID) of the offer to deactivate.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
+}
 
 impl client::RequestValue for DeactivateSubscriptionOfferRequest {}
+
+
+/// Information related to deferred item replacement.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeferredItemReplacement {
+    /// The product_id going to replace the existing product_id.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
+}
+
+impl client::Part for DeferredItemReplacement {}
 
 
 /// Represents a deobfuscation file.
@@ -805,6 +1528,36 @@ pub struct DeobfuscationFilesUploadResponse {
 impl client::ResponseResult for DeobfuscationFilesUploadResponse {}
 
 
+/// Request message for DeployAppRecovery.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [deploy apprecovery](ApprecoveryDeployCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeployAppRecoveryRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for DeployAppRecoveryRequest {}
+
+
+/// Response message for DeployAppRecovery.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [deploy apprecovery](ApprecoveryDeployCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeployAppRecoveryResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for DeployAppRecoveryResponse {}
+
+
 /// Developer entry from conversation between user and developer.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -835,7 +1588,43 @@ pub struct DeveloperInitiatedCancellation { _never_set: Option<bool> }
 impl client::Part for DeveloperInitiatedCancellation {}
 
 
-/// LINT.IfChange A group of devices. A group is defined by a set of device selectors. A device belongs to the group if it matches any selector (logical OR).
+/// Represents a device feature.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceFeature {
+    /// Name of the feature.
+    #[serde(rename="featureName")]
+    
+    pub feature_name: Option<String>,
+    /// The feature version specified by android:glEsVersion or android:version in in the AndroidManifest.
+    #[serde(rename="featureVersion")]
+    
+    pub feature_version: Option<i32>,
+}
+
+impl client::Part for DeviceFeature {}
+
+
+/// Targeting for a device feature.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceFeatureTargeting {
+    /// Feature of the device.
+    #[serde(rename="requiredFeature")]
+    
+    pub required_feature: Option<DeviceFeature>,
+}
+
+impl client::Part for DeviceFeatureTargeting {}
+
+
+/// A group of devices. A group is defined by a set of device selectors. A device belongs to the group if it matches any selector (logical OR).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1026,7 +1815,7 @@ pub struct DeviceTier {
 impl client::Part for DeviceTier {}
 
 
-/// LINT.IfChange Configuration describing device targeting criteria for the content of an app.
+/// Configuration describing device targeting criteria for the content of an app.
 /// 
 /// # Activities
 /// 
@@ -1051,6 +1840,10 @@ pub struct DeviceTierConfig {
     #[serde(rename="deviceTierSet")]
     
     pub device_tier_set: Option<DeviceTierSet>,
+    /// Definition of user country sets for the app.
+    #[serde(rename="userCountrySets")]
+    
+    pub user_country_sets: Option<Vec<UserCountrySet>>,
 }
 
 impl client::RequestValue for DeviceTierConfig {}
@@ -1145,6 +1938,125 @@ pub struct ExternalAccountIdentifiers {
 impl client::Part for ExternalAccountIdentifiers {}
 
 
+/// Details of an external subscription.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExternalSubscription {
+    /// Required. The type of the external subscription.
+    #[serde(rename="subscriptionType")]
+    
+    pub subscription_type: Option<String>,
+}
+
+impl client::Part for ExternalSubscription {}
+
+
+/// The details of an external transaction.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [createexternaltransaction externaltransactions](ExternaltransactionCreateexternaltransactionCall) (request|response)
+/// * [getexternaltransaction externaltransactions](ExternaltransactionGetexternaltransactionCall) (response)
+/// * [refundexternaltransaction externaltransactions](ExternaltransactionRefundexternaltransactionCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExternalTransaction {
+    /// Output only. The time when this transaction was created. This is the time when Google was notified of the transaction.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. The current transaction amount before tax. This represents the current pre-tax amount including any refunds that may have been applied to this transaction.
+    #[serde(rename="currentPreTaxAmount")]
+    
+    pub current_pre_tax_amount: Option<Price>,
+    /// Output only. The current tax amount. This represents the current tax amount including any refunds that may have been applied to this transaction.
+    #[serde(rename="currentTaxAmount")]
+    
+    pub current_tax_amount: Option<Price>,
+    /// Output only. The id of this transaction. All transaction ids under the same package name must be unique. Set when creating the external transaction.
+    #[serde(rename="externalTransactionId")]
+    
+    pub external_transaction_id: Option<String>,
+    /// This is a one-time transaction and not part of a subscription.
+    #[serde(rename="oneTimeTransaction")]
+    
+    pub one_time_transaction: Option<OneTimeExternalTransaction>,
+    /// Required. The original transaction amount before taxes. This represents the pre-tax amount originally notified to Google before any refunds were applied.
+    #[serde(rename="originalPreTaxAmount")]
+    
+    pub original_pre_tax_amount: Option<Price>,
+    /// Required. The original tax amount. This represents the tax amount originally notified to Google before any refunds were applied.
+    #[serde(rename="originalTaxAmount")]
+    
+    pub original_tax_amount: Option<Price>,
+    /// Output only. The resource name of the external transaction. The package name of the application the inapp products were sold (for example, 'com.some.app').
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// This transaction is part of a recurring series of transactions.
+    #[serde(rename="recurringTransaction")]
+    
+    pub recurring_transaction: Option<RecurringExternalTransaction>,
+    /// Output only. If set, this transaction was a test purchase. Google will not charge for a test transaction.
+    #[serde(rename="testPurchase")]
+    
+    pub test_purchase: Option<ExternalTransactionTestPurchase>,
+    /// Output only. The current state of the transaction.
+    #[serde(rename="transactionState")]
+    
+    pub transaction_state: Option<String>,
+    /// Required. The time when the transaction was completed.
+    #[serde(rename="transactionTime")]
+    
+    pub transaction_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Required. User address for tax computation.
+    #[serde(rename="userTaxAddress")]
+    
+    pub user_tax_address: Option<ExternalTransactionAddress>,
+}
+
+impl client::RequestValue for ExternalTransaction {}
+impl client::Resource for ExternalTransaction {}
+impl client::ResponseResult for ExternalTransaction {}
+
+
+/// User's address for the external transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExternalTransactionAddress {
+    /// Optional. Top-level administrative subdivision of the country/region. Only required for transactions in India. Valid values are "ANDAMAN AND NICOBAR ISLANDS", "ANDHRA PRADESH", "ARUNACHAL PRADESH", "ASSAM", "BIHAR", "CHANDIGARH", "CHHATTISGARH", "DADRA AND NAGAR HAVELI", "DADRA AND NAGAR HAVELI AND DAMAN AND DIU", "DAMAN AND DIU", "DELHI", "GOA", "GUJARAT", "HARYANA", "HIMACHAL PRADESH", "JAMMU AND KASHMIR", "JHARKHAND", "KARNATAKA", "KERALA", "LADAKH", "LAKSHADWEEP", "MADHYA PRADESH", "MAHARASHTRA", "MANIPUR", "MEGHALAYA", "MIZORAM", "NAGALAND", "ODISHA", "PUDUCHERRY", "PUNJAB", "RAJASTHAN", "SIKKIM", "TAMIL NADU", "TELANGANA", "TRIPURA", "UTTAR PRADESH", "UTTARAKHAND", and "WEST BENGAL".
+    #[serde(rename="administrativeArea")]
+    
+    pub administrative_area: Option<String>,
+    /// Required. Two letter region code based on ISO-3166-1 Alpha-2 (UN region codes).
+    #[serde(rename="regionCode")]
+    
+    pub region_code: Option<String>,
+}
+
+impl client::Part for ExternalTransactionAddress {}
+
+
+/// Represents a transaction performed using a test account. These transactions will not be charged by Google.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExternalTransactionTestPurchase { _never_set: Option<bool> }
+
+impl client::Part for ExternalTransactionTestPurchase {}
+
+
 /// Defines an APK available for this application that is hosted externally and not uploaded to Google Play. This function is only available to organizations using Managed Play whose application is configured to restrict distribution to the organizations.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1218,6 +2130,17 @@ pub struct ExternallyHostedApk {
 impl client::Part for ExternallyHostedApk {}
 
 
+/// A full refund of the remaining amount of a transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FullRefund { _never_set: Option<bool> }
+
+impl client::Part for FullRefund {}
+
+
 /// Response to list generated APKs.
 /// 
 /// # Activities
@@ -1253,6 +2176,10 @@ pub struct GeneratedApksPerSigningKey {
     #[serde(rename="generatedAssetPackSlices")]
     
     pub generated_asset_pack_slices: Option<Vec<GeneratedAssetPackSlice>>,
+    /// Generated recovery apks for recovery actions signed with a key corresponding to certificate_sha256_hash. This includes all generated recovery APKs, also those in draft or cancelled state. This field is not set if no recovery actions were created for this signing key.
+    #[serde(rename="generatedRecoveryModules")]
+    
+    pub generated_recovery_modules: Option<Vec<GeneratedRecoveryApk>>,
     /// List of generated split APKs, signed with a key corresponding to certificate_sha256_hash.
     #[serde(rename="generatedSplitApks")]
     
@@ -1265,6 +2192,10 @@ pub struct GeneratedApksPerSigningKey {
     #[serde(rename="generatedUniversalApk")]
     
     pub generated_universal_apk: Option<GeneratedUniversalApk>,
+    /// Contains targeting information about the generated apks.
+    #[serde(rename="targetingInfo")]
+    
+    pub targeting_info: Option<TargetingInfo>,
 }
 
 impl client::Part for GeneratedApksPerSigningKey {}
@@ -1296,6 +2227,35 @@ pub struct GeneratedAssetPackSlice {
 }
 
 impl client::Part for GeneratedAssetPackSlice {}
+
+
+/// Download metadata for an app recovery module.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GeneratedRecoveryApk {
+    /// Download ID, which uniquely identifies the APK to download. Should be supplied to `generatedapks.download` method.
+    #[serde(rename="downloadId")]
+    
+    pub download_id: Option<String>,
+    /// Name of the module which recovery apk belongs to.
+    #[serde(rename="moduleName")]
+    
+    pub module_name: Option<String>,
+    /// ID of the recovery action.
+    #[serde(rename="recoveryId")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub recovery_id: Option<i64>,
+    /// The status of the recovery action corresponding to the recovery apk.
+    #[serde(rename="recoveryStatus")]
+    
+    pub recovery_status: Option<String>,
+}
+
+impl client::Part for GeneratedRecoveryApk {}
 
 
 /// Download metadata for a split APK.
@@ -1360,6 +2320,34 @@ pub struct GeneratedUniversalApk {
 }
 
 impl client::Part for GeneratedUniversalApk {}
+
+
+/// Request message for GetSubscriptionOffer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetSubscriptionOfferRequest {
+    /// Required. The parent base plan (ID) of the offer to get.
+    #[serde(rename="basePlanId")]
+    
+    pub base_plan_id: Option<String>,
+    /// Required. The unique offer ID of the offer to get.
+    #[serde(rename="offerId")]
+    
+    pub offer_id: Option<String>,
+    /// Required. The parent app (package name) of the offer to get.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Required. The parent subscription (ID) of the offer to get.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
+}
+
+impl client::Part for GetSubscriptionOfferRequest {}
 
 
 /// An access grant resource.
@@ -1564,6 +2552,105 @@ pub struct InAppProductListing {
 impl client::Part for InAppProductListing {}
 
 
+/// Request to delete multiple in-app products.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch delete inappproducts](InappproductBatchDeleteCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsBatchDeleteRequest {
+    /// Individual delete requests. At least one request is required. Can contain up to 100 requests. All requests must correspond to different in-app products.
+    
+    pub requests: Option<Vec<InappproductsDeleteRequest>>,
+}
+
+impl client::RequestValue for InappproductsBatchDeleteRequest {}
+
+
+/// Response message for BatchGetSubscriptions endpoint.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch get inappproducts](InappproductBatchGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsBatchGetResponse {
+    /// The list of requested in-app products, in the same order as the request.
+    
+    pub inappproduct: Option<Vec<InAppProduct>>,
+}
+
+impl client::ResponseResult for InappproductsBatchGetResponse {}
+
+
+/// Request to update or insert one or more in-app products.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch update inappproducts](InappproductBatchUpdateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsBatchUpdateRequest {
+    /// Required. Individual update requests. At least one request is required. Can contain up to 100 requests. All requests must correspond to different in-app products.
+    
+    pub requests: Option<Vec<InappproductsUpdateRequest>>,
+}
+
+impl client::RequestValue for InappproductsBatchUpdateRequest {}
+
+
+/// Response for a batch in-app product update.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch update inappproducts](InappproductBatchUpdateCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsBatchUpdateResponse {
+    /// The updated or inserted in-app products.
+    
+    pub inappproducts: Option<Vec<InAppProduct>>,
+}
+
+impl client::ResponseResult for InappproductsBatchUpdateResponse {}
+
+
+/// Request to delete an in-app product.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsDeleteRequest {
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Package name of the app.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Unique identifier for the in-app product.
+    
+    pub sku: Option<String>,
+}
+
+impl client::Part for InappproductsDeleteRequest {}
+
+
 /// Response listing all in-app products.
 /// 
 /// # Activities
@@ -1592,6 +2679,40 @@ pub struct InappproductsListResponse {
 }
 
 impl client::ResponseResult for InappproductsListResponse {}
+
+
+/// Request to update an in-app product.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsUpdateRequest {
+    /// If set to true, and the in-app product with the given package_name and sku doesn't exist, the in-app product will be created.
+    #[serde(rename="allowMissing")]
+    
+    pub allow_missing: Option<bool>,
+    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    #[serde(rename="autoConvertMissingPrices")]
+    
+    pub auto_convert_missing_prices: Option<bool>,
+    /// The new in-app product.
+    
+    pub inappproduct: Option<InAppProduct>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Package name of the app.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Unique identifier for the in-app product.
+    
+    pub sku: Option<String>,
+}
+
+impl client::Part for InappproductsUpdateRequest {}
 
 
 /// An artifact resource which gets created when uploading an APK or Android App Bundle through internal app sharing.
@@ -1650,6 +2771,44 @@ pub struct IntroductoryPriceInfo {
 }
 
 impl client::Part for IntroductoryPriceInfo {}
+
+
+/// Targeting based on language.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LanguageTargeting {
+    /// Alternative languages.
+    
+    pub alternatives: Option<Vec<String>>,
+    /// ISO-639: 2 or 3 letter language code.
+    
+    pub value: Option<Vec<String>>,
+}
+
+impl client::Part for LanguageTargeting {}
+
+
+/// Response message for ListAppRecoveries. – api-linter: core::0158::response-next-page-token-field=disabled
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [app recoveries apprecovery](ApprecoveryAppRecoveryCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListAppRecoveriesResponse {
+    /// List of recovery actions associated with the requested package name.
+    #[serde(rename="recoveryActions")]
+    
+    pub recovery_actions: Option<Vec<AppRecoveryAction>>,
+}
+
+impl client::ResponseResult for ListAppRecoveriesResponse {}
 
 
 /// Response listing existing device tier configs.
@@ -1833,6 +2992,10 @@ pub struct ManagedProductTaxAndComplianceSettings {
     #[serde(rename="eeaWithdrawalRightType")]
     
     pub eea_withdrawal_right_type: Option<String>,
+    /// Whether this in-app product is declared as a product representing a tokenized digital asset.
+    #[serde(rename="isTokenizedDigitalAsset")]
+    
+    pub is_tokenized_digital_asset: Option<bool>,
     /// A mapping from region code to tax rate details. The keys are region codes as defined by Unicode's "CLDR".
     #[serde(rename="taxRateInfoByRegionCode")]
     
@@ -1853,6 +3016,22 @@ impl client::Part for ManagedProductTaxAndComplianceSettings {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MigrateBasePlanPricesRequest {
+    /// Required. The unique base plan ID of the base plan to update prices on.
+    #[serde(rename="basePlanId")]
+    
+    pub base_plan_id: Option<String>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. Package name of the parent app. Must be equal to the package_name field on the Subscription resource.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// Required. The ID of the subscription to update. Must be equal to the product_id field on the Subscription resource.
+    #[serde(rename="productId")]
+    
+    pub product_id: Option<String>,
     /// Required. The regional prices to update.
     #[serde(rename="regionalPriceMigrations")]
     
@@ -1881,6 +3060,59 @@ pub struct MigrateBasePlanPricesResponse { _never_set: Option<bool> }
 impl client::ResponseResult for MigrateBasePlanPricesResponse {}
 
 
+/// Metadata of a module.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModuleMetadata {
+    /// Indicates the delivery type (e.g. on-demand) of the module.
+    #[serde(rename="deliveryType")]
+    
+    pub delivery_type: Option<String>,
+    /// Names of the modules that this module directly depends on. Each module implicitly depends on the base module.
+    
+    pub dependencies: Option<Vec<String>>,
+    /// Indicates the type of this feature module.
+    #[serde(rename="moduleType")]
+    
+    pub module_type: Option<String>,
+    /// Module name.
+    
+    pub name: Option<String>,
+    /// The targeting that makes a conditional module installed. Relevant only for Split APKs.
+    
+    pub targeting: Option<ModuleTargeting>,
+}
+
+impl client::Part for ModuleMetadata {}
+
+
+/// Targeting on the module level.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModuleTargeting {
+    /// Targeting for device features.
+    #[serde(rename="deviceFeatureTargeting")]
+    
+    pub device_feature_targeting: Option<Vec<DeviceFeatureTargeting>>,
+    /// The sdk version that the variant targets
+    #[serde(rename="sdkVersionTargeting")]
+    
+    pub sdk_version_targeting: Option<SdkVersionTargeting>,
+    /// Countries-level targeting
+    #[serde(rename="userCountriesTargeting")]
+    
+    pub user_countries_targeting: Option<UserCountriesTargeting>,
+}
+
+impl client::Part for ModuleTargeting {}
+
+
 /// Represents an amount of money with its currency type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1902,6 +3134,39 @@ pub struct Money {
 }
 
 impl client::Part for Money {}
+
+
+/// Represents a list of apis.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MultiAbi {
+    /// A list of targeted ABIs, as represented by the Android Platform
+    
+    pub abi: Option<Vec<Abi>>,
+}
+
+impl client::Part for MultiAbi {}
+
+
+/// Targeting based on multiple abis.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MultiAbiTargeting {
+    /// Targeting of other sibling directories that were in the Bundle. For main splits this is targeting of other main splits.
+    
+    pub alternatives: Option<Vec<MultiAbi>>,
+    /// Value of a multi abi.
+    
+    pub value: Option<Vec<MultiAbi>>,
+}
+
+impl client::Part for MultiAbiTargeting {}
 
 
 /// Offer details information related to a purchase line item.
@@ -1941,6 +3206,22 @@ pub struct OfferTag {
 }
 
 impl client::Part for OfferTag {}
+
+
+/// Represents a one-time transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OneTimeExternalTransaction {
+    /// Input only. Provided during the call to Create. Retrieved from the client when the alternative billing flow is launched.
+    #[serde(rename="externalTransactionToken")]
+    
+    pub external_transaction_token: Option<String>,
+}
+
+impl client::Part for OneTimeExternalTransaction {}
 
 
 /// Pricing information for any new locations Play may launch in.
@@ -2049,6 +3330,26 @@ pub struct PageInfo {
 }
 
 impl client::Part for PageInfo {}
+
+
+/// A partial refund of a transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartialRefund {
+    /// Required. A unique id distinguishing this partial refund. If the refund is successful, subsequent refunds with the same id will fail. Must be unique across refunds for one individual transaction.
+    #[serde(rename="refundId")]
+    
+    pub refund_id: Option<String>,
+    /// Required. The pre-tax amount of the partial refund. Should be less than the remaining pre-tax amount of the transaction.
+    #[serde(rename="refundPreTaxAmount")]
+    
+    pub refund_pre_tax_amount: Option<Price>,
+}
+
+impl client::Part for PartialRefund {}
 
 
 /// Information specific to a subscription in paused state.
@@ -2213,6 +3514,62 @@ pub struct ProductPurchasesAcknowledgeRequest {
 impl client::RequestValue for ProductPurchasesAcknowledgeRequest {}
 
 
+/// Represents a transaction that is part of a recurring series of payments. This can be a subscription or a one-time product with multiple payments (such as preorder).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RecurringExternalTransaction {
+    /// Details of an external subscription.
+    #[serde(rename="externalSubscription")]
+    
+    pub external_subscription: Option<ExternalSubscription>,
+    /// Input only. Provided during the call to Create. Retrieved from the client when the alternative billing flow is launched. Required only for the initial purchase.
+    #[serde(rename="externalTransactionToken")]
+    
+    pub external_transaction_token: Option<String>,
+    /// The external transaction id of the first transaction of this recurring series of transactions. For example, for a subscription this would be the transaction id of the first payment. Required when creating recurring external transactions.
+    #[serde(rename="initialExternalTransactionId")]
+    
+    pub initial_external_transaction_id: Option<String>,
+    /// Input only. Provided during the call to Create. Must only be used when migrating a subscription from manual monthly reporting to automated reporting.
+    #[serde(rename="migratedTransactionProgram")]
+    
+    pub migrated_transaction_program: Option<String>,
+}
+
+impl client::Part for RecurringExternalTransaction {}
+
+
+/// A request to refund an existing external transaction.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [refundexternaltransaction externaltransactions](ExternaltransactionRefundexternaltransactionCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RefundExternalTransactionRequest {
+    /// A full-amount refund.
+    #[serde(rename="fullRefund")]
+    
+    pub full_refund: Option<FullRefund>,
+    /// A partial refund.
+    #[serde(rename="partialRefund")]
+    
+    pub partial_refund: Option<PartialRefund>,
+    /// Required. The time that the transaction was refunded.
+    #[serde(rename="refundTime")]
+    
+    pub refund_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::RequestValue for RefundExternalTransactionRequest {}
+
+
 /// Configuration for a base plan specific to a region.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2243,10 +3600,14 @@ impl client::Part for RegionalBasePlanConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegionalPriceMigrationConfig {
-    /// Required. The cutoff time for historical prices that subscribers can remain paying. Subscribers who are on a price that was created before this cutoff time will be migrated to the currently-offered price. These subscribers will receive a notification that they will be paying a different price. Subscribers who do not agree to the new price will have their subscription ended at the next renewal.
+    /// Required. The cutoff time for historical prices that subscribers can remain paying. Subscribers on prices which were available at this cutoff time or later will stay on their existing price. Subscribers on older prices will be migrated to the currently-offered price. The migrated subscribers will receive a notification that they will be paying a different price. Subscribers who do not agree to the new price will have their subscription ended at the next renewal.
     #[serde(rename="oldestAllowedPriceVersionTime")]
     
     pub oldest_allowed_price_version_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. The behavior the caller wants users to see when there is a price increase during migration. If left unset, the behavior defaults to PRICE_INCREASE_TYPE_OPT_IN. Note that the first opt-out price increase migration for each app must be initiated in Play Console.
+    #[serde(rename="priceIncreaseType")]
+    
+    pub price_increase_type: Option<String>,
     /// Required. Region code this configuration applies to, as defined by ISO 3166-2, e.g. "US".
     #[serde(rename="regionCode")]
     
@@ -2310,7 +3671,7 @@ impl client::Part for RegionalSubscriptionOfferPhaseConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegionalTaxRateInfo {
-    /// You must tell us if your app contains streaming products to correctly charge US state and local sales tax. Field only supported in United States.
+    /// You must tell us if your app contains streaming products to correctly charge US state and local sales tax. Field only supported in the United States.
     #[serde(rename="eligibleForStreamingServiceTaxRate")]
     
     pub eligible_for_streaming_service_tax_rate: Option<bool>,
@@ -2327,6 +3688,22 @@ pub struct RegionalTaxRateInfo {
 impl client::Part for RegionalTaxRateInfo {}
 
 
+/// Region targeting data for app recovery action targeting.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Regions {
+    /// Regions targeted by the recovery action. Region codes are ISO 3166 Alpha-2 country codes. For example, US stands for United States of America. See https://www.iso.org/iso-3166-country-codes.html for the complete list of country codes.
+    #[serde(rename="regionCode")]
+    
+    pub region_code: Option<Vec<String>>,
+}
+
+impl client::Part for Regions {}
+
+
 /// The version of the available regions being used for the specified resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2334,12 +3711,71 @@ impl client::Part for RegionalTaxRateInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegionsVersion {
-    /// Required. A string representing version of the available regions being used for the specified resource. The current version is 2022/02.
+    /// Required. A string representing the version of available regions being used for the specified resource. Regional prices for the resource have to be specified according to the information published in [this article](https://support.google.com/googleplay/android-developer/answer/10532353). Each time the supported locations substantially change, the version will be incremented. Using this field will ensure that creating and updating the resource with an older region's version and set of regional prices and currencies will succeed even though a new version is available. The latest version is 2022/02.
     
     pub version: Option<String>,
 }
 
 impl client::Part for RegionsVersion {}
+
+
+/// Object representation for Remote in-app update action type.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RemoteInAppUpdate {
+    /// Required. Set to true if Remote In-App Update action type is needed.
+    #[serde(rename="isRemoteInAppUpdateRequested")]
+    
+    pub is_remote_in_app_update_requested: Option<bool>,
+}
+
+impl client::Part for RemoteInAppUpdate {}
+
+
+/// Data related to Remote In-App Update action such as recovered user count, affected user count etc.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RemoteInAppUpdateData {
+    /// Data related to the recovery action at bundle level.
+    #[serde(rename="remoteAppUpdateDataPerBundle")]
+    
+    pub remote_app_update_data_per_bundle: Option<Vec<RemoteInAppUpdateDataPerBundle>>,
+}
+
+impl client::Part for RemoteInAppUpdateData {}
+
+
+/// Data related to the recovery action at bundle level.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RemoteInAppUpdateDataPerBundle {
+    /// Total number of devices which have been rescued.
+    #[serde(rename="recoveredDeviceCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub recovered_device_count: Option<i64>,
+    /// Total number of devices affected by this recovery action associated with bundle of the app.
+    #[serde(rename="totalDeviceCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub total_device_count: Option<i64>,
+    /// Version Code corresponding to the target bundle.
+    #[serde(rename="versionCode")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub version_code: Option<i64>,
+}
+
+impl client::Part for RemoteInAppUpdateDataPerBundle {}
 
 
 /// Information specific to cancellations caused by subscription replacement.
@@ -2469,6 +3905,233 @@ pub struct ReviewsReplyResponse {
 impl client::ResponseResult for ReviewsReplyResponse {}
 
 
+/// Revocation context of the purchases.subscriptionsv2.revoke API.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RevocationContext {
+    /// Optional. Used when users should be refunded a prorated amount they paid for their subscription based on the amount of time remaining in a subscription.
+    #[serde(rename="proratedRefund")]
+    
+    pub prorated_refund: Option<RevocationContextProratedRefund>,
+}
+
+impl client::Part for RevocationContext {}
+
+
+/// Used to determine if the refund type in the RevocationContext is a prorated refund.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RevocationContextProratedRefund { _never_set: Option<bool> }
+
+impl client::Part for RevocationContextProratedRefund {}
+
+
+/// Request for the purchases.subscriptionsv2.revoke API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptionsv2 revoke purchases](PurchaseSubscriptionsv2RevokeCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RevokeSubscriptionPurchaseRequest {
+    /// Required. Additional details around the subscription revocation.
+    #[serde(rename="revocationContext")]
+    
+    pub revocation_context: Option<RevocationContext>,
+}
+
+impl client::RequestValue for RevokeSubscriptionPurchaseRequest {}
+
+
+/// Response for the purchases.subscriptionsv2.revoke API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptionsv2 revoke purchases](PurchaseSubscriptionsv2RevokeCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RevokeSubscriptionPurchaseResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for RevokeSubscriptionPurchaseResponse {}
+
+
+/// Request to update Safety Labels of an app.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [data safety applications](ApplicationDataSafetyCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SafetyLabelsUpdateRequest {
+    /// Required. Contents of the CSV file containing Data Safety responses. For the format of this file, see the Help Center documentation at https://support.google.com/googleplay/android-developer/answer/10787469?#zippy=%2Cunderstand-the-csv-format To download an up to date template, follow the steps at https://support.google.com/googleplay/android-developer/answer/10787469?#zippy=%2Cexport-to-a-csv-file
+    #[serde(rename="safetyLabels")]
+    
+    pub safety_labels: Option<String>,
+}
+
+impl client::RequestValue for SafetyLabelsUpdateRequest {}
+
+
+/// Response for SafetyLabelsUpdate rpc.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [data safety applications](ApplicationDataSafetyCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SafetyLabelsUpdateResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for SafetyLabelsUpdateResponse {}
+
+
+/// Represents a screen density.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScreenDensity {
+    /// Alias for a screen density.
+    #[serde(rename="densityAlias")]
+    
+    pub density_alias: Option<String>,
+    /// Value for density dpi.
+    #[serde(rename="densityDpi")]
+    
+    pub density_dpi: Option<i32>,
+}
+
+impl client::Part for ScreenDensity {}
+
+
+/// Targeting based on screen density.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScreenDensityTargeting {
+    /// Targeting of other sibling directories that were in the Bundle. For main splits this is targeting of other main splits.
+    
+    pub alternatives: Option<Vec<ScreenDensity>>,
+    /// Value of a screen density.
+    
+    pub value: Option<Vec<ScreenDensity>>,
+}
+
+impl client::Part for ScreenDensityTargeting {}
+
+
+/// Represents an sdk version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SdkVersion {
+    /// Inclusive minimum value of an sdk version.
+    
+    pub min: Option<i32>,
+}
+
+impl client::Part for SdkVersion {}
+
+
+/// Targeting based on sdk version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SdkVersionTargeting {
+    /// Targeting of other sibling directories that were in the Bundle. For main splits this is targeting of other main splits.
+    
+    pub alternatives: Option<Vec<SdkVersion>>,
+    /// Value of an sdk version.
+    
+    pub value: Option<Vec<SdkVersion>>,
+}
+
+impl client::Part for SdkVersionTargeting {}
+
+
+/// Holds data specific to Split APKs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SplitApkMetadata {
+    /// Indicates whether this APK is the main split of the module.
+    #[serde(rename="isMasterSplit")]
+    
+    pub is_master_split: Option<bool>,
+    /// Id of the split.
+    #[serde(rename="splitId")]
+    
+    pub split_id: Option<String>,
+}
+
+impl client::Part for SplitApkMetadata {}
+
+
+/// Variant is a group of APKs that covers a part of the device configuration space. APKs from multiple variants are never combined on one device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SplitApkVariant {
+    /// Set of APKs, one set per module.
+    #[serde(rename="apkSet")]
+    
+    pub apk_set: Option<Vec<ApkSet>>,
+    /// Variant-level targeting.
+    
+    pub targeting: Option<VariantTargeting>,
+    /// Number of the variant, starting at 0 (unless overridden). A device will receive APKs from the first variant that matches the device configuration, with higher variant numbers having priority over lower variant numbers.
+    #[serde(rename="variantNumber")]
+    
+    pub variant_number: Option<i32>,
+}
+
+impl client::Part for SplitApkVariant {}
+
+
+/// Holds data specific to Standalone APKs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StandaloneApkMetadata {
+    /// Names of the modules fused in this standalone APK.
+    #[serde(rename="fusedModuleName")]
+    
+    pub fused_module_name: Option<Vec<String>>,
+}
+
+impl client::Part for StandaloneApkMetadata {}
+
+
 /// Information associated with purchases made with 'Subscribe with Google'.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2517,7 +4180,7 @@ impl client::Part for SubscribeWithGoogleInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// Output only. Whether this subscription is archived. Archived subscriptions are not available to any subscriber any longer, cannot be updated, and are not returned in list requests unless the show archived flag is passed in.
+    /// Output only. Deprecated: subscription archiving is not supported.
     
     pub archived: Option<bool>,
     /// The set of base plans for this subscription. Represents the prices and duration of the subscription if no other offers apply.
@@ -2594,7 +4257,7 @@ impl client::Part for SubscriptionDeferralInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionItemPriceChangeDetails {
-    /// The renewal time at which the price change will become effective for the user. This is subject to change(to a future time) due to cases where the renewal time shifts like pause.
+    /// The renewal time at which the price change will become effective for the user. This is subject to change(to a future time) due to cases where the renewal time shifts like pause. This field is only populated if the price change has not taken effect.
     #[serde(rename="expectedNewPriceChargeTime")]
     
     pub expected_new_price_charge_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -2911,6 +4574,10 @@ pub struct SubscriptionPurchaseLineItem {
     #[serde(rename="autoRenewingPlan")]
     
     pub auto_renewing_plan: Option<AutoRenewingPlan>,
+    /// Information for deferred item replacement.
+    #[serde(rename="deferredItemReplacement")]
+    
+    pub deferred_item_replacement: Option<DeferredItemReplacement>,
     /// Time at which the subscription expired or will expire unless the access is extended (ex. renews).
     #[serde(rename="expiryTime")]
     
@@ -3071,6 +4738,10 @@ pub struct SubscriptionTaxAndComplianceSettings {
     #[serde(rename="eeaWithdrawalRightType")]
     
     pub eea_withdrawal_right_type: Option<String>,
+    /// Whether this subscription is declared as a product representing a tokenized digital asset.
+    #[serde(rename="isTokenizedDigitalAsset")]
+    
+    pub is_tokenized_digital_asset: Option<bool>,
     /// A mapping from region code to tax rate details. The keys are region codes as defined by Unicode's "CLDR".
     #[serde(rename="taxRateInfoByRegionCode")]
     
@@ -3078,6 +4749,29 @@ pub struct SubscriptionTaxAndComplianceSettings {
 }
 
 impl client::Part for SubscriptionTaxAndComplianceSettings {}
+
+
+/// Options for system APKs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SystemApkOptions {
+    /// Whether to use the rotated key for signing the system APK.
+    
+    pub rotated: Option<bool>,
+    /// Whether system APK was generated with uncompressed dex files.
+    #[serde(rename="uncompressedDexFiles")]
+    
+    pub uncompressed_dex_files: Option<bool>,
+    /// Whether system APK was generated with uncompressed native libraries.
+    #[serde(rename="uncompressedNativeLibraries")]
+    
+    pub uncompressed_native_libraries: Option<bool>,
+}
+
+impl client::Part for SystemApkOptions {}
 
 
 /// Response to list previously created system APK variants.
@@ -3125,6 +4819,60 @@ pub struct SystemInitiatedCancellation { _never_set: Option<bool> }
 impl client::Part for SystemInitiatedCancellation {}
 
 
+/// Targeting details for a recovery action such as regions, android sdk levels, app versions etc.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Targeting {
+    /// All users are targeted.
+    #[serde(rename="allUsers")]
+    
+    pub all_users: Option<AllUsers>,
+    /// Targeting is based on android api levels of devices.
+    #[serde(rename="androidSdks")]
+    
+    pub android_sdks: Option<AndroidSdks>,
+    /// Targeting is based on the user account region.
+    
+    pub regions: Option<Regions>,
+    /// Target version codes as a list.
+    #[serde(rename="versionList")]
+    
+    pub version_list: Option<AppVersionList>,
+    /// Target version codes as a range.
+    #[serde(rename="versionRange")]
+    
+    pub version_range: Option<AppVersionRange>,
+}
+
+impl client::Part for Targeting {}
+
+
+/// Targeting information about the generated apks.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TargetingInfo {
+    /// List of created asset slices.
+    #[serde(rename="assetSliceSet")]
+    
+    pub asset_slice_set: Option<Vec<AssetSliceSet>>,
+    /// The package name of this app.
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// List of the created variants.
+    
+    pub variant: Option<Vec<SplitApkVariant>>,
+}
+
+impl client::Part for TargetingInfo {}
+
+
 /// Defines the scope of subscriptions which a targeting rule can match to target offers to users based on past or current entitlement.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3139,6 +4887,29 @@ pub struct TargetingRuleScope {
 }
 
 impl client::Part for TargetingRuleScope {}
+
+
+/// Update type for targeting. Note it is always a subset Targeting.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TargetingUpdate {
+    /// All users are targeted.
+    #[serde(rename="allUsers")]
+    
+    pub all_users: Option<AllUsers>,
+    /// Additional android sdk levels are targeted by the recovery action.
+    #[serde(rename="androidSdks")]
+    
+    pub android_sdks: Option<AndroidSdks>,
+    /// Additional regions are targeted by the recovery action.
+    
+    pub regions: Option<Regions>,
+}
+
+impl client::Part for TargetingUpdate {}
 
 
 /// Whether this subscription purchase is a test purchase.
@@ -3173,6 +4944,39 @@ pub struct Testers {
 
 impl client::RequestValue for Testers {}
 impl client::ResponseResult for Testers {}
+
+
+/// Represents texture compression format.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextureCompressionFormat {
+    /// Alias for texture compression format.
+    
+    pub alias: Option<String>,
+}
+
+impl client::Part for TextureCompressionFormat {}
+
+
+/// Targeting by a texture compression format.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextureCompressionFormatTargeting {
+    /// List of alternative TCFs (TCFs targeted by the sibling splits).
+    
+    pub alternatives: Option<Vec<TextureCompressionFormat>>,
+    /// The list of targeted TCFs. Should not be empty.
+    
+    pub value: Option<Vec<TextureCompressionFormat>>,
+}
+
+impl client::Part for TextureCompressionFormatTargeting {}
 
 
 /// A Timestamp represents a point in time independent of any time zone or local calendar, encoded as a count of seconds and fractions of seconds at nanosecond resolution. The count is relative to an epoch at UTC midnight on January 1, 1970.
@@ -3221,6 +5025,7 @@ impl client::Part for TokenPagination {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [tracks create edits](EditTrackCreateCall) (response)
 /// * [tracks get edits](EditTrackGetCall) (response)
 /// * [tracks patch edits](EditTrackPatchCall) (request|response)
 /// * [tracks update edits](EditTrackUpdateCall) (request|response)
@@ -3230,13 +5035,40 @@ pub struct Track {
     /// In a read request, represents all active releases in the track. In an update request, represents desired changes.
     
     pub releases: Option<Vec<TrackRelease>>,
-    /// Identifier of the track.
+    /// Identifier of the track. Form factor tracks have a special prefix as an identifier, for example `wear:production`, `automotive:production`. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     
     pub track: Option<String>,
 }
 
 impl client::RequestValue for Track {}
 impl client::ResponseResult for Track {}
+
+
+/// Configurations of the new track.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [tracks create edits](EditTrackCreateCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TrackConfig {
+    /// Required. Form factor of the new track. Defaults to the default track.
+    #[serde(rename="formFactor")]
+    
+    pub form_factor: Option<String>,
+    /// Required. Identifier of the new track. For default tracks, this field consists of the track alias only. Form factor tracks have a special prefix as an identifier, for example `wear:production`, `automotive:production`. This prefix must match the value of the `form_factor` field, if it is not a default track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
+    
+    pub track: Option<String>,
+    /// Required. Type of the new track. Currently, the only supported value is closedTesting.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::RequestValue for TrackConfig {}
 
 
 /// Resource for per-track country availability information.
@@ -3335,12 +5167,115 @@ pub struct TracksListResponse {
     /// The kind of this response ("androidpublisher#tracksListResponse").
     
     pub kind: Option<String>,
-    /// All tracks.
+    /// All tracks (including tracks with no releases).
     
     pub tracks: Option<Vec<Track>>,
 }
 
 impl client::ResponseResult for TracksListResponse {}
+
+
+/// Request message to update the state of a subscription base plan.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateBasePlanStateRequest {
+    /// Activates a base plan. Once activated, base plans will be available to new subscribers.
+    #[serde(rename="activateBasePlanRequest")]
+    
+    pub activate_base_plan_request: Option<ActivateBasePlanRequest>,
+    /// Deactivates a base plan. Once deactivated, the base plan will become unavailable to new subscribers, but existing subscribers will maintain their subscription
+    #[serde(rename="deactivateBasePlanRequest")]
+    
+    pub deactivate_base_plan_request: Option<DeactivateBasePlanRequest>,
+}
+
+impl client::Part for UpdateBasePlanStateRequest {}
+
+
+/// Request message for UpdateSubscriptionOffer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSubscriptionOfferRequest {
+    /// Optional. If set to true, and the subscription offer with the given package_name, product_id, base_plan_id and offer_id doesn't exist, an offer will be created. If a new offer is created, update_mask is ignored.
+    #[serde(rename="allowMissing")]
+    
+    pub allow_missing: Option<bool>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. The version of the available regions being used for the subscription_offer.
+    #[serde(rename="regionsVersion")]
+    
+    pub regions_version: Option<RegionsVersion>,
+    /// Required. The subscription offer to update.
+    #[serde(rename="subscriptionOffer")]
+    
+    pub subscription_offer: Option<SubscriptionOffer>,
+    /// Required. The list of fields to be updated.
+    #[serde(rename="updateMask")]
+    
+    pub update_mask: Option<client::FieldMask>,
+}
+
+impl client::Part for UpdateSubscriptionOfferRequest {}
+
+
+/// Request message to update the state of a subscription offer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSubscriptionOfferStateRequest {
+    /// Activates an offer. Once activated, the offer will be available to new subscribers.
+    #[serde(rename="activateSubscriptionOfferRequest")]
+    
+    pub activate_subscription_offer_request: Option<ActivateSubscriptionOfferRequest>,
+    /// Deactivates an offer. Once deactivated, the offer will become unavailable to new subscribers, but existing subscribers will maintain their subscription
+    #[serde(rename="deactivateSubscriptionOfferRequest")]
+    
+    pub deactivate_subscription_offer_request: Option<DeactivateSubscriptionOfferRequest>,
+}
+
+impl client::Part for UpdateSubscriptionOfferStateRequest {}
+
+
+/// Request message for UpdateSubscription.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSubscriptionRequest {
+    /// Optional. If set to true, and the subscription with the given package_name and product_id doesn't exist, the subscription will be created. If a new subscription is created, update_mask is ignored.
+    #[serde(rename="allowMissing")]
+    
+    pub allow_missing: Option<bool>,
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    #[serde(rename="latencyTolerance")]
+    
+    pub latency_tolerance: Option<String>,
+    /// Required. The version of the available regions being used for the subscription.
+    #[serde(rename="regionsVersion")]
+    
+    pub regions_version: Option<RegionsVersion>,
+    /// Required. The subscription to update.
+    
+    pub subscription: Option<Subscription>,
+    /// Required. The list of fields to be updated.
+    #[serde(rename="updateMask")]
+    
+    pub update_mask: Option<client::FieldMask>,
+}
+
+impl client::Part for UpdateSubscriptionRequest {}
 
 
 /// Represents a targeting rule of the form: User currently has {scope} [with billing period {billing_period}].
@@ -3469,6 +5404,44 @@ pub struct UserComment {
 impl client::Part for UserComment {}
 
 
+/// Describes an inclusive/exclusive list of country codes that module targets.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserCountriesTargeting {
+    /// List of country codes in the two-letter CLDR territory format.
+    #[serde(rename="countryCodes")]
+    
+    pub country_codes: Option<Vec<String>>,
+    /// Indicates if the list above is exclusive.
+    
+    pub exclude: Option<bool>,
+}
+
+impl client::Part for UserCountriesTargeting {}
+
+
+/// A set of user countries. A country set determines what variation of app content gets served to a specific location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserCountrySet {
+    /// List of country codes representing countries. A Country code is represented in ISO 3166 alpha-2 format. For Example:- "IT" for Italy, "GE" for Georgia.
+    #[serde(rename="countryCodes")]
+    
+    pub country_codes: Option<Vec<String>>,
+    /// Country set name.
+    
+    pub name: Option<String>,
+}
+
+impl client::Part for UserCountrySet {}
+
+
 /// Information specific to cancellations initiated by users.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3524,6 +5497,9 @@ pub struct Variant {
     #[serde(rename="deviceSpec")]
     
     pub device_spec: Option<DeviceSpec>,
+    /// Optional. Options applied to the generated APK.
+    
+    pub options: Option<SystemApkOptions>,
     /// Output only. The ID of a previously created system APK variant.
     #[serde(rename="variantId")]
     
@@ -3532,6 +5508,38 @@ pub struct Variant {
 
 impl client::RequestValue for Variant {}
 impl client::ResponseResult for Variant {}
+
+
+/// Targeting on the level of variants.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VariantTargeting {
+    /// The abi that the variant targets
+    #[serde(rename="abiTargeting")]
+    
+    pub abi_targeting: Option<AbiTargeting>,
+    /// Multi-api-level targeting
+    #[serde(rename="multiAbiTargeting")]
+    
+    pub multi_abi_targeting: Option<MultiAbiTargeting>,
+    /// The screen densities that this variant supports
+    #[serde(rename="screenDensityTargeting")]
+    
+    pub screen_density_targeting: Option<ScreenDensityTargeting>,
+    /// The sdk version that the variant targets
+    #[serde(rename="sdkVersionTargeting")]
+    
+    pub sdk_version_targeting: Option<SdkVersionTargeting>,
+    /// Texture-compression-format-level targeting
+    #[serde(rename="textureCompressionFormatTargeting")]
+    
+    pub texture_compression_format_targeting: Option<TextureCompressionFormatTargeting>,
+}
+
+impl client::Part for VariantTargeting {}
 
 
 /// A VoidedPurchase resource indicates a purchase that was either canceled/refunded/charged-back.
@@ -3631,7 +5639,7 @@ impl client::ResponseResult for VoidedPurchasesListResponse {}
 ///     ).build().await.unwrap();
 /// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `device_tier_configs_create(...)`, `device_tier_configs_get(...)` and `device_tier_configs_list(...)`
+/// // like `data_safety(...)`, `device_tier_configs_create(...)`, `device_tier_configs_get(...)` and `device_tier_configs_list(...)`
 /// // to build up your call.
 /// let rb = hub.applications();
 /// # }
@@ -3703,6 +5711,166 @@ impl<'a, S> ApplicationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Writes the Safety Labels declaration of an app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. Package name of the app.
+    pub fn data_safety(&self, request: SafetyLabelsUpdateRequest, package_name: &str) -> ApplicationDataSafetyCall<'a, S> {
+        ApplicationDataSafetyCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *apprecovery* resources.
+/// It is not used directly, but through the [`AndroidPublisher`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_androidpublisher3 as androidpublisher3;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `add_targeting(...)`, `app_recoveries(...)`, `cancel(...)`, `create(...)` and `deploy(...)`
+/// // to build up your call.
+/// let rb = hub.apprecovery();
+/// # }
+/// ```
+pub struct ApprecoveryMethods<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+}
+
+impl<'a, S> client::MethodsBuilder for ApprecoveryMethods<'a, S> {}
+
+impl<'a, S> ApprecoveryMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Incrementally update targeting for a recovery action. Note that only the criteria selected during the creation of recovery action can be expanded.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. Package name of the app for which recovery action is to be updated.
+    /// * `appRecoveryId` - Required. ID corresponding to the app recovery action.
+    pub fn add_targeting(&self, request: AddTargetingRequest, package_name: &str, app_recovery_id: i64) -> ApprecoveryAddTargetingCall<'a, S> {
+        ApprecoveryAddTargetingCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _app_recovery_id: app_recovery_id,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all app recovery action resources associated with a particular package name and app version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Required. Package name of the app for which list of recovery actions is requested.
+    pub fn app_recoveries(&self, package_name: &str) -> ApprecoveryAppRecoveryCall<'a, S> {
+        ApprecoveryAppRecoveryCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _version_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Cancel an already executing app recovery action. Note that this action changes status of the recovery action to CANCELED.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. Package name of the app for which recovery action cancellation is requested.
+    /// * `appRecoveryId` - Required. ID corresponding to the app recovery action.
+    pub fn cancel(&self, request: CancelAppRecoveryRequest, package_name: &str, app_recovery_id: i64) -> ApprecoveryCancelCall<'a, S> {
+        ApprecoveryCancelCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _app_recovery_id: app_recovery_id,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create an app recovery action with recovery status as DRAFT. Note that this action does not execute the recovery action.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. Package name of the app on which recovery action is performed.
+    pub fn create(&self, request: CreateDraftAppRecoveryRequest, package_name: &str) -> ApprecoveryCreateCall<'a, S> {
+        ApprecoveryCreateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deploy an already created app recovery action with recovery status DRAFT. Note that this action activates the recovery action for all targeted users and changes its status to ACTIVE.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. Package name of the app for which recovery action is deployed.
+    /// * `appRecoveryId` - Required. ID corresponding to the app recovery action to deploy.
+    pub fn deploy(&self, request: DeployAppRecoveryRequest, package_name: &str, app_recovery_id: i64) -> ApprecoveryDeployCall<'a, S> {
+        ApprecoveryDeployCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _app_recovery_id: app_recovery_id,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
 }
 
 
@@ -3730,7 +5898,7 @@ impl<'a, S> ApplicationMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `apks_addexternallyhosted(...)`, `apks_list(...)`, `apks_upload(...)`, `bundles_list(...)`, `bundles_upload(...)`, `commit(...)`, `countryavailability_get(...)`, `delete(...)`, `deobfuscationfiles_upload(...)`, `details_get(...)`, `details_patch(...)`, `details_update(...)`, `expansionfiles_get(...)`, `expansionfiles_patch(...)`, `expansionfiles_update(...)`, `expansionfiles_upload(...)`, `get(...)`, `images_delete(...)`, `images_deleteall(...)`, `images_list(...)`, `images_upload(...)`, `insert(...)`, `listings_delete(...)`, `listings_deleteall(...)`, `listings_get(...)`, `listings_list(...)`, `listings_patch(...)`, `listings_update(...)`, `testers_get(...)`, `testers_patch(...)`, `testers_update(...)`, `tracks_get(...)`, `tracks_list(...)`, `tracks_patch(...)`, `tracks_update(...)` and `validate(...)`
+/// // like `apks_addexternallyhosted(...)`, `apks_list(...)`, `apks_upload(...)`, `bundles_list(...)`, `bundles_upload(...)`, `commit(...)`, `countryavailability_get(...)`, `delete(...)`, `deobfuscationfiles_upload(...)`, `details_get(...)`, `details_patch(...)`, `details_update(...)`, `expansionfiles_get(...)`, `expansionfiles_patch(...)`, `expansionfiles_update(...)`, `expansionfiles_upload(...)`, `get(...)`, `images_delete(...)`, `images_deleteall(...)`, `images_list(...)`, `images_upload(...)`, `insert(...)`, `listings_delete(...)`, `listings_deleteall(...)`, `listings_get(...)`, `listings_list(...)`, `listings_patch(...)`, `listings_update(...)`, `testers_get(...)`, `testers_patch(...)`, `testers_update(...)`, `tracks_create(...)`, `tracks_get(...)`, `tracks_list(...)`, `tracks_patch(...)`, `tracks_update(...)` and `validate(...)`
 /// // to build up your call.
 /// let rb = hub.edits();
 /// # }
@@ -4334,13 +6502,34 @@ impl<'a, S> EditMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a new track.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. Package name of the app.
+    /// * `editId` - Required. Identifier of the edit.
+    pub fn tracks_create(&self, request: TrackConfig, package_name: &str, edit_id: &str) -> EditTrackCreateCall<'a, S> {
+        EditTrackCreateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _edit_id: edit_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a track.
     /// 
     /// # Arguments
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    /// * `track` - Identifier of the track.
+    /// * `track` - Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a, S> {
         EditTrackGetCall {
             hub: self.hub,
@@ -4381,7 +6570,7 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    /// * `track` - Identifier of the track.
+    /// * `track` - Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     pub fn tracks_patch(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a, S> {
         EditTrackPatchCall {
             hub: self.hub,
@@ -4404,7 +6593,7 @@ impl<'a, S> EditMethods<'a, S> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    /// * `track` - Identifier of the track.
+    /// * `track` - Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     pub fn tracks_update(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a, S> {
         EditTrackUpdateCall {
             hub: self.hub,
@@ -4508,6 +6697,103 @@ impl<'a, S> EditMethods<'a, S> {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *externaltransaction* resources.
+/// It is not used directly, but through the [`AndroidPublisher`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_androidpublisher3 as androidpublisher3;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `createexternaltransaction(...)`, `getexternaltransaction(...)` and `refundexternaltransaction(...)`
+/// // to build up your call.
+/// let rb = hub.externaltransactions();
+/// # }
+/// ```
+pub struct ExternaltransactionMethods<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+}
+
+impl<'a, S> client::MethodsBuilder for ExternaltransactionMethods<'a, S> {}
+
+impl<'a, S> ExternaltransactionMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new external transaction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource where this external transaction will be created. Format: applications/{package_name}
+    pub fn createexternaltransaction(&self, request: ExternalTransaction, parent: &str) -> ExternaltransactionCreateexternaltransactionCall<'a, S> {
+        ExternaltransactionCreateexternaltransactionCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _external_transaction_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets an existing external transaction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the external transaction to retrieve. Format: applications/{package_name}/externalTransactions/{external_transaction}
+    pub fn getexternaltransaction(&self, name: &str) -> ExternaltransactionGetexternaltransactionCall<'a, S> {
+        ExternaltransactionGetexternaltransactionCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Refunds or partially refunds an existing external transaction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the external transaction that will be refunded. Format: applications/{package_name}/externalTransactions/{external_transaction}
+    pub fn refundexternaltransaction(&self, request: RefundExternalTransactionRequest, name: &str) -> ExternaltransactionRefundexternaltransactionCall<'a, S> {
+        ExternaltransactionRefundexternaltransactionCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4718,7 +7004,7 @@ impl<'a, S> GrantMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `batch_delete(...)`, `batch_get(...)`, `batch_update(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.inappproducts();
 /// # }
@@ -4735,7 +7021,63 @@ impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an in-app product (i.e. a managed product or a subscriptions).
+    /// Deletes in-app products (managed products or subscriptions). Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput. This method should not be used to delete subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Package name of the app.
+    pub fn batch_delete(&self, request: InappproductsBatchDeleteRequest, package_name: &str) -> InappproductBatchDeleteCall<'a, S> {
+        InappproductBatchDeleteCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reads multiple in-app products, which can be managed products or subscriptions. This method should not be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Package name of the app.
+    pub fn batch_get(&self, package_name: &str) -> InappproductBatchGetCall<'a, S> {
+        InappproductBatchGetCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _sku: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates or inserts one or more in-app products (managed products or subscriptions). Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput. This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Package name of the app.
+    pub fn batch_update(&self, request: InappproductsBatchUpdateRequest, package_name: &str) -> InappproductBatchUpdateCall<'a, S> {
+        InappproductBatchUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an in-app product (a managed product or a subscription). This method should no longer be used to delete subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
     /// 
     /// # Arguments
     ///
@@ -4746,6 +7088,7 @@ impl<'a, S> InappproductMethods<'a, S> {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _sku: sku.to_string(),
+            _latency_tolerance: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4754,7 +7097,7 @@ impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets an in-app product, which can be a managed product or a subscription.
+    /// Gets an in-app product, which can be a managed product or a subscription. This method should no longer be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
     /// 
     /// # Arguments
     ///
@@ -4773,7 +7116,7 @@ impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an in-app product (i.e. a managed product or a subscriptions).
+    /// Creates an in-app product (a managed product or a subscription). This method should no longer be used to create subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
     /// 
     /// # Arguments
     ///
@@ -4793,7 +7136,7 @@ impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field `tokenPagination.nextPageToken` will be set and the caller should provide its value as a `token` request parameter to retrieve the next page.
+    /// Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field `tokenPagination.nextPageToken` will be set and the caller should provide its value as a `token` request parameter to retrieve the next page. This method should no longer be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
     /// 
     /// # Arguments
     ///
@@ -4813,7 +7156,7 @@ impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Patches an in-app product (i.e. a managed product or a subscriptions).
+    /// Patches an in-app product (a managed product or a subscription). This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
     /// 
     /// # Arguments
     ///
@@ -4826,6 +7169,7 @@ impl<'a, S> InappproductMethods<'a, S> {
             _request: request,
             _package_name: package_name.to_string(),
             _sku: sku.to_string(),
+            _latency_tolerance: Default::default(),
             _auto_convert_missing_prices: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -4835,7 +7179,7 @@ impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an in-app product (i.e. a managed product or a subscriptions).
+    /// Updates an in-app product (a managed product or a subscription). This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
     /// 
     /// # Arguments
     ///
@@ -4848,6 +7192,7 @@ impl<'a, S> InappproductMethods<'a, S> {
             _request: request,
             _package_name: package_name.to_string(),
             _sku: sku.to_string(),
+            _latency_tolerance: Default::default(),
             _auto_convert_missing_prices: Default::default(),
             _allow_missing: Default::default(),
             _delegate: Default::default(),
@@ -4957,7 +7302,7 @@ impl<'a, S> InternalappsharingartifactMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `convert_region_prices(...)`, `subscriptions_archive(...)`, `subscriptions_base_plans_activate(...)`, `subscriptions_base_plans_deactivate(...)`, `subscriptions_base_plans_delete(...)`, `subscriptions_base_plans_migrate_prices(...)`, `subscriptions_base_plans_offers_activate(...)`, `subscriptions_base_plans_offers_create(...)`, `subscriptions_base_plans_offers_deactivate(...)`, `subscriptions_base_plans_offers_delete(...)`, `subscriptions_base_plans_offers_get(...)`, `subscriptions_base_plans_offers_list(...)`, `subscriptions_base_plans_offers_patch(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_list(...)` and `subscriptions_patch(...)`
+/// // like `convert_region_prices(...)`, `subscriptions_archive(...)`, `subscriptions_base_plans_activate(...)`, `subscriptions_base_plans_batch_migrate_prices(...)`, `subscriptions_base_plans_batch_update_states(...)`, `subscriptions_base_plans_deactivate(...)`, `subscriptions_base_plans_delete(...)`, `subscriptions_base_plans_migrate_prices(...)`, `subscriptions_base_plans_offers_activate(...)`, `subscriptions_base_plans_offers_batch_get(...)`, `subscriptions_base_plans_offers_batch_update(...)`, `subscriptions_base_plans_offers_batch_update_states(...)`, `subscriptions_base_plans_offers_create(...)`, `subscriptions_base_plans_offers_deactivate(...)`, `subscriptions_base_plans_offers_delete(...)`, `subscriptions_base_plans_offers_get(...)`, `subscriptions_base_plans_offers_list(...)`, `subscriptions_base_plans_offers_patch(...)`, `subscriptions_batch_get(...)`, `subscriptions_batch_update(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_list(...)` and `subscriptions_patch(...)`
 /// // to build up your call.
 /// let rb = hub.monetization();
 /// # }
@@ -4991,6 +7336,75 @@ impl<'a, S> MonetizationMethods<'a, S> {
             _product_id: product_id.to_string(),
             _base_plan_id: base_plan_id.to_string(),
             _offer_id: offer_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reads one or more subscription offers.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The parent app (package name) for which the subscriptions should be created or updated. Must be equal to the package_name field on all the requests.
+    /// * `productId` - Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set.
+    /// * `basePlanId` - Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read offers from multiple base plans.
+    pub fn subscriptions_base_plans_offers_batch_get(&self, request: BatchGetSubscriptionOffersRequest, package_name: &str, product_id: &str, base_plan_id: &str) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        MonetizationSubscriptionBasePlanOfferBatchGetCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _product_id: product_id.to_string(),
+            _base_plan_id: base_plan_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a batch of subscription offers. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The parent app (package name) of the updated subscription offers. Must be equal to the package_name field on all the updated SubscriptionOffer resources.
+    /// * `productId` - Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set.
+    /// * `basePlanId` - Required. The parent base plan (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple base plans.
+    pub fn subscriptions_base_plans_offers_batch_update(&self, request: BatchUpdateSubscriptionOffersRequest, package_name: &str, product_id: &str, base_plan_id: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        MonetizationSubscriptionBasePlanOfferBatchUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _product_id: product_id.to_string(),
+            _base_plan_id: base_plan_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a batch of subscription offer states. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The parent app (package name) of the updated subscription offers. Must be equal to the package_name field on all the updated SubscriptionOffer resources.
+    /// * `productId` - Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set.
+    /// * `basePlanId` - Required. The parent base plan (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple base plans.
+    pub fn subscriptions_base_plans_offers_batch_update_states(&self, request: BatchUpdateSubscriptionOfferStatesRequest, package_name: &str, product_id: &str, base_plan_id: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _product_id: product_id.to_string(),
+            _base_plan_id: base_plan_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5100,8 +7514,8 @@ impl<'a, S> MonetizationMethods<'a, S> {
     /// # Arguments
     ///
     /// * `packageName` - Required. The parent app (package name) for which the subscriptions should be read.
-    /// * `productId` - Required. The parent subscription (ID) for which the offers should be read.
-    /// * `basePlanId` - Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read all offers under a subscription.
+    /// * `productId` - Required. The parent subscription (ID) for which the offers should be read. May be specified as '-' to read all offers under an app.
+    /// * `basePlanId` - Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read all offers under a subscription or an app. Must be specified as '-' if product_id is specified as '-'.
     pub fn subscriptions_base_plans_offers_list(&self, package_name: &str, product_id: &str, base_plan_id: &str) -> MonetizationSubscriptionBasePlanOfferListCall<'a, S> {
         MonetizationSubscriptionBasePlanOfferListCall {
             hub: self.hub,
@@ -5137,6 +7551,8 @@ impl<'a, S> MonetizationMethods<'a, S> {
             _offer_id: offer_id.to_string(),
             _update_mask: Default::default(),
             _regions_version_version: Default::default(),
+            _latency_tolerance: Default::default(),
+            _allow_missing: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5160,6 +7576,48 @@ impl<'a, S> MonetizationMethods<'a, S> {
             _package_name: package_name.to_string(),
             _product_id: product_id.to_string(),
             _base_plan_id: base_plan_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Batch variant of the MigrateBasePlanPrices endpoint. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The parent app (package name) for which the subscriptions should be created or updated. Must be equal to the package_name field on all the Subscription resources.
+    /// * `productId` - Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this batch update spans multiple subscriptions, set this field to "-". Must be set.
+    pub fn subscriptions_base_plans_batch_migrate_prices(&self, request: BatchMigrateBasePlanPricesRequest, package_name: &str, product_id: &str) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {
+        MonetizationSubscriptionBasePlanBatchMigratePriceCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _product_id: product_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Activates or deactivates base plans across one or multiple subscriptions. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The parent app (package name) of the updated base plans.
+    /// * `productId` - Required. The product ID of the parent subscription, if all updated base plans belong to the same subscription. If this batch update spans multiple subscriptions, set this field to "-". Must be set.
+    pub fn subscriptions_base_plans_batch_update_states(&self, request: BatchUpdateBasePlanStatesRequest, package_name: &str, product_id: &str) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {
+        MonetizationSubscriptionBasePlanBatchUpdateStateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _product_id: product_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5235,7 +7693,7 @@ impl<'a, S> MonetizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Archives a subscription. Can only be done if at least one base plan was active in the past, and no base plan is available for new or existing subscribers currently. This action is irreversible, and the subscription ID will remain reserved.
+    /// Deprecated: subscription archiving is not supported.
     /// 
     /// # Arguments
     ///
@@ -5248,6 +7706,43 @@ impl<'a, S> MonetizationMethods<'a, S> {
             _request: request,
             _package_name: package_name.to_string(),
             _product_id: product_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reads one or more subscriptions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Required. The parent app (package name) for which the subscriptions should be retrieved. Must be equal to the package_name field on all the requests.
+    pub fn subscriptions_batch_get(&self, package_name: &str) -> MonetizationSubscriptionBatchGetCall<'a, S> {
+        MonetizationSubscriptionBatchGetCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _product_ids: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a batch of subscriptions. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The parent app (package name) for which the subscriptions should be updated. Must be equal to the package_name field on all the Subscription resources.
+    pub fn subscriptions_batch_update(&self, request: BatchUpdateSubscriptionsRequest, package_name: &str) -> MonetizationSubscriptionBatchUpdateCall<'a, S> {
+        MonetizationSubscriptionBatchUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5350,6 +7845,8 @@ impl<'a, S> MonetizationMethods<'a, S> {
             _product_id: product_id.to_string(),
             _update_mask: Default::default(),
             _regions_version_version: Default::default(),
+            _latency_tolerance: Default::default(),
+            _allow_missing: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5418,7 +7915,7 @@ impl<'a, S> OrderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refunds a user's subscription or in-app purchase order. Orders older than 1 year cannot be refunded.
+    /// Refunds a user's subscription or in-app purchase order. Orders older than 3 years cannot be refunded.
     /// 
     /// # Arguments
     ///
@@ -5462,7 +7959,7 @@ impl<'a, S> OrderMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `products_acknowledge(...)`, `products_get(...)`, `subscriptions_acknowledge(...)`, `subscriptions_cancel(...)`, `subscriptions_defer(...)`, `subscriptions_get(...)`, `subscriptions_refund(...)`, `subscriptions_revoke(...)`, `subscriptionsv2_get(...)` and `voidedpurchases_list(...)`
+/// // like `products_acknowledge(...)`, `products_consume(...)`, `products_get(...)`, `subscriptions_acknowledge(...)`, `subscriptions_cancel(...)`, `subscriptions_defer(...)`, `subscriptions_get(...)`, `subscriptions_refund(...)`, `subscriptions_revoke(...)`, `subscriptionsv2_get(...)`, `subscriptionsv2_revoke(...)` and `voidedpurchases_list(...)`
 /// // to build up your call.
 /// let rb = hub.purchases();
 /// # }
@@ -5491,6 +7988,27 @@ impl<'a, S> PurchaseMethods<'a, S> {
         PurchaseProductAcknowledgeCall {
             hub: self.hub,
             _request: request,
+            _package_name: package_name.to_string(),
+            _product_id: product_id.to_string(),
+            _token: token.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Consumes a purchase for an inapp item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
+    /// * `token` - The token provided to the user's device when the inapp product was purchased.
+    pub fn products_consume(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductConsumeCall<'a, S> {
+        PurchaseProductConsumeCall {
+            hub: self.hub,
             _package_name: package_name.to_string(),
             _product_id: product_id.to_string(),
             _token: token.to_string(),
@@ -5662,6 +8180,27 @@ impl<'a, S> PurchaseMethods<'a, S> {
     pub fn subscriptionsv2_get(&self, package_name: &str, token: &str) -> PurchaseSubscriptionsv2GetCall<'a, S> {
         PurchaseSubscriptionsv2GetCall {
             hub: self.hub,
+            _package_name: package_name.to_string(),
+            _token: token.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Revoke a subscription purchase for the user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Required. The package of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `token` - Required. The token provided to the user's device when the subscription was purchased.
+    pub fn subscriptionsv2_revoke(&self, request: RevokeSubscriptionPurchaseRequest, package_name: &str, token: &str) -> PurchaseSubscriptionsv2RevokeCall<'a, S> {
+        PurchaseSubscriptionsv2RevokeCall {
+            hub: self.hub,
+            _request: request,
             _package_name: package_name.to_string(),
             _token: token.to_string(),
             _delegate: Default::default(),
@@ -6374,7 +8913,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.applications().device_tier_configs_get("packageName", -55)
+/// let result = hub.applications().device_tier_configs_get("packageName", -50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6649,7 +9188,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().device_tier_configs_list("packageName")
-///              .page_token("Lorem")
+///              .page_token("ut")
 ///              .page_size(-12)
 ///              .doit().await;
 /// # }
@@ -6902,6 +9441,1776 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ApplicationDeviceTierConfigListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Writes the Safety Labels declaration of an app.
+///
+/// A builder for the *dataSafety* method supported by a *application* resource.
+/// It is not used directly, but through a [`ApplicationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::SafetyLabelsUpdateRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SafetyLabelsUpdateRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.applications().data_safety(req, "packageName")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ApplicationDataSafetyCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: SafetyLabelsUpdateRequest,
+    _package_name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ApplicationDataSafetyCall<'a, S> {}
+
+impl<'a, S> ApplicationDataSafetyCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, SafetyLabelsUpdateResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.applications.dataSafety",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/dataSafety";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SafetyLabelsUpdateRequest) -> ApplicationDataSafetyCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Package name of the app.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ApplicationDataSafetyCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationDataSafetyCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationDataSafetyCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ApplicationDataSafetyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ApplicationDataSafetyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ApplicationDataSafetyCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Incrementally update targeting for a recovery action. Note that only the criteria selected during the creation of recovery action can be expanded.
+///
+/// A builder for the *addTargeting* method supported by a *apprecovery* resource.
+/// It is not used directly, but through a [`ApprecoveryMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::AddTargetingRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddTargetingRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apprecovery().add_targeting(req, "packageName", -50)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ApprecoveryAddTargetingCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: AddTargetingRequest,
+    _package_name: String,
+    _app_recovery_id: i64,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ApprecoveryAddTargetingCall<'a, S> {}
+
+impl<'a, S> ApprecoveryAddTargetingCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddTargetingResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.apprecovery.addTargeting",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "appRecoveryId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("appRecoveryId", self._app_recovery_id.to_string());
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/appRecoveries/{appRecoveryId}:addTargeting";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{appRecoveryId}", "appRecoveryId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["appRecoveryId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddTargetingRequest) -> ApprecoveryAddTargetingCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Package name of the app for which recovery action is to be updated.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ApprecoveryAddTargetingCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. ID corresponding to the app recovery action.
+    ///
+    /// Sets the *app recovery id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn app_recovery_id(mut self, new_value: i64) -> ApprecoveryAddTargetingCall<'a, S> {
+        self._app_recovery_id = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApprecoveryAddTargetingCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ApprecoveryAddTargetingCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ApprecoveryAddTargetingCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ApprecoveryAddTargetingCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ApprecoveryAddTargetingCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// List all app recovery action resources associated with a particular package name and app version.
+///
+/// A builder for the *appRecoveries* method supported by a *apprecovery* resource.
+/// It is not used directly, but through a [`ApprecoveryMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apprecovery().app_recoveries("packageName")
+///              .version_code(-7)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ApprecoveryAppRecoveryCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _package_name: String,
+    _version_code: Option<i64>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ApprecoveryAppRecoveryCall<'a, S> {}
+
+impl<'a, S> ApprecoveryAppRecoveryCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAppRecoveriesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.apprecovery.appRecoveries",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "versionCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        if let Some(value) = self._version_code.as_ref() {
+            params.push("versionCode", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/appRecoveries";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Package name of the app for which list of recovery actions is requested.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ApprecoveryAppRecoveryCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. Version code targeted by the list of recovery actions.
+    ///
+    /// Sets the *version code* query property to the given value.
+    pub fn version_code(mut self, new_value: i64) -> ApprecoveryAppRecoveryCall<'a, S> {
+        self._version_code = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApprecoveryAppRecoveryCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ApprecoveryAppRecoveryCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ApprecoveryAppRecoveryCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ApprecoveryAppRecoveryCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ApprecoveryAppRecoveryCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Cancel an already executing app recovery action. Note that this action changes status of the recovery action to CANCELED.
+///
+/// A builder for the *cancel* method supported by a *apprecovery* resource.
+/// It is not used directly, but through a [`ApprecoveryMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::CancelAppRecoveryRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CancelAppRecoveryRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apprecovery().cancel(req, "packageName", -17)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ApprecoveryCancelCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: CancelAppRecoveryRequest,
+    _package_name: String,
+    _app_recovery_id: i64,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ApprecoveryCancelCall<'a, S> {}
+
+impl<'a, S> ApprecoveryCancelCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, CancelAppRecoveryResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.apprecovery.cancel",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "appRecoveryId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("appRecoveryId", self._app_recovery_id.to_string());
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/appRecoveries/{appRecoveryId}:cancel";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{appRecoveryId}", "appRecoveryId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["appRecoveryId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CancelAppRecoveryRequest) -> ApprecoveryCancelCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Package name of the app for which recovery action cancellation is requested.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ApprecoveryCancelCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. ID corresponding to the app recovery action.
+    ///
+    /// Sets the *app recovery id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn app_recovery_id(mut self, new_value: i64) -> ApprecoveryCancelCall<'a, S> {
+        self._app_recovery_id = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApprecoveryCancelCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ApprecoveryCancelCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ApprecoveryCancelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ApprecoveryCancelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ApprecoveryCancelCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Create an app recovery action with recovery status as DRAFT. Note that this action does not execute the recovery action.
+///
+/// A builder for the *create* method supported by a *apprecovery* resource.
+/// It is not used directly, but through a [`ApprecoveryMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::CreateDraftAppRecoveryRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateDraftAppRecoveryRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apprecovery().create(req, "packageName")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ApprecoveryCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: CreateDraftAppRecoveryRequest,
+    _package_name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ApprecoveryCreateCall<'a, S> {}
+
+impl<'a, S> ApprecoveryCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AppRecoveryAction)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.apprecovery.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/appRecoveries";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateDraftAppRecoveryRequest) -> ApprecoveryCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Package name of the app on which recovery action is performed.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ApprecoveryCreateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApprecoveryCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ApprecoveryCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ApprecoveryCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ApprecoveryCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ApprecoveryCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deploy an already created app recovery action with recovery status DRAFT. Note that this action activates the recovery action for all targeted users and changes its status to ACTIVE.
+///
+/// A builder for the *deploy* method supported by a *apprecovery* resource.
+/// It is not used directly, but through a [`ApprecoveryMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::DeployAppRecoveryRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = DeployAppRecoveryRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apprecovery().deploy(req, "packageName", -25)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ApprecoveryDeployCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: DeployAppRecoveryRequest,
+    _package_name: String,
+    _app_recovery_id: i64,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ApprecoveryDeployCall<'a, S> {}
+
+impl<'a, S> ApprecoveryDeployCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DeployAppRecoveryResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.apprecovery.deploy",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "appRecoveryId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("appRecoveryId", self._app_recovery_id.to_string());
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/appRecoveries/{appRecoveryId}:deploy";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{appRecoveryId}", "appRecoveryId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["appRecoveryId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: DeployAppRecoveryRequest) -> ApprecoveryDeployCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Package name of the app for which recovery action is deployed.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> ApprecoveryDeployCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. ID corresponding to the app recovery action to deploy.
+    ///
+    /// Sets the *app recovery id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn app_recovery_id(mut self, new_value: i64) -> ApprecoveryDeployCall<'a, S> {
+        self._app_recovery_id = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApprecoveryDeployCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ApprecoveryDeployCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ApprecoveryDeployCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ApprecoveryDeployCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ApprecoveryDeployCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -8172,8 +12481,8 @@ where
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().bundles_upload("packageName", "editId")
-///              .device_tier_config_id("gubergren")
-///              .ack_bundle_installation_warning(true)
+///              .device_tier_config_id("et")
+///              .ack_bundle_installation_warning(false)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -8865,7 +13174,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -99, "deobfuscationFileType")
+/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -28, "deobfuscationFileType")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -8992,8 +13301,8 @@ where
                             let request = if protocol == client::UploadProtocol::Simple {
                                 let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 838860800 {
-                    	return Err(client::Error::UploadSizeLimitExceeded(size, 838860800))
+                    if size > 1677721600 {
+                    	return Err(client::Error::UploadSizeLimitExceeded(size, 1677721600))
                     }
                                 let mut bytes = Vec::with_capacity(size as usize);
                                 reader.read_to_end(&mut bytes)?;
@@ -9042,8 +13351,8 @@ where
                     if protocol == client::UploadProtocol::Resumable {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 838860800 {
-                        	return Err(client::Error::UploadSizeLimitExceeded(size, 838860800))
+                        if size > 1677721600 {
+                        	return Err(client::Error::UploadSizeLimitExceeded(size, 1677721600))
                         }
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
@@ -9113,7 +13422,7 @@ where
     /// `cancel_chunk_upload(...)`.
     ///
     /// * *multipart*: yes
-    /// * *max size*: 838860800
+    /// * *max size*: 1677721600
     /// * *valid mime types*: 'application/octet-stream'
     pub async fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, DeobfuscationFilesUploadResponse)>
                 where RS: client::ReadSeek {
@@ -9123,7 +13432,7 @@ where
     /// If the upload fails for whichever reason, all progress is lost.
     ///
     /// * *multipart*: yes
-    /// * *max size*: 838860800
+    /// * *max size*: 1677721600
     /// * *valid mime types*: 'application/octet-stream'
     pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, DeobfuscationFilesUploadResponse)>
                 where RS: client::ReadSeek {
@@ -10154,7 +14463,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_get("packageName", "editId", -24, "expansionFileType")
+/// let result = hub.edits().expansionfiles_get("packageName", "editId", -20, "expansionFileType")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10458,7 +14767,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -76, "expansionFileType")
+/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -65, "expansionFileType")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10786,7 +15095,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -34, "expansionFileType")
+/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -29, "expansionFileType")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11109,7 +15418,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -96, "expansionFileType")
+/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -59, "expansionFileType")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -15441,6 +19750,310 @@ where
 }
 
 
+/// Creates a new track.
+///
+/// A builder for the *tracks.create* method supported by a *edit* resource.
+/// It is not used directly, but through a [`EditMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::TrackConfig;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TrackConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.edits().tracks_create(req, "packageName", "editId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct EditTrackCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: TrackConfig,
+    _package_name: String,
+    _edit_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for EditTrackCreateCall<'a, S> {}
+
+impl<'a, S> EditTrackCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Track)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.edits.tracks.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "editId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("editId", self._edit_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{editId}", "editId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["editId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TrackConfig) -> EditTrackCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Package name of the app.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> EditTrackCreateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the edit.
+    ///
+    /// Sets the *edit id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackCreateCall<'a, S> {
+        self._edit_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EditTrackCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> EditTrackCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EditTrackCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets a track.
 ///
 /// A builder for the *tracks.get* method supported by a *edit* resource.
@@ -15641,7 +20254,7 @@ where
         self._edit_id = new_value.to_string();
         self
     }
-    /// Identifier of the track.
+    /// Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -16231,7 +20844,7 @@ where
         self._edit_id = new_value.to_string();
         self
     }
-    /// Identifier of the track.
+    /// Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -16547,7 +21160,7 @@ where
         self._edit_id = new_value.to_string();
         self
     }
-    /// Identifier of the track.
+    /// Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -16660,7 +21273,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().commit("packageName", "editId")
-///              .changes_not_sent_for_review(true)
+///              .changes_not_sent_for_review(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18022,6 +22635,864 @@ where
 }
 
 
+/// Creates a new external transaction.
+///
+/// A builder for the *createexternaltransaction* method supported by a *externaltransaction* resource.
+/// It is not used directly, but through a [`ExternaltransactionMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::ExternalTransaction;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ExternalTransaction::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.externaltransactions().createexternaltransaction(req, "parent")
+///              .external_transaction_id("sit")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ExternaltransactionCreateexternaltransactionCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: ExternalTransaction,
+    _parent: String,
+    _external_transaction_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ExternaltransactionCreateexternaltransactionCall<'a, S> {}
+
+impl<'a, S> ExternaltransactionCreateexternaltransactionCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ExternalTransaction)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.externaltransactions.createexternaltransaction",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "externalTransactionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._external_transaction_id.as_ref() {
+            params.push("externalTransactionId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/{+parent}/externalTransactions";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ExternalTransaction) -> ExternaltransactionCreateexternaltransactionCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource where this external transaction will be created. Format: applications/{package_name}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ExternaltransactionCreateexternaltransactionCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The id to use for the external transaction. Must be unique across all other transactions for the app. This value should be 1-63 characters and valid characters are /a-z0-9_-/. Do not use this field to store any Personally Identifiable Information (PII) such as emails. Attempting to store PII in this field may result in requests being blocked.
+    ///
+    /// Sets the *external transaction id* query property to the given value.
+    pub fn external_transaction_id(mut self, new_value: &str) -> ExternaltransactionCreateexternaltransactionCall<'a, S> {
+        self._external_transaction_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ExternaltransactionCreateexternaltransactionCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ExternaltransactionCreateexternaltransactionCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ExternaltransactionCreateexternaltransactionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ExternaltransactionCreateexternaltransactionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ExternaltransactionCreateexternaltransactionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets an existing external transaction.
+///
+/// A builder for the *getexternaltransaction* method supported by a *externaltransaction* resource.
+/// It is not used directly, but through a [`ExternaltransactionMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.externaltransactions().getexternaltransaction("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ExternaltransactionGetexternaltransactionCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ExternaltransactionGetexternaltransactionCall<'a, S> {}
+
+impl<'a, S> ExternaltransactionGetexternaltransactionCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ExternalTransaction)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.externaltransactions.getexternaltransaction",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the external transaction to retrieve. Format: applications/{package_name}/externalTransactions/{external_transaction}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ExternaltransactionGetexternaltransactionCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ExternaltransactionGetexternaltransactionCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ExternaltransactionGetexternaltransactionCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ExternaltransactionGetexternaltransactionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ExternaltransactionGetexternaltransactionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ExternaltransactionGetexternaltransactionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Refunds or partially refunds an existing external transaction.
+///
+/// A builder for the *refundexternaltransaction* method supported by a *externaltransaction* resource.
+/// It is not used directly, but through a [`ExternaltransactionMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::RefundExternalTransactionRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RefundExternalTransactionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.externaltransactions().refundexternaltransaction(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ExternaltransactionRefundexternaltransactionCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: RefundExternalTransactionRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ExternaltransactionRefundexternaltransactionCall<'a, S> {}
+
+impl<'a, S> ExternaltransactionRefundexternaltransactionCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ExternalTransaction)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.externaltransactions.refundexternaltransaction",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/{+name}:refund";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RefundExternalTransactionRequest) -> ExternaltransactionRefundexternaltransactionCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the external transaction that will be refunded. Format: applications/{package_name}/externalTransactions/{external_transaction}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ExternaltransactionRefundexternaltransactionCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ExternaltransactionRefundexternaltransactionCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ExternaltransactionRefundexternaltransactionCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ExternaltransactionRefundexternaltransactionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ExternaltransactionRefundexternaltransactionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ExternaltransactionRefundexternaltransactionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Downloads a single signed APK generated from an app bundle.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
@@ -18051,7 +23522,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.generatedapks().download("packageName", -77, "downloadId")
+/// let result = hub.generatedapks().download("packageName", -17, "downloadId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18326,7 +23797,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.generatedapks().list("packageName", -69)
+/// let result = hub.generatedapks().list("packageName", -25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19421,7 +24892,857 @@ where
 }
 
 
-/// Deletes an in-app product (i.e. a managed product or a subscriptions).
+/// Deletes in-app products (managed products or subscriptions). Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput. This method should not be used to delete subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
+///
+/// A builder for the *batchDelete* method supported by a *inappproduct* resource.
+/// It is not used directly, but through a [`InappproductMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::InappproductsBatchDeleteRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InappproductsBatchDeleteRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.inappproducts().batch_delete(req, "packageName")
+///              .doit().await;
+/// # }
+/// ```
+pub struct InappproductBatchDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: InappproductsBatchDeleteRequest,
+    _package_name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for InappproductBatchDeleteCall<'a, S> {}
+
+impl<'a, S> InappproductBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.inappproducts.batchDelete",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+
+        params.extend(self._additional_params.iter());
+
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts:batchDelete";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InappproductsBatchDeleteRequest) -> InappproductBatchDeleteCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Package name of the app.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> InappproductBatchDeleteCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductBatchDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductBatchDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> InappproductBatchDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InappproductBatchDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InappproductBatchDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Reads multiple in-app products, which can be managed products or subscriptions. This method should not be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
+///
+/// A builder for the *batchGet* method supported by a *inappproduct* resource.
+/// It is not used directly, but through a [`InappproductMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.inappproducts().batch_get("packageName")
+///              .add_sku("eirmod")
+///              .doit().await;
+/// # }
+/// ```
+pub struct InappproductBatchGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _package_name: String,
+    _sku: Vec<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for InappproductBatchGetCall<'a, S> {}
+
+impl<'a, S> InappproductBatchGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, InappproductsBatchGetResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.inappproducts.batchGet",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "packageName", "sku"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        if self._sku.len() > 0 {
+            for f in self._sku.iter() {
+                params.push("sku", f);
+            }
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts:batchGet";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Package name of the app.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> InappproductBatchGetCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Unique identifier for the in-app products.
+    ///
+    /// Append the given value to the *sku* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_sku(mut self, new_value: &str) -> InappproductBatchGetCall<'a, S> {
+        self._sku.push(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductBatchGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductBatchGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> InappproductBatchGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InappproductBatchGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InappproductBatchGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates or inserts one or more in-app products (managed products or subscriptions). Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput. This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
+///
+/// A builder for the *batchUpdate* method supported by a *inappproduct* resource.
+/// It is not used directly, but through a [`InappproductMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::InappproductsBatchUpdateRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InappproductsBatchUpdateRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.inappproducts().batch_update(req, "packageName")
+///              .doit().await;
+/// # }
+/// ```
+pub struct InappproductBatchUpdateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: InappproductsBatchUpdateRequest,
+    _package_name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for InappproductBatchUpdateCall<'a, S> {}
+
+impl<'a, S> InappproductBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, InappproductsBatchUpdateResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.inappproducts.batchUpdate",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts:batchUpdate";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InappproductsBatchUpdateRequest) -> InappproductBatchUpdateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Package name of the app.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> InappproductBatchUpdateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductBatchUpdateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductBatchUpdateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> InappproductBatchUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InappproductBatchUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InappproductBatchUpdateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes an in-app product (a managed product or a subscription). This method should no longer be used to delete subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
 ///
 /// A builder for the *delete* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a [`InappproductMethods`] instance.
@@ -19448,6 +25769,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().delete("packageName", "sku")
+///              .latency_tolerance("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19457,6 +25779,7 @@ pub struct InappproductDeleteCall<'a, S>
     hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _sku: String,
+    _latency_tolerance: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -19485,16 +25808,19 @@ where
         dlg.begin(client::MethodInfo { id: "androidpublisher.inappproducts.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["packageName", "sku"].iter() {
+        for &field in ["packageName", "sku", "latencyTolerance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("packageName", self._package_name);
         params.push("sku", self._sku);
+        if let Some(value) = self._latency_tolerance.as_ref() {
+            params.push("latencyTolerance", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -19608,6 +25934,13 @@ where
         self._sku = new_value.to_string();
         self
     }
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    ///
+    /// Sets the *latency tolerance* query property to the given value.
+    pub fn latency_tolerance(mut self, new_value: &str) -> InappproductDeleteCall<'a, S> {
+        self._latency_tolerance = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -19684,7 +26017,7 @@ where
 }
 
 
-/// Gets an in-app product, which can be a managed product or a subscription.
+/// Gets an in-app product, which can be a managed product or a subscription. This method should no longer be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
 ///
 /// A builder for the *get* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a [`InappproductMethods`] instance.
@@ -19958,7 +26291,7 @@ where
 }
 
 
-/// Creates an in-app product (i.e. a managed product or a subscriptions).
+/// Creates an in-app product (a managed product or a subscription). This method should no longer be used to create subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
 ///
 /// A builder for the *insert* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a [`InappproductMethods`] instance.
@@ -20262,7 +26595,7 @@ where
 }
 
 
-/// Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field `tokenPagination.nextPageToken` will be set and the caller should provide its value as a `token` request parameter to retrieve the next page.
+/// Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field `tokenPagination.nextPageToken` will be set and the caller should provide its value as a `token` request parameter to retrieve the next page. This method should no longer be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
 ///
 /// A builder for the *list* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a [`InappproductMethods`] instance.
@@ -20289,9 +26622,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().list("packageName")
-///              .token("est")
-///              .start_index(19)
-///              .max_results(7)
+///              .token("et")
+///              .start_index(24)
+///              .max_results(97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20470,7 +26803,7 @@ where
         self._token = Some(new_value.to_string());
         self
     }
-    /// Deprecated and ignored. Set the `token` parameter to rertieve the next page.
+    /// Deprecated and ignored. Set the `token` parameter to retrieve the next page.
     ///
     /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a, S> {
@@ -20560,7 +26893,7 @@ where
 }
 
 
-/// Patches an in-app product (i.e. a managed product or a subscriptions).
+/// Patches an in-app product (a managed product or a subscription). This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
 ///
 /// A builder for the *patch* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a [`InappproductMethods`] instance.
@@ -20593,6 +26926,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().patch(req, "packageName", "sku")
+///              .latency_tolerance("erat")
 ///              .auto_convert_missing_prices(true)
 ///              .doit().await;
 /// # }
@@ -20604,6 +26938,7 @@ pub struct InappproductPatchCall<'a, S>
     _request: InAppProduct,
     _package_name: String,
     _sku: String,
+    _latency_tolerance: Option<String>,
     _auto_convert_missing_prices: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -20633,16 +26968,19 @@ where
         dlg.begin(client::MethodInfo { id: "androidpublisher.inappproducts.patch",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "packageName", "sku", "autoConvertMissingPrices"].iter() {
+        for &field in ["alt", "packageName", "sku", "latencyTolerance", "autoConvertMissingPrices"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("packageName", self._package_name);
         params.push("sku", self._sku);
+        if let Some(value) = self._latency_tolerance.as_ref() {
+            params.push("latencyTolerance", value);
+        }
         if let Some(value) = self._auto_convert_missing_prices.as_ref() {
             params.push("autoConvertMissingPrices", value.to_string());
         }
@@ -20793,6 +27131,13 @@ where
         self._sku = new_value.to_string();
         self
     }
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    ///
+    /// Sets the *latency tolerance* query property to the given value.
+    pub fn latency_tolerance(mut self, new_value: &str) -> InappproductPatchCall<'a, S> {
+        self._latency_tolerance = Some(new_value.to_string());
+        self
+    }
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
@@ -20876,7 +27221,7 @@ where
 }
 
 
-/// Updates an in-app product (i.e. a managed product or a subscriptions).
+/// Updates an in-app product (a managed product or a subscription). This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information.
 ///
 /// A builder for the *update* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a [`InappproductMethods`] instance.
@@ -20909,8 +27254,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().update(req, "packageName", "sku")
-///              .auto_convert_missing_prices(false)
-///              .allow_missing(true)
+///              .latency_tolerance("justo")
+///              .auto_convert_missing_prices(true)
+///              .allow_missing(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20921,6 +27267,7 @@ pub struct InappproductUpdateCall<'a, S>
     _request: InAppProduct,
     _package_name: String,
     _sku: String,
+    _latency_tolerance: Option<String>,
     _auto_convert_missing_prices: Option<bool>,
     _allow_missing: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20951,16 +27298,19 @@ where
         dlg.begin(client::MethodInfo { id: "androidpublisher.inappproducts.update",
                                http_method: hyper::Method::PUT });
 
-        for &field in ["alt", "packageName", "sku", "autoConvertMissingPrices", "allowMissing"].iter() {
+        for &field in ["alt", "packageName", "sku", "latencyTolerance", "autoConvertMissingPrices", "allowMissing"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
         params.push("packageName", self._package_name);
         params.push("sku", self._sku);
+        if let Some(value) = self._latency_tolerance.as_ref() {
+            params.push("latencyTolerance", value);
+        }
         if let Some(value) = self._auto_convert_missing_prices.as_ref() {
             params.push("autoConvertMissingPrices", value.to_string());
         }
@@ -21112,6 +27462,13 @@ where
     /// we provide this method for API completeness.
     pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a, S> {
         self._sku = new_value.to_string();
+        self
+    }
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    ///
+    /// Sets the *latency tolerance* query property to the given value.
+    pub fn latency_tolerance(mut self, new_value: &str) -> InappproductUpdateCall<'a, S> {
+        self._latency_tolerance = Some(new_value.to_string());
         self
     }
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
@@ -22276,6 +28633,954 @@ where
 }
 
 
+/// Reads one or more subscription offers.
+///
+/// A builder for the *subscriptions.basePlans.offers.batchGet* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::BatchGetSubscriptionOffersRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchGetSubscriptionOffersRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_base_plans_offers_batch_get(req, "packageName", "productId", "basePlanId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: BatchGetSubscriptionOffersRequest,
+    _package_name: String,
+    _product_id: String,
+    _base_plan_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchGetSubscriptionOffersResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.basePlans.offers.batchGet",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "productId", "basePlanId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("productId", self._product_id);
+        params.push("basePlanId", self._base_plan_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers:batchGet";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{productId}", "productId"), ("{basePlanId}", "basePlanId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["basePlanId", "productId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchGetSubscriptionOffersRequest) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent app (package name) for which the subscriptions should be created or updated. Must be equal to the package_name field on all the requests.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read offers from multiple base plans.
+    ///
+    /// Sets the *base plan id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn base_plan_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        self._base_plan_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBasePlanOfferBatchGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates a batch of subscription offers. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+///
+/// A builder for the *subscriptions.basePlans.offers.batchUpdate* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::BatchUpdateSubscriptionOffersRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUpdateSubscriptionOffersRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_base_plans_offers_batch_update(req, "packageName", "productId", "basePlanId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: BatchUpdateSubscriptionOffersRequest,
+    _package_name: String,
+    _product_id: String,
+    _base_plan_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchUpdateSubscriptionOffersResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.basePlans.offers.batchUpdate",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "productId", "basePlanId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("productId", self._product_id);
+        params.push("basePlanId", self._base_plan_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers:batchUpdate";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{productId}", "productId"), ("{basePlanId}", "basePlanId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["basePlanId", "productId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchUpdateSubscriptionOffersRequest) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent app (package name) of the updated subscription offers. Must be equal to the package_name field on all the updated SubscriptionOffer resources.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// Required. The parent base plan (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple base plans.
+    ///
+    /// Sets the *base plan id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn base_plan_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        self._base_plan_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBasePlanOfferBatchUpdateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates a batch of subscription offer states. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+///
+/// A builder for the *subscriptions.basePlans.offers.batchUpdateStates* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::BatchUpdateSubscriptionOfferStatesRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUpdateSubscriptionOfferStatesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_base_plans_offers_batch_update_states(req, "packageName", "productId", "basePlanId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: BatchUpdateSubscriptionOfferStatesRequest,
+    _package_name: String,
+    _product_id: String,
+    _base_plan_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchUpdateSubscriptionOfferStatesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.basePlans.offers.batchUpdateStates",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "productId", "basePlanId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("productId", self._product_id);
+        params.push("basePlanId", self._base_plan_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans/{basePlanId}/offers:batchUpdateStates";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{productId}", "productId"), ("{basePlanId}", "basePlanId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["basePlanId", "productId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchUpdateSubscriptionOfferStatesRequest) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent app (package name) of the updated subscription offers. Must be equal to the package_name field on all the updated SubscriptionOffer resources.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// Required. The parent base plan (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple base plans.
+    ///
+    /// Sets the *base plan id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn base_plan_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        self._base_plan_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a new subscription offer. Only auto-renewing base plans can have subscription offers. The offer state will be DRAFT until it is activated.
 ///
 /// A builder for the *subscriptions.basePlans.offers.create* method supported by a *monetization* resource.
@@ -22309,8 +29614,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_base_plans_offers_create(req, "packageName", "productId", "basePlanId")
-///              .regions_version_version("eirmod")
-///              .offer_id("Lorem")
+///              .regions_version_version("duo")
+///              .offer_id("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22526,7 +29831,7 @@ where
         self._base_plan_id = new_value.to_string();
         self
     }
-    /// Required. A string representing version of the available regions being used for the specified resource. The current version is 2022/02.
+    /// Required. A string representing the version of available regions being used for the specified resource. Regional prices for the resource have to be specified according to the information published in [this article](https://support.google.com/googleplay/android-developer/answer/10532353). Each time the supported locations substantially change, the version will be incremented. Using this field will ensure that creating and updating the resource with an older region's version and set of regional prices and currencies will succeed even though a new version is available. The latest version is 2022/02.
     ///
     /// Sets the *regions version.version* query property to the given value.
     pub fn regions_version_version(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferCreateCall<'a, S> {
@@ -23556,8 +30861,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_base_plans_offers_list("packageName", "productId", "basePlanId")
-///              .page_token("sea")
-///              .page_size(-41)
+///              .page_token("tempor")
+///              .page_size(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23729,7 +31034,7 @@ where
         self._package_name = new_value.to_string();
         self
     }
-    /// Required. The parent subscription (ID) for which the offers should be read.
+    /// Required. The parent subscription (ID) for which the offers should be read. May be specified as '-' to read all offers under an app.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -23739,7 +31044,7 @@ where
         self._product_id = new_value.to_string();
         self
     }
-    /// Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read all offers under a subscription.
+    /// Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read all offers under a subscription or an app. Must be specified as '-' if product_id is specified as '-'.
     ///
     /// Sets the *base plan id* path property to the given value.
     ///
@@ -23873,7 +31178,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_base_plans_offers_patch(req, "packageName", "productId", "basePlanId", "offerId")
 ///              .update_mask(&Default::default())
-///              .regions_version_version("consetetur")
+///              .regions_version_version("ut")
+///              .latency_tolerance("At")
+///              .allow_missing(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23888,6 +31195,8 @@ pub struct MonetizationSubscriptionBasePlanOfferPatchCall<'a, S>
     _offer_id: String,
     _update_mask: Option<client::FieldMask>,
     _regions_version_version: Option<String>,
+    _latency_tolerance: Option<String>,
+    _allow_missing: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -23916,14 +31225,14 @@ where
         dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.basePlans.offers.patch",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "packageName", "productId", "basePlanId", "offerId", "updateMask", "regionsVersion.version"].iter() {
+        for &field in ["alt", "packageName", "productId", "basePlanId", "offerId", "updateMask", "regionsVersion.version", "latencyTolerance", "allowMissing"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
         params.push("packageName", self._package_name);
         params.push("productId", self._product_id);
         params.push("basePlanId", self._base_plan_id);
@@ -23933,6 +31242,12 @@ where
         }
         if let Some(value) = self._regions_version_version.as_ref() {
             params.push("regionsVersion.version", value);
+        }
+        if let Some(value) = self._latency_tolerance.as_ref() {
+            params.push("latencyTolerance", value);
+        }
+        if let Some(value) = self._allow_missing.as_ref() {
+            params.push("allowMissing", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -24108,11 +31423,25 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// Required. A string representing version of the available regions being used for the specified resource. The current version is 2022/02.
+    /// Required. A string representing the version of available regions being used for the specified resource. Regional prices for the resource have to be specified according to the information published in [this article](https://support.google.com/googleplay/android-developer/answer/10532353). Each time the supported locations substantially change, the version will be incremented. Using this field will ensure that creating and updating the resource with an older region's version and set of regional prices and currencies will succeed even though a new version is available. The latest version is 2022/02.
     ///
     /// Sets the *regions version.version* query property to the given value.
     pub fn regions_version_version(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferPatchCall<'a, S> {
         self._regions_version_version = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    ///
+    /// Sets the *latency tolerance* query property to the given value.
+    pub fn latency_tolerance(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanOfferPatchCall<'a, S> {
+        self._latency_tolerance = Some(new_value.to_string());
+        self
+    }
+    /// Optional. If set to true, and the subscription offer with the given package_name, product_id, base_plan_id and offer_id doesn't exist, an offer will be created. If a new offer is created, update_mask is ignored.
+    ///
+    /// Sets the *allow missing* query property to the given value.
+    pub fn allow_missing(mut self, new_value: bool) -> MonetizationSubscriptionBasePlanOfferPatchCall<'a, S> {
+        self._allow_missing = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -24501,6 +31830,614 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> MonetizationSubscriptionBasePlanActivateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Batch variant of the MigrateBasePlanPrices endpoint. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+///
+/// A builder for the *subscriptions.basePlans.batchMigratePrices* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::BatchMigrateBasePlanPricesRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchMigrateBasePlanPricesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_base_plans_batch_migrate_prices(req, "packageName", "productId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: BatchMigrateBasePlanPricesRequest,
+    _package_name: String,
+    _product_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchMigrateBasePlanPricesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.basePlans.batchMigratePrices",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "productId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("productId", self._product_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans:batchMigratePrices";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{productId}", "productId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["productId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchMigrateBasePlanPricesRequest) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent app (package name) for which the subscriptions should be created or updated. Must be equal to the package_name field on all the Subscription resources.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this batch update spans multiple subscriptions, set this field to "-". Must be set.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBasePlanBatchMigratePriceCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Activates or deactivates base plans across one or multiple subscriptions. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+///
+/// A builder for the *subscriptions.basePlans.batchUpdateStates* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::BatchUpdateBasePlanStatesRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUpdateBasePlanStatesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_base_plans_batch_update_states(req, "packageName", "productId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: BatchUpdateBasePlanStatesRequest,
+    _package_name: String,
+    _product_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchUpdateBasePlanStatesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.basePlans.batchUpdateStates",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "productId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("productId", self._product_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions/{productId}/basePlans:batchUpdateStates";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{productId}", "productId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["productId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchUpdateBasePlanStatesRequest) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent app (package name) of the updated base plans.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. The product ID of the parent subscription, if all updated base plans belong to the same subscription. If this batch update spans multiple subscriptions, set this field to "-". Must be set.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBasePlanBatchUpdateStateCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -25414,7 +33351,7 @@ where
 }
 
 
-/// Archives a subscription. Can only be done if at least one base plan was active in the past, and no base plan is available for new or existing subscribers currently. This action is irreversible, and the subscription ID will remain reserved.
+/// Deprecated: subscription archiving is not supported.
 ///
 /// A builder for the *subscriptions.archive* method supported by a *monetization* resource.
 /// It is not used directly, but through a [`MonetizationMethods`] instance.
@@ -25718,6 +33655,575 @@ where
 }
 
 
+/// Reads one or more subscriptions.
+///
+/// A builder for the *subscriptions.batchGet* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_batch_get("packageName")
+///              .add_product_ids("aliquyam")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBatchGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _package_name: String,
+    _product_ids: Vec<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBatchGetCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBatchGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchGetSubscriptionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.batchGet",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "packageName", "productIds"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        if self._product_ids.len() > 0 {
+            for f in self._product_ids.iter() {
+                params.push("productIds", f);
+            }
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions:batchGet";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent app (package name) for which the subscriptions should be retrieved. Must be equal to the package_name field on all the requests.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBatchGetCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. A list of up to 100 subscription product IDs to retrieve. All the IDs must be different.
+    ///
+    /// Append the given value to the *product ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_product_ids(mut self, new_value: &str) -> MonetizationSubscriptionBatchGetCall<'a, S> {
+        self._product_ids.push(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBatchGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBatchGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBatchGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBatchGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBatchGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates a batch of subscriptions. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput.
+///
+/// A builder for the *subscriptions.batchUpdate* method supported by a *monetization* resource.
+/// It is not used directly, but through a [`MonetizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::BatchUpdateSubscriptionsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUpdateSubscriptionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.monetization().subscriptions_batch_update(req, "packageName")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MonetizationSubscriptionBatchUpdateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: BatchUpdateSubscriptionsRequest,
+    _package_name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MonetizationSubscriptionBatchUpdateCall<'a, S> {}
+
+impl<'a, S> MonetizationSubscriptionBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchUpdateSubscriptionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.batchUpdate",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/subscriptions:batchUpdate";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchUpdateSubscriptionsRequest) -> MonetizationSubscriptionBatchUpdateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent app (package name) for which the subscriptions should be updated. Must be equal to the package_name field on all the Subscription resources.
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> MonetizationSubscriptionBatchUpdateCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationSubscriptionBatchUpdateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationSubscriptionBatchUpdateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MonetizationSubscriptionBatchUpdateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MonetizationSubscriptionBatchUpdateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MonetizationSubscriptionBatchUpdateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a new subscription. Newly added base plans will remain in draft state until activated.
 ///
 /// A builder for the *subscriptions.create* method supported by a *monetization* resource.
@@ -25751,8 +34257,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_create(req, "packageName")
-///              .regions_version_version("sadipscing")
-///              .product_id("At")
+///              .regions_version_version("vero")
+///              .product_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25944,7 +34450,7 @@ where
         self._package_name = new_value.to_string();
         self
     }
-    /// Required. A string representing version of the available regions being used for the specified resource. The current version is 2022/02.
+    /// Required. A string representing the version of available regions being used for the specified resource. Regional prices for the resource have to be specified according to the information published in [this article](https://support.google.com/googleplay/android-developer/answer/10532353). Each time the supported locations substantially change, the version will be incremented. Using this field will ensure that creating and updating the resource with an older region's version and set of regional prices and currencies will succeed even though a new version is available. The latest version is 2022/02.
     ///
     /// Sets the *regions version.version* query property to the given value.
     pub fn regions_version_version(mut self, new_value: &str) -> MonetizationSubscriptionCreateCall<'a, S> {
@@ -26600,7 +35106,7 @@ where
 /// let result = hub.monetization().subscriptions_list("packageName")
 ///              .show_archived(true)
 ///              .page_token("dolor")
-///              .page_size(-6)
+///              .page_size(-82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26772,7 +35278,7 @@ where
         self._package_name = new_value.to_string();
         self
     }
-    /// Whether archived subscriptions should be included in the response. Defaults to false.
+    /// Deprecated: subscription archiving is not supported.
     ///
     /// Sets the *show archived* query property to the given value.
     pub fn show_archived(mut self, new_value: bool) -> MonetizationSubscriptionListCall<'a, S> {
@@ -26903,7 +35409,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.monetization().subscriptions_patch(req, "packageName", "productId")
 ///              .update_mask(&Default::default())
-///              .regions_version_version("no")
+///              .regions_version_version("nonumy")
+///              .latency_tolerance("et")
+///              .allow_missing(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26916,6 +35424,8 @@ pub struct MonetizationSubscriptionPatchCall<'a, S>
     _product_id: String,
     _update_mask: Option<client::FieldMask>,
     _regions_version_version: Option<String>,
+    _latency_tolerance: Option<String>,
+    _allow_missing: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -26944,14 +35454,14 @@ where
         dlg.begin(client::MethodInfo { id: "androidpublisher.monetization.subscriptions.patch",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "packageName", "productId", "updateMask", "regionsVersion.version"].iter() {
+        for &field in ["alt", "packageName", "productId", "updateMask", "regionsVersion.version", "latencyTolerance", "allowMissing"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
         params.push("packageName", self._package_name);
         params.push("productId", self._product_id);
         if let Some(value) = self._update_mask.as_ref() {
@@ -26959,6 +35469,12 @@ where
         }
         if let Some(value) = self._regions_version_version.as_ref() {
             params.push("regionsVersion.version", value);
+        }
+        if let Some(value) = self._latency_tolerance.as_ref() {
+            params.push("latencyTolerance", value);
+        }
+        if let Some(value) = self._allow_missing.as_ref() {
+            params.push("allowMissing", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -27114,11 +35630,25 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// Required. A string representing version of the available regions being used for the specified resource. The current version is 2022/02.
+    /// Required. A string representing the version of available regions being used for the specified resource. Regional prices for the resource have to be specified according to the information published in [this article](https://support.google.com/googleplay/android-developer/answer/10532353). Each time the supported locations substantially change, the version will be incremented. Using this field will ensure that creating and updating the resource with an older region's version and set of regional prices and currencies will succeed even though a new version is available. The latest version is 2022/02.
     ///
     /// Sets the *regions version.version* query property to the given value.
     pub fn regions_version_version(mut self, new_value: &str) -> MonetizationSubscriptionPatchCall<'a, S> {
         self._regions_version_version = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The latency tolerance for the propagation of this product update. Defaults to latency-sensitive.
+    ///
+    /// Sets the *latency tolerance* query property to the given value.
+    pub fn latency_tolerance(mut self, new_value: &str) -> MonetizationSubscriptionPatchCall<'a, S> {
+        self._latency_tolerance = Some(new_value.to_string());
+        self
+    }
+    /// Optional. If set to true, and the subscription with the given package_name and product_id doesn't exist, the subscription will be created. If a new subscription is created, update_mask is ignored.
+    ///
+    /// Sets the *allow missing* query property to the given value.
+    pub fn allow_missing(mut self, new_value: bool) -> MonetizationSubscriptionPatchCall<'a, S> {
+        self._allow_missing = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -27489,7 +36019,7 @@ where
 }
 
 
-/// Refunds a user's subscription or in-app purchase order. Orders older than 1 year cannot be refunded.
+/// Refunds a user's subscription or in-app purchase order. Orders older than 3 years cannot be refunded.
 ///
 /// A builder for the *refund* method supported by a *order* resource.
 /// It is not used directly, but through a [`OrderMethods`] instance.
@@ -28063,6 +36593,281 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> PurchaseProductAcknowledgeCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Consumes a purchase for an inapp item.
+///
+/// A builder for the *products.consume* method supported by a *purchase* resource.
+/// It is not used directly, but through a [`PurchaseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.purchases().products_consume("packageName", "productId", "token")
+///              .doit().await;
+/// # }
+/// ```
+pub struct PurchaseProductConsumeCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _package_name: String,
+    _product_id: String,
+    _token: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for PurchaseProductConsumeCall<'a, S> {}
+
+impl<'a, S> PurchaseProductConsumeCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.purchases.products.consume",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["packageName", "productId", "token"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("productId", self._product_id);
+        params.push("token", self._token);
+
+        params.extend(self._additional_params.iter());
+
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:consume";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{productId}", "productId"), ("{token}", "token")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["token", "productId", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> PurchaseProductConsumeCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The inapp product SKU (for example, 'com.some.thing.inapp1').
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> PurchaseProductConsumeCall<'a, S> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The token provided to the user's device when the inapp product was purchased.
+    ///
+    /// Sets the *token* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn token(mut self, new_value: &str) -> PurchaseProductConsumeCall<'a, S> {
+        self._token = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseProductConsumeCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductConsumeCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PurchaseProductConsumeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PurchaseProductConsumeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PurchaseProductConsumeCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -30361,6 +39166,310 @@ where
 }
 
 
+/// Revoke a subscription purchase for the user.
+///
+/// A builder for the *subscriptionsv2.revoke* method supported by a *purchase* resource.
+/// It is not used directly, but through a [`PurchaseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::api::RevokeSubscriptionPurchaseRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidpublisher3::{AndroidPublisher, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RevokeSubscriptionPurchaseRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.purchases().subscriptionsv2_revoke(req, "packageName", "token")
+///              .doit().await;
+/// # }
+/// ```
+pub struct PurchaseSubscriptionsv2RevokeCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidPublisher<S>,
+    _request: RevokeSubscriptionPurchaseRequest,
+    _package_name: String,
+    _token: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionsv2RevokeCall<'a, S> {}
+
+impl<'a, S> PurchaseSubscriptionsv2RevokeCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RevokeSubscriptionPurchaseResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidpublisher.purchases.subscriptionsv2.revoke",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "packageName", "token"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("packageName", self._package_name);
+        params.push("token", self._token);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptionsv2/tokens/{token}:revoke";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{token}", "token")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["token", "packageName"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RevokeSubscriptionPurchaseRequest) -> PurchaseSubscriptionsv2RevokeCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The package of the application for which this subscription was purchased (for example, 'com.some.thing').
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionsv2RevokeCall<'a, S> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Required. The token provided to the user's device when the subscription was purchased.
+    ///
+    /// Sets the *token* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionsv2RevokeCall<'a, S> {
+        self._token = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionsv2RevokeCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionsv2RevokeCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PurchaseSubscriptionsv2RevokeCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PurchaseSubscriptionsv2RevokeCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PurchaseSubscriptionsv2RevokeCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Lists the purchases that were canceled, refunded or charged-back.
 ///
 /// A builder for the *voidedpurchases.list* method supported by a *purchase* resource.
@@ -30388,12 +39497,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.purchases().voidedpurchases_list("packageName")
-///              .type_(-27)
-///              .token("invidunt")
-///              .start_time(-14)
-///              .start_index(86)
-///              .max_results(19)
-///              .end_time(-37)
+///              .type_(-81)
+///              .token("clita")
+///              .start_time(-76)
+///              .start_index(13)
+///              .max_results(10)
+///              .end_time(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30722,7 +39831,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().get("packageName", "reviewId")
-///              .translation_language("rebum.")
+///              .translation_language("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -31008,10 +40117,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().list("packageName")
-///              .translation_language("consetetur")
-///              .token("dolores")
-///              .start_index(71)
-///              .max_results(63)
+///              .translation_language("eos")
+///              .token("duo")
+///              .start_index(7)
+///              .max_results(55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31627,7 +40736,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_create(req, "packageName", -83)
+/// let result = hub.systemapks().variants_create(req, "packageName", -59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31928,7 +41037,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_download("packageName", -91, 83)
+/// let result = hub.systemapks().variants_download("packageName", -42, 60)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32203,7 +41312,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_get("packageName", -23, 62)
+/// let result = hub.systemapks().variants_get("packageName", -77, 9)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32489,7 +41598,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.systemapks().variants_list("packageName", -7)
+/// let result = hub.systemapks().variants_list("packageName", -93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33307,8 +42416,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().list("parent")
-///              .page_token("At")
-///              .page_size(-81)
+///              .page_token("ipsum")
+///              .page_size(-67)
 ///              .doit().await;
 /// # }
 /// ```

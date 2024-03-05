@@ -4,7 +4,7 @@
 [package]
 
 name = "google-searchconsole1-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Search Console (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/searchconsole1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-searchconsole1]
 path = "../searchconsole1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240304"
 

@@ -1,4 +1,4 @@
-site_name: Cloudchannel v5.0.3+20230123
+site_name: Cloudchannel v5.0.3+20240303
 site_url: http://byron.github.io/google-apis-rs/google-cloudchannel1-cli
 site_description: A complete library to interact with Cloudchannel (protocol v1)
 
@@ -41,6 +41,7 @@ nav:
     - 'Customers Entitlements Create': 'accounts_customers-entitlements-create.md'
     - 'Customers Entitlements Get': 'accounts_customers-entitlements-get.md'
     - 'Customers Entitlements List': 'accounts_customers-entitlements-list.md'
+    - 'Customers Entitlements List Entitlement Changes': 'accounts_customers-entitlements-list-entitlement-changes.md'
     - 'Customers Entitlements Lookup Offer': 'accounts_customers-entitlements-lookup-offer.md'
     - 'Customers Entitlements Start Paid Service': 'accounts_customers-entitlements-start-paid-service.md'
     - 'Customers Entitlements Suspend': 'accounts_customers-entitlements-suspend.md'
@@ -51,6 +52,7 @@ nav:
     - 'Customers List Purchasable Skus': 'accounts_customers-list-purchasable-skus.md'
     - 'Customers Patch': 'accounts_customers-patch.md'
     - 'Customers Provision Cloud Identity': 'accounts_customers-provision-cloud-identity.md'
+    - 'Customers Query Eligible Billing Accounts': 'accounts_customers-query-eligible-billing-accounts.md'
     - 'Customers Transfer Entitlements': 'accounts_customers-transfer-entitlements.md'
     - 'Customers Transfer Entitlements To Google': 'accounts_customers-transfer-entitlements-to-google.md'
     - 'List Subscribers': 'accounts_list-subscribers.md'
@@ -61,6 +63,8 @@ nav:
     - 'Report Jobs Fetch Report Results': 'accounts_report-jobs-fetch-report-results.md'
     - 'Reports List': 'accounts_reports-list.md'
     - 'Reports Run': 'accounts_reports-run.md'
+    - 'Sku Groups Billable Skus List': 'accounts_sku-groups-billable-skus-list.md'
+    - 'Sku Groups List': 'accounts_sku-groups-list.md'
     - 'Unregister': 'accounts_unregister.md'
 - 'Operations':
     - 'Cancel': 'operations_cancel.md'

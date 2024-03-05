@@ -1,4 +1,4 @@
-site_name: Dataproc v5.0.3+20230103
+site_name: Dataproc v5.0.3+20240222
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: A complete library to interact with Dataproc (protocol v1)
 
@@ -26,6 +26,16 @@ nav:
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Session Templates Create': 'projects_locations-session-templates-create.md'
+    - 'Locations Session Templates Delete': 'projects_locations-session-templates-delete.md'
+    - 'Locations Session Templates Get': 'projects_locations-session-templates-get.md'
+    - 'Locations Session Templates List': 'projects_locations-session-templates-list.md'
+    - 'Locations Session Templates Patch': 'projects_locations-session-templates-patch.md'
+    - 'Locations Sessions Create': 'projects_locations-sessions-create.md'
+    - 'Locations Sessions Delete': 'projects_locations-sessions-delete.md'
+    - 'Locations Sessions Get': 'projects_locations-sessions-get.md'
+    - 'Locations Sessions List': 'projects_locations-sessions-list.md'
+    - 'Locations Sessions Terminate': 'projects_locations-sessions-terminate.md'
     - 'Locations Workflow Templates Create': 'projects_locations-workflow-templates-create.md'
     - 'Locations Workflow Templates Delete': 'projects_locations-workflow-templates-delete.md'
     - 'Locations Workflow Templates Get': 'projects_locations-workflow-templates-get.md'
@@ -53,6 +63,7 @@ nav:
     - 'Regions Clusters List': 'projects_regions-clusters-list.md'
     - 'Regions Clusters Node Groups Create': 'projects_regions-clusters-node-groups-create.md'
     - 'Regions Clusters Node Groups Get': 'projects_regions-clusters-node-groups-get.md'
+    - 'Regions Clusters Node Groups Repair': 'projects_regions-clusters-node-groups-repair.md'
     - 'Regions Clusters Node Groups Resize': 'projects_regions-clusters-node-groups-resize.md'
     - 'Regions Clusters Patch': 'projects_regions-clusters-patch.md'
     - 'Regions Clusters Repair': 'projects_regions-clusters-repair.md'

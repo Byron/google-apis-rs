@@ -279,6 +279,7 @@ where
                     "build-environment-variables" => Some(("buildEnvironmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build-name" => Some(("buildName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build-service-account" => Some(("buildServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build-worker-pool" => Some(("buildWorkerPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "docker-registry" => Some(("dockerRegistry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -297,6 +298,7 @@ where
                     "min-instances" => Some(("minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "on-deploy-update-policy.runtime-version" => Some(("onDeployUpdatePolicy.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -311,7 +313,7 @@ where
                     "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-environment-variables", "build-id", "build-name", "build-worker-pool", "deployed-url", "description", "docker-registry", "docker-repository", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "kms-key-name", "labels", "max-instances", "min-instances", "name", "network", "resource", "runtime", "security-level", "service", "service-account-email", "source-archive-url", "source-repository", "source-token", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-environment-variables", "build-id", "build-name", "build-service-account", "build-worker-pool", "deployed-url", "description", "docker-registry", "docker-repository", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "kms-key-name", "labels", "max-instances", "min-instances", "name", "network", "on-deploy-update-policy", "resource", "runtime", "runtime-version", "security-level", "service", "service-account-email", "source-archive-url", "source-repository", "source-token", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -599,6 +601,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "version-id" => {
+                    call = call.version_id(        value.map(|v| arg_from_str(v, err, "version-id", "int64")).unwrap_or(-0));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -612,6 +617,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -787,6 +793,7 @@ where
                     "build-environment-variables" => Some(("buildEnvironmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build-name" => Some(("buildName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build-service-account" => Some(("buildServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build-worker-pool" => Some(("buildWorkerPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "docker-registry" => Some(("dockerRegistry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -805,6 +812,7 @@ where
                     "min-instances" => Some(("minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "on-deploy-update-policy.runtime-version" => Some(("onDeployUpdatePolicy.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -819,7 +827,7 @@ where
                     "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-environment-variables", "build-id", "build-name", "build-worker-pool", "deployed-url", "description", "docker-registry", "docker-repository", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "kms-key-name", "labels", "max-instances", "min-instances", "name", "network", "resource", "runtime", "security-level", "service", "service-account-email", "source-archive-url", "source-repository", "source-token", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-environment-variables", "build-id", "build-name", "build-service-account", "build-worker-pool", "deployed-url", "description", "docker-registry", "docker-repository", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "kms-key-name", "labels", "max-instances", "min-instances", "name", "network", "on-deploy-update-policy", "resource", "runtime", "runtime-version", "security-level", "service", "service-account-email", "source-archive-url", "source-repository", "source-token", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1277,7 +1285,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/operations_list",
                   vec![
                     (Some(r##"v"##),
@@ -1607,7 +1615,7 @@ async fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.3+20240229")
            .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")

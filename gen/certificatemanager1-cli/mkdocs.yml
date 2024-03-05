@@ -1,4 +1,4 @@
-site_name: Certificate Manager v5.0.3+20230104
+site_name: Certificate Manager v5.0.3+20240221
 site_url: http://byron.github.io/google-apis-rs/google-certificatemanager1-cli
 site_description: A complete library to interact with Certificate Manager (protocol v1)
 
@@ -40,6 +40,11 @@ nav:
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Trust Configs Create': 'projects_locations-trust-configs-create.md'
+    - 'Locations Trust Configs Delete': 'projects_locations-trust-configs-delete.md'
+    - 'Locations Trust Configs Get': 'projects_locations-trust-configs-get.md'
+    - 'Locations Trust Configs List': 'projects_locations-trust-configs-list.md'
+    - 'Locations Trust Configs Patch': 'projects_locations-trust-configs-patch.md'
 
 theme: readthedocs
 

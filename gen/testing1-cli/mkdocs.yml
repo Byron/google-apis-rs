@@ -1,4 +1,4 @@
-site_name: testing v5.0.3+20230119
+site_name: testing v5.0.3+20240227
 site_url: http://byron.github.io/google-apis-rs/google-testing1-cli
 site_description: A complete library to interact with testing (protocol v1)
 
@@ -12,6 +12,11 @@ nav:
 - 'Application Detail Service':
     - 'Get Apk Details': 'application-detail-service_get-apk-details.md'
 - 'Projects':
+    - 'Device Sessions Cancel': 'projects_device-sessions-cancel.md'
+    - 'Device Sessions Create': 'projects_device-sessions-create.md'
+    - 'Device Sessions Get': 'projects_device-sessions-get.md'
+    - 'Device Sessions List': 'projects_device-sessions-list.md'
+    - 'Device Sessions Patch': 'projects_device-sessions-patch.md'
     - 'Test Matrices Cancel': 'projects_test-matrices-cancel.md'
     - 'Test Matrices Create': 'projects_test-matrices-create.md'
     - 'Test Matrices Get': 'projects_test-matrices-get.md'

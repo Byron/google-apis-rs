@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Catalog* API at revision *20230117*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Data Catalog* API at revision *20240222*. The CLI is at version *5.0.3*.
 
 ```bash
 datacatalog1 [options]
@@ -50,6 +50,7 @@ datacatalog1 [options]
                 locations-entry-groups-entries-tags-delete <name> [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-tags-list <parent> [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-tags-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-entry-groups-entries-tags-reconcile <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-entries-unstar <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-get <name> [-p <v>]... [-o <out>]

@@ -720,7 +720,7 @@ async fn main() {
     
     let mut app = App::new("admob1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.3+20240223")
            .about("The AdMob API allows publishers to programmatically get information about their AdMob account. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admob1_cli")
            .arg(Arg::with_name("url")

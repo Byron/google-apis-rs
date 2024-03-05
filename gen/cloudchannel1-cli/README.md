@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloudchannel* API at revision *20230123*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloudchannel* API at revision *20240303*. The CLI is at version *5.0.3*.
 
 ```bash
 cloudchannel1 [options]
@@ -61,6 +61,7 @@ cloudchannel1 [options]
                 customers-entitlements-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-entitlements-get <name> [-p <v>]... [-o <out>]
                 customers-entitlements-list <parent> [-p <v>]... [-o <out>]
+                customers-entitlements-list-entitlement-changes <parent> [-p <v>]... [-o <out>]
                 customers-entitlements-lookup-offer <entitlement> [-p <v>]... [-o <out>]
                 customers-entitlements-start-paid-service <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-entitlements-suspend <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -71,6 +72,7 @@ cloudchannel1 [options]
                 customers-list-purchasable-skus <customer> [-p <v>]... [-o <out>]
                 customers-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-provision-cloud-identity <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                customers-query-eligible-billing-accounts <customer> [-p <v>]... [-o <out>]
                 customers-transfer-entitlements <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 customers-transfer-entitlements-to-google <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 list-subscribers <account> [-p <v>]... [-o <out>]
@@ -81,6 +83,8 @@ cloudchannel1 [options]
                 report-jobs-fetch-report-results <report-job> (-r <kv>)... [-p <v>]... [-o <out>]
                 reports-list <parent> [-p <v>]... [-o <out>]
                 reports-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sku-groups-billable-skus-list <parent> [-p <v>]... [-o <out>]
+                sku-groups-list <parent> [-p <v>]... [-o <out>]
                 unregister <account> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]

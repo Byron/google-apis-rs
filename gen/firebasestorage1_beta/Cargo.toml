@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebasestorage1_beta"
-version = "5.0.3+20230106"
+version = "5.0.3+20240301"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebasestorage (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebasestorage1_beta"
 homepage = "https://firebase.google.com/docs/storage"
-documentation = "https://docs.rs/google-firebasestorage1_beta/5.0.3+20230106"
+documentation = "https://docs.rs/google-firebasestorage1_beta/5.0.3+20240301"
 license = "MIT"
 keywords = ["firebasestorage", "google", "protocol", "web", "api"]
 autobins = false

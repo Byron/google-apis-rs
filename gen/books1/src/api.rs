@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Manage your books
     Full,
@@ -609,7 +609,7 @@ pub struct DictionaryAnnotationdata {
     /// Base64 encoded data for this annotation data.
     #[serde(rename="encodedData")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub encoded_data: Option<Vec<u8>>,
     /// Unique id for this annotation data.
     
@@ -825,7 +825,7 @@ pub struct GeoAnnotationdata {
     /// Base64 encoded data for this annotation data.
     #[serde(rename="encodedData")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub encoded_data: Option<Vec<u8>>,
     /// Unique id for this annotation data.
     
@@ -4297,6 +4297,7 @@ impl<'a, S> MylibraryMethods<'a, S> {
             hub: self.hub,
             _layer_ids: layer_ids.clone(),
             _volume_id: volume_id.to_string(),
+            _source: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -12431,6 +12432,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_summary(&vec!["Stet".into()], "volumeId")
+///              .source("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12440,6 +12442,7 @@ pub struct MylibraryAnnotationSummaryCall<'a, S>
     hub: &'a Books<S>,
     _layer_ids: Vec<String>,
     _volume_id: String,
+    _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -12468,20 +12471,23 @@ where
         dlg.begin(client::MethodInfo { id: "books.mylibrary.annotations.summary",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "layerIds", "volumeId"].iter() {
+        for &field in ["alt", "layerIds", "volumeId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
         if self._layer_ids.len() > 0 {
             for f in self._layer_ids.iter() {
                 params.push("layerIds", f);
             }
         }
         params.push("volumeId", self._volume_id);
+        if let Some(value) = self._source.as_ref() {
+            params.push("source", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -12600,6 +12606,13 @@ where
         self._volume_id = new_value.to_string();
         self
     }
+    /// Optional. String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, S> {
+        self._source = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12709,7 +12722,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("elitr")
+///              .source("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13007,13 +13020,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_volumes_list("shelf")
-///              .start_index(59)
-///              .source("est")
-///              .show_preorders(true)
-///              .q("sed")
-///              .projection("eos")
-///              .max_results(45)
-///              .country("ea")
+///              .start_index(44)
+///              .source("sit")
+///              .show_preorders(false)
+///              .q("eos")
+///              .projection("Lorem")
+///              .max_results(84)
+///              .country("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13353,8 +13366,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_add_volume("shelf", "volumeId")
-///              .source("eos")
-///              .reason("et")
+///              .source("et")
+///              .reason("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13651,7 +13664,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_clear_volumes("shelf")
-///              .source("et")
+///              .source("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13925,7 +13938,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("dolore")
+///              .source("eirmod")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14199,7 +14212,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("eirmod")
+///              .source("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14453,8 +14466,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -47)
-///              .source("erat")
+/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -31)
+///              .source("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14752,8 +14765,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("accusam")
-///              .reason("sea")
+///              .source("sea")
+///              .reason("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15050,8 +15063,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("Lorem")
-///              .content_version("et")
+///              .source("et")
+///              .content_version("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15336,10 +15349,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "position", "timestamp")
-///              .source("sit")
-///              .device_cookie("erat")
-///              .content_version("sea")
-///              .action("nonumy")
+///              .source("erat")
+///              .device_cookie("sea")
+///              .content_version("nonumy")
+///              .action("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15670,8 +15683,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notification().get("notification_id")
-///              .source("gubergren")
-///              .locale("justo")
+///              .source("justo")
+///              .locale("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15949,7 +15962,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_categories()
-///              .locale("sea")
+///              .locale("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16204,11 +16217,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_category_volumes()
-///              .page_token("consetetur")
-///              .page_size(3)
-///              .max_allowed_maturity_rating("aliquyam")
-///              .locale("eos")
-///              .add_category_id("At")
+///              .page_token("sit")
+///              .page_size(69)
+///              .max_allowed_maturity_rating("eos")
+///              .locale("At")
+///              .add_category_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16510,9 +16523,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.personalizedstream().get()
-///              .source("dolores")
-///              .max_allowed_maturity_rating("consetetur")
-///              .locale("gubergren")
+///              .source("consetetur")
+///              .max_allowed_maturity_rating("gubergren")
+///              .locale("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16789,14 +16802,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().accept()
-///              .volume_id("dolor")
-///              .serial("aliquyam")
-///              .product("no")
-///              .offer_id("amet.")
-///              .model("ipsum")
-///              .manufacturer("Lorem")
-///              .device("accusam")
-///              .android_id("gubergren")
+///              .volume_id("aliquyam")
+///              .serial("no")
+///              .product("amet.")
+///              .offer_id("ipsum")
+///              .model("Lorem")
+///              .manufacturer("accusam")
+///              .device("gubergren")
+///              .android_id("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17127,13 +17140,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().dismiss()
-///              .serial("sadipscing")
-///              .product("At")
-///              .offer_id("sit")
-///              .model("duo")
-///              .manufacturer("sit")
-///              .device("magna")
-///              .android_id("et")
+///              .serial("At")
+///              .product("sit")
+///              .offer_id("duo")
+///              .model("sit")
+///              .manufacturer("magna")
+///              .device("et")
+///              .android_id("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17454,12 +17467,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().get()
-///              .serial("rebum.")
-///              .product("dolor")
-///              .model("Lorem")
-///              .manufacturer("justo")
-///              .device("amet.")
-///              .android_id("no")
+///              .serial("dolor")
+///              .product("Lorem")
+///              .model("justo")
+///              .manufacturer("amet.")
+///              .device("no")
+///              .android_id("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17769,8 +17782,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.series().membership_get("series_id")
-///              .page_token("sed")
-///              .page_size(88)
+///              .page_token("kasd")
+///              .page_size(0)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18047,7 +18060,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.series().get(&vec!["Lorem".into()])
+/// let result = hub.series().get(&vec!["sanctus".into()])
 ///              .doit().await;
 /// # }
 /// ```
@@ -18308,10 +18321,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().associated_list("volumeId")
-///              .source("nonumy")
-///              .max_allowed_maturity_rating("rebum.")
-///              .locale("tempor")
-///              .association("dolore")
+///              .source("rebum.")
+///              .max_allowed_maturity_rating("tempor")
+///              .locale("dolore")
+///              .association("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18618,13 +18631,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().mybooks_list()
-///              .start_index(76)
-///              .source("amet.")
-///              .add_processing_state("dolore")
-///              .max_results(4)
-///              .locale("ut")
-///              .country("At")
-///              .add_acquire_method("sit")
+///              .start_index(49)
+///              .source("dolore")
+///              .add_processing_state("amet")
+///              .max_results(64)
+///              .locale("At")
+///              .country("sit")
+///              .add_acquire_method("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18951,9 +18964,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().recommended_list()
-///              .source("vero")
-///              .max_allowed_maturity_rating("duo")
-///              .locale("sadipscing")
+///              .source("duo")
+///              .max_allowed_maturity_rating("sadipscing")
+///              .locale("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19230,8 +19243,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().recommended_rate("rating", "volumeId")
-///              .source("duo")
-///              .locale("kasd")
+///              .source("kasd")
+///              .locale("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19521,12 +19534,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().useruploaded_list()
-///              .add_volume_id("sadipscing")
-///              .start_index(62)
-///              .source("sea")
-///              .add_processing_state("et")
-///              .max_results(45)
-///              .locale("magna")
+///              .add_volume_id("tempor")
+///              .start_index(91)
+///              .source("et")
+///              .add_processing_state("Lorem")
+///              .max_results(68)
+///              .locale("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19842,12 +19855,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().get("volumeId")
-///              .user_library_consistent_read(true)
-///              .source("At")
-///              .projection("invidunt")
-///              .partner("clita")
+///              .user_library_consistent_read(false)
+///              .source("clita")
+///              .projection("Stet")
+///              .partner("aliquyam")
 ///              .include_non_comics_series(false)
-///              .country("ut")
+///              .country("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20175,19 +20188,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().list("q")
-///              .start_index(75)
-///              .source("rebum.")
+///              .start_index(63)
+///              .source("clita")
 ///              .show_preorders(false)
-///              .projection("dolores")
-///              .print_type("sed")
-///              .partner("invidunt")
-///              .order_by("clita")
-///              .max_results(2)
-///              .max_allowed_maturity_rating("aliquyam")
-///              .library_restrict("magna")
-///              .lang_restrict("diam")
-///              .filter("nonumy")
-///              .download("et")
+///              .projection("aliquyam")
+///              .print_type("magna")
+///              .partner("diam")
+///              .order_by("nonumy")
+///              .max_results(83)
+///              .max_allowed_maturity_rating("sanctus")
+///              .library_restrict("accusam")
+///              .lang_restrict("tempor")
+///              .filter("sed")
+///              .download("est")
 ///              .doit().await;
 /// # }
 /// ```

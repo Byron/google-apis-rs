@@ -25,11 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20230118*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Firestore* API at revision *20240226*. The CLI is at version *5.0.3*.
 
 ```bash
 firestore1 [options]
         projects
+                databases-backup-schedules-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-backup-schedules-delete <name> [-p <v>]... [-o <out>]
+                databases-backup-schedules-get <name> [-p <v>]... [-o <out>]
+                databases-backup-schedules-list <parent> [-p <v>]... [-o <out>]
+                databases-backup-schedules-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-get <name> [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-list <parent> [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -65,6 +70,10 @@ firestore1 [options]
                 databases-operations-get <name> [-p <v>]... [-o <out>]
                 databases-operations-list <name> [-p <v>]... [-o <out>]
                 databases-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-restore <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-backups-delete <name> [-p <v>]... [-o <out>]
+                locations-backups-get <name> [-p <v>]... [-o <out>]
+                locations-backups-list <parent> [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
   firestore1 --help

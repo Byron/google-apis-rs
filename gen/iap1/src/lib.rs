@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud IAP* crate version *5.0.3+20230118*, where *20230118* is the exact revision of the *iap:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud IAP* crate version *5.0.3+20240224*, where *20240224* is the exact revision of the *iap:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud IAP* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iap).
@@ -21,6 +21,7 @@
 //! * [set iam policy](api::MethodSetIamPolicyCall)
 //! * [test iam permissions](api::MethodTestIamPermissionCall)
 //! * [update iap settings](api::MethodUpdateIapSettingCall)
+//! * [validate attribute expression](api::MethodValidateAttributeExpressionCall)
 //! 
 //! 
 //! 

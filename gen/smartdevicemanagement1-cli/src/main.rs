@@ -193,12 +193,6 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -215,7 +209,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -307,12 +301,6 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -329,7 +317,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -421,12 +409,6 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -440,7 +422,6 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -748,7 +729,7 @@ async fn main() {
     
     let mut app = App::new("smartdevicemanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230112")
+           .version("5.0.3+20240218")
            .about("Allow select enterprise partners to access, control, and manage Google and Nest devices programmatically.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_smartdevicemanagement1_cli")
            .arg(Arg::with_name("url")

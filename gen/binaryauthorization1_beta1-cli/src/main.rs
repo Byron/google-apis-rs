@@ -1475,7 +1475,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("attestors-validate-attestation-occurrence",
-                    Some(r##"Returns whether the given Attestation for the given image URI was signed by the given Attestor"##),
+                    Some(r##"Returns whether the given `Attestation` for the given image URI was signed by the given `Attestor`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli/projects_attestors-validate-attestation-occurrence",
                   vec![
                     (Some(r##"attestor"##),
@@ -1661,7 +1661,7 @@ async fn main() {
     
     let mut app = App::new("binaryauthorization1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230113")
+           .version("5.0.3+20240223")
            .about("The management interface for Binary Authorization, a service that provides policy-based deployment validation and control for images deployed to Google Kubernetes Engine (GKE), Anthos Service Mesh, Anthos Clusters, and Cloud Run. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli")
            .arg(Arg::with_name("url")

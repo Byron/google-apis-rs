@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *My Business Business Information* crate version *5.0.3+20230124*, where *20230124* is the exact revision of the *mybusinessbusinessinformation:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *My Business Business Information* crate version *5.0.3+20240304*, where *20240304* is the exact revision of the *mybusinessbusinessinformation:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *My Business Business Information* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/my-business/).
@@ -22,7 +22,7 @@
 //! * [google locations](api::GoogleLocation)
 //!  * [*search*](api::GoogleLocationSearchCall)
 //! * [locations](api::Location)
-//!  * [*associate*](api::LocationAssociateCall), [*attributes get google updated*](api::LocationAttributeGetGoogleUpdatedCall), [*clear location association*](api::LocationClearLocationAssociationCall), [*delete*](api::LocationDeleteCall), [*get*](api::LocationGetCall), [*get attributes*](api::LocationGetAttributeCall), [*get google updated*](api::LocationGetGoogleUpdatedCall), [*patch*](api::LocationPatchCall) and [*update attributes*](api::LocationUpdateAttributeCall)
+//!  * [*attributes get google updated*](api::LocationAttributeGetGoogleUpdatedCall), [*delete*](api::LocationDeleteCall), [*get*](api::LocationGetCall), [*get attributes*](api::LocationGetAttributeCall), [*get google updated*](api::LocationGetGoogleUpdatedCall), [*patch*](api::LocationPatchCall) and [*update attributes*](api::LocationUpdateAttributeCall)
 //! 
 //! 
 //! 
@@ -59,8 +59,6 @@
 //! ```ignore
 //! let r = hub.accounts().locations_create(...).doit().await
 //! let r = hub.locations().attributes_get_google_updated(...).doit().await
-//! let r = hub.locations().associate(...).doit().await
-//! let r = hub.locations().clear_location_association(...).doit().await
 //! let r = hub.locations().delete(...).doit().await
 //! let r = hub.locations().get(...).doit().await
 //! let r = hub.locations().get_attributes(...).doit().await

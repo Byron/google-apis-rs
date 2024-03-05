@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Workflows* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Workflows* API at revision *20240207*. The CLI is at version *5.0.3*.
 
 ```bash
 workflows1 [options]
@@ -39,6 +39,7 @@ workflows1 [options]
                 locations-workflows-delete <name> [-p <v>]... [-o <out>]
                 locations-workflows-get <name> [-p <v>]... [-o <out>]
                 locations-workflows-list <parent> [-p <v>]... [-o <out>]
+                locations-workflows-list-revisions <name> [-p <v>]... [-o <out>]
                 locations-workflows-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
   workflows1 --help
 

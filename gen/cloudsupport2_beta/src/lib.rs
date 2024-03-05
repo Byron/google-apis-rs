@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Support* crate version *5.0.3+20230121*, where *20230121* is the exact revision of the *cloudsupport:v2beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Support* crate version *5.0.3+20240304*, where *20240304* is the exact revision of the *cloudsupport:v2beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud Support* *v2_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/support/docs/apis).
@@ -11,8 +11,6 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudSupport) ... 
 //! 
-//! * [attachments](api::Attachment)
-//!  * [*create*](api::AttachmentCreateCall)
 //! * [case classifications](api::CaseClassification)
 //!  * [*search*](api::CaseClassificationSearchCall)
 //! * [cases](api::Case)
@@ -119,9 +117,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.cases().list("parent")
-//!              .page_token("At")
-//!              .page_size(-8)
-//!              .filter("sed")
+//!              .product_line("sanctus")
+//!              .page_token("sed")
+//!              .page_size(-2)
+//!              .filter("takimata")
 //!              .doit().await;
 //! 
 //! match result {

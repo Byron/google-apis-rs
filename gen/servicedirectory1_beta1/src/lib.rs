@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Directory* crate version *5.0.3+20230105*, where *20230105* is the exact revision of the *servicedirectory:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Service Directory* crate version *5.0.3+20240226*, where *20240226* is the exact revision of the *servicedirectory:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Service Directory* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-directory).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](ServiceDirectory) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations namespaces create*](api::ProjectLocationNamespaceCreateCall), [*locations namespaces delete*](api::ProjectLocationNamespaceDeleteCall), [*locations namespaces get*](api::ProjectLocationNamespaceGetCall), [*locations namespaces get iam policy*](api::ProjectLocationNamespaceGetIamPolicyCall), [*locations namespaces list*](api::ProjectLocationNamespaceListCall), [*locations namespaces patch*](api::ProjectLocationNamespacePatchCall), [*locations namespaces service workloads get iam policy*](api::ProjectLocationNamespaceServiceWorkloadGetIamPolicyCall), [*locations namespaces service workloads set iam policy*](api::ProjectLocationNamespaceServiceWorkloadSetIamPolicyCall), [*locations namespaces service workloads test iam permissions*](api::ProjectLocationNamespaceServiceWorkloadTestIamPermissionCall), [*locations namespaces services create*](api::ProjectLocationNamespaceServiceCreateCall), [*locations namespaces services delete*](api::ProjectLocationNamespaceServiceDeleteCall), [*locations namespaces services endpoints create*](api::ProjectLocationNamespaceServiceEndpointCreateCall), [*locations namespaces services endpoints delete*](api::ProjectLocationNamespaceServiceEndpointDeleteCall), [*locations namespaces services endpoints get*](api::ProjectLocationNamespaceServiceEndpointGetCall), [*locations namespaces services endpoints list*](api::ProjectLocationNamespaceServiceEndpointListCall), [*locations namespaces services endpoints patch*](api::ProjectLocationNamespaceServiceEndpointPatchCall), [*locations namespaces services get*](api::ProjectLocationNamespaceServiceGetCall), [*locations namespaces services get iam policy*](api::ProjectLocationNamespaceServiceGetIamPolicyCall), [*locations namespaces services list*](api::ProjectLocationNamespaceServiceListCall), [*locations namespaces services patch*](api::ProjectLocationNamespaceServicePatchCall), [*locations namespaces services resolve*](api::ProjectLocationNamespaceServiceResolveCall), [*locations namespaces services set iam policy*](api::ProjectLocationNamespaceServiceSetIamPolicyCall), [*locations namespaces services test iam permissions*](api::ProjectLocationNamespaceServiceTestIamPermissionCall), [*locations namespaces set iam policy*](api::ProjectLocationNamespaceSetIamPolicyCall), [*locations namespaces test iam permissions*](api::ProjectLocationNamespaceTestIamPermissionCall), [*locations registration policies get iam policy*](api::ProjectLocationRegistrationPolicyGetIamPolicyCall), [*locations registration policies set iam policy*](api::ProjectLocationRegistrationPolicySetIamPolicyCall) and [*locations registration policies test iam permissions*](api::ProjectLocationRegistrationPolicyTestIamPermissionCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations namespaces create*](api::ProjectLocationNamespaceCreateCall), [*locations namespaces delete*](api::ProjectLocationNamespaceDeleteCall), [*locations namespaces get*](api::ProjectLocationNamespaceGetCall), [*locations namespaces get iam policy*](api::ProjectLocationNamespaceGetIamPolicyCall), [*locations namespaces list*](api::ProjectLocationNamespaceListCall), [*locations namespaces patch*](api::ProjectLocationNamespacePatchCall), [*locations namespaces services create*](api::ProjectLocationNamespaceServiceCreateCall), [*locations namespaces services delete*](api::ProjectLocationNamespaceServiceDeleteCall), [*locations namespaces services endpoints create*](api::ProjectLocationNamespaceServiceEndpointCreateCall), [*locations namespaces services endpoints delete*](api::ProjectLocationNamespaceServiceEndpointDeleteCall), [*locations namespaces services endpoints get*](api::ProjectLocationNamespaceServiceEndpointGetCall), [*locations namespaces services endpoints list*](api::ProjectLocationNamespaceServiceEndpointListCall), [*locations namespaces services endpoints patch*](api::ProjectLocationNamespaceServiceEndpointPatchCall), [*locations namespaces services get*](api::ProjectLocationNamespaceServiceGetCall), [*locations namespaces services get iam policy*](api::ProjectLocationNamespaceServiceGetIamPolicyCall), [*locations namespaces services list*](api::ProjectLocationNamespaceServiceListCall), [*locations namespaces services patch*](api::ProjectLocationNamespaceServicePatchCall), [*locations namespaces services resolve*](api::ProjectLocationNamespaceServiceResolveCall), [*locations namespaces services set iam policy*](api::ProjectLocationNamespaceServiceSetIamPolicyCall), [*locations namespaces services test iam permissions*](api::ProjectLocationNamespaceServiceTestIamPermissionCall), [*locations namespaces set iam policy*](api::ProjectLocationNamespaceSetIamPolicyCall), [*locations namespaces test iam permissions*](api::ProjectLocationNamespaceTestIamPermissionCall), [*locations namespaces workloads get iam policy*](api::ProjectLocationNamespaceWorkloadGetIamPolicyCall), [*locations namespaces workloads set iam policy*](api::ProjectLocationNamespaceWorkloadSetIamPolicyCall) and [*locations namespaces workloads test iam permissions*](api::ProjectLocationNamespaceWorkloadTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -47,14 +47,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_namespaces_service_workloads_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_namespaces_service_workloads_set_iam_policy(...).doit().await
 //! let r = hub.projects().locations_namespaces_services_get_iam_policy(...).doit().await
 //! let r = hub.projects().locations_namespaces_services_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_namespaces_workloads_get_iam_policy(...).doit().await
+//! let r = hub.projects().locations_namespaces_workloads_set_iam_policy(...).doit().await
 //! let r = hub.projects().locations_namespaces_get_iam_policy(...).doit().await
 //! let r = hub.projects().locations_namespaces_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_registration_policies_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_registration_policies_set_iam_policy(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -108,7 +106,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_namespaces_service_workloads_get_iam_policy(req, "resource")
+//! let result = hub.projects().locations_namespaces_services_get_iam_policy(req, "resource")
 //!              .doit().await;
 //! 
 //! match result {

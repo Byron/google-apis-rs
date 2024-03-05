@@ -387,6 +387,7 @@ where
                     "access-settings.gcip-settings.login-page-uri" => Some(("accessSettings.gcipSettings.loginPageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.gcip-settings.tenant-ids" => Some(("accessSettings.gcipSettings.tenantIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "access-settings.oauth-settings.login-hint" => Some(("accessSettings.oauthSettings.loginHint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-settings.oauth-settings.programmatic-clients" => Some(("accessSettings.oauthSettings.programmaticClients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "access-settings.policy-delegation-settings.iam-permission" => Some(("accessSettings.policyDelegationSettings.iamPermission", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.iam-service-name" => Some(("accessSettings.policyDelegationSettings.iamServiceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.policy-name.id" => Some(("accessSettings.policyDelegationSettings.policyName.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -409,7 +410,7 @@ where
                     "application-settings.csm-settings.rctoken-aud" => Some(("applicationSettings.csmSettings.rctokenAud", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "allowed-domains-settings", "application-settings", "attribute-propagation-settings", "cookie-domain", "cors-settings", "csm-settings", "domains", "enable", "expression", "gcip-settings", "generate-troubleshooting-uri", "iam-permission", "iam-service-name", "id", "labels", "login-hint", "login-page-uri", "max-age", "method", "name", "oauth-settings", "output-credentials", "policy-delegation-settings", "policy-name", "policy-type", "rctoken-aud", "reauth-settings", "region", "remediation-token-generation-enabled", "resource", "service", "tenant-ids", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "allowed-domains-settings", "application-settings", "attribute-propagation-settings", "cookie-domain", "cors-settings", "csm-settings", "domains", "enable", "expression", "gcip-settings", "generate-troubleshooting-uri", "iam-permission", "iam-service-name", "id", "labels", "login-hint", "login-page-uri", "max-age", "method", "name", "oauth-settings", "output-credentials", "policy-delegation-settings", "policy-name", "policy-type", "programmatic-clients", "rctoken-aud", "reauth-settings", "region", "remediation-token-generation-enabled", "resource", "service", "tenant-ids", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -440,6 +441,62 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _methods_validate_attribute_expression(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.methods().validate_attribute_expression(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "expression" => {
+                    call = call.expression(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["expression"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1366,6 +1423,9 @@ where
                     ("update-iap-settings", Some(opt)) => {
                         call_result = self._methods_update_iap_settings(opt, dry_run, &mut err).await;
                     },
+                    ("validate-attribute-expression", Some(opt)) => {
+                        call_result = self._methods_validate_attribute_expression(opt, dry_run, &mut err).await;
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("methods".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -1492,7 +1552,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("methods", "methods: 'get-iam-policy', 'get-iap-settings', 'set-iam-policy', 'test-iam-permissions' and 'update-iap-settings'", vec![
+        ("methods", "methods: 'get-iam-policy', 'get-iap-settings', 'set-iam-policy', 'test-iam-permissions', 'update-iap-settings' and 'validate-attribute-expression'", vec![
             ("get-iam-policy",
                     Some(r##"Gets the access control policy for an Identity-Aware Proxy protected resource. More information about managing access via IAP can be found at: https://cloud.google.com/iap/docs/managing-access#managing_access_via_the_api"##),
                     "Details at http://byron.github.io/google-apis-rs/google_iap1_cli/methods_get-iam-policy",
@@ -1614,6 +1674,28 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("validate-attribute-expression",
+                    Some(r##"Validates a given CEL expression conforms to IAP restrictions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iap1_cli/methods_validate-attribute-expression",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the IAP protected resource."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -1952,7 +2034,7 @@ async fn main() {
     
     let mut app = App::new("iap1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230118")
+           .version("5.0.3+20240224")
            .about("Controls access to cloud applications running on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iap1_cli")
            .arg(Arg::with_name("url")

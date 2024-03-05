@@ -4,7 +4,7 @@
 [package]
 
 name = "google-chromepolicy1-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Chrome Policy (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/chromepolicy1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-chromepolicy1]
 path = "../chromepolicy1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -181,7 +181,7 @@ pub struct GoogleCloudOrgpolicyV2AlternatePolicySpec {
     /// Reference to the launch that will be used while audit logging and to control the launch. Should be set only in the alternate policy.
     
     pub launch: Option<String>,
-    /// Specify `Constraint` for configurations of Cloud Platform resources.
+    /// Specify constraint for configurations of Google Cloud resources.
     
     pub spec: Option<GoogleCloudOrgpolicyV2PolicySpec>,
 }
@@ -189,7 +189,7 @@ pub struct GoogleCloudOrgpolicyV2AlternatePolicySpec {
 impl client::Part for GoogleCloudOrgpolicyV2AlternatePolicySpec {}
 
 
-/// A `constraint` describes a way to restrict resource's configuration. For example, you could enforce a constraint that controls which cloud services can be activated across an organization, or whether a Compute Engine instance can have serial port connections established. `Constraints` can be configured by the organization's policy administrator to fit the needs of the organization by setting a `policy` that includes `constraints` at different locations in the organization's resource hierarchy. Policies are inherited down the resource hierarchy from higher levels, but can also be overridden. For details about the inheritance rules please read about `policies`. `Constraints` have a default behavior determined by the `constraint_default` field, which is the enforcement behavior that is used in the absence of a `policy` being defined or inherited for the resource in question.
+/// A constraint describes a way to restrict resource's configuration. For example, you could enforce a constraint that controls which Google Cloud services can be activated across an organization, or whether a Compute Engine instance can have serial port connections established. Constraints can be configured by the organization policy administrator to fit the needs of the organization by setting a policy that includes constraints at different locations in the organization's resource hierarchy. Policies are inherited down the resource hierarchy from higher levels, but can also be overridden. For details about the inheritance rules please read about `policies`. Constraints have a default behavior determined by the `constraint_default` field, which is the enforcement behavior that is used in the absence of a policy being defined or inherited for the resource in question.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -200,11 +200,11 @@ pub struct GoogleCloudOrgpolicyV2Constraint {
     #[serde(rename="booleanConstraint")]
     
     pub boolean_constraint: Option<GoogleCloudOrgpolicyV2ConstraintBooleanConstraint>,
-    /// The evaluation behavior of this constraint in the absence of 'Policy'.
+    /// The evaluation behavior of this constraint in the absence of a policy.
     #[serde(rename="constraintDefault")]
     
     pub constraint_default: Option<String>,
-    /// Detailed description of what this `Constraint` controls as well as how and where it is enforced. Mutable.
+    /// Detailed description of what this constraint controls as well as how and where it is enforced. Mutable.
     
     pub description: Option<String>,
     /// The human readable name. Mutable.
@@ -215,15 +215,19 @@ pub struct GoogleCloudOrgpolicyV2Constraint {
     #[serde(rename="listConstraint")]
     
     pub list_constraint: Option<GoogleCloudOrgpolicyV2ConstraintListConstraint>,
-    /// Immutable. The resource name of the Constraint. Must be in one of the following forms: * `projects/{project_number}/constraints/{constraint_name}` * `folders/{folder_id}/constraints/{constraint_name}` * `organizations/{organization_id}/constraints/{constraint_name}` For example, "/projects/123/constraints/compute.disableSerialPortAccess".
+    /// Immutable. The resource name of the constraint. Must be in one of the following forms: * `projects/{project_number}/constraints/{constraint_name}` * `folders/{folder_id}/constraints/{constraint_name}` * `organizations/{organization_id}/constraints/{constraint_name}` For example, "/projects/123/constraints/compute.disableSerialPortAccess".
     
     pub name: Option<String>,
+    /// Shows if dry run is supported for this constraint or not.
+    #[serde(rename="supportsDryRun")]
+    
+    pub supports_dry_run: Option<bool>,
 }
 
 impl client::Part for GoogleCloudOrgpolicyV2Constraint {}
 
 
-/// A `Constraint` that is either enforced or not. For example a constraint `constraints/compute.disableSerialPortAccess`. If it is enforced on a VM instance, serial port connections will not be opened to that instance.
+/// A constraint that is either enforced or not. For example, a constraint `constraints/compute.disableSerialPortAccess`. If it is enforced on a VM instance, serial port connections will not be opened to that instance.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -234,7 +238,7 @@ pub struct GoogleCloudOrgpolicyV2ConstraintBooleanConstraint { _never_set: Optio
 impl client::Part for GoogleCloudOrgpolicyV2ConstraintBooleanConstraint {}
 
 
-/// A `Constraint` that allows or disallows a list of string values, which are configured by an Organization's policy administrator with a `Policy`.
+/// A constraint that allows or disallows a list of string values, which are configured by an Organization Policy administrator with a policy.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -245,7 +249,7 @@ pub struct GoogleCloudOrgpolicyV2ConstraintListConstraint {
     #[serde(rename="supportsIn")]
     
     pub supports_in: Option<bool>,
-    /// Indicates whether subtrees of Cloud Resource Manager resource hierarchy can be used in `Policy.allowed_values` and `Policy.denied_values`. For example, `"under:folders/123"` would match any resource under the 'folders/123' folder.
+    /// Indicates whether subtrees of the Resource Manager resource hierarchy can be used in `Policy.allowed_values` and `Policy.denied_values`. For example, `"under:folders/123"` would match any resource under the 'folders/123' folder.
     #[serde(rename="supportsUnder")]
     
     pub supports_under: Option<bool>,
@@ -254,7 +258,7 @@ pub struct GoogleCloudOrgpolicyV2ConstraintListConstraint {
 impl client::Part for GoogleCloudOrgpolicyV2ConstraintListConstraint {}
 
 
-/// A custom constraint defined by customers which can *only* be applied to the given resource types and organization. By creating a custom constraint, customers can applied policies of this custom constraint. *Creating a custom constraint itself does NOT apply any policy enforcement*.
+/// A custom constraint defined by customers which can *only* be applied to the given resource types and organization. By creating a custom constraint, customers can apply policies of this custom constraint. *Creating a custom constraint itself does NOT apply any policy enforcement*.
 /// 
 /// # Activities
 /// 
@@ -271,7 +275,7 @@ pub struct GoogleCloudOrgpolicyV2CustomConstraint {
     #[serde(rename="actionType")]
     
     pub action_type: Option<String>,
-    /// Org policy condition/expression. For example: `resource.instanceName.matches("[production|test]_.*_(\d)+")'` or, `resource.management.auto_upgrade == true` The max length of the condition is 1000 characters.
+    /// Org policy condition/expression. For example: `resource.instanceName.matches("[production|test]_.*_(\d)+")` or, `resource.management.auto_upgrade == true` The max length of the condition is 1000 characters.
     
     pub condition: Option<String>,
     /// Detailed information about this custom policy constraint. The max length of the description is 2000 characters.
@@ -285,10 +289,10 @@ pub struct GoogleCloudOrgpolicyV2CustomConstraint {
     #[serde(rename="methodTypes")]
     
     pub method_types: Option<Vec<String>>,
-    /// Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example : "organizations/123/customConstraints/custom.createOnlyE2TypeVms" The max length is 70 characters and the min length is 1. Note that the prefix "organizations/{organization_id}/customConstraints/" is not counted.
+    /// Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms` The max length is 70 characters and the minimum length is 1. Note that the prefix `organizations/{organization_id}/customConstraints/` is not counted.
     
     pub name: Option<String>,
-    /// Immutable. The Resource Instance type on which this policy applies to. Format will be of the form : "/" Example: * `compute.googleapis.com/Instance`.
+    /// Immutable. The resource instance type on which this policy applies. Format will be of the form : `/` Example: * `compute.googleapis.com/Instance`.
     #[serde(rename="resourceTypes")]
     
     pub resource_types: Option<Vec<String>>,
@@ -327,7 +331,7 @@ pub struct GoogleCloudOrgpolicyV2ListConstraintsResponse {
 impl client::ResponseResult for GoogleCloudOrgpolicyV2ListConstraintsResponse {}
 
 
-/// The response returned from the ListCustomConstraints method. It will be empty if no `CustomConstraints` are set on the organization resource.
+/// The response returned from the ListCustomConstraints method. It will be empty if no custom constraints are set on the organization resource.
 /// 
 /// # Activities
 /// 
@@ -338,7 +342,7 @@ impl client::ResponseResult for GoogleCloudOrgpolicyV2ListConstraintsResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudOrgpolicyV2ListCustomConstraintsResponse {
-    /// All `CustomConstraints` that exist on the organization resource. It will be empty if no `CustomConstraints` are set.
+    /// All custom constraints that exist on the organization resource. It will be empty if no custom constraints are set.
     #[serde(rename="customConstraints")]
     
     pub custom_constraints: Option<Vec<GoogleCloudOrgpolicyV2CustomConstraint>>,
@@ -351,7 +355,7 @@ pub struct GoogleCloudOrgpolicyV2ListCustomConstraintsResponse {
 impl client::ResponseResult for GoogleCloudOrgpolicyV2ListCustomConstraintsResponse {}
 
 
-/// The response returned from the ListPolicies method. It will be empty if no `Policies` are set on the resource.
+/// The response returned from the ListPolicies method. It will be empty if no policies are set on the resource.
 /// 
 /// # Activities
 /// 
@@ -368,7 +372,7 @@ pub struct GoogleCloudOrgpolicyV2ListPoliciesResponse {
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
-    /// All `Policies` that exist on the resource. It will be empty if no `Policies` are set.
+    /// All policies that exist on the resource. It will be empty if no policies are set.
     
     pub policies: Option<Vec<GoogleCloudOrgpolicyV2Policy>>,
 }
@@ -376,7 +380,7 @@ pub struct GoogleCloudOrgpolicyV2ListPoliciesResponse {
 impl client::ResponseResult for GoogleCloudOrgpolicyV2ListPoliciesResponse {}
 
 
-/// Defines a Cloud Organization `Policy` which is used to specify `Constraints` for configurations of Cloud Platform resources.
+/// Defines an organization policy which is used to specify constraints for configurations of Google Cloud resources.
 /// 
 /// # Activities
 /// 
@@ -401,11 +405,14 @@ pub struct GoogleCloudOrgpolicyV2Policy {
     /// Deprecated.
     
     pub alternate: Option<GoogleCloudOrgpolicyV2AlternatePolicySpec>,
-    /// dry-run policy. Audit-only policy, can be used to monitor how the policy would have impacted the existing and future resources if it's enforced.
+    /// Dry-run policy. Audit-only policy, can be used to monitor how the policy would have impacted the existing and future resources if it's enforced.
     #[serde(rename="dryRunSpec")]
     
     pub dry_run_spec: Option<GoogleCloudOrgpolicyV2PolicySpec>,
-    /// Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// Optional. An opaque tag indicating the current state of the policy, used for concurrency control. This 'etag' is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
+    
+    pub etag: Option<String>,
+    /// Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     
     pub name: Option<String>,
     /// Basic information about the Organization Policy.
@@ -417,27 +424,27 @@ impl client::RequestValue for GoogleCloudOrgpolicyV2Policy {}
 impl client::ResponseResult for GoogleCloudOrgpolicyV2Policy {}
 
 
-/// Defines a Cloud Organization `PolicySpec` which is used to specify `Constraints` for configurations of Cloud Platform resources.
+/// Defines a Google Cloud policy specification which is used to specify constraints for configurations of Google Cloud resources.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudOrgpolicyV2PolicySpec {
-    /// An opaque tag indicating the current version of the `Policy`, used for concurrency control. This field is ignored if used in a `CreatePolicy` request. When the `Policy` is returned from either a `GetPolicy` or a `ListPolicies` request, this `etag` indicates the version of the current `Policy` to use when executing a read-modify-write loop. When the `Policy` is returned from a `GetEffectivePolicy` request, the `etag` will be unset.
+    /// An opaque tag indicating the current version of the policySpec, used for concurrency control. This field is ignored if used in a `CreatePolicy` request. When the policy is returned from either a `GetPolicy` or a `ListPolicies` request, this `etag` indicates the version of the current policySpec to use when executing a read-modify-write loop. When the policy is returned from a `GetEffectivePolicy` request, the `etag` will be unset.
     
     pub etag: Option<String>,
-    /// Determines the inheritance behavior for this `Policy`. If `inherit_from_parent` is true, PolicyRules set higher up in the hierarchy (up to the closest root) are inherited and present in the effective policy. If it is false, then no rules are inherited, and this Policy becomes the new root for evaluation. This field can be set only for Policies which configure list constraints.
+    /// Determines the inheritance behavior for this policy. If `inherit_from_parent` is true, policy rules set higher up in the hierarchy (up to the closest root) are inherited and present in the effective policy. If it is false, then no rules are inherited, and this policy becomes the new root for evaluation. This field can be set only for policies which configure list constraints.
     #[serde(rename="inheritFromParent")]
     
     pub inherit_from_parent: Option<bool>,
-    /// Ignores policies set above this resource and restores the `constraint_default` enforcement behavior of the specific `Constraint` at this resource. This field can be set in policies for either list or boolean constraints. If set, `rules` must be empty and `inherit_from_parent` must be set to false.
+    /// Ignores policies set above this resource and restores the `constraint_default` enforcement behavior of the specific constraint at this resource. This field can be set in policies for either list or boolean constraints. If set, `rules` must be empty and `inherit_from_parent` must be set to false.
     
     pub reset: Option<bool>,
-    /// Up to 10 PolicyRules are allowed. In Policies for boolean constraints, the following requirements apply: - There must be one and only one PolicyRule where condition is unset. - BooleanPolicyRules with conditions must set `enforced` to the opposite of the PolicyRule without a condition. - During policy evaluation, PolicyRules with conditions that are true for a target resource take precedence.
+    /// In policies for boolean constraints, the following requirements apply: - There must be one and only one policy rule where condition is unset. - Boolean policy rules with conditions must set `enforced` to the opposite of the policy rule without a condition. - During policy evaluation, policy rules with conditions that are true for a target resource take precedence.
     
     pub rules: Option<Vec<GoogleCloudOrgpolicyV2PolicySpecPolicyRule>>,
-    /// Output only. The time stamp this was previously updated. This represents the last time a call to `CreatePolicy` or `UpdatePolicy` was made for that `Policy`.
+    /// Output only. The time stamp this was previously updated. This represents the last time a call to `CreatePolicy` or `UpdatePolicy` was made for that policy.
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -453,21 +460,21 @@ impl client::Part for GoogleCloudOrgpolicyV2PolicySpec {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudOrgpolicyV2PolicySpecPolicyRule {
-    /// Setting this to true means that all values are allowed. This field can be set only in Policies for list constraints.
+    /// Setting this to true means that all values are allowed. This field can be set only in policies for list constraints.
     #[serde(rename="allowAll")]
     
     pub allow_all: Option<bool>,
     /// A condition which determines whether this rule is used in the evaluation of the policy. When set, the `expression` field in the `Expr' must include from 1 to 10 subexpressions, joined by the "||" or "&&" operators. Each subexpression must be of the form "resource.matchTag('/tag_key_short_name, 'tag_value_short_name')". or "resource.matchTagId('tagKeys/key_id', 'tagValues/value_id')". where key_name and value_name are the resource names for Label Keys and Values. These names are available from the Tag Manager Service. An example expression is: "resource.matchTag('123456789/environment, 'prod')". or "resource.matchTagId('tagKeys/123', 'tagValues/456')".
     
     pub condition: Option<GoogleTypeExpr>,
-    /// Setting this to true means that all values are denied. This field can be set only in Policies for list constraints.
+    /// Setting this to true means that all values are denied. This field can be set only in policies for list constraints.
     #[serde(rename="denyAll")]
     
     pub deny_all: Option<bool>,
-    /// If `true`, then the `Policy` is enforced. If `false`, then any configuration is acceptable. This field can be set only in Policies for boolean constraints.
+    /// If `true`, then the policy is enforced. If `false`, then any configuration is acceptable. This field can be set only in policies for boolean constraints.
     
     pub enforce: Option<bool>,
-    /// List of values to be used for this PolicyRule. This field can be set only in Policies for list constraints.
+    /// List of values to be used for this policy rule. This field can be set only in policies for list constraints.
     
     pub values: Option<GoogleCloudOrgpolicyV2PolicySpecPolicyRuleStringValues>,
 }
@@ -475,7 +482,7 @@ pub struct GoogleCloudOrgpolicyV2PolicySpecPolicyRule {
 impl client::Part for GoogleCloudOrgpolicyV2PolicySpecPolicyRule {}
 
 
-/// A message that holds specific allowed and denied values. This message can define specific values and subtrees of Cloud Resource Manager resource hierarchy (`Organizations`, `Folders`, `Projects`) that are allowed or denied. This is achieved by using the `under:` and optional `is:` prefixes. The `under:` prefix is used to denote resource subtree values. The `is:` prefix is used to denote specific values, and is required only if the value contains a ":". Values prefixed with "is:" are treated the same as values with no prefix. Ancestry subtrees must be in one of the following formats: - "projects/", e.g. "projects/tokyo-rain-123" - "folders/", e.g. "folders/1234" - "organizations/", e.g. "organizations/1234" The `supports_under` field of the associated `Constraint` defines whether ancestry prefixes can be used.
+/// A message that holds specific allowed and denied values. This message can define specific values and subtrees of the Resource Manager resource hierarchy (`Organizations`, `Folders`, `Projects`) that are allowed or denied. This is achieved by using the `under:` and optional `is:` prefixes. The `under:` prefix is used to denote resource subtree values. The `is:` prefix is used to denote specific values, and is required only if the value contains a ":". Values prefixed with "is:" are treated the same as values with no prefix. Ancestry subtrees must be in one of the following formats: - `projects/` (for example, `projects/tokyo-rain-123`) - `folders/` (for example, `folders/1234`) - `organizations/` (for example, `organizations/1234`) The `supports_under` field of the associated `Constraint` defines whether ancestry prefixes can be used.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -582,11 +589,11 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists `Constraints` that could be applied on the specified resource.
+    /// Lists constraints that could be applied on the specified resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn constraints_list(&self, parent: &str) -> FolderConstraintListCall<'a, S> {
         FolderConstraintListCall {
             hub: self.hub,
@@ -601,12 +608,12 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource.
+    /// Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn policies_create(&self, request: GoogleCloudOrgpolicyV2Policy, parent: &str) -> FolderPolicyCreateCall<'a, S> {
         FolderPolicyCreateCall {
             hub: self.hub,
@@ -620,15 +627,16 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist.
+    /// Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the policy to delete. See `Policy` for naming rules.
+    /// * `name` - Required. Name of the policy to delete. See the policy entry for naming rules.
     pub fn policies_delete(&self, name: &str) -> FolderPolicyDeleteCall<'a, S> {
         FolderPolicyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _etag: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -637,11 +645,11 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write.
+    /// Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the policy. See `Policy` for naming requirements.
+    /// * `name` - Required. Resource name of the policy. See Policy for naming requirements.
     pub fn policies_get(&self, name: &str) -> FolderPolicyGetCall<'a, S> {
         FolderPolicyGetCall {
             hub: self.hub,
@@ -654,11 +662,11 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
+    /// Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The effective policy to compute. See `Policy` for naming rules.
+    /// * `name` - Required. The effective policy to compute. See Policy for naming requirements.
     pub fn policies_get_effective_policy(&self, name: &str) -> FolderPolicyGetEffectivePolicyCall<'a, S> {
         FolderPolicyGetEffectivePolicyCall {
             hub: self.hub,
@@ -671,11 +679,11 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves all of the `Policies` that exist on a particular resource.
+    /// Retrieves all of the policies that exist on a particular resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn policies_list(&self, parent: &str) -> FolderPolicyListCall<'a, S> {
         FolderPolicyListCall {
             hub: self.hub,
@@ -690,12 +698,12 @@ impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
+    /// Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// * `name` - Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     pub fn policies_patch(&self, request: GoogleCloudOrgpolicyV2Policy, name: &str) -> FolderPolicyPatchCall<'a, S> {
         FolderPolicyPatchCall {
             hub: self.hub,
@@ -751,11 +759,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists `Constraints` that could be applied on the specified resource.
+    /// Lists constraints that could be applied on the specified resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn constraints_list(&self, parent: &str) -> OrganizationConstraintListCall<'a, S> {
         OrganizationConstraintListCall {
             hub: self.hub,
@@ -770,7 +778,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a CustomConstraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the organization does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the constraint already exists on the given organization.
+    /// Creates a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the organization does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the constraint already exists on the given organization.
     /// 
     /// # Arguments
     ///
@@ -789,11 +797,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Custom Constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist.
+    /// Deletes a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom constraint to delete. See `CustomConstraint` for naming rules.
+    /// * `name` - Required. Name of the custom constraint to delete. See the custom constraint entry for naming rules.
     pub fn custom_constraints_delete(&self, name: &str) -> OrganizationCustomConstraintDeleteCall<'a, S> {
         OrganizationCustomConstraintDeleteCall {
             hub: self.hub,
@@ -806,11 +814,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a CustomConstraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the CustomConstraint does not exist.
+    /// Gets a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the custom constraint does not exist.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the custom constraint. See `CustomConstraint` for naming requirements.
+    /// * `name` - Required. Resource name of the custom constraint. See the custom constraint entry for naming requirements.
     pub fn custom_constraints_get(&self, name: &str) -> OrganizationCustomConstraintGetCall<'a, S> {
         OrganizationCustomConstraintGetCall {
             hub: self.hub,
@@ -823,11 +831,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves all of the `CustomConstraints` that exist on a particular organization resource.
+    /// Retrieves all of the custom constraints that exist on a particular organization resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The target Cloud resource that parents the set of custom constraints that will be returned from this call. Must be in one of the following forms: * `organizations/{organization_id}`
+    /// * `parent` - Required. The target Google Cloud resource that parents the set of custom constraints that will be returned from this call. Must be in one of the following forms: * `organizations/{organization_id}`
     pub fn custom_constraints_list(&self, parent: &str) -> OrganizationCustomConstraintListCall<'a, S> {
         OrganizationCustomConstraintListCall {
             hub: self.hub,
@@ -842,12 +850,12 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Custom Constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Note: the supplied policy will perform a full overwrite of all fields.
+    /// Updates a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Note: the supplied policy will perform a full overwrite of all fields.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example : "organizations/123/customConstraints/custom.createOnlyE2TypeVms" The max length is 70 characters and the min length is 1. Note that the prefix "organizations/{organization_id}/customConstraints/" is not counted.
+    /// * `name` - Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms` The max length is 70 characters and the minimum length is 1. Note that the prefix `organizations/{organization_id}/customConstraints/` is not counted.
     pub fn custom_constraints_patch(&self, request: GoogleCloudOrgpolicyV2CustomConstraint, name: &str) -> OrganizationCustomConstraintPatchCall<'a, S> {
         OrganizationCustomConstraintPatchCall {
             hub: self.hub,
@@ -861,12 +869,12 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource.
+    /// Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn policies_create(&self, request: GoogleCloudOrgpolicyV2Policy, parent: &str) -> OrganizationPolicyCreateCall<'a, S> {
         OrganizationPolicyCreateCall {
             hub: self.hub,
@@ -880,15 +888,16 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist.
+    /// Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the policy to delete. See `Policy` for naming rules.
+    /// * `name` - Required. Name of the policy to delete. See the policy entry for naming rules.
     pub fn policies_delete(&self, name: &str) -> OrganizationPolicyDeleteCall<'a, S> {
         OrganizationPolicyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _etag: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -897,11 +906,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write.
+    /// Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the policy. See `Policy` for naming requirements.
+    /// * `name` - Required. Resource name of the policy. See Policy for naming requirements.
     pub fn policies_get(&self, name: &str) -> OrganizationPolicyGetCall<'a, S> {
         OrganizationPolicyGetCall {
             hub: self.hub,
@@ -914,11 +923,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
+    /// Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The effective policy to compute. See `Policy` for naming rules.
+    /// * `name` - Required. The effective policy to compute. See Policy for naming requirements.
     pub fn policies_get_effective_policy(&self, name: &str) -> OrganizationPolicyGetEffectivePolicyCall<'a, S> {
         OrganizationPolicyGetEffectivePolicyCall {
             hub: self.hub,
@@ -931,11 +940,11 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves all of the `Policies` that exist on a particular resource.
+    /// Retrieves all of the policies that exist on a particular resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn policies_list(&self, parent: &str) -> OrganizationPolicyListCall<'a, S> {
         OrganizationPolicyListCall {
             hub: self.hub,
@@ -950,12 +959,12 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
+    /// Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// * `name` - Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     pub fn policies_patch(&self, request: GoogleCloudOrgpolicyV2Policy, name: &str) -> OrganizationPolicyPatchCall<'a, S> {
         OrganizationPolicyPatchCall {
             hub: self.hub,
@@ -1011,11 +1020,11 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists `Constraints` that could be applied on the specified resource.
+    /// Lists constraints that could be applied on the specified resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn constraints_list(&self, parent: &str) -> ProjectConstraintListCall<'a, S> {
         ProjectConstraintListCall {
             hub: self.hub,
@@ -1030,12 +1039,12 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource.
+    /// Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn policies_create(&self, request: GoogleCloudOrgpolicyV2Policy, parent: &str) -> ProjectPolicyCreateCall<'a, S> {
         ProjectPolicyCreateCall {
             hub: self.hub,
@@ -1049,15 +1058,16 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist.
+    /// Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the policy to delete. See `Policy` for naming rules.
+    /// * `name` - Required. Name of the policy to delete. See the policy entry for naming rules.
     pub fn policies_delete(&self, name: &str) -> ProjectPolicyDeleteCall<'a, S> {
         ProjectPolicyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _etag: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1066,11 +1076,11 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write.
+    /// Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the policy. See `Policy` for naming requirements.
+    /// * `name` - Required. Resource name of the policy. See Policy for naming requirements.
     pub fn policies_get(&self, name: &str) -> ProjectPolicyGetCall<'a, S> {
         ProjectPolicyGetCall {
             hub: self.hub,
@@ -1083,11 +1093,11 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
+    /// Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The effective policy to compute. See `Policy` for naming rules.
+    /// * `name` - Required. The effective policy to compute. See Policy for naming requirements.
     pub fn policies_get_effective_policy(&self, name: &str) -> ProjectPolicyGetEffectivePolicyCall<'a, S> {
         ProjectPolicyGetEffectivePolicyCall {
             hub: self.hub,
@@ -1100,11 +1110,11 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves all of the `Policies` that exist on a particular resource.
+    /// Retrieves all of the policies that exist on a particular resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// * `parent` - Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     pub fn policies_list(&self, parent: &str) -> ProjectPolicyListCall<'a, S> {
         ProjectPolicyListCall {
             hub: self.hub,
@@ -1119,12 +1129,12 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
+    /// Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// * `name` - Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     pub fn policies_patch(&self, request: GoogleCloudOrgpolicyV2Policy, name: &str) -> ProjectPolicyPatchCall<'a, S> {
         ProjectPolicyPatchCall {
             hub: self.hub,
@@ -1146,7 +1156,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
-/// Lists `Constraints` that could be applied on the specified resource.
+/// Lists constraints that could be applied on the specified resource.
 ///
 /// A builder for the *constraints.list* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -1332,7 +1342,7 @@ where
     }
 
 
-    /// Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -1432,7 +1442,7 @@ where
 }
 
 
-/// Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource.
+/// Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource.
 ///
 /// A builder for the *policies.create* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -1638,7 +1648,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -1724,7 +1734,7 @@ where
 }
 
 
-/// Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist.
+/// Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist.
 ///
 /// A builder for the *policies.delete* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -1751,6 +1761,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().policies_delete("name")
+///              .etag("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1759,6 +1770,7 @@ pub struct FolderPolicyDeleteCall<'a, S>
 
     hub: &'a OrgPolicyAPI<S>,
     _name: String,
+    _etag: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -1787,15 +1799,18 @@ where
         dlg.begin(client::MethodInfo { id: "orgpolicy.folders.policies.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["alt", "name"].iter() {
+        for &field in ["alt", "name", "etag"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._etag.as_ref() {
+            params.push("etag", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -1900,7 +1915,7 @@ where
     }
 
 
-    /// Required. Name of the policy to delete. See `Policy` for naming rules.
+    /// Required. Name of the policy to delete. See the policy entry for naming rules.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1908,6 +1923,13 @@ where
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> FolderPolicyDeleteCall<'a, S> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The current etag of policy. If an etag is provided and does not match the current etag of the policy, deletion will be blocked and an ABORTED error will be returned.
+    ///
+    /// Sets the *etag* query property to the given value.
+    pub fn etag(mut self, new_value: &str) -> FolderPolicyDeleteCall<'a, S> {
+        self._etag = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1986,7 +2008,7 @@ where
 }
 
 
-/// Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write.
+/// Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write.
 ///
 /// A builder for the *policies.get* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -2162,7 +2184,7 @@ where
     }
 
 
-    /// Required. Resource name of the policy. See `Policy` for naming requirements.
+    /// Required. Resource name of the policy. See Policy for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2248,7 +2270,7 @@ where
 }
 
 
-/// Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
+/// Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
 ///
 /// A builder for the *policies.getEffectivePolicy* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -2424,7 +2446,7 @@ where
     }
 
 
-    /// Required. The effective policy to compute. See `Policy` for naming rules.
+    /// Required. The effective policy to compute. See Policy for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2510,7 +2532,7 @@ where
 }
 
 
-/// Retrieves all of the `Policies` that exist on a particular resource.
+/// Retrieves all of the policies that exist on a particular resource.
 ///
 /// A builder for the *policies.list* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -2537,8 +2559,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().policies_list("parent")
-///              .page_token("duo")
-///              .page_size(-55)
+///              .page_token("ipsum")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2696,7 +2718,7 @@ where
     }
 
 
-    /// Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2796,7 +2818,7 @@ where
 }
 
 
-/// Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
+/// Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
 ///
 /// A builder for the *policies.patch* method supported by a *folder* resource.
 /// It is not used directly, but through a [`FolderMethods`] instance.
@@ -3007,7 +3029,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3100,7 +3122,7 @@ where
 }
 
 
-/// Lists `Constraints` that could be applied on the specified resource.
+/// Lists constraints that could be applied on the specified resource.
 ///
 /// A builder for the *constraints.list* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -3127,8 +3149,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().constraints_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-75)
+///              .page_token("eos")
+///              .page_size(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3286,7 +3308,7 @@ where
     }
 
 
-    /// Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3386,7 +3408,7 @@ where
 }
 
 
-/// Creates a CustomConstraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the organization does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the constraint already exists on the given organization.
+/// Creates a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the organization does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the constraint already exists on the given organization.
 ///
 /// A builder for the *customConstraints.create* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -3678,7 +3700,7 @@ where
 }
 
 
-/// Deletes a Custom Constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist.
+/// Deletes a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist.
 ///
 /// A builder for the *customConstraints.delete* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -3854,7 +3876,7 @@ where
     }
 
 
-    /// Required. Name of the custom constraint to delete. See `CustomConstraint` for naming rules.
+    /// Required. Name of the custom constraint to delete. See the custom constraint entry for naming rules.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3940,7 +3962,7 @@ where
 }
 
 
-/// Gets a CustomConstraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the CustomConstraint does not exist.
+/// Gets a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the custom constraint does not exist.
 ///
 /// A builder for the *customConstraints.get* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -4116,7 +4138,7 @@ where
     }
 
 
-    /// Required. Resource name of the custom constraint. See `CustomConstraint` for naming requirements.
+    /// Required. Resource name of the custom constraint. See the custom constraint entry for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4202,7 +4224,7 @@ where
 }
 
 
-/// Retrieves all of the `CustomConstraints` that exist on a particular organization resource.
+/// Retrieves all of the custom constraints that exist on a particular organization resource.
 ///
 /// A builder for the *customConstraints.list* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -4229,8 +4251,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().custom_constraints_list("parent")
-///              .page_token("amet")
-///              .page_size(-20)
+///              .page_token("duo")
+///              .page_size(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4388,7 +4410,7 @@ where
     }
 
 
-    /// Required. The target Cloud resource that parents the set of custom constraints that will be returned from this call. Must be in one of the following forms: * `organizations/{organization_id}`
+    /// Required. The target Google Cloud resource that parents the set of custom constraints that will be returned from this call. Must be in one of the following forms: * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4488,7 +4510,7 @@ where
 }
 
 
-/// Updates a Custom Constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Note: the supplied policy will perform a full overwrite of all fields.
+/// Updates a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Note: the supplied policy will perform a full overwrite of all fields.
 ///
 /// A builder for the *customConstraints.patch* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -4694,7 +4716,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example : "organizations/123/customConstraints/custom.createOnlyE2TypeVms" The max length is 70 characters and the min length is 1. Note that the prefix "organizations/{organization_id}/customConstraints/" is not counted.
+    /// Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms` The max length is 70 characters and the minimum length is 1. Note that the prefix `organizations/{organization_id}/customConstraints/` is not counted.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4780,7 +4802,7 @@ where
 }
 
 
-/// Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource.
+/// Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource.
 ///
 /// A builder for the *policies.create* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -4986,7 +5008,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5072,7 +5094,7 @@ where
 }
 
 
-/// Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist.
+/// Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist.
 ///
 /// A builder for the *policies.delete* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -5099,6 +5121,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().policies_delete("name")
+///              .etag("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5107,6 +5130,7 @@ pub struct OrganizationPolicyDeleteCall<'a, S>
 
     hub: &'a OrgPolicyAPI<S>,
     _name: String,
+    _etag: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -5135,15 +5159,18 @@ where
         dlg.begin(client::MethodInfo { id: "orgpolicy.organizations.policies.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["alt", "name"].iter() {
+        for &field in ["alt", "name", "etag"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._etag.as_ref() {
+            params.push("etag", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -5248,7 +5275,7 @@ where
     }
 
 
-    /// Required. Name of the policy to delete. See `Policy` for naming rules.
+    /// Required. Name of the policy to delete. See the policy entry for naming rules.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5256,6 +5283,13 @@ where
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> OrganizationPolicyDeleteCall<'a, S> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The current etag of policy. If an etag is provided and does not match the current etag of the policy, deletion will be blocked and an ABORTED error will be returned.
+    ///
+    /// Sets the *etag* query property to the given value.
+    pub fn etag(mut self, new_value: &str) -> OrganizationPolicyDeleteCall<'a, S> {
+        self._etag = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5334,7 +5368,7 @@ where
 }
 
 
-/// Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write.
+/// Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write.
 ///
 /// A builder for the *policies.get* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -5510,7 +5544,7 @@ where
     }
 
 
-    /// Required. Resource name of the policy. See `Policy` for naming requirements.
+    /// Required. Resource name of the policy. See Policy for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5596,7 +5630,7 @@ where
 }
 
 
-/// Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
+/// Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
 ///
 /// A builder for the *policies.getEffectivePolicy* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -5772,7 +5806,7 @@ where
     }
 
 
-    /// Required. The effective policy to compute. See `Policy` for naming rules.
+    /// Required. The effective policy to compute. See Policy for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5858,7 +5892,7 @@ where
 }
 
 
-/// Retrieves all of the `Policies` that exist on a particular resource.
+/// Retrieves all of the policies that exist on a particular resource.
 ///
 /// A builder for the *policies.list* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -5885,8 +5919,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().policies_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-50)
+///              .page_token("est")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6044,7 +6078,7 @@ where
     }
 
 
-    /// Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6144,7 +6178,7 @@ where
 }
 
 
-/// Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
+/// Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
 ///
 /// A builder for the *policies.patch* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -6355,7 +6389,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6448,7 +6482,7 @@ where
 }
 
 
-/// Lists `Constraints` that could be applied on the specified resource.
+/// Lists constraints that could be applied on the specified resource.
 ///
 /// A builder for the *constraints.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -6475,8 +6509,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().constraints_list("parent")
-///              .page_token("ea")
-///              .page_size(-99)
+///              .page_token("Lorem")
+///              .page_size(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6634,7 +6668,7 @@ where
     }
 
 
-    /// Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6734,7 +6768,7 @@ where
 }
 
 
-/// Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource.
+/// Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource.
 ///
 /// A builder for the *policies.create* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -6940,7 +6974,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7026,7 +7060,7 @@ where
 }
 
 
-/// Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist.
+/// Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist.
 ///
 /// A builder for the *policies.delete* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -7053,6 +7087,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().policies_delete("name")
+///              .etag("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7061,6 +7096,7 @@ pub struct ProjectPolicyDeleteCall<'a, S>
 
     hub: &'a OrgPolicyAPI<S>,
     _name: String,
+    _etag: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -7089,15 +7125,18 @@ where
         dlg.begin(client::MethodInfo { id: "orgpolicy.projects.policies.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["alt", "name"].iter() {
+        for &field in ["alt", "name", "etag"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._etag.as_ref() {
+            params.push("etag", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -7202,7 +7241,7 @@ where
     }
 
 
-    /// Required. Name of the policy to delete. See `Policy` for naming rules.
+    /// Required. Name of the policy to delete. See the policy entry for naming rules.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7210,6 +7249,13 @@ where
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> ProjectPolicyDeleteCall<'a, S> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The current etag of policy. If an etag is provided and does not match the current etag of the policy, deletion will be blocked and an ABORTED error will be returned.
+    ///
+    /// Sets the *etag* query property to the given value.
+    pub fn etag(mut self, new_value: &str) -> ProjectPolicyDeleteCall<'a, S> {
+        self._etag = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7288,7 +7334,7 @@ where
 }
 
 
-/// Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write.
+/// Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write.
 ///
 /// A builder for the *policies.get* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -7464,7 +7510,7 @@ where
     }
 
 
-    /// Required. Resource name of the policy. See `Policy` for naming requirements.
+    /// Required. Resource name of the policy. See Policy for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7550,7 +7596,7 @@ where
 }
 
 
-/// Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
+/// Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded.
 ///
 /// A builder for the *policies.getEffectivePolicy* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -7726,7 +7772,7 @@ where
     }
 
 
-    /// Required. The effective policy to compute. See `Policy` for naming rules.
+    /// Required. The effective policy to compute. See Policy for naming requirements.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7812,7 +7858,7 @@ where
 }
 
 
-/// Retrieves all of the `Policies` that exist on a particular resource.
+/// Retrieves all of the policies that exist on a particular resource.
 ///
 /// A builder for the *policies.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -7839,8 +7885,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().policies_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .page_token("kasd")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7998,7 +8044,7 @@ where
     }
 
 
-    /// Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
+    /// Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8098,7 +8144,7 @@ where
 }
 
 
-/// Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
+/// Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields.
 ///
 /// A builder for the *policies.patch* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -8309,7 +8355,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
+    /// Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number.
     ///
     /// Sets the *name* path property to the given value.
     ///

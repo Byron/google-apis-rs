@@ -4,12 +4,12 @@
 [package]
 
 name = "google-artifactregistry1_beta1"
-version = "5.0.3+20230113"
+version = "5.0.3+20240213"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Artifact Registry (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/artifactregistry1_beta1"
 homepage = "https://cloud.google.com/artifacts/docs/"
-documentation = "https://docs.rs/google-artifactregistry1_beta1/5.0.3+20230113"
+documentation = "https://docs.rs/google-artifactregistry1_beta1/5.0.3+20240213"
 license = "MIT"
 keywords = ["artifactregistry", "google", "protocol", "web", "api"]
 autobins = false

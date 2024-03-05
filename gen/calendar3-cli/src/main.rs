@@ -1912,6 +1912,9 @@ where
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "extended-properties.private" => Some(("extendedProperties.private", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "extended-properties.shared" => Some(("extendedProperties.shared", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "focus-time-properties.auto-decline-mode" => Some(("focusTimeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.chat-status" => Some(("focusTimeProperties.chatStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.decline-message" => Some(("focusTimeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.display" => Some(("gadget.display", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.height" => Some(("gadget.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "gadget.icon-link" => Some(("gadget.iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1937,6 +1940,8 @@ where
                     "original-start-time.date" => Some(("originalStartTime.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.date-time" => Some(("originalStartTime.dateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.time-zone" => Some(("originalStartTime.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.auto-decline-mode" => Some(("outOfOfficeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.decline-message" => Some(("outOfOfficeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "recurrence" => Some(("recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "recurring-event-id" => Some(("recurringEventId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1952,8 +1957,15 @@ where
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.custom-location.label" => Some(("workingLocationProperties.customLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.building-id" => Some(("workingLocationProperties.officeLocation.buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.desk-id" => Some(("workingLocationProperties.officeLocation.deskId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-id" => Some(("workingLocationProperties.officeLocation.floorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-section-id" => Some(("workingLocationProperties.officeLocation.floorSectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.label" => Some(("workingLocationProperties.officeLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.type" => Some(("workingLocationProperties.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "auto-decline-mode", "building-id", "chat-status", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "custom-location", "date", "date-time", "decline-message", "description", "desk-id", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "floor-id", "floor-section-id", "focus-time-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "label", "link", "location", "locked", "name", "notes", "office-location", "organizer", "original-start-time", "out-of-office-properties", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width", "working-location-properties"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2070,6 +2082,9 @@ where
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "extended-properties.private" => Some(("extendedProperties.private", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "extended-properties.shared" => Some(("extendedProperties.shared", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "focus-time-properties.auto-decline-mode" => Some(("focusTimeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.chat-status" => Some(("focusTimeProperties.chatStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.decline-message" => Some(("focusTimeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.display" => Some(("gadget.display", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.height" => Some(("gadget.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "gadget.icon-link" => Some(("gadget.iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2095,6 +2110,8 @@ where
                     "original-start-time.date" => Some(("originalStartTime.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.date-time" => Some(("originalStartTime.dateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.time-zone" => Some(("originalStartTime.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.auto-decline-mode" => Some(("outOfOfficeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.decline-message" => Some(("outOfOfficeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "recurrence" => Some(("recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "recurring-event-id" => Some(("recurringEventId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2110,8 +2127,15 @@ where
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.custom-location.label" => Some(("workingLocationProperties.customLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.building-id" => Some(("workingLocationProperties.officeLocation.buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.desk-id" => Some(("workingLocationProperties.officeLocation.deskId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-id" => Some(("workingLocationProperties.officeLocation.floorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-section-id" => Some(("workingLocationProperties.officeLocation.floorSectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.label" => Some(("workingLocationProperties.officeLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.type" => Some(("workingLocationProperties.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "auto-decline-mode", "building-id", "chat-status", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "custom-location", "date", "date-time", "decline-message", "description", "desk-id", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "floor-id", "floor-section-id", "focus-time-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "label", "link", "location", "locked", "name", "notes", "office-location", "organizer", "original-start-time", "out-of-office-properties", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width", "working-location-properties"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2321,6 +2345,9 @@ where
                 "i-cal-uid" => {
                     call = call.i_cal_uid(value.unwrap_or(""));
                 },
+                "event-types" => {
+                    call = call.add_event_types(value.unwrap_or(""));
+                },
                 "always-include-email" => {
                     call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
@@ -2337,7 +2364,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["always-include-email", "i-cal-uid", "max-attendees", "max-results", "order-by", "page-token", "private-extended-property", "q", "shared-extended-property", "show-deleted", "show-hidden-invitations", "single-events", "sync-token", "time-max", "time-min", "time-zone", "updated-min"].iter().map(|v|*v));
+                                                                           v.extend(["always-include-email", "event-types", "i-cal-uid", "max-attendees", "max-results", "order-by", "page-token", "private-extended-property", "q", "shared-extended-property", "show-deleted", "show-hidden-invitations", "single-events", "sync-token", "time-max", "time-min", "time-zone", "updated-min"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2480,6 +2507,9 @@ where
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "extended-properties.private" => Some(("extendedProperties.private", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "extended-properties.shared" => Some(("extendedProperties.shared", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "focus-time-properties.auto-decline-mode" => Some(("focusTimeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.chat-status" => Some(("focusTimeProperties.chatStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.decline-message" => Some(("focusTimeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.display" => Some(("gadget.display", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.height" => Some(("gadget.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "gadget.icon-link" => Some(("gadget.iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2505,6 +2535,8 @@ where
                     "original-start-time.date" => Some(("originalStartTime.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.date-time" => Some(("originalStartTime.dateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.time-zone" => Some(("originalStartTime.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.auto-decline-mode" => Some(("outOfOfficeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.decline-message" => Some(("outOfOfficeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "recurrence" => Some(("recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "recurring-event-id" => Some(("recurringEventId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2520,8 +2552,15 @@ where
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.custom-location.label" => Some(("workingLocationProperties.customLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.building-id" => Some(("workingLocationProperties.officeLocation.buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.desk-id" => Some(("workingLocationProperties.officeLocation.deskId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-id" => Some(("workingLocationProperties.officeLocation.floorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-section-id" => Some(("workingLocationProperties.officeLocation.floorSectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.label" => Some(("workingLocationProperties.officeLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.type" => Some(("workingLocationProperties.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "auto-decline-mode", "building-id", "chat-status", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "custom-location", "date", "date-time", "decline-message", "description", "desk-id", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "floor-id", "floor-section-id", "focus-time-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "label", "link", "location", "locked", "name", "notes", "office-location", "organizer", "original-start-time", "out-of-office-properties", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width", "working-location-properties"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2709,6 +2748,9 @@ where
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "extended-properties.private" => Some(("extendedProperties.private", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "extended-properties.shared" => Some(("extendedProperties.shared", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "focus-time-properties.auto-decline-mode" => Some(("focusTimeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.chat-status" => Some(("focusTimeProperties.chatStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "focus-time-properties.decline-message" => Some(("focusTimeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.display" => Some(("gadget.display", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gadget.height" => Some(("gadget.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "gadget.icon-link" => Some(("gadget.iconLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2734,6 +2776,8 @@ where
                     "original-start-time.date" => Some(("originalStartTime.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.date-time" => Some(("originalStartTime.dateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-start-time.time-zone" => Some(("originalStartTime.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.auto-decline-mode" => Some(("outOfOfficeProperties.autoDeclineMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "out-of-office-properties.decline-message" => Some(("outOfOfficeProperties.declineMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "recurrence" => Some(("recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "recurring-event-id" => Some(("recurringEventId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2749,8 +2793,15 @@ where
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.custom-location.label" => Some(("workingLocationProperties.customLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.building-id" => Some(("workingLocationProperties.officeLocation.buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.desk-id" => Some(("workingLocationProperties.officeLocation.deskId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-id" => Some(("workingLocationProperties.officeLocation.floorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.floor-section-id" => Some(("workingLocationProperties.officeLocation.floorSectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.office-location.label" => Some(("workingLocationProperties.officeLocation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "working-location-properties.type" => Some(("workingLocationProperties.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "auto-decline-mode", "building-id", "chat-status", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "custom-location", "date", "date-time", "decline-message", "description", "desk-id", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "event-type", "extended-properties", "floor-id", "floor-section-id", "focus-time-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "label", "link", "location", "locked", "name", "notes", "office-location", "organizer", "original-start-time", "out-of-office-properties", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width", "working-location-properties"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2925,6 +2976,9 @@ where
                 "i-cal-uid" => {
                     call = call.i_cal_uid(value.unwrap_or(""));
                 },
+                "event-types" => {
+                    call = call.add_event_types(value.unwrap_or(""));
+                },
                 "always-include-email" => {
                     call = call.always_include_email(        value.map(|v| arg_from_str(v, err, "always-include-email", "boolean")).unwrap_or(false));
                 },
@@ -2941,7 +2995,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["always-include-email", "i-cal-uid", "max-attendees", "max-results", "order-by", "page-token", "private-extended-property", "q", "shared-extended-property", "show-deleted", "show-hidden-invitations", "single-events", "sync-token", "time-max", "time-min", "time-zone", "updated-min"].iter().map(|v|*v));
+                                                                           v.extend(["always-include-email", "event-types", "i-cal-uid", "max-attendees", "max-results", "order-by", "page-token", "private-extended-property", "q", "shared-extended-property", "show-deleted", "show-hidden-invitations", "single-events", "sync-token", "time-max", "time-min", "time-zone", "updated-min"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4219,7 +4273,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("move",
-                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer."##),
+                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime and workingLocation events cannot be moved."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_move",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -4470,7 +4524,7 @@ async fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221229")
+           .version("5.0.3+20240223")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")

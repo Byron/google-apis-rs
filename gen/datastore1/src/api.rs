@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -168,19 +168,25 @@ impl<'a, S> Datastore<S> {
 // ############
 // SCHEMAS ###
 // ##########
-/// Defines a aggregation that produces a single result.
+/// Defines an aggregation that produces a single result.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Aggregation {
-    /// Optional. Optional name of the property to store the result of the aggregation. If not provided, Datastore will pick a default name following the format `property_`. For example: ``` AGGREGATE COUNT_UP_TO(1) AS count_up_to_1, COUNT_UP_TO(2), COUNT_UP_TO(3) AS count_up_to_3, COUNT_UP_TO(4) OVER ( ... ); ``` becomes: ``` AGGREGATE COUNT_UP_TO(1) AS count_up_to_1, COUNT_UP_TO(2) AS property_1, COUNT_UP_TO(3) AS count_up_to_3, COUNT_UP_TO(4) AS property_2 OVER ( ... ); ``` Requires: * Must be unique across all aggregation aliases. * Conform to entity property name limitations.
+    /// Optional. Optional name of the property to store the result of the aggregation. If not provided, Datastore will pick a default name following the format `property_`. For example: ``` AGGREGATE COUNT_UP_TO(1) AS count_up_to_1, COUNT_UP_TO(2), COUNT_UP_TO(3) AS count_up_to_3, COUNT(*) OVER ( ... ); ``` becomes: ``` AGGREGATE COUNT_UP_TO(1) AS count_up_to_1, COUNT_UP_TO(2) AS property_1, COUNT_UP_TO(3) AS count_up_to_3, COUNT(*) AS property_2 OVER ( ... ); ``` Requires: * Must be unique across all aggregation aliases. * Conform to entity property name limitations.
     
     pub alias: Option<String>,
+    /// Average aggregator.
+    
+    pub avg: Option<Avg>,
     /// Count aggregator.
     
     pub count: Option<Count>,
+    /// Sum aggregator.
+    
+    pub sum: Option<Sum>,
 }
 
 impl client::Part for Aggregation {}
@@ -302,6 +308,21 @@ pub struct ArrayValue {
 impl client::Part for ArrayValue {}
 
 
+/// Average of the values of the requested property. * Only numeric values will be aggregated. All non-numeric values including `NULL` are skipped. * If the aggregated values contain `NaN`, returns `NaN`. Infinity math follows IEEE-754 standards. * If the aggregated value set is empty, returns `NULL`. * Always returns the result as a double.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Avg {
+    /// The property to aggregate on.
+    
+    pub property: Option<PropertyReference>,
+}
+
+impl client::Part for Avg {}
+
+
 /// The request for Datastore.BeginTransaction.
 /// 
 /// # Activities
@@ -339,7 +360,7 @@ impl client::RequestValue for BeginTransactionRequest {}
 pub struct BeginTransactionResponse {
     /// The transaction identifier (always present).
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -373,7 +394,7 @@ pub struct CommitRequest {
     pub single_use_transaction: Option<TransactionOptions>,
     /// The identifier of the transaction associated with the commit. A transaction identifier is returned by a call to Datastore.BeginTransaction.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -433,7 +454,7 @@ impl client::Part for CompositeFilter {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Count {
-    /// Optional. Optional constraint on the maximum number of entities to count. This provides a way to set an upper bound on the number of entities to scan, limiting latency and cost. Unspecified is interpreted as no bound. If a zero value is provided, a count result of zero should always be expected. High-Level Example: ``` AGGREGATE COUNT_UP_TO(1000) OVER ( SELECT * FROM k ); ``` Requires: * Must be non-negative when present.
+    /// Optional. Optional constraint on the maximum number of entities to count. This provides a way to set an upper bound on the number of entities to scan, limiting latency, and cost. Unspecified is interpreted as no bound. If a zero value is provided, a count result of zero should always be expected. High-Level Example: ``` AGGREGATE COUNT_UP_TO(1000) OVER ( SELECT * FROM k ); ``` Requires: * Must be non-negative when present.
     #[serde(rename="upTo")]
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -459,7 +480,7 @@ pub struct Empty { _never_set: Option<bool> }
 impl client::ResponseResult for Empty {}
 
 
-/// A Datastore data object. An entity is limited to 1 megabyte when stored. That _roughly_ corresponds to a limit of 1 megabyte for the serialized form of this message.
+/// A Datastore data object. Must not exceed 1 MiB - 4 bytes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -469,7 +490,7 @@ pub struct Entity {
     /// The entity's key. An entity must have a key, unless otherwise documented (for example, an entity in `Value.entity_value` may have no key). An entity's kind is its key path's last element's kind, or null if it has no key.
     
     pub key: Option<Key>,
-    /// The entity's properties. The map's keys are property names. A property name matching regex `__.*__` is reserved. A reserved property name is forbidden in certain documented contexts. The name must not contain more than 500 characters. The name cannot be `""`.
+    /// The entity's properties. The map's keys are property names. A property name matching regex `__.*__` is reserved. A reserved property name is forbidden in certain documented contexts. The map keys, represented as UTF-8, must not exceed 1,500 bytes and cannot be empty.
     
     pub properties: Option<HashMap<String, Value>>,
 }
@@ -490,7 +511,7 @@ pub struct EntityResult {
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// A cursor that points to the position after the result entity. Set only when the `EntityResult` is part of a `QueryResultBatch` message.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cursor: Option<Vec<u8>>,
     /// The resulting entity.
     
@@ -730,7 +751,7 @@ pub struct GoogleLongrunningOperation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -775,7 +796,7 @@ impl client::Part for GqlQuery {}
 pub struct GqlQueryParameter {
     /// A query cursor. Query cursors are returned in query result batches.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cursor: Option<Vec<u8>>,
     /// A value parameter.
     
@@ -888,9 +909,9 @@ pub struct LookupResponse {
     #[serde(rename="readTime")]
     
     pub read_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// The identifier of the transaction that was started as part of this Lookup request. Set only when ReadOptions.begin_transaction was set in LookupRequest.read_options.
+    /// The identifier of the transaction that was started as part of this Lookup request. Set only when ReadOptions.new_transaction was set in LookupRequest.read_options.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -1068,7 +1089,7 @@ impl client::Part for PropertyOrder {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PropertyReference {
-    /// The name of the property. If name includes "."s, it may be interpreted as a property name path.
+    /// A reference to a property. Requires: * MUST be a dot-delimited (`.`) string of segments, where each segment conforms to entity property name limitations.
     
     pub name: Option<String>,
 }
@@ -1083,14 +1104,14 @@ impl client::Part for PropertyReference {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Query {
-    /// The properties to make distinct. The query results will contain the first result for each distinct combination of values for the given properties (if empty, all results are returned).
+    /// The properties to make distinct. The query results will contain the first result for each distinct combination of values for the given properties (if empty, all results are returned). Requires: * If `order` is specified, the set of distinct on properties must appear before the non-distinct on properties in `order`.
     #[serde(rename="distinctOn")]
     
     pub distinct_on: Option<Vec<PropertyReference>>,
     /// An ending point for the query results. Query cursors are returned in query result batches and [can only be used to limit the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
     #[serde(rename="endCursor")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub end_cursor: Option<Vec<u8>>,
     /// The filter to apply.
     
@@ -1113,7 +1134,7 @@ pub struct Query {
     /// A starting point for the query results. Query cursors are returned in query result batches and [can only be used to continue the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
     #[serde(rename="startCursor")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub start_cursor: Option<Vec<u8>>,
 }
 
@@ -1130,7 +1151,7 @@ pub struct QueryResultBatch {
     /// A cursor that points to the position after the last result in the batch.
     #[serde(rename="endCursor")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub end_cursor: Option<Vec<u8>>,
     /// The result type for every entity in `entity_results`.
     #[serde(rename="entityResultType")]
@@ -1151,7 +1172,7 @@ pub struct QueryResultBatch {
     /// A cursor that points to the position after the last skipped result. Will be set when `skipped_results` != 0.
     #[serde(rename="skippedCursor")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub skipped_cursor: Option<Vec<u8>>,
     /// The number of results skipped, typically because of an offset.
     #[serde(rename="skippedResults")]
@@ -1174,7 +1195,7 @@ impl client::Part for QueryResultBatch {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadOnly {
-    /// Reads entities at the given time. This may not be older than 60 seconds.
+    /// Reads entities at the given time. This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
     #[serde(rename="readTime")]
     
     pub read_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -1198,13 +1219,13 @@ pub struct ReadOptions {
     #[serde(rename="readConsistency")]
     
     pub read_consistency: Option<String>,
-    /// Reads entities as they were at the given time. This may not be older than 270 seconds. This value is only supported for Cloud Firestore in Datastore mode.
+    /// Reads entities as they were at the given time. This value is only supported for Cloud Firestore in Datastore mode. This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
     #[serde(rename="readTime")]
     
     pub read_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The identifier of the transaction in which to read. A transaction identifier is returned by a call to Datastore.BeginTransaction.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -1221,7 +1242,7 @@ pub struct ReadWrite {
     /// The transaction identifier of the transaction being retried.
     #[serde(rename="previousTransaction")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub previous_transaction: Option<Vec<u8>>,
 }
 
@@ -1283,7 +1304,7 @@ pub struct RollbackRequest {
     pub database_id: Option<String>,
     /// Required. The transaction identifier, returned by a call to Datastore.BeginTransaction.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -1358,9 +1379,9 @@ pub struct RunAggregationQueryResponse {
     /// The parsed form of the `GqlQuery` from the request, if it was set.
     
     pub query: Option<AggregationQuery>,
-    /// The identifier of the transaction that was started as part of this RunAggregationQuery request. Set only when ReadOptions.begin_transaction was set in RunAggregationQueryRequest.read_options.
+    /// The identifier of the transaction that was started as part of this RunAggregationQuery request. Set only when ReadOptions.new_transaction was set in RunAggregationQueryRequest.read_options.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -1419,9 +1440,9 @@ pub struct RunQueryResponse {
     /// The parsed form of the `GqlQuery` from the request, if it was set.
     
     pub query: Option<Query>,
-    /// The identifier of the transaction that was started as part of this RunQuery request. Set only when ReadOptions.begin_transaction was set in RunQueryRequest.read_options.
+    /// The identifier of the transaction that was started as part of this RunQuery request. Set only when ReadOptions.new_transaction was set in RunQueryRequest.read_options.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub transaction: Option<Vec<u8>>,
 }
 
@@ -1447,6 +1468,21 @@ pub struct Status {
 }
 
 impl client::Part for Status {}
+
+
+/// Sum of the values of the requested property. * Only numeric values will be aggregated. All non-numeric values including `NULL` are skipped. * If the aggregated values contain `NaN`, returns `NaN`. Infinity math follows IEEE-754 standards. * If the aggregated value set is empty, returns 0. * Returns a 64-bit integer if all aggregated numbers are integers and the sum result does not overflow. Otherwise, the result is returned as a double. Note that even if all the aggregated values are integers, the result is returned as a double if it cannot fit within a 64-bit signed integer. When this occurs, the returned value will lose precision. * When underflow occurs, floating-point aggregation is non-deterministic. This means that running the same query repeatedly without any changes to the underlying values could produce slightly different results each time. In those cases, values should be stored as integers over floating-point numbers.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Sum {
+    /// The property to aggregate on.
+    
+    pub property: Option<PropertyReference>,
+}
+
+impl client::Part for Sum {}
 
 
 /// Options for beginning a new transaction. Transactions can be created explicitly with calls to Datastore.BeginTransaction or implicitly by setting ReadOptions.new_transaction in read requests.
@@ -1483,7 +1519,7 @@ pub struct Value {
     /// A blob value. May have at most 1,000,000 bytes. When `exclude_from_indexes` is false, may have at most 1500 bytes. In JSON requests, must be base64-encoded.
     #[serde(rename="blobValue")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_value: Option<Vec<u8>>,
     /// A boolean value.
     #[serde(rename="booleanValue")]
@@ -1707,7 +1743,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -3847,7 +3883,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.

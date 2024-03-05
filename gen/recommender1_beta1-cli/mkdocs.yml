@@ -1,4 +1,4 @@
-site_name: Recommender v5.0.3+20230108
+site_name: Recommender v5.0.3+20240226
 site_url: http://byron.github.io/google-apis-rs/google-recommender1_beta1-cli
 site_description: A complete library to interact with Recommender (protocol v1beta1)
 
@@ -15,6 +15,7 @@ nav:
     - 'Locations Insight Types Insights List': 'billing-accounts_locations-insight-types-insights-list.md'
     - 'Locations Insight Types Insights Mark Accepted': 'billing-accounts_locations-insight-types-insights-mark-accepted.md'
     - 'Locations Insight Types Update Config': 'billing-accounts_locations-insight-types-update-config.md'
+    - 'Locations List': 'billing-accounts_locations-list.md'
     - 'Locations Recommenders Get Config': 'billing-accounts_locations-recommenders-get-config.md'
     - 'Locations Recommenders Recommendations Get': 'billing-accounts_locations-recommenders-recommendations-get.md'
     - 'Locations Recommenders Recommendations List': 'billing-accounts_locations-recommenders-recommendations-list.md'
@@ -27,18 +28,22 @@ nav:
     - 'Locations Insight Types Insights Get': 'folders_locations-insight-types-insights-get.md'
     - 'Locations Insight Types Insights List': 'folders_locations-insight-types-insights-list.md'
     - 'Locations Insight Types Insights Mark Accepted': 'folders_locations-insight-types-insights-mark-accepted.md'
+    - 'Locations List': 'folders_locations-list.md'
     - 'Locations Recommenders Recommendations Get': 'folders_locations-recommenders-recommendations-get.md'
     - 'Locations Recommenders Recommendations List': 'folders_locations-recommenders-recommendations-list.md'
     - 'Locations Recommenders Recommendations Mark Claimed': 'folders_locations-recommenders-recommendations-mark-claimed.md'
     - 'Locations Recommenders Recommendations Mark Dismissed': 'folders_locations-recommenders-recommendations-mark-dismissed.md'
     - 'Locations Recommenders Recommendations Mark Failed': 'folders_locations-recommenders-recommendations-mark-failed.md'
     - 'Locations Recommenders Recommendations Mark Succeeded': 'folders_locations-recommenders-recommendations-mark-succeeded.md'
+- 'Insight Types':
+    - 'List': 'insight-types_list.md'
 - 'Organizations':
     - 'Locations Insight Types Get Config': 'organizations_locations-insight-types-get-config.md'
     - 'Locations Insight Types Insights Get': 'organizations_locations-insight-types-insights-get.md'
     - 'Locations Insight Types Insights List': 'organizations_locations-insight-types-insights-list.md'
     - 'Locations Insight Types Insights Mark Accepted': 'organizations_locations-insight-types-insights-mark-accepted.md'
     - 'Locations Insight Types Update Config': 'organizations_locations-insight-types-update-config.md'
+    - 'Locations List': 'organizations_locations-list.md'
     - 'Locations Recommenders Get Config': 'organizations_locations-recommenders-get-config.md'
     - 'Locations Recommenders Recommendations Get': 'organizations_locations-recommenders-recommendations-get.md'
     - 'Locations Recommenders Recommendations List': 'organizations_locations-recommenders-recommendations-list.md'
@@ -53,6 +58,7 @@ nav:
     - 'Locations Insight Types Insights List': 'projects_locations-insight-types-insights-list.md'
     - 'Locations Insight Types Insights Mark Accepted': 'projects_locations-insight-types-insights-mark-accepted.md'
     - 'Locations Insight Types Update Config': 'projects_locations-insight-types-update-config.md'
+    - 'Locations List': 'projects_locations-list.md'
     - 'Locations Recommenders Get Config': 'projects_locations-recommenders-get-config.md'
     - 'Locations Recommenders Recommendations Get': 'projects_locations-recommenders-recommendations-get.md'
     - 'Locations Recommenders Recommendations List': 'projects_locations-recommenders-recommendations-list.md'
@@ -61,6 +67,8 @@ nav:
     - 'Locations Recommenders Recommendations Mark Failed': 'projects_locations-recommenders-recommendations-mark-failed.md'
     - 'Locations Recommenders Recommendations Mark Succeeded': 'projects_locations-recommenders-recommendations-mark-succeeded.md'
     - 'Locations Recommenders Update Config': 'projects_locations-recommenders-update-config.md'
+- 'Recommenders':
+    - 'List': 'recommenders_list.md'
 
 theme: readthedocs
 

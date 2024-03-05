@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20240303*. The CLI is at version *5.0.3*.
 
 ```bash
 cloudresourcemanager3 [options]
@@ -77,6 +77,7 @@ cloudresourcemanager3 [options]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-namespaced [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -86,6 +87,7 @@ cloudresourcemanager3 [options]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-namespaced [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

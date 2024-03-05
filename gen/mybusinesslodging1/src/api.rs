@@ -409,7 +409,7 @@ pub struct Connectivity {
 impl client::Part for Connectivity {}
 
 
-/// An eco certificate awarded to the hotel.
+/// An eco certificate awarded to the hotel. Deprecated: this message is no longer populated. All certification data is now provided by BeCause.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -479,7 +479,7 @@ pub struct EnergyEfficiency {
     #[serde(rename="energySavingThermostatsException")]
     
     pub energy_saving_thermostats_exception: Option<String>,
-    /// Output only. Green building design. True if BREEAM-* or LEED-* certified.
+    /// Output only. Green building design. True if the property has been awarded a relevant certification.
     #[serde(rename="greenBuildingDesign")]
     
     pub green_building_design: Option<bool>,
@@ -2359,7 +2359,7 @@ pub struct Sustainability {
     #[serde(rename="energyEfficiency")]
     
     pub energy_efficiency: Option<EnergyEfficiency>,
-    /// Sustainability certifications the hotel has been awarded.
+    /// Sustainability certifications the hotel has been awarded. Deprecated: this field is no longer populated. All certification data is now provided by BeCause.
     #[serde(rename="sustainabilityCertifications")]
     
     pub sustainability_certifications: Option<SustainabilityCertifications>,
@@ -2380,7 +2380,7 @@ pub struct Sustainability {
 impl client::Part for Sustainability {}
 
 
-/// Sustainability certifications the hotel has been awarded.
+/// Sustainability certifications the hotel has been awarded. Deprecated: this message is no longer populated. All certification data is now provided by BeCause.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2399,11 +2399,11 @@ pub struct SustainabilityCertifications {
     #[serde(rename="ecoCertifications")]
     
     pub eco_certifications: Option<Vec<EcoCertification>>,
-    /// LEED certification. Deprecated: this field is no longer populated. LEED certification status is now provided directly by USGBC.
+    /// LEED certification.
     #[serde(rename="leedCertification")]
     
     pub leed_certification: Option<String>,
-    /// LEED certification exception. Deprecated: this field is no longer populated. LEED certification status is now provided directly by USGBC.
+    /// LEED certification exception.
     #[serde(rename="leedCertificationException")]
     
     pub leed_certification_exception: Option<String>,
@@ -2999,7 +2999,7 @@ impl<'a, S> LocationMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Google identifier for this location in the form: `accounts/{account_id}/locations/{location_id}/lodging`
+    /// * `name` - Required. Google identifier for this location in the form: `locations/{location_id}/lodging`
     pub fn lodging_get_google_updated(&self, name: &str) -> LocationLodgingGetGoogleUpdatedCall<'a, S> {
         LocationLodgingGetGoogleUpdatedCall {
             hub: self.hub,
@@ -3225,7 +3225,7 @@ where
     }
 
 
-    /// Required. Google identifier for this location in the form: `accounts/{account_id}/locations/{location_id}/lodging`
+    /// Required. Google identifier for this location in the form: `locations/{location_id}/lodging`
     ///
     /// Sets the *name* path property to the given value.
     ///

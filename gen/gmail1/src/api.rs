@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Read, compose, send, and permanently delete all your email from Gmail
     Gmai,
@@ -312,10 +312,14 @@ pub struct CseIdentity {
     #[serde(rename="emailAddress")]
     
     pub email_address: Option<String>,
-    /// If a key pair is associated, the identifier of the key pair, CseKeyPair.
+    /// If a key pair is associated, the ID of the key pair, CseKeyPair.
     #[serde(rename="primaryKeyPairId")]
     
     pub primary_key_pair_id: Option<String>,
+    /// The configuration of a CSE identity that uses different key pairs for signing and encryption.
+    #[serde(rename="signAndEncryptKeyPairs")]
+    
+    pub sign_and_encrypt_key_pairs: Option<SignAndEncryptKeyPairs>,
 }
 
 impl client::RequestValue for CseIdentity {}
@@ -375,6 +379,10 @@ impl client::ResponseResult for CseKeyPair {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CsePrivateKeyMetadata {
+    /// Metadata for hardware keys.
+    #[serde(rename="hardwareKeyMetadata")]
+    
+    pub hardware_key_metadata: Option<HardwareKeyMetadata>,
     /// Metadata for a private key instance managed by an external key access control list service.
     #[serde(rename="kaclsKeyMetadata")]
     
@@ -587,6 +595,21 @@ pub struct ForwardingAddress {
 
 impl client::RequestValue for ForwardingAddress {}
 impl client::ResponseResult for ForwardingAddress {}
+
+
+/// Metadata for hardware keys.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HardwareKeyMetadata {
+    /// Description about the hardware key.
+    
+    pub description: Option<String>,
+}
+
+impl client::Part for HardwareKeyMetadata {}
 
 
 /// A record of a change to the user's mailbox. Each history change may affect multiple messages in multiple ways.
@@ -1158,7 +1181,7 @@ pub struct Message {
     pub payload: Option<MessagePart>,
     /// The entire email message in an RFC 2822 formatted and base64url encoded string. Returned in `messages.get` and `drafts.get` responses when the `format=RAW` parameter is supplied.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub raw: Option<Vec<u8>>,
     /// Estimated size in bytes of the message.
     #[serde(rename="sizeEstimate")]
@@ -1226,7 +1249,7 @@ pub struct MessagePartBody {
     pub attachment_id: Option<String>,
     /// The body data of a MIME message part as a base64url encoded string. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Number of bytes for the message part data (encoding notwithstanding).
     
@@ -1430,6 +1453,26 @@ impl client::RequestValue for SendAs {}
 impl client::ResponseResult for SendAs {}
 
 
+/// The configuration of a CSE identity that uses different key pairs for signing and encryption.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SignAndEncryptKeyPairs {
+    /// The ID of the CseKeyPair that encrypts signed outgoing mail.
+    #[serde(rename="encryptionKeyPairId")]
+    
+    pub encryption_key_pair_id: Option<String>,
+    /// The ID of the CseKeyPair that signs outgoing mail.
+    #[serde(rename="signingKeyPairId")]
+    
+    pub signing_key_pair_id: Option<String>,
+}
+
+impl client::Part for SignAndEncryptKeyPairs {}
+
+
 /// An S/MIME email config.
 /// 
 /// # Activities
@@ -1466,7 +1509,7 @@ pub struct SmimeInfo {
     pub pem: Option<String>,
     /// PKCS#12 format containing a single private/public key pair and certificate chain. This format is only accepted from client for creating a new SmimeInfo and is never returned, because the private key is not intended to be exported. PKCS#12 may be encrypted, in which case encryptedKeyPassword should be set appropriately.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub pkcs12: Option<Vec<u8>>,
 }
 
@@ -1572,7 +1615,7 @@ pub struct VacationSettings {
     #[serde(rename="restrictToContacts")]
     
     pub restrict_to_contacts: Option<bool>,
-    /// Flag that determines whether responses are sent to recipients who are outside of the user's domain. This feature is only available for G Suite users.
+    /// Flag that determines whether responses are sent to recipients who are outside of the user's domain. This feature is only available for Google Workspace users.
     #[serde(rename="restrictToDomain")]
     
     pub restrict_to_domain: Option<bool>,
@@ -1598,10 +1641,14 @@ impl client::ResponseResult for VacationSettings {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WatchRequest {
-    /// Filtering behavior of labelIds list specified.
+    /// Filtering behavior of `labelIds list` specified. This field is deprecated because it caused incorrect behavior in some cases; use `label_filter_behavior` instead.
     #[serde(rename="labelFilterAction")]
     
     pub label_filter_action: Option<String>,
+    /// Filtering behavior of `labelIds list` specified. This field replaces `label_filter_action`; if set, `label_filter_action` is ignored.
+    #[serde(rename="labelFilterBehavior")]
+    
+    pub label_filter_behavior: Option<String>,
     /// List of label_ids to restrict notifications about. By default, if unspecified, all changes are pushed out. If specified then dictates which labels are required for a push notification to be generated.
     #[serde(rename="labelIds")]
     
@@ -2041,7 +2088,7 @@ impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message. Note: This function doesn't trigger forwarding rules or filters set up by the user.
+    /// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message.
     /// 
     /// # Arguments
     ///
@@ -2128,7 +2175,7 @@ impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers.
+    /// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending).
     /// 
     /// # Arguments
     ///
@@ -2402,7 +2449,7 @@ impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same G Suite organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a G Suite organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority.
+    /// Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same Google Workspace organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a Google Workspace organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority.
     /// 
     /// # Arguments
     ///
@@ -8748,7 +8795,7 @@ where
 }
 
 
-/// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message. Note: This function doesn't trigger forwarding rules or filters set up by the user.
+/// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message.
 ///
 /// A builder for the *messages.import* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -9119,7 +9166,7 @@ where
         self._internal_date_source = Some(new_value.to_string());
         self
     }
-    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.
+    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for Google Workspace accounts.
     ///
     /// Sets the *deleted* query property to the given value.
     pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a, S> {
@@ -9549,7 +9596,7 @@ where
         self._internal_date_source = Some(new_value.to_string());
         self
     }
-    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.
+    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for Google Workspace accounts.
     ///
     /// Sets the *deleted* query property to the given value.
     pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a, S> {
@@ -9866,7 +9913,7 @@ where
         self._max_results = Some(new_value);
         self
     }
-    /// Only return messages with labels that match all of the specified label IDs.
+    /// Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. To learn more, see [Manage labels on messages and threads](https://developers.google.com/gmail/api/guides/labels#manage_labels_on_messages_threads).
     ///
     /// Append the given value to the *label ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -10261,7 +10308,7 @@ where
 }
 
 
-/// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers.
+/// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending).
 ///
 /// A builder for the *messages.send* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -14387,7 +14434,7 @@ where
 }
 
 
-/// Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same G Suite organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a G Suite organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority.
+/// Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same Google Workspace organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a Google Workspace organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority.
 ///
 /// A builder for the *settings.delegates.create* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.

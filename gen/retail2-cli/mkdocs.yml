@@ -1,4 +1,4 @@
-site_name: Cloud Retail v5.0.3+20230117
+site_name: Cloud Retail v5.0.3+20240222
 site_url: http://byron.github.io/google-apis-rs/google-retail2-cli
 site_description: A complete library to interact with Cloud Retail (protocol v2)
 
@@ -22,6 +22,7 @@ nav:
     - 'Locations Catalogs Branches Products Import': 'projects_locations-catalogs-branches-products-import.md'
     - 'Locations Catalogs Branches Products List': 'projects_locations-catalogs-branches-products-list.md'
     - 'Locations Catalogs Branches Products Patch': 'projects_locations-catalogs-branches-products-patch.md'
+    - 'Locations Catalogs Branches Products Purge': 'projects_locations-catalogs-branches-products-purge.md'
     - 'Locations Catalogs Branches Products Remove Fulfillment Places': 'projects_locations-catalogs-branches-products-remove-fulfillment-places.md'
     - 'Locations Catalogs Branches Products Remove Local Inventories': 'projects_locations-catalogs-branches-products-remove-local-inventories.md'
     - 'Locations Catalogs Branches Products Set Inventory': 'projects_locations-catalogs-branches-products-set-inventory.md'
@@ -32,10 +33,19 @@ nav:
     - 'Locations Catalogs Controls Get': 'projects_locations-catalogs-controls-get.md'
     - 'Locations Catalogs Controls List': 'projects_locations-catalogs-controls-list.md'
     - 'Locations Catalogs Controls Patch': 'projects_locations-catalogs-controls-patch.md'
+    - 'Locations Catalogs Export Analytics Metrics': 'projects_locations-catalogs-export-analytics-metrics.md'
     - 'Locations Catalogs Get Attributes Config': 'projects_locations-catalogs-get-attributes-config.md'
     - 'Locations Catalogs Get Completion Config': 'projects_locations-catalogs-get-completion-config.md'
     - 'Locations Catalogs Get Default Branch': 'projects_locations-catalogs-get-default-branch.md'
     - 'Locations Catalogs List': 'projects_locations-catalogs-list.md'
+    - 'Locations Catalogs Models Create': 'projects_locations-catalogs-models-create.md'
+    - 'Locations Catalogs Models Delete': 'projects_locations-catalogs-models-delete.md'
+    - 'Locations Catalogs Models Get': 'projects_locations-catalogs-models-get.md'
+    - 'Locations Catalogs Models List': 'projects_locations-catalogs-models-list.md'
+    - 'Locations Catalogs Models Patch': 'projects_locations-catalogs-models-patch.md'
+    - 'Locations Catalogs Models Pause': 'projects_locations-catalogs-models-pause.md'
+    - 'Locations Catalogs Models Resume': 'projects_locations-catalogs-models-resume.md'
+    - 'Locations Catalogs Models Tune': 'projects_locations-catalogs-models-tune.md'
     - 'Locations Catalogs Operations Get': 'projects_locations-catalogs-operations-get.md'
     - 'Locations Catalogs Operations List': 'projects_locations-catalogs-operations-list.md'
     - 'Locations Catalogs Patch': 'projects_locations-catalogs-patch.md'

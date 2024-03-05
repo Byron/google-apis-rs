@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Context Manager* API at revision *20230123*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Access Context Manager* API at revision *20240226*. The CLI is at version *5.0.3*.
 
 ```bash
 accesscontextmanager1 [options]
@@ -69,6 +69,9 @@ accesscontextmanager1 [options]
                 gcp-user-access-bindings-get <name> [-p <v>]... [-o <out>]
                 gcp-user-access-bindings-list <parent> [-p <v>]... [-o <out>]
                 gcp-user-access-bindings-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        services
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
   accesscontextmanager1 --help
 
 Configuration:

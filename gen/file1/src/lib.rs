@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Filestore* crate version *5.0.3+20230103*, where *20230103* is the exact revision of the *file:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Filestore* crate version *5.0.3+20240126*, where *20240126* is the exact revision of the *file:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud Filestore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/filestore/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudFilestore) ... 
 //! 
 //! * projects
-//!  * [*locations backups create*](api::ProjectLocationBackupCreateCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations backups patch*](api::ProjectLocationBackupPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances restore*](api::ProjectLocationInstanceRestoreCall), [*locations instances snapshots create*](api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations backups create*](api::ProjectLocationBackupCreateCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations backups patch*](api::ProjectLocationBackupPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances restore*](api::ProjectLocationInstanceRestoreCall), [*locations instances revert*](api::ProjectLocationInstanceRevertCall), [*locations instances snapshots create*](api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -57,6 +57,7 @@
 //! let r = hub.projects().locations_instances_delete(...).doit().await
 //! let r = hub.projects().locations_instances_patch(...).doit().await
 //! let r = hub.projects().locations_instances_restore(...).doit().await
+//! let r = hub.projects().locations_instances_revert(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! ```
 //! 

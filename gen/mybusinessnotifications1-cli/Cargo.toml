@@ -4,7 +4,7 @@
 [package]
 
 name = "google-mybusinessnotifications1-cli"
-version = "5.0.3+20230124"
+version = "5.0.3+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with My Business Notification Settings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessnotifications1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-mybusinessnotifications1]
 path = "../mybusinessnotifications1"
-version = "5.0.3+20230124"
+version = "5.0.3+20240304"
 

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -165,7 +165,7 @@ impl<'a, S> Assuredworkloads<S> {
 // ############
 // SCHEMAS ###
 // ##########
-/// Request for acknowledging the violation Next Id: 4
+/// Request for acknowledging the violation
 /// 
 /// # Activities
 /// 
@@ -176,6 +176,10 @@ impl<'a, S> Assuredworkloads<S> {
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudAssuredworkloadsV1AcknowledgeViolationRequest {
+    /// Optional. Acknowledge type of specified violation.
+    #[serde(rename="acknowledgeType")]
+    
+    pub acknowledge_type: Option<String>,
     /// Required. Business justification explaining the need for violation acknowledgement
     
     pub comment: Option<String>,
@@ -201,6 +205,68 @@ impl client::RequestValue for GoogleCloudAssuredworkloadsV1AcknowledgeViolationR
 pub struct GoogleCloudAssuredworkloadsV1AcknowledgeViolationResponse { _never_set: Option<bool> }
 
 impl client::ResponseResult for GoogleCloudAssuredworkloadsV1AcknowledgeViolationResponse {}
+
+
+/// Response containing the analysis results for the hypothetical resource move.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations workloads analyze workload move organizations](OrganizationLocationWorkloadAnalyzeWorkloadMoveCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1AnalyzeWorkloadMoveResponse {
+    /// List of analysis results for each asset in scope.
+    #[serde(rename="assetMoveAnalyses")]
+    
+    pub asset_move_analyses: Option<Vec<GoogleCloudAssuredworkloadsV1AssetMoveAnalysis>>,
+    /// The next page token. Is empty if the last page is reached.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for GoogleCloudAssuredworkloadsV1AnalyzeWorkloadMoveResponse {}
+
+
+/// Represents move analysis results for an asset.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1AssetMoveAnalysis {
+    /// List of eligible analyses performed for the asset.
+    #[serde(rename="analysisGroups")]
+    
+    pub analysis_groups: Option<Vec<GoogleCloudAssuredworkloadsV1MoveAnalysisGroup>>,
+    /// The full resource name of the asset being analyzed. Example: //compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1
+    
+    pub asset: Option<String>,
+    /// Type of the asset being analyzed. Possible values will be among the ones listed [here](https://cloud.google.com/asset-inventory/docs/supported-asset-types).
+    #[serde(rename="assetType")]
+    
+    pub asset_type: Option<String>,
+}
+
+impl client::Part for GoogleCloudAssuredworkloadsV1AssetMoveAnalysis {}
+
+
+/// Response for EnableResourceMonitoring endpoint.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations workloads enable resource monitoring organizations](OrganizationLocationWorkloadEnableResourceMonitoringCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1EnableResourceMonitoringResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for GoogleCloudAssuredworkloadsV1EnableResourceMonitoringResponse {}
 
 
 /// Response of ListViolations endpoint.
@@ -249,7 +315,63 @@ pub struct GoogleCloudAssuredworkloadsV1ListWorkloadsResponse {
 impl client::ResponseResult for GoogleCloudAssuredworkloadsV1ListWorkloadsResponse {}
 
 
-/// Request of updating permission settings for a partner workload.
+/// Represents a logical group of checks performed for an asset. If successful, the group contains the analysis result, otherwise it contains an error with the failure reason.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1MoveAnalysisGroup {
+    /// Result of a successful analysis.
+    #[serde(rename="analysisResult")]
+    
+    pub analysis_result: Option<GoogleCloudAssuredworkloadsV1MoveAnalysisResult>,
+    /// Name of the analysis group.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Error details for a failed analysis.
+    
+    pub error: Option<GoogleRpcStatus>,
+}
+
+impl client::Part for GoogleCloudAssuredworkloadsV1MoveAnalysisGroup {}
+
+
+/// Represents the successful move analysis results for a group.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1MoveAnalysisResult {
+    /// List of blockers. If not resolved, these will result in compliance violations in the target.
+    
+    pub blockers: Option<Vec<GoogleCloudAssuredworkloadsV1MoveImpact>>,
+    /// List of warnings. These are risks that may or may not result in compliance violations.
+    
+    pub warnings: Option<Vec<GoogleCloudAssuredworkloadsV1MoveImpact>>,
+}
+
+impl client::Part for GoogleCloudAssuredworkloadsV1MoveAnalysisResult {}
+
+
+/// Represents the impact of moving the asset to the target.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1MoveImpact {
+    /// Explanation of the impact.
+    
+    pub detail: Option<String>,
+}
+
+impl client::Part for GoogleCloudAssuredworkloadsV1MoveImpact {}
+
+
+/// Request for updating permission settings for a partner workload.
 /// 
 /// # Activities
 /// 
@@ -311,7 +433,7 @@ pub struct GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesResponse { _neve
 impl client::ResponseResult for GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesResponse {}
 
 
-/// Workload monitoring Violation. Next Id: 22
+/// Workload monitoring Violation.
 /// 
 /// # Activities
 /// 
@@ -325,10 +447,14 @@ pub struct GoogleCloudAssuredworkloadsV1Violation {
     /// A boolean that indicates if the violation is acknowledged
     
     pub acknowledged: Option<bool>,
-    /// Optional. Timestamp when this violation was acknowledged last. This will be absent when acknowledged field is marked as false.
+    /// Optional. Timestamp when this violation was acknowledged first. Check exception_contexts to find the last time the violation was acknowledged when there are more than one violations. This field will be absent when acknowledged field is marked as false.
     #[serde(rename="acknowledgementTime")]
     
     pub acknowledgement_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. Output only. Violation Id of the org-policy violation due to which the resource violation is caused. Empty for org-policy violations.
+    #[serde(rename="associatedOrgPolicyViolationId")]
+    
+    pub associated_org_policy_violation_id: Option<String>,
     /// Output only. Immutable. Audit Log Link for violated resource Format: https://console.cloud.google.com/logs/query;query={logName}{protoPayload.resourceName}{timeRange}{folder}
     #[serde(rename="auditLogLink")]
     
@@ -347,6 +473,10 @@ pub struct GoogleCloudAssuredworkloadsV1Violation {
     #[serde(rename="exceptionAuditLogLink")]
     
     pub exception_audit_log_link: Option<String>,
+    /// Output only. List of all the exception detail added for the violation.
+    #[serde(rename="exceptionContexts")]
+    
+    pub exception_contexts: Option<Vec<GoogleCloudAssuredworkloadsV1ViolationExceptionContext>>,
     /// Output only. Immutable. Name of the Violation. Format: organizations/{organization}/locations/{location}/workloads/{workload_id}/violations/{violations_id}
     
     pub name: Option<String>,
@@ -358,6 +488,10 @@ pub struct GoogleCloudAssuredworkloadsV1Violation {
     #[serde(rename="orgPolicyConstraint")]
     
     pub org_policy_constraint: Option<String>,
+    /// Optional. Output only. Parent project number where resource is present. Empty for org-policy violations.
+    #[serde(rename="parentProjectNumber")]
+    
+    pub parent_project_number: Option<String>,
     /// Output only. Compliance violation remediation
     
     pub remediation: Option<GoogleCloudAssuredworkloadsV1ViolationRemediation>,
@@ -365,6 +499,14 @@ pub struct GoogleCloudAssuredworkloadsV1Violation {
     #[serde(rename="resolveTime")]
     
     pub resolve_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. Output only. Name of the resource like //storage.googleapis.com/myprojectxyz-testbucket. Empty for org-policy violations.
+    #[serde(rename="resourceName")]
+    
+    pub resource_name: Option<String>,
+    /// Optional. Output only. Type of the resource like compute.googleapis.com/Disk, etc. Empty for org-policy violations.
+    #[serde(rename="resourceType")]
+    
+    pub resource_type: Option<String>,
     /// Output only. State of the violation
     
     pub state: Option<String>,
@@ -372,9 +514,36 @@ pub struct GoogleCloudAssuredworkloadsV1Violation {
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. Type of the violation
+    #[serde(rename="violationType")]
+    
+    pub violation_type: Option<String>,
 }
 
 impl client::ResponseResult for GoogleCloudAssuredworkloadsV1Violation {}
+
+
+/// Violation exception detail.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1ViolationExceptionContext {
+    /// Timestamp when the violation was acknowledged.
+    #[serde(rename="acknowledgementTime")]
+    
+    pub acknowledgement_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Business justification provided towards the acknowledgement of the violation.
+    
+    pub comment: Option<String>,
+    /// Name of the user (or service account) who acknowledged the violation.
+    #[serde(rename="userName")]
+    
+    pub user_name: Option<String>,
+}
+
+impl client::Part for GoogleCloudAssuredworkloadsV1ViolationExceptionContext {}
 
 
 /// Represents remediation guidance to resolve compliance violation for AssuredWorkload
@@ -492,7 +661,7 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     #[serde(rename="complianceStatus")]
     
     pub compliance_status: Option<GoogleCloudAssuredworkloadsV1WorkloadComplianceStatus>,
-    /// Output only. Urls for services which are compliant for this Assured Workload, but which are currently disallowed by the ResourceUsageRestriction org policy. Invoke RestrictAllowedResources endpoint to allow your project developers to use these services in their environment."
+    /// Output only. Urls for services which are compliant for this Assured Workload, but which are currently disallowed by the ResourceUsageRestriction org policy. Invoke RestrictAllowedResources endpoint to allow your project developers to use these services in their environment.
     #[serde(rename="compliantButDisallowedServices")]
     
     pub compliant_but_disallowed_services: Option<Vec<String>>,
@@ -504,6 +673,10 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
+    /// Output only. Represents the Ekm Provisioning State of the given workload.
+    #[serde(rename="ekmProvisioningResponse")]
+    
+    pub ekm_provisioning_response: Option<GoogleCloudAssuredworkloadsV1WorkloadEkmProvisioningResponse>,
     /// Optional. Indicates the sovereignty status of the given workload. Currently meant to be used by Europe/Canada customers.
     #[serde(rename="enableSovereignControls")]
     
@@ -528,10 +701,18 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     /// Optional. Partner regime associated with this workload.
     
     pub partner: Option<String>,
+    /// Optional. Permissions granted to the AW Partner SA account for the customer workload
+    #[serde(rename="partnerPermissions")]
+    
+    pub partner_permissions: Option<GoogleCloudAssuredworkloadsV1WorkloadPartnerPermissions>,
     /// Input only. The parent resource for the resources managed by this Assured Workload. May be either empty or a folder resource which is a child of the Workload parent. If not specified all resources are created under the parent organization. Format: folders/{folder_id}
     #[serde(rename="provisionedResourcesParent")]
     
     pub provisioned_resources_parent: Option<String>,
+    /// Output only. Indicates whether resource monitoring is enabled for workload or not. It is true when Resource feed is subscribed to AWM topic and AWM Service Agent Role is binded to AW Service Account for resource Assured workload.
+    #[serde(rename="resourceMonitoringEnabled")]
+    
+    pub resource_monitoring_enabled: Option<bool>,
     /// Input only. Resource properties that are used to customize workload resources. These properties (such as custom project id) will be used to create workload resources if possible. This field is optional.
     #[serde(rename="resourceSettings")]
     
@@ -543,6 +724,10 @@ pub struct GoogleCloudAssuredworkloadsV1Workload {
     #[serde(rename="saaEnrollmentResponse")]
     
     pub saa_enrollment_response: Option<GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponse>,
+    /// Optional. Indicates whether the e-mail notification for a violation is enabled for a workload. This value will be by default True, and if not present will be considered as true. This should only be updated via updateWorkload call. Any Changes to this field during the createWorkload call will not be honored. This will always be true while creating the workload.
+    #[serde(rename="violationNotificationsEnabled")]
+    
+    pub violation_notifications_enabled: Option<bool>,
 }
 
 impl client::RequestValue for GoogleCloudAssuredworkloadsV1Workload {}
@@ -556,11 +741,19 @@ impl client::ResponseResult for GoogleCloudAssuredworkloadsV1Workload {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudAssuredworkloadsV1WorkloadComplianceStatus {
-    /// Count of active Violations which are acknowledged in the Workload.
+    /// Number of current resource violations which are not acknowledged.
+    #[serde(rename="acknowledgedResourceViolationCount")]
+    
+    pub acknowledged_resource_violation_count: Option<i32>,
+    /// Number of current orgPolicy violations which are acknowledged.
     #[serde(rename="acknowledgedViolationCount")]
     
     pub acknowledged_violation_count: Option<i32>,
-    /// Count of active Violations which haven't been acknowledged.
+    /// Number of current resource violations which are acknowledged.
+    #[serde(rename="activeResourceViolationCount")]
+    
+    pub active_resource_violation_count: Option<i32>,
+    /// Number of current orgPolicy violations which are not acknowledged.
     #[serde(rename="activeViolationCount")]
     
     pub active_violation_count: Option<i32>,
@@ -569,7 +762,31 @@ pub struct GoogleCloudAssuredworkloadsV1WorkloadComplianceStatus {
 impl client::Part for GoogleCloudAssuredworkloadsV1WorkloadComplianceStatus {}
 
 
-/// Settings specific to the Key Management Service. This message is deprecated. In order to create a Keyring, callers should specify, ENCRYPTION_KEYS_PROJECT or KEYRING in ResourceSettings.resource_type field.
+/// External key management systems(EKM) Provisioning response
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudAssuredworkloadsV1WorkloadEkmProvisioningResponse {
+    /// Indicates Ekm provisioning error if any.
+    #[serde(rename="ekmProvisioningErrorDomain")]
+    
+    pub ekm_provisioning_error_domain: Option<String>,
+    /// Detailed error message if Ekm provisioning fails
+    #[serde(rename="ekmProvisioningErrorMapping")]
+    
+    pub ekm_provisioning_error_mapping: Option<String>,
+    /// Indicates Ekm enrollment Provisioning of a given workload.
+    #[serde(rename="ekmProvisioningState")]
+    
+    pub ekm_provisioning_state: Option<String>,
+}
+
+impl client::Part for GoogleCloudAssuredworkloadsV1WorkloadEkmProvisioningResponse {}
+
+
+/// Settings specific to the Key Management Service.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -597,15 +814,15 @@ impl client::Part for GoogleCloudAssuredworkloadsV1WorkloadKMSSettings {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudAssuredworkloadsV1WorkloadPartnerPermissions {
-    /// Allow partner to view data and logs
+    /// Optional. Allow partner to view violation alerts.
+    #[serde(rename="assuredWorkloadsMonitoring")]
+    
+    pub assured_workloads_monitoring: Option<bool>,
+    /// Allow the partner to view inspectability logs and monitoring violations.
     #[serde(rename="dataLogsViewer")]
     
     pub data_logs_viewer: Option<bool>,
-    /// Allow partner to monitor folder and remediate violations
-    #[serde(rename="remediateFolderViolations")]
-    
-    pub remediate_folder_violations: Option<bool>,
-    /// Allow partner to approve or reject Service Access requests
+    /// Optional. Allow partner to view access approval logs.
     #[serde(rename="serviceAccessApprover")]
     
     pub service_access_approver: Option<bool>,
@@ -650,7 +867,7 @@ pub struct GoogleCloudAssuredworkloadsV1WorkloadResourceSettings {
     #[serde(rename="resourceId")]
     
     pub resource_id: Option<String>,
-    /// Indicates the type of resource. This field should be specified to correspond the id to the right resource type (CONSUMER_FOLDER or ENCRYPTION_KEYS_PROJECT)
+    /// Indicates the type of resource. This field should be specified to correspond the id to the right project type (CONSUMER_PROJECT or ENCRYPTION_KEYS_PROJECT)
     #[serde(rename="resourceType")]
     
     pub resource_type: Option<String>,
@@ -726,7 +943,7 @@ pub struct GoogleLongrunningOperation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -798,7 +1015,7 @@ impl client::Part for GoogleRpcStatus {}
 ///     ).build().await.unwrap();
 /// let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_workloads_create(...)`, `locations_workloads_delete(...)`, `locations_workloads_get(...)`, `locations_workloads_list(...)`, `locations_workloads_mutate_partner_permissions(...)`, `locations_workloads_patch(...)`, `locations_workloads_restrict_allowed_resources(...)`, `locations_workloads_violations_acknowledge(...)`, `locations_workloads_violations_get(...)` and `locations_workloads_violations_list(...)`
+/// // like `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_workloads_analyze_workload_move(...)`, `locations_workloads_create(...)`, `locations_workloads_delete(...)`, `locations_workloads_enable_resource_monitoring(...)`, `locations_workloads_get(...)`, `locations_workloads_list(...)`, `locations_workloads_mutate_partner_permissions(...)`, `locations_workloads_patch(...)`, `locations_workloads_restrict_allowed_resources(...)`, `locations_workloads_violations_acknowledge(...)`, `locations_workloads_violations_get(...)` and `locations_workloads_violations_list(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
@@ -832,7 +1049,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -910,6 +1127,27 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Analyzes a hypothetical move of a source resource to a target workload to surface compliance risks. The analysis is best effort and is not guaranteed to be exhaustive.
+    /// 
+    /// # Arguments
+    ///
+    /// * `target` - Required. The resource ID of the folder-based destination workload. This workload is where the source resource will hypothetically be moved to. Specify the workload's relative resource name, formatted as: "organizations/{ORGANIZATION_ID}/locations/{LOCATION_ID}/workloads/{WORKLOAD_ID}" For example: "organizations/123/locations/us-east1/workloads/assured-workload-2"
+    pub fn locations_workloads_analyze_workload_move(&self, target: &str) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        OrganizationLocationWorkloadAnalyzeWorkloadMoveCall {
+            hub: self.hub,
+            _target: target.to_string(),
+            _project: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _asset_types: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates Assured Workload.
     /// 
     /// # Arguments
@@ -930,7 +1168,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error.
+    /// Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error. In addition to assuredworkloads.workload.delete permission, the user should also have orgpolicy.policy.set permission on the deleted folder to remove Assured Workloads OrgPolicies.
     /// 
     /// # Arguments
     ///
@@ -948,11 +1186,28 @@ impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Enable resource violation monitoring for a workload.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The `name` field is used to identify the workload. Format: organizations/{org_id}/locations/{location_id}/workloads/{workload_id}
+    pub fn locations_workloads_enable_resource_monitoring(&self, name: &str) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S> {
+        OrganizationLocationWorkloadEnableResourceMonitoringCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets Assured Workload associated with a CRM Node
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the Workload to fetch. This is the workload's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1".
+    /// * `name` - Required. The resource name of the Workload to fetch. This is the workloads's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1".
     pub fn locations_workloads_get(&self, name: &str) -> OrganizationLocationWorkloadGetCall<'a, S> {
         OrganizationLocationWorkloadGetCall {
             hub: self.hub,
@@ -1312,7 +1567,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -2486,6 +2741,319 @@ where
 }
 
 
+/// Analyzes a hypothetical move of a source resource to a target workload to surface compliance risks. The analysis is best effort and is not guaranteed to be exhaustive.
+///
+/// A builder for the *locations.workloads.analyzeWorkloadMove* method supported by a *organization* resource.
+/// It is not used directly, but through a [`OrganizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_assuredworkloads1 as assuredworkloads1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use assuredworkloads1::{Assuredworkloads, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().locations_workloads_analyze_workload_move("target")
+///              .project("ea")
+///              .page_token("ipsum")
+///              .page_size(-88)
+///              .add_asset_types("amet")
+///              .doit().await;
+/// # }
+/// ```
+pub struct OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Assuredworkloads<S>,
+    _target: String,
+    _project: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _asset_types: Vec<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {}
+
+impl<'a, S> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudAssuredworkloadsV1AnalyzeWorkloadMoveResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "assuredworkloads.organizations.locations.workloads.analyzeWorkloadMove",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "target", "project", "pageToken", "pageSize", "assetTypes"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("target", self._target);
+        if let Some(value) = self._project.as_ref() {
+            params.push("project", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if self._asset_types.len() > 0 {
+            for f in self._asset_types.iter() {
+                params.push("assetTypes", f);
+            }
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+target}:analyzeWorkloadMove";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+target}", "target")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["target"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The resource ID of the folder-based destination workload. This workload is where the source resource will hypothetically be moved to. Specify the workload's relative resource name, formatted as: "organizations/{ORGANIZATION_ID}/locations/{LOCATION_ID}/workloads/{WORKLOAD_ID}" For example: "organizations/123/locations/us-east1/workloads/assured-workload-2"
+    ///
+    /// Sets the *target* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn target(mut self, new_value: &str) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._target = new_value.to_string();
+        self
+    }
+    /// The source type is a project. Specify the project's relative resource name, formatted as either a project number or a project ID: "projects/{PROJECT_NUMBER}" or "projects/{PROJECT_ID}" For example: "projects/951040570662" when specifying a project number, or "projects/my-project-123" when specifying a project ID.
+    ///
+    /// Sets the *project* query property to the given value.
+    pub fn project(mut self, new_value: &str) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._project = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The page token from the previous response. It needs to be passed in the second and following requests.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Page size. If a value is not specified, the default value of 10 is used.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. List of asset types to be analyzed, including and under the source resource. If empty, all assets are analyzed. The complete list of asset types is available [here](https://cloud.google.com/asset-inventory/docs/supported-asset-types).
+    ///
+    /// Append the given value to the *asset types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_asset_types(mut self, new_value: &str) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._asset_types.push(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OrganizationLocationWorkloadAnalyzeWorkloadMoveCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates Assured Workload.
 ///
 /// A builder for the *locations.workloads.create* method supported by a *organization* resource.
@@ -2519,7 +3087,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().locations_workloads_create(req, "parent")
-///              .external_id("ea")
+///              .external_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2790,7 +3358,7 @@ where
 }
 
 
-/// Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error.
+/// Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error. In addition to assuredworkloads.workload.delete permission, the user should also have orgpolicy.policy.set permission on the deleted folder to remove Assured Workloads OrgPolicies.
 ///
 /// A builder for the *locations.workloads.delete* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -2817,7 +3385,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().locations_workloads_delete("name")
-///              .etag("invidunt")
+///              .etag("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3064,6 +3632,268 @@ where
 }
 
 
+/// Enable resource violation monitoring for a workload.
+///
+/// A builder for the *locations.workloads.enableResourceMonitoring* method supported by a *organization* resource.
+/// It is not used directly, but through a [`OrganizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_assuredworkloads1 as assuredworkloads1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use assuredworkloads1::{Assuredworkloads, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().locations_workloads_enable_resource_monitoring("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Assuredworkloads<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S> {}
+
+impl<'a, S> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudAssuredworkloadsV1EnableResourceMonitoringResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "assuredworkloads.organizations.locations.workloads.enableResourceMonitoring",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:enableResourceMonitoring";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The `name` field is used to identify the workload. Format: organizations/{org_id}/locations/{location_id}/workloads/{workload_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OrganizationLocationWorkloadEnableResourceMonitoringCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets Assured Workload associated with a CRM Node
 ///
 /// A builder for the *locations.workloads.get* method supported by a *organization* resource.
@@ -3240,7 +4070,7 @@ where
     }
 
 
-    /// Required. The resource name of the Workload to fetch. This is the workload's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1".
+    /// Required. The resource name of the Workload to fetch. This is the workloads's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1".
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3354,8 +4184,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().locations_workloads_list("parent")
 ///              .page_token("ipsum")
-///              .page_size(-93)
-///              .filter("ut")
+///              .page_size(-50)
+///              .filter("est")
 ///              .doit().await;
 /// # }
 /// ```

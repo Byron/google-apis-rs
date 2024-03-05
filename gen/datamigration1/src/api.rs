@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -194,6 +194,14 @@ impl client::Part for AlloyDbConnectionProfile {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AlloyDbSettings {
+    /// Optional. The database engine major version. This is an optional field. If a database version is not supplied at cluster creation time, then a default database version will be used.
+    #[serde(rename="databaseVersion")]
+    
+    pub database_version: Option<String>,
+    /// Optional. The encryption config can be specified to encrypt the data disks and other persistent data resources of a cluster with a customer-managed encryption key (CMEK). When this field is not specified, the cluster will then use default encryption scheme to protect the user data.
+    #[serde(rename="encryptionConfig")]
+    
+    pub encryption_config: Option<EncryptionConfig>,
     /// Required. Input only. Initial user to setup during cluster creation. Required.
     #[serde(rename="initialUser")]
     
@@ -225,16 +233,74 @@ impl client::Part for AlloyDbSettings {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplyConversionWorkspaceRequest {
-    /// Fully qualified (Uri) name of the destination connection profile.
+    /// Optional. Specifies whether the conversion workspace is to be committed automatically after the apply.
+    #[serde(rename="autoCommit")]
+    
+    pub auto_commit: Option<bool>,
+    /// Optional. Fully qualified (Uri) name of the destination connection profile.
     #[serde(rename="connectionProfile")]
     
     pub connection_profile: Option<String>,
+    /// Optional. Only validates the apply process, but doesn't change the destination database. Only works for PostgreSQL destination connection profile.
+    #[serde(rename="dryRun")]
+    
+    pub dry_run: Option<bool>,
     /// Filter which entities to apply. Leaving this field empty will apply all of the entities. Supports Google AIP 160 based filtering.
     
     pub filter: Option<String>,
 }
 
 impl client::RequestValue for ApplyConversionWorkspaceRequest {}
+
+
+/// Apply a hash function on the value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApplyHash {
+    /// Optional. Generate UUID from the data's byte array
+    #[serde(rename="uuidFromBytes")]
+    
+    pub uuid_from_bytes: Option<Empty>,
+}
+
+impl client::Part for ApplyHash {}
+
+
+/// Details regarding an Apply background job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApplyJobDetails {
+    /// Output only. The connection profile which was used for the apply job.
+    #[serde(rename="connectionProfile")]
+    
+    pub connection_profile: Option<String>,
+    /// Output only. AIP-160 based filter used to specify the entities to apply
+    
+    pub filter: Option<String>,
+}
+
+impl client::Part for ApplyJobDetails {}
+
+
+/// Set to a specific value (value is converted to fit the target data type)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AssignSpecificValue {
+    /// Required. Specific value to be assigned
+    
+    pub value: Option<String>,
+}
+
+impl client::Part for AssignSpecificValue {}
 
 
 /// Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { "audit_configs": [ { "service": "allServices", "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" }, { "log_type": "ADMIN_READ" } ] }, { "service": "sampleservice.googleapis.com", "audit_log_configs": [ { "log_type": "DATA_READ" }, { "log_type": "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts `jose@example.com` from DATA_READ logging, and `aliya@example.com` from DATA_WRITE logging.
@@ -283,22 +349,30 @@ impl client::Part for AuditLogConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackgroundJobLogEntry {
-    /// Job completion comment, such as how many entities were seeded, how many warnings were found during conversion and similar information.
+    /// Output only. Apply job details.
+    #[serde(rename="applyJobDetails")]
+    
+    pub apply_job_details: Option<ApplyJobDetails>,
+    /// Output only. Job completion comment, such as how many entities were seeded, how many warnings were found during conversion, and similar information.
     #[serde(rename="completionComment")]
     
     pub completion_comment: Option<String>,
-    /// Job completion state, i.e. the final state after the job completed.
+    /// Output only. Job completion state, i.e. the final state after the job completed.
     #[serde(rename="completionState")]
     
     pub completion_state: Option<String>,
+    /// Output only. Convert job details.
+    #[serde(rename="convertJobDetails")]
+    
+    pub convert_job_details: Option<ConvertJobDetails>,
     /// The timestamp when the background job was finished.
     #[serde(rename="finishTime")]
     
     pub finish_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// The background job log entry id
+    /// The background job log entry ID.
     
     pub id: Option<String>,
-    /// Import rules job details
+    /// Output only. Import rules job details.
     #[serde(rename="importRulesJobDetails")]
     
     pub import_rules_job_details: Option<ImportRulesJobDetails>,
@@ -306,11 +380,11 @@ pub struct BackgroundJobLogEntry {
     #[serde(rename="jobType")]
     
     pub job_type: Option<String>,
-    /// Whether the client requested the conversion workspace to be committed after a successful completion of the job.
+    /// Output only. Whether the client requested the conversion workspace to be committed after a successful completion of the job.
     #[serde(rename="requestAutocommit")]
     
     pub request_autocommit: Option<bool>,
-    /// Seed job details
+    /// Output only. Seed job details.
     #[serde(rename="seedJobDetails")]
     
     pub seed_job_details: Option<SeedJobDetails>,
@@ -333,10 +407,10 @@ pub struct Binding {
     /// The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
     pub condition: Option<Expr>,
-    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. 
+    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.
     
     pub members: Option<Vec<String>>,
-    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).
     
     pub role: Option<String>,
 }
@@ -416,6 +490,10 @@ pub struct CloudSqlSettings {
     /// The Cloud SQL default instance level collation.
     
     pub collation: Option<String>,
+    /// Optional. Data cache is an optional feature available for Cloud SQL for MySQL Enterprise Plus edition only. For more information on data cache, see [Data cache overview](https://cloud.google.com/sql/help/mysql-data-cache) in Cloud SQL documentation.
+    #[serde(rename="dataCacheConfig")]
+    
+    pub data_cache_config: Option<DataCacheConfig>,
     /// The storage capacity available to the database, in GB. The minimum (and default) size is 10GB.
     #[serde(rename="dataDiskSizeGb")]
     
@@ -433,6 +511,9 @@ pub struct CloudSqlSettings {
     #[serde(rename="databaseVersion")]
     
     pub database_version: Option<String>,
+    /// Optional. The edition of the given Cloud SQL instance.
+    
+    pub edition: Option<String>,
     /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled.
     #[serde(rename="ipConfig")]
     
@@ -480,67 +561,67 @@ impl client::Part for CloudSqlSettings {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ColumnEntity {
-    /// Is the column of array type
+    /// Is the column of array type.
     
     pub array: Option<bool>,
-    /// If the column is array, of which length
+    /// If the column is array, of which length.
     #[serde(rename="arrayLength")]
     
     pub array_length: Option<i32>,
-    /// Is the column auto-generated/identity
+    /// Is the column auto-generated/identity.
     #[serde(rename="autoGenerated")]
     
     pub auto_generated: Option<bool>,
-    /// Charset override - instead of table level charset
+    /// Charset override - instead of table level charset.
     
     pub charset: Option<String>,
-    /// Collation override - instead of table level collation
+    /// Collation override - instead of table level collation.
     
     pub collation: Option<String>,
-    /// Comment associated with the column
+    /// Comment associated with the column.
     
     pub comment: Option<String>,
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// Column data type
+    /// Column data type.
     #[serde(rename="dataType")]
     
     pub data_type: Option<String>,
-    /// Default value of the column
+    /// Default value of the column.
     #[serde(rename="defaultValue")]
     
     pub default_value: Option<String>,
-    /// Column fractional second precision - used for timestamp based datatypes
+    /// Column fractional second precision - used for timestamp based datatypes.
     #[serde(rename="fractionalSecondsPrecision")]
     
     pub fractional_seconds_precision: Option<i32>,
-    /// Column length - e.g. varchar (50)
+    /// Column length - e.g. varchar (50).
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub length: Option<i64>,
-    /// Column name
+    /// Column name.
     
     pub name: Option<String>,
-    /// Is the column nullable
+    /// Is the column nullable.
     
     pub nullable: Option<bool>,
-    /// Column order in the table
+    /// Column order in the table.
     #[serde(rename="ordinalPosition")]
     
     pub ordinal_position: Option<i32>,
-    /// Column precision - when relevant
+    /// Column precision - when relevant.
     
     pub precision: Option<i32>,
-    /// Column scale - when relevant
+    /// Column scale - when relevant.
     
     pub scale: Option<i32>,
-    /// Specifies the list of values allowed in the column. List is empty if set values is not required
+    /// Specifies the list of values allowed in the column. Only used for set data type.
     #[serde(rename="setValues")]
     
     pub set_values: Option<Vec<String>>,
-    /// Is the column a UDT
+    /// Is the column a UDT.
     
     pub udt: Option<bool>,
 }
@@ -566,6 +647,34 @@ pub struct CommitConversionWorkspaceRequest {
 }
 
 impl client::RequestValue for CommitConversionWorkspaceRequest {}
+
+
+/// Options to configure rule type ConditionalColumnSetValue. The rule is used to transform the data which is being replicated/migrated. The rule filter field can refer to one or more entities. The rule scope can be one of: Column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConditionalColumnSetValue {
+    /// Optional. Custom engine specific features.
+    #[serde(rename="customFeatures")]
+    
+    pub custom_features: Option<HashMap<String, json::Value>>,
+    /// Optional. Optional filter on source column precision and scale. Used for fixed point numbers such as NUMERIC/NUMBER data types.
+    #[serde(rename="sourceNumericFilter")]
+    
+    pub source_numeric_filter: Option<SourceNumericFilter>,
+    /// Optional. Optional filter on source column length. Used for text based data types like varchar.
+    #[serde(rename="sourceTextFilter")]
+    
+    pub source_text_filter: Option<SourceTextFilter>,
+    /// Required. Description of data transformation during migration.
+    #[serde(rename="valueTransformation")]
+    
+    pub value_transformation: Option<ValueTransformation>,
+}
+
+impl client::Part for ConditionalColumnSetValue {}
 
 
 /// A connection profile definition.
@@ -636,22 +745,22 @@ impl client::ResponseResult for ConnectionProfile {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConstraintEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// The name of the table constraint
+    /// The name of the table constraint.
     
     pub name: Option<String>,
-    /// Reference Columns which may be associated with the constraint. eg: if the constraint is a FOREIGN_KEY, this represents the list of full names of referenced columns by the foreign key.
+    /// Reference columns which may be associated with the constraint. For example, if the constraint is a FOREIGN_KEY, this represents the list of full names of referenced columns by the foreign key.
     #[serde(rename="referenceColumns")]
     
     pub reference_columns: Option<Vec<String>>,
-    /// Reference table which may be associated with the constraint. eg: if the constraint is a FOREIGN_KEY, this represents the list of full name of the referenced table by the foreign key.
+    /// Reference table which may be associated with the constraint. For example, if the constraint is a FOREIGN_KEY, this represents the list of full name of the referenced table by the foreign key.
     #[serde(rename="referenceTable")]
     
     pub reference_table: Option<String>,
-    /// Table columns used as part of the Constraint for e.g. primary key constraint should list the columns which constitutes the key
+    /// Table columns used as part of the Constraint, for example primary key constraint should list the columns which constitutes the key.
     #[serde(rename="tableColumns")]
     
     pub table_columns: Option<Vec<String>>,
@@ -659,7 +768,7 @@ pub struct ConstraintEntity {
     #[serde(rename="tableName")]
     
     pub table_name: Option<String>,
-    /// Type of constraint - e.g. unique, primary key, foreign key (currently only primary key is supported)
+    /// Type of constraint, for example unique, primary key, foreign key (currently only primary key is supported).
     #[serde(rename="type")]
     
     pub type_: Option<String>,
@@ -688,19 +797,19 @@ pub struct ConversionWorkspace {
     /// Required. The destination engine details.
     
     pub destination: Option<DatabaseEngineInfo>,
-    /// The display name for the workspace
+    /// Optional. The display name for the workspace.
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
-    /// A generic list of settings for the workspace. The settings are database pair dependant and can indicate default behavior for the mapping rules engine or turn on or off specific features. Such examples can be: convert_foreign_key_to_interleave=true, skip_triggers=false, ignore_non_table_synonyms=true
+    /// Optional. A generic list of settings for the workspace. The settings are database pair dependant and can indicate default behavior for the mapping rules engine or turn on or off specific features. Such examples can be: convert_foreign_key_to_interleave=true, skip_triggers=false, ignore_non_table_synonyms=true
     #[serde(rename="globalSettings")]
     
     pub global_settings: Option<HashMap<String, String>>,
-    /// Output only. Whether the workspace has uncommitted changes (changes which were made after the workspace was committed)
+    /// Output only. Whether the workspace has uncommitted changes (changes which were made after the workspace was committed).
     #[serde(rename="hasUncommittedChanges")]
     
     pub has_uncommitted_changes: Option<bool>,
-    /// Output only. The latest commit id
+    /// Output only. The latest commit ID.
     #[serde(rename="latestCommitId")]
     
     pub latest_commit_id: Option<String>,
@@ -754,11 +863,15 @@ impl client::Part for ConversionWorkspaceInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConvertConversionWorkspaceRequest {
-    /// Should the conversion workspace be committed automatically after the conversion.
+    /// Optional. Specifies whether the conversion workspace is to be committed automatically after the conversion.
     #[serde(rename="autoCommit")]
     
     pub auto_commit: Option<bool>,
-    /// Filter the entities to convert. Leaving this field empty will convert all of the entities. Supports Google AIP-160 style filtering.
+    /// Optional. Automatically convert the full entity path for each entity specified by the filter. For example, if the filter specifies a table, that table schema (and database if there is one) will also be converted.
+    #[serde(rename="convertFullPath")]
+    
+    pub convert_full_path: Option<bool>,
+    /// Optional. Filter the entities to convert. Leaving this field empty will convert all of the entities. Supports Google AIP-160 style filtering.
     
     pub filter: Option<String>,
 }
@@ -766,17 +879,64 @@ pub struct ConvertConversionWorkspaceRequest {
 impl client::RequestValue for ConvertConversionWorkspaceRequest {}
 
 
-/// The type and version of a source or destination DB.
+/// Details regarding a Convert background job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConvertJobDetails {
+    /// Output only. AIP-160 based filter used to specify the entities to convert
+    
+    pub filter: Option<String>,
+}
+
+impl client::Part for ConvertJobDetails {}
+
+
+/// Options to configure rule type ConvertROWIDToColumn. The rule is used to add column rowid to destination tables based on an Oracle rowid function/property. The rule filter field can refer to one or more entities. The rule scope can be one of: Table. This rule requires additional filter to be specified beyond the basic rule filter field, which is whether or not to work on tables which already have a primary key defined.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConvertRowIdToColumn {
+    /// Required. Only work on tables without primary key defined
+    #[serde(rename="onlyIfNoPrimaryKey")]
+    
+    pub only_if_no_primary_key: Option<bool>,
+}
+
+impl client::Part for ConvertRowIdToColumn {}
+
+
+/// Data cache is an optional feature available for Cloud SQL for MySQL Enterprise Plus edition only. For more information on data cache, see [Data cache overview](https://cloud.google.com/sql/help/mysql-data-cache) in Cloud SQL documentation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DataCacheConfig {
+    /// Optional. Whether data cache is enabled for the instance.
+    #[serde(rename="dataCacheEnabled")]
+    
+    pub data_cache_enabled: Option<bool>,
+}
+
+impl client::Part for DataCacheConfig {}
+
+
+/// The type and version of a source or destination database.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseEngineInfo {
-    /// Required. Engine Type.
+    /// Required. Engine type.
     
     pub engine: Option<String>,
-    /// Required. Engine named version, for e.g. 12.c.1
+    /// Required. Engine version, for example "12.c.1".
     
     pub version: Option<String>,
 }
@@ -784,28 +944,42 @@ pub struct DatabaseEngineInfo {
 impl client::Part for DatabaseEngineInfo {}
 
 
-/// The base entity type for all the database related entities The message contains the entity name, the name of its parent, its type and the specific details per its type
+/// The base entity type for all the database related entities. The message contains the entity name, the name of its parent, the entity type, and the specific details per entity type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseEntity {
-    /// Function
+    /// Database.
+    
+    pub database: Option<DatabaseInstanceEntity>,
+    /// Function.
     #[serde(rename="databaseFunction")]
     
     pub database_function: Option<FunctionEntity>,
-    /// Package
+    /// Package.
     #[serde(rename="databasePackage")]
     
     pub database_package: Option<PackageEntity>,
+    /// Details about the entity DDL script. Multiple DDL scripts are provided for child entities such as a table entity will have one DDL for the table with additional DDLs for each index, constraint and such.
+    #[serde(rename="entityDdl")]
+    
+    pub entity_ddl: Option<Vec<EntityDdl>>,
     /// The type of the database entity (table, view, index, ...).
     #[serde(rename="entityType")]
     
     pub entity_type: Option<String>,
+    /// Details about the various issues found for the entity.
+    
+    pub issues: Option<Vec<EntityIssue>>,
     /// Details about entity mappings. For source tree entities, this holds the draft entities which were generated by the mapping rules. For draft tree entities, this holds the source entities which were converted to form the draft entity. Destination entities will have no mapping details.
     
     pub mappings: Option<Vec<EntityMapping>>,
+    /// Materialized view.
+    #[serde(rename="materializedView")]
+    
+    pub materialized_view: Option<MaterializedViewEntity>,
     /// The full name of the parent entity (e.g. schema name).
     #[serde(rename="parentEntity")]
     
@@ -813,18 +987,18 @@ pub struct DatabaseEntity {
     /// Schema.
     
     pub schema: Option<SchemaEntity>,
-    /// Sequence
+    /// Sequence.
     
     pub sequence: Option<SequenceEntity>,
     /// The short name (e.g. table name) of the entity.
     #[serde(rename="shortName")]
     
     pub short_name: Option<String>,
-    /// Stored Procedure
+    /// Stored procedure.
     #[serde(rename="storedProcedure")]
     
     pub stored_procedure: Option<StoredProcedureEntity>,
-    /// Synonym
+    /// Synonym.
     
     pub synonym: Option<SynonymEntity>,
     /// Table.
@@ -833,12 +1007,31 @@ pub struct DatabaseEntity {
     /// The type of tree the entity belongs to.
     
     pub tree: Option<String>,
-    /// View
+    /// UDT.
+    
+    pub udt: Option<UDTEntity>,
+    /// View.
     
     pub view: Option<ViewEntity>,
 }
 
 impl client::Part for DatabaseEntity {}
+
+
+/// DatabaseInstance acts as a parent entity to other database entities.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DatabaseInstanceEntity {
+    /// Custom engine specific features.
+    #[serde(rename="customFeatures")]
+    
+    pub custom_features: Option<HashMap<String, json::Value>>,
+}
+
+impl client::Part for DatabaseInstanceEntity {}
 
 
 /// A message defining the database engine and provider.
@@ -857,6 +1050,21 @@ pub struct DatabaseType {
 }
 
 impl client::Part for DatabaseType {}
+
+
+/// Request message for ‘DemoteDestination’ request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations migration jobs demote destination projects](ProjectLocationMigrationJobDemoteDestinationCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DemoteDestinationRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for DemoteDestinationRequest {}
 
 
 /// Response message for ‘DescribeConversionWorkspaceRevisions’ request.
@@ -893,13 +1101,32 @@ pub struct DescribeDatabaseEntitiesResponse {
     #[serde(rename="databaseEntities")]
     
     pub database_entities: Option<Vec<DatabaseEntity>>,
-    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    /// A token which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
 }
 
 impl client::ResponseResult for DescribeDatabaseEntitiesResponse {}
+
+
+/// Filter based on relation between source value and compare value of type double in ConditionalColumnSetValue
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DoubleComparisonFilter {
+    /// Required. Double compare value to be used
+    
+    pub value: Option<f64>,
+    /// Required. Relation between source value and compare value
+    #[serde(rename="valueComparison")]
+    
+    pub value_comparison: Option<String>,
+}
+
+impl client::Part for DoubleComparisonFilter {}
 
 
 /// Dump flag definition.
@@ -943,6 +1170,7 @@ impl client::Part for DumpFlags {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations conversion workspaces mapping rules delete projects](ProjectLocationConversionWorkspaceMappingRuleDeleteCall) (response)
 /// * [locations operations cancel projects](ProjectLocationOperationCancelCall) (response)
 /// * [locations operations delete projects](ProjectLocationOperationDeleteCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
@@ -952,6 +1180,90 @@ pub struct Empty { _never_set: Option<bool> }
 impl client::ResponseResult for Empty {}
 
 
+/// EncryptionConfig describes the encryption config of a cluster that is encrypted with a CMEK (customer-managed encryption key).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EncryptionConfig {
+    /// The fully-qualified resource name of the KMS key. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY_NAME]
+    #[serde(rename="kmsKeyName")]
+    
+    pub kms_key_name: Option<String>,
+}
+
+impl client::Part for EncryptionConfig {}
+
+
+/// A single DDL statement for a specific entity
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EntityDdl {
+    /// The actual ddl code.
+    
+    pub ddl: Option<String>,
+    /// Type of DDL (Create, Alter).
+    #[serde(rename="ddlType")]
+    
+    pub ddl_type: Option<String>,
+    /// The name of the database entity the ddl refers to.
+    
+    pub entity: Option<String>,
+    /// The entity type (if the DDL is for a sub entity).
+    #[serde(rename="entityType")]
+    
+    pub entity_type: Option<String>,
+    /// EntityIssues found for this ddl.
+    #[serde(rename="issueId")]
+    
+    pub issue_id: Option<Vec<String>>,
+}
+
+impl client::Part for EntityDdl {}
+
+
+/// Issue related to the entity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EntityIssue {
+    /// Error/Warning code
+    
+    pub code: Option<String>,
+    /// The ddl which caused the issue, if relevant.
+    
+    pub ddl: Option<String>,
+    /// The entity type (if the DDL is for a sub entity).
+    #[serde(rename="entityType")]
+    
+    pub entity_type: Option<String>,
+    /// Unique Issue ID.
+    
+    pub id: Option<String>,
+    /// Issue detailed message
+    
+    pub message: Option<String>,
+    /// The position of the issue found, if relevant.
+    
+    pub position: Option<Position>,
+    /// Severity of the issue
+    
+    pub severity: Option<String>,
+    /// The type of the issue.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for EntityIssue {}
+
+
 /// Details of the mappings of a database entity.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -959,18 +1271,26 @@ impl client::ResponseResult for Empty {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityMapping {
-    /// Target entity full name. The draft entity can also include a column, index or constraint using the same naming notation schema.table.column
+    /// Target entity full name. The draft entity can also include a column, index or constraint using the same naming notation schema.table.column.
     #[serde(rename="draftEntity")]
     
     pub draft_entity: Option<String>,
-    /// Entity mapping log entries. Multiple rules can be effective and contribute changes to a converted entity such as, a rule can handle the entity name, another rule can handle an entity type. In addition, rules which did not change the entity are also logged along the with the reason preventing them to do so.
+    /// Type of draft entity.
+    #[serde(rename="draftType")]
+    
+    pub draft_type: Option<String>,
+    /// Entity mapping log entries. Multiple rules can be effective and contribute changes to a converted entity, such as a rule can handle the entity name, another rule can handle an entity type. In addition, rules which did not change the entity are also logged along with the reason preventing them to do so.
     #[serde(rename="mappingLog")]
     
     pub mapping_log: Option<Vec<EntityMappingLogEntry>>,
-    /// Source entity full name. The source entity can also be a column, index or constraint using the same naming notation schema.table.column
+    /// Source entity full name. The source entity can also be a column, index or constraint using the same naming notation schema.table.column.
     #[serde(rename="sourceEntity")]
     
     pub source_entity: Option<String>,
+    /// Type of source entity.
+    #[serde(rename="sourceType")]
+    
+    pub source_type: Option<String>,
 }
 
 impl client::Part for EntityMapping {}
@@ -987,17 +1307,33 @@ pub struct EntityMappingLogEntry {
     #[serde(rename="mappingComment")]
     
     pub mapping_comment: Option<String>,
-    /// Which rule caused it.
+    /// Which rule caused this log entry.
     #[serde(rename="ruleId")]
     
     pub rule_id: Option<String>,
-    /// Rule revision id
+    /// Rule revision ID.
     #[serde(rename="ruleRevisionId")]
     
     pub rule_revision_id: Option<String>,
 }
 
 impl client::Part for EntityMappingLogEntry {}
+
+
+/// Options to configure rule type EntityMove. The rule is used to move an entity to a new schema. The rule filter field can refer to one or more entities. The rule scope can be one of: Table, Column, Constraint, Index, View, Function, Stored Procedure, Materialized View, Sequence, UDT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EntityMove {
+    /// Required. The new schema
+    #[serde(rename="newSchema")]
+    
+    pub new_schema: Option<String>,
+}
+
+impl client::Part for EntityMove {}
 
 
 /// Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: "Summary size limit" description: "Determines if a summary is less than 100 chars" expression: "document.summary.size() < 100" Example (Equality): title: "Requestor is owner" description: "Determines if requestor is the document owner" expression: "document.owner == request.auth.claims.email" Example (Logic): title: "Public documents" description: "Determine whether the document should be publicly visible" expression: "document.type != 'private' && document.type != 'internal'" Example (Data Manipulation): title: "Notification string" description: "Create a notification string with a timestamp." expression: "'New message received at ' + string(document.create_time)" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
@@ -1022,6 +1358,50 @@ pub struct Expr {
 }
 
 impl client::Part for Expr {}
+
+
+/// Response message for a ‘FetchStaticIps’ request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations fetch static ips projects](ProjectLocationFetchStaticIpCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FetchStaticIpsResponse {
+    /// A token that can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// List of static IPs.
+    #[serde(rename="staticIps")]
+    
+    pub static_ips: Option<Vec<String>>,
+}
+
+impl client::ResponseResult for FetchStaticIpsResponse {}
+
+
+/// Options to configure rule type FilterTableColumns. The rule is used to filter the list of columns to include or exclude from a table. The rule filter field can refer to one entity. The rule scope can be: Table Only one of the two lists can be specified for the rule.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FilterTableColumns {
+    /// Optional. List of columns to be excluded for a particular table.
+    #[serde(rename="excludeColumns")]
+    
+    pub exclude_columns: Option<Vec<String>>,
+    /// Optional. List of columns to be included for a particular table.
+    #[serde(rename="includeColumns")]
+    
+    pub include_columns: Option<Vec<String>>,
+}
+
+impl client::Part for FilterTableColumns {}
 
 
 /// Forward SSH Tunnel connectivity.
@@ -1059,11 +1439,11 @@ impl client::Part for ForwardSshTunnelConnectivity {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FunctionEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// The SQL code which creates the function
+    /// The SQL code which creates the function.
     #[serde(rename="sqlCode")]
     
     pub sql_code: Option<String>,
@@ -1090,7 +1470,7 @@ pub struct GenerateSshScriptRequest {
     #[serde(rename="vmCreationConfig")]
     
     pub vm_creation_config: Option<VmCreationConfig>,
-    /// The port that will be open on the bastion host
+    /// The port that will be open on the bastion host.
     #[serde(rename="vmPort")]
     
     pub vm_port: Option<i32>,
@@ -1101,6 +1481,38 @@ pub struct GenerateSshScriptRequest {
 }
 
 impl client::RequestValue for GenerateSshScriptRequest {}
+
+
+/// Request message for ‘GenerateTcpProxyScript’ request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations migration jobs generate tcp proxy script projects](ProjectLocationMigrationJobGenerateTcpProxyScriptCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GenerateTcpProxyScriptRequest {
+    /// Required. The type of the Compute instance that will host the proxy.
+    #[serde(rename="vmMachineType")]
+    
+    pub vm_machine_type: Option<String>,
+    /// Required. The name of the Compute instance that will host the proxy.
+    #[serde(rename="vmName")]
+    
+    pub vm_name: Option<String>,
+    /// Required. The name of the subnet the Compute instance will use for private connectivity. Must be supplied in the form of projects/{project}/regions/{region}/subnetworks/{subnetwork}. Note: the region for the subnet must match the Compute instance region.
+    #[serde(rename="vmSubnet")]
+    
+    pub vm_subnet: Option<String>,
+    /// Optional. The Google Cloud Platform zone to create the VM in. The fully qualified name of the zone must be specified, including the region name, for example "us-central1-b". If not specified, uses the "-b" zone of the destination Connection Profile's region.
+    #[serde(rename="vmZone")]
+    
+    pub vm_zone: Option<String>,
+}
+
+impl client::RequestValue for GenerateTcpProxyScriptRequest {}
 
 
 /// Request message for ‘ImportMappingRules’ request.
@@ -1114,15 +1526,15 @@ impl client::RequestValue for GenerateSshScriptRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportMappingRulesRequest {
-    /// Should the conversion workspace be committed automatically after the import operation.
+    /// Required. Should the conversion workspace be committed automatically after the import operation.
     #[serde(rename="autoCommit")]
     
     pub auto_commit: Option<bool>,
-    /// One or more rules files
+    /// Required. One or more rules files.
     #[serde(rename="rulesFiles")]
     
     pub rules_files: Option<Vec<RulesFile>>,
-    /// The format of the rules content file.
+    /// Required. The format of the rules content file.
     #[serde(rename="rulesFormat")]
     
     pub rules_format: Option<String>,
@@ -1131,18 +1543,18 @@ pub struct ImportMappingRulesRequest {
 impl client::RequestValue for ImportMappingRulesRequest {}
 
 
-/// Details regarding an Import Rules background job
+/// Details regarding an Import Rules background job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportRulesJobDetails {
-    /// The requested file format
+    /// Output only. The requested file format.
     #[serde(rename="fileFormat")]
     
     pub file_format: Option<String>,
-    /// File names used for the import rules job
+    /// Output only. File names used for the import rules job.
     
     pub files: Option<Vec<String>>,
 }
@@ -1157,27 +1569,47 @@ impl client::Part for ImportRulesJobDetails {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IndexEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// The name of the index
+    /// The name of the index.
     
     pub name: Option<String>,
-    /// Table columns used as part of the Index for e.g. B-TREE index should list the columns which constitutes the index.
+    /// Table columns used as part of the Index, for example B-TREE index should list the columns which constitutes the index.
     #[serde(rename="tableColumns")]
     
     pub table_columns: Option<Vec<String>>,
-    /// Type of index - e.g. B-TREE
+    /// Type of index, for example B-TREE.
     #[serde(rename="type")]
     
     pub type_: Option<String>,
-    /// boolean value indicating whether the index is unique
+    /// Boolean value indicating whether the index is unique.
     
     pub unique: Option<bool>,
 }
 
 impl client::Part for IndexEntity {}
+
+
+/// Filter based on relation between source value and compare value of type integer in ConditionalColumnSetValue
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IntComparisonFilter {
+    /// Required. Integer compare value to be used
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub value: Option<i64>,
+    /// Required. Relation between source value and compare value
+    #[serde(rename="valueComparison")]
+    
+    pub value_comparison: Option<String>,
+}
+
+impl client::Part for IntComparisonFilter {}
 
 
 /// Response message for ‘ListConnectionProfiles’ request.
@@ -1195,7 +1627,7 @@ pub struct ListConnectionProfilesResponse {
     #[serde(rename="connectionProfiles")]
     
     pub connection_profiles: Option<Vec<ConnectionProfile>>,
-    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    /// A token which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -1222,7 +1654,7 @@ pub struct ListConversionWorkspacesResponse {
     #[serde(rename="conversionWorkspaces")]
     
     pub conversion_workspaces: Option<Vec<ConversionWorkspace>>,
-    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    /// A token which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -1257,6 +1689,30 @@ pub struct ListLocationsResponse {
 impl client::ResponseResult for ListLocationsResponse {}
 
 
+/// Response message for ‘ListMappingRulesRequest’ request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations conversion workspaces mapping rules list projects](ProjectLocationConversionWorkspaceMappingRuleListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListMappingRulesResponse {
+    /// The list of conversion workspace mapping rules.
+    #[serde(rename="mappingRules")]
+    
+    pub mapping_rules: Option<Vec<MappingRule>>,
+    /// A token which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for ListMappingRulesResponse {}
+
+
 /// Response message for ‘ListMigrationJobs’ request.
 /// 
 /// # Activities
@@ -1272,7 +1728,7 @@ pub struct ListMigrationJobsResponse {
     #[serde(rename="migrationJobs")]
     
     pub migration_jobs: Option<Vec<MigrationJob>>,
-    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    /// A token which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -1318,7 +1774,7 @@ impl client::ResponseResult for ListOperationsResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListPrivateConnectionsResponse {
-    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    /// A token which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -1334,7 +1790,7 @@ pub struct ListPrivateConnectionsResponse {
 impl client::ResponseResult for ListPrivateConnectionsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -1383,6 +1839,149 @@ pub struct MachineConfig {
 impl client::Part for MachineConfig {}
 
 
+/// Definition of a transformation that is to be applied to a group of entities in the source schema. Several such transformations can be applied to an entity sequentially to define the corresponding entity in the target schema.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations conversion workspaces mapping rules create projects](ProjectLocationConversionWorkspaceMappingRuleCreateCall) (request|response)
+/// * [locations conversion workspaces mapping rules get projects](ProjectLocationConversionWorkspaceMappingRuleGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MappingRule {
+    /// Optional. Rule to specify how the data contained in a column should be transformed (such as trimmed, rounded, etc) provided that the data meets certain criteria.
+    #[serde(rename="conditionalColumnSetValue")]
+    
+    pub conditional_column_set_value: Option<ConditionalColumnSetValue>,
+    /// Optional. Rule to specify how multiple tables should be converted with an additional rowid column.
+    #[serde(rename="convertRowidColumn")]
+    
+    pub convert_rowid_column: Option<ConvertRowIdToColumn>,
+    /// Optional. A human readable name
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Optional. Rule to specify how multiple entities should be relocated into a different schema.
+    #[serde(rename="entityMove")]
+    
+    pub entity_move: Option<EntityMove>,
+    /// Required. The rule filter
+    
+    pub filter: Option<MappingRuleFilter>,
+    /// Optional. Rule to specify the list of columns to include or exclude from a table.
+    #[serde(rename="filterTableColumns")]
+    
+    pub filter_table_columns: Option<FilterTableColumns>,
+    /// Optional. Rule to specify how multiple columns should be converted to a different data type.
+    #[serde(rename="multiColumnDataTypeChange")]
+    
+    pub multi_column_data_type_change: Option<MultiColumnDatatypeChange>,
+    /// Optional. Rule to specify how multiple entities should be renamed.
+    #[serde(rename="multiEntityRename")]
+    
+    pub multi_entity_rename: Option<MultiEntityRename>,
+    /// Full name of the mapping rule resource, in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{set}/mappingRule/{rule}.
+    
+    pub name: Option<String>,
+    /// Output only. The timestamp that the revision was created.
+    #[serde(rename="revisionCreateTime")]
+    
+    pub revision_create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. The revision ID of the mapping rule. A new revision is committed whenever the mapping rule is changed in any way. The format is an 8-character hexadecimal string.
+    #[serde(rename="revisionId")]
+    
+    pub revision_id: Option<String>,
+    /// Required. The order in which the rule is applied. Lower order rules are applied before higher value rules so they may end up being overridden.
+    #[serde(rename="ruleOrder")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub rule_order: Option<i64>,
+    /// Required. The rule scope
+    #[serde(rename="ruleScope")]
+    
+    pub rule_scope: Option<String>,
+    /// Optional. Rule to specify the primary key for a table
+    #[serde(rename="setTablePrimaryKey")]
+    
+    pub set_table_primary_key: Option<SetTablePrimaryKey>,
+    /// Optional. Rule to specify how a single column is converted.
+    #[serde(rename="singleColumnChange")]
+    
+    pub single_column_change: Option<SingleColumnChange>,
+    /// Optional. Rule to specify how a single entity should be renamed.
+    #[serde(rename="singleEntityRename")]
+    
+    pub single_entity_rename: Option<SingleEntityRename>,
+    /// Optional. Rule to specify how a single package is converted.
+    #[serde(rename="singlePackageChange")]
+    
+    pub single_package_change: Option<SinglePackageChange>,
+    /// Optional. Rule to change the sql code for an entity, for example, function, procedure.
+    #[serde(rename="sourceSqlChange")]
+    
+    pub source_sql_change: Option<SourceSqlChange>,
+    /// Optional. The mapping rule state
+    
+    pub state: Option<String>,
+}
+
+impl client::RequestValue for MappingRule {}
+impl client::ResponseResult for MappingRule {}
+
+
+/// A filter defining the entities that a mapping rule should be applied to. When more than one field is specified, the rule is applied only to entities which match all the fields.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MappingRuleFilter {
+    /// Optional. The rule should be applied to specific entities defined by their fully qualified names.
+    
+    pub entities: Option<Vec<String>>,
+    /// Optional. The rule should be applied to entities whose non-qualified name contains the given string.
+    #[serde(rename="entityNameContains")]
+    
+    pub entity_name_contains: Option<String>,
+    /// Optional. The rule should be applied to entities whose non-qualified name starts with the given prefix.
+    #[serde(rename="entityNamePrefix")]
+    
+    pub entity_name_prefix: Option<String>,
+    /// Optional. The rule should be applied to entities whose non-qualified name ends with the given suffix.
+    #[serde(rename="entityNameSuffix")]
+    
+    pub entity_name_suffix: Option<String>,
+    /// Optional. The rule should be applied to entities whose parent entity (fully qualified name) matches the given value. For example, if the rule applies to a table entity, the expected value should be a schema (schema). If the rule applies to a column or index entity, the expected value can be either a schema (schema) or a table (schema.table)
+    #[serde(rename="parentEntity")]
+    
+    pub parent_entity: Option<String>,
+}
+
+impl client::Part for MappingRuleFilter {}
+
+
+/// MaterializedView's parent is a schema.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MaterializedViewEntity {
+    /// Custom engine specific features.
+    #[serde(rename="customFeatures")]
+    
+    pub custom_features: Option<HashMap<String, json::Value>>,
+    /// The SQL code which creates the view.
+    #[serde(rename="sqlCode")]
+    
+    pub sql_code: Option<String>,
+}
+
+impl client::Part for MaterializedViewEntity {}
+
+
 /// Represents a Database Migration Service migration job object.
 /// 
 /// # Activities
@@ -1396,6 +1995,10 @@ impl client::Part for MachineConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MigrationJob {
+    /// The CMEK (customer-managed encryption key) fully qualified key name used for the migration job. This field supports all migration jobs types except for: * Mysql to Mysql (use the cmek field in the cloudsql connection profile instead). * PostrgeSQL to PostgreSQL (use the cmek field in the cloudsql connection profile instead). * PostgreSQL to AlloyDB (use the kms_key_name field in the alloydb connection profile instead). Each Cloud CMEK key has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY_NAME]
+    #[serde(rename="cmekKeyName")]
+    
+    pub cmek_key_name: Option<String>,
     /// The conversion workspace used by the migration.
     #[serde(rename="conversionWorkspace")]
     
@@ -1443,6 +2046,10 @@ pub struct MigrationJob {
     /// The name (URI) of this migration job resource, in the form of: projects/{project}/locations/{location}/migrationJobs/{migrationJob}.
     
     pub name: Option<String>,
+    /// Optional. Data dump parallelism settings used by the migration. Currently applicable only for MySQL to Cloud SQL for MySQL migrations only.
+    #[serde(rename="performanceConfig")]
+    
+    pub performance_config: Option<PerformanceConfig>,
     /// Output only. The current migration job phase.
     
     pub phase: Option<String>,
@@ -1480,6 +2087,75 @@ pub struct MigrationJob {
 
 impl client::RequestValue for MigrationJob {}
 impl client::ResponseResult for MigrationJob {}
+
+
+/// Options to configure rule type MultiColumnDatatypeChange. The rule is used to change the data type and associated properties of multiple columns at once. The rule filter field can refer to one or more entities. The rule scope can be one of:Column. This rule requires additional filters to be specified beyond the basic rule filter field, which is the source data type, but the rule supports additional filtering capabilities such as the minimum and maximum field length. All additional filters which are specified are required to be met in order for the rule to be applied (logical AND between the fields).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MultiColumnDatatypeChange {
+    /// Optional. Custom engine specific features.
+    #[serde(rename="customFeatures")]
+    
+    pub custom_features: Option<HashMap<String, json::Value>>,
+    /// Required. New data type.
+    #[serde(rename="newDataType")]
+    
+    pub new_data_type: Option<String>,
+    /// Optional. Column fractional seconds precision - used only for timestamp based datatypes - if not specified and relevant uses the source column fractional seconds precision.
+    #[serde(rename="overrideFractionalSecondsPrecision")]
+    
+    pub override_fractional_seconds_precision: Option<i32>,
+    /// Optional. Column length - e.g. varchar (50) - if not specified and relevant uses the source column length.
+    #[serde(rename="overrideLength")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub override_length: Option<i64>,
+    /// Optional. Column precision - when relevant - if not specified and relevant uses the source column precision.
+    #[serde(rename="overridePrecision")]
+    
+    pub override_precision: Option<i32>,
+    /// Optional. Column scale - when relevant - if not specified and relevant uses the source column scale.
+    #[serde(rename="overrideScale")]
+    
+    pub override_scale: Option<i32>,
+    /// Required. Filter on source data type.
+    #[serde(rename="sourceDataTypeFilter")]
+    
+    pub source_data_type_filter: Option<String>,
+    /// Optional. Filter for fixed point number data types such as NUMERIC/NUMBER.
+    #[serde(rename="sourceNumericFilter")]
+    
+    pub source_numeric_filter: Option<SourceNumericFilter>,
+    /// Optional. Filter for text-based data types like varchar.
+    #[serde(rename="sourceTextFilter")]
+    
+    pub source_text_filter: Option<SourceTextFilter>,
+}
+
+impl client::Part for MultiColumnDatatypeChange {}
+
+
+/// Options to configure rule type MultiEntityRename. The rule is used to rename multiple entities. The rule filter field can refer to one or more entities. The rule scope can be one of: Database, Schema, Table, Column, Constraint, Index, View, Function, Stored Procedure, Materialized View, Sequence, UDT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MultiEntityRename {
+    /// Optional. The pattern used to generate the new entity's name. This pattern must include the characters '{name}', which will be replaced with the name of the original entity. For example, the pattern 't_{name}' for an entity name jobs would be converted to 't_jobs'. If unspecified, the default value for this field is '{name}'
+    #[serde(rename="newNamePattern")]
+    
+    pub new_name_pattern: Option<String>,
+    /// Optional. Additional transformation that can be done on the source entity name before it is being used by the new_name_pattern, for example lower case. If no transformation is desired, use NO_TRANSFORMATION
+    #[serde(rename="sourceNameTransformation")]
+    
+    pub source_name_transformation: Option<String>,
+}
+
+impl client::Part for MultiEntityRename {}
 
 
 /// Specifies connection parameters required specifically for MySQL databases.
@@ -1538,6 +2214,7 @@ impl client::Part for MySqlConnectionProfile {}
 /// * [locations conversion workspaces seed projects](ProjectLocationConversionWorkspaceSeedCall) (response)
 /// * [locations migration jobs create projects](ProjectLocationMigrationJobCreateCall) (response)
 /// * [locations migration jobs delete projects](ProjectLocationMigrationJobDeleteCall) (response)
+/// * [locations migration jobs demote destination projects](ProjectLocationMigrationJobDemoteDestinationCall) (response)
 /// * [locations migration jobs patch projects](ProjectLocationMigrationJobPatchCall) (response)
 /// * [locations migration jobs promote projects](ProjectLocationMigrationJobPromoteCall) (response)
 /// * [locations migration jobs restart projects](ProjectLocationMigrationJobRestartCall) (response)
@@ -1563,7 +2240,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1603,6 +2280,9 @@ pub struct OracleConnectionProfile {
     #[serde(rename="privateConnectivity")]
     
     pub private_connectivity: Option<PrivateConnectivity>,
+    /// SSL configuration for the connection to the source Oracle database. * Only `SERVER_ONLY` configuration is supported for Oracle SSL. * SSL is supported for Oracle versions 12 and above.
+    
+    pub ssl: Option<SslConfig>,
     /// Static Service IP connectivity.
     #[serde(rename="staticServiceIpConnectivity")]
     
@@ -1622,7 +2302,7 @@ impl client::Part for OracleConnectionProfile {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PackageEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
@@ -1630,7 +2310,7 @@ pub struct PackageEntity {
     #[serde(rename="packageBody")]
     
     pub package_body: Option<String>,
-    /// The SQL code which creates the package
+    /// The SQL code which creates the package.
     #[serde(rename="packageSqlCode")]
     
     pub package_sql_code: Option<String>,
@@ -1639,7 +2319,23 @@ pub struct PackageEntity {
 impl client::Part for PackageEntity {}
 
 
-/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { “bindings”: \[ { “role”: “roles/resourcemanager.organizationAdmin”, “members”: \[ “user:mike@example.com”, “group:admins@example.com”, “domain:google.com”, “serviceAccount:my-project-id@appspot.gserviceaccount.com” \] }, { “role”: “roles/resourcemanager.organizationViewer”, “members”: \[ “user:eve@example.com” \], “condition”: { “title”: “expirable access”, “description”: “Does not grant access after Sep 2020”, “expression”: “request.time \< timestamp(‘2020-10-01T00:00:00.000Z’)”, } } \], “etag”: “BwWWja0YfJA=”, “version”: 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time \< timestamp(‘2020-10-01T00:00:00.000Z’) etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
+/// Performance configuration definition.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PerformanceConfig {
+    /// Initial dump parallelism level.
+    #[serde(rename="dumpParallelLevel")]
+    
+    pub dump_parallel_level: Option<String>,
+}
+
+impl client::Part for PerformanceConfig {}
+
+
+/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** `{ "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 }` **YAML example:** `bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -1648,8 +2344,12 @@ impl client::Part for PackageEntity {}
 /// 
 /// * [locations connection profiles get iam policy projects](ProjectLocationConnectionProfileGetIamPolicyCall) (response)
 /// * [locations connection profiles set iam policy projects](ProjectLocationConnectionProfileSetIamPolicyCall) (response)
+/// * [locations conversion workspaces get iam policy projects](ProjectLocationConversionWorkspaceGetIamPolicyCall) (response)
+/// * [locations conversion workspaces set iam policy projects](ProjectLocationConversionWorkspaceSetIamPolicyCall) (response)
 /// * [locations migration jobs get iam policy projects](ProjectLocationMigrationJobGetIamPolicyCall) (response)
 /// * [locations migration jobs set iam policy projects](ProjectLocationMigrationJobSetIamPolicyCall) (response)
+/// * [locations private connections get iam policy projects](ProjectLocationPrivateConnectionGetIamPolicyCall) (response)
+/// * [locations private connections set iam policy projects](ProjectLocationPrivateConnectionSetIamPolicyCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
@@ -1662,7 +2362,7 @@ pub struct Policy {
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub etag: Option<Vec<u8>>,
     /// Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
@@ -1672,6 +2372,30 @@ pub struct Policy {
 impl client::ResponseResult for Policy {}
 
 
+/// Issue position.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Position {
+    /// Issue column number
+    
+    pub column: Option<i32>,
+    /// Issue length
+    
+    pub length: Option<i32>,
+    /// Issue line number
+    
+    pub line: Option<i32>,
+    /// Issue offset
+    
+    pub offset: Option<i32>,
+}
+
+impl client::Part for Position {}
+
+
 /// Specifies connection parameters required specifically for PostgreSQL databases.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1679,6 +2403,10 @@ impl client::ResponseResult for Policy {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostgreSqlConnectionProfile {
+    /// Optional. If the destination is an AlloyDB database, use this field to provide the AlloyDB cluster ID.
+    #[serde(rename="alloydbClusterId")]
+    
+    pub alloydb_cluster_id: Option<String>,
     /// If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.
     #[serde(rename="cloudSqlId")]
     
@@ -1775,17 +2503,17 @@ pub struct PrivateConnection {
     /// The resource labels for private connections to use to annotate any related underlying resources such as Compute Engine VMs. An object containing a list of "key": "value" pairs. Example: `{ "name": "wrench", "mass": "1.3kg", "count": "3" }`.
     
     pub labels: Option<HashMap<String, String>>,
-    /// The resource's name.
+    /// The name of the resource.
     
     pub name: Option<String>,
-    /// Output only. The state of the Private Connection.
+    /// Output only. The state of the private connection.
     
     pub state: Option<String>,
     /// Output only. The last update time of the resource.
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// VPC Peering Config.
+    /// VPC peering configuration.
     #[serde(rename="vpcPeeringConfig")]
     
     pub vpc_peering_config: Option<VpcPeeringConfig>,
@@ -1811,7 +2539,7 @@ pub struct PrivateConnectivity {
 impl client::Part for PrivateConnectivity {}
 
 
-/// Private Service Connect connectivity (https://cloud.google.com/vpc/docs/private-service-connect#benefits-services)
+/// [Private Service Connect connectivity](https://cloud.google.com/vpc/docs/private-service-connect#service-attachments)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1852,7 +2580,12 @@ impl client::RequestValue for PromoteMigrationJobRequest {}
 /// * [locations migration jobs restart projects](ProjectLocationMigrationJobRestartCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RestartMigrationJobRequest { _never_set: Option<bool> }
+pub struct RestartMigrationJobRequest {
+    /// Optional. Restart the migration job without running prior configuration verification. Defaults to `false`.
+    #[serde(rename="skipValidation")]
+    
+    pub skip_validation: Option<bool>,
+}
 
 impl client::RequestValue for RestartMigrationJobRequest {}
 
@@ -1913,18 +2646,33 @@ pub struct RollbackConversionWorkspaceRequest { _never_set: Option<bool> }
 impl client::RequestValue for RollbackConversionWorkspaceRequest {}
 
 
-/// Details of a single rules file
+/// This allows the data to change scale, for example if the source is 2 digits after the decimal point, specify round to scale value = 2. If for example the value needs to be converted to an integer, use round to scale value = 0.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RoundToScale {
+    /// Required. Scale value to be used
+    
+    pub scale: Option<i32>,
+}
+
+impl client::Part for RoundToScale {}
+
+
+/// Details of a single rules file.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RulesFile {
-    /// The text content of the rules that needs to be converted
+    /// Required. The text content of the rules that needs to be converted.
     #[serde(rename="rulesContent")]
     
     pub rules_content: Option<String>,
-    /// The filename of the rules that needs to be converted. This is used mainly so future logs of the import rules job will contain this detail and can therefore be searched by it later
+    /// Required. The filename of the rules that needs to be converted. The filename is used mainly so that future logs of the import rules job contain it, and can therefore be searched by it.
     #[serde(rename="rulesSourceFilename")]
     
     pub rules_source_filename: Option<String>,
@@ -1933,14 +2681,14 @@ pub struct RulesFile {
 impl client::Part for RulesFile {}
 
 
-/// Schema typically has no parent entity, but can have a parent entity DatabaseInstance (for database engines which supports it). For some database engines the term schema and user can be used interchangeably when they refer to a namespace or a collection of other database entities. Can store additional information which is schema specific.
+/// Schema typically has no parent entity, but can have a parent entity DatabaseInstance (for database engines which support it). For some database engines, the terms schema and user can be used interchangeably when they refer to a namespace or a collection of other database entities. Can store additional information which is schema specific.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SchemaEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
@@ -1983,11 +2731,11 @@ pub struct SeedConversionWorkspaceRequest {
     #[serde(rename="autoCommit")]
     
     pub auto_commit: Option<bool>,
-    /// Fully qualified (Uri) name of the destination connection profile.
+    /// Optional. Fully qualified (Uri) name of the destination connection profile.
     #[serde(rename="destinationConnectionProfile")]
     
     pub destination_connection_profile: Option<String>,
-    /// Fully qualified (Uri) name of the source connection profile.
+    /// Optional. Fully qualified (Uri) name of the source connection profile.
     #[serde(rename="sourceConnectionProfile")]
     
     pub source_connection_profile: Option<String>,
@@ -1996,14 +2744,14 @@ pub struct SeedConversionWorkspaceRequest {
 impl client::RequestValue for SeedConversionWorkspaceRequest {}
 
 
-/// Details regarding a Seed background job
+/// Details regarding a Seed background job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SeedJobDetails {
-    /// The connection profile which was used for the seed job
+    /// Output only. The connection profile which was used for the seed job.
     #[serde(rename="connectionProfile")]
     
     pub connection_profile: Option<String>,
@@ -2019,35 +2767,35 @@ impl client::Part for SeedJobDetails {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SequenceEntity {
-    /// Indicates number of entries to cache / precreate
+    /// Indicates number of entries to cache / precreate.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub cache: Option<i64>,
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// Indicates whether the sequence value should cycle through
+    /// Indicates whether the sequence value should cycle through.
     
     pub cycle: Option<bool>,
-    /// Increment value for the sequence
+    /// Increment value for the sequence.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub increment: Option<i64>,
-    /// Maximum number for the sequence represented as bytes to accommodate large numbers
+    /// Maximum number for the sequence represented as bytes to accommodate large. numbers
     #[serde(rename="maxValue")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub max_value: Option<Vec<u8>>,
-    /// Minimum number for the sequence represented as bytes to accommodate large numbers
+    /// Minimum number for the sequence represented as bytes to accommodate large. numbers
     #[serde(rename="minValue")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub min_value: Option<Vec<u8>>,
-    /// Start number for the sequence represented as bytes to accommodate large numbers
+    /// Start number for the sequence represented as bytes to accommodate large. numbers
     #[serde(rename="startValue")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub start_value: Option<Vec<u8>>,
 }
 
@@ -2062,7 +2810,9 @@ impl client::Part for SequenceEntity {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations connection profiles set iam policy projects](ProjectLocationConnectionProfileSetIamPolicyCall) (request)
+/// * [locations conversion workspaces set iam policy projects](ProjectLocationConversionWorkspaceSetIamPolicyCall) (request)
 /// * [locations migration jobs set iam policy projects](ProjectLocationMigrationJobSetIamPolicyCall) (request)
+/// * [locations private connections set iam policy projects](ProjectLocationPrivateConnectionSetIamPolicyCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
@@ -2076,6 +2826,196 @@ pub struct SetIamPolicyRequest {
 }
 
 impl client::RequestValue for SetIamPolicyRequest {}
+
+
+/// Options to configure rule type SetTablePrimaryKey. The rule is used to specify the columns and name to configure/alter the primary key of a table. The rule filter field can refer to one entity. The rule scope can be one of: Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetTablePrimaryKey {
+    /// Optional. Name for the primary key
+    #[serde(rename="primaryKey")]
+    
+    pub primary_key: Option<String>,
+    /// Required. List of column names for the primary key
+    #[serde(rename="primaryKeyColumns")]
+    
+    pub primary_key_columns: Option<Vec<String>>,
+}
+
+impl client::Part for SetTablePrimaryKey {}
+
+
+/// Options to configure rule type SingleColumnChange. The rule is used to change the properties of a column. The rule filter field can refer to one entity. The rule scope can be one of: Column. When using this rule, if a field is not specified than the destination column's configuration will be the same as the one in the source column..
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SingleColumnChange {
+    /// Optional. Is the column of array type.
+    
+    pub array: Option<bool>,
+    /// Optional. The length of the array, only relevant if the column type is an array.
+    #[serde(rename="arrayLength")]
+    
+    pub array_length: Option<i32>,
+    /// Optional. Is the column auto-generated/identity.
+    #[serde(rename="autoGenerated")]
+    
+    pub auto_generated: Option<bool>,
+    /// Optional. Charset override - instead of table level charset.
+    
+    pub charset: Option<String>,
+    /// Optional. Collation override - instead of table level collation.
+    
+    pub collation: Option<String>,
+    /// Optional. Comment associated with the column.
+    
+    pub comment: Option<String>,
+    /// Optional. Custom engine specific features.
+    #[serde(rename="customFeatures")]
+    
+    pub custom_features: Option<HashMap<String, json::Value>>,
+    /// Optional. Column data type name.
+    #[serde(rename="dataType")]
+    
+    pub data_type: Option<String>,
+    /// Optional. Column fractional seconds precision - e.g. 2 as in timestamp (2) - when relevant.
+    #[serde(rename="fractionalSecondsPrecision")]
+    
+    pub fractional_seconds_precision: Option<i32>,
+    /// Optional. Column length - e.g. 50 as in varchar (50) - when relevant.
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub length: Option<i64>,
+    /// Optional. Is the column nullable.
+    
+    pub nullable: Option<bool>,
+    /// Optional. Column precision - e.g. 8 as in double (8,2) - when relevant.
+    
+    pub precision: Option<i32>,
+    /// Optional. Column scale - e.g. 2 as in double (8,2) - when relevant.
+    
+    pub scale: Option<i32>,
+    /// Optional. Specifies the list of values allowed in the column.
+    #[serde(rename="setValues")]
+    
+    pub set_values: Option<Vec<String>>,
+    /// Optional. Is the column a UDT (User-defined Type).
+    
+    pub udt: Option<bool>,
+}
+
+impl client::Part for SingleColumnChange {}
+
+
+/// Options to configure rule type SingleEntityRename. The rule is used to rename an entity. The rule filter field can refer to only one entity. The rule scope can be one of: Database, Schema, Table, Column, Constraint, Index, View, Function, Stored Procedure, Materialized View, Sequence, UDT, Synonym
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SingleEntityRename {
+    /// Required. The new name of the destination entity
+    #[serde(rename="newName")]
+    
+    pub new_name: Option<String>,
+}
+
+impl client::Part for SingleEntityRename {}
+
+
+/// Options to configure rule type SinglePackageChange. The rule is used to alter the sql code for a package entities. The rule filter field can refer to one entity. The rule scope can be: Package
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SinglePackageChange {
+    /// Optional. Sql code for package body
+    #[serde(rename="packageBody")]
+    
+    pub package_body: Option<String>,
+    /// Optional. Sql code for package description
+    #[serde(rename="packageDescription")]
+    
+    pub package_description: Option<String>,
+}
+
+impl client::Part for SinglePackageChange {}
+
+
+/// Filter for fixed point number data types such as NUMERIC/NUMBER
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SourceNumericFilter {
+    /// Required. Enum to set the option defining the datatypes numeric filter has to be applied to
+    #[serde(rename="numericFilterOption")]
+    
+    pub numeric_filter_option: Option<String>,
+    /// Optional. The filter will match columns with precision smaller than or equal to this number.
+    #[serde(rename="sourceMaxPrecisionFilter")]
+    
+    pub source_max_precision_filter: Option<i32>,
+    /// Optional. The filter will match columns with scale smaller than or equal to this number.
+    #[serde(rename="sourceMaxScaleFilter")]
+    
+    pub source_max_scale_filter: Option<i32>,
+    /// Optional. The filter will match columns with precision greater than or equal to this number.
+    #[serde(rename="sourceMinPrecisionFilter")]
+    
+    pub source_min_precision_filter: Option<i32>,
+    /// Optional. The filter will match columns with scale greater than or equal to this number.
+    #[serde(rename="sourceMinScaleFilter")]
+    
+    pub source_min_scale_filter: Option<i32>,
+}
+
+impl client::Part for SourceNumericFilter {}
+
+
+/// Options to configure rule type SourceSqlChange. The rule is used to alter the sql code for database entities. The rule filter field can refer to one entity. The rule scope can be: StoredProcedure, Function, Trigger, View
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SourceSqlChange {
+    /// Required. Sql code for source (stored procedure, function, trigger or view)
+    #[serde(rename="sqlCode")]
+    
+    pub sql_code: Option<String>,
+}
+
+impl client::Part for SourceSqlChange {}
+
+
+/// Filter for text-based data types like varchar.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SourceTextFilter {
+    /// Optional. The filter will match columns with length smaller than or equal to this number.
+    #[serde(rename="sourceMaxLengthFilter")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub source_max_length_filter: Option<i64>,
+    /// Optional. The filter will match columns with length greater than or equal to this number.
+    #[serde(rename="sourceMinLengthFilter")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub source_min_length_filter: Option<i64>,
+}
+
+impl client::Part for SourceTextFilter {}
 
 
 /// An entry for an Access Control list.
@@ -2111,6 +3051,10 @@ impl client::Part for SqlAclEntry {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlIpConfig {
+    /// Optional. The name of the allocated IP address range for the private IP Cloud SQL instance. This name refers to an already allocated IP range address. If set, the instance IP address will be created in the allocated range. Note that this IP address range can't be modified after the instance is created. If you change the VPC when configuring connectivity settings for the migration job, this field is not relevant.
+    #[serde(rename="allocatedIpRange")]
+    
+    pub allocated_ip_range: Option<String>,
     /// The list of external networks that are allowed to connect to the instance using the IP. See https://en.wikipedia.org/wiki/CIDR_notation#CIDR_notation, also known as 'slash' notation (e.g. `192.168.100.0/24`).
     #[serde(rename="authorizedNetworks")]
     
@@ -2189,12 +3133,17 @@ impl client::Part for SslConfig {}
 /// * [locations migration jobs start projects](ProjectLocationMigrationJobStartCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartMigrationJobRequest { _never_set: Option<bool> }
+pub struct StartMigrationJobRequest {
+    /// Optional. Start the migration job without running prior configuration verification. Defaults to `false`.
+    #[serde(rename="skipValidation")]
+    
+    pub skip_validation: Option<bool>,
+}
 
 impl client::RequestValue for StartMigrationJobRequest {}
 
 
-/// The source database will allow incoming connections from the destination database's public IP. You can retrieve the Cloud SQL instance's public IP from the Cloud SQL console or using Cloud SQL APIs. No additional configuration is required.
+/// The source database will allow incoming connections from the public IP of the destination database. You can retrieve the public IP of the Cloud SQL instance from the Cloud SQL console or using Cloud SQL APIs. No additional configuration is required.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2259,11 +3208,11 @@ impl client::RequestValue for StopMigrationJobRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StoredProcedureEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// The SQL code which creates the stored procedure
+    /// The SQL code which creates the stored procedure.
     #[serde(rename="sqlCode")]
     
     pub sql_code: Option<String>,
@@ -2279,15 +3228,15 @@ impl client::Part for StoredProcedureEntity {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SynonymEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// The name of the entity for which the synonym is being created (the source)
+    /// The name of the entity for which the synonym is being created (the source).
     #[serde(rename="sourceEntity")]
     
     pub source_entity: Option<String>,
-    /// The type of the entity for which the synonym is being created (usually a table or a sequence)
+    /// The type of the entity for which the synonym is being created (usually a table or a sequence).
     #[serde(rename="sourceType")]
     
     pub source_type: Option<String>,
@@ -2303,20 +3252,20 @@ impl client::Part for SynonymEntity {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableEntity {
-    /// Table Columns.
+    /// Table columns.
     
     pub columns: Option<Vec<ColumnEntity>>,
-    /// Comment associated with the table
+    /// Comment associated with the table.
     
     pub comment: Option<String>,
-    /// Table Constraints.
+    /// Table constraints.
     
     pub constraints: Option<Vec<ConstraintEntity>>,
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// Table Indices.
+    /// Table indices.
     
     pub indices: Option<Vec<IndexEntity>>,
     /// Table triggers.
@@ -2327,6 +3276,25 @@ pub struct TableEntity {
 impl client::Part for TableEntity {}
 
 
+/// Response message for ‘GenerateTcpProxyScript’ request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations migration jobs generate tcp proxy script projects](ProjectLocationMigrationJobGenerateTcpProxyScriptCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TcpProxyScript {
+    /// The TCP Proxy configuration script.
+    
+    pub script: Option<String>,
+}
+
+impl client::ResponseResult for TcpProxyScript {}
+
+
 /// Request message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -2335,7 +3303,9 @@ impl client::Part for TableEntity {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations connection profiles test iam permissions projects](ProjectLocationConnectionProfileTestIamPermissionCall) (request)
+/// * [locations conversion workspaces test iam permissions projects](ProjectLocationConversionWorkspaceTestIamPermissionCall) (request)
 /// * [locations migration jobs test iam permissions projects](ProjectLocationMigrationJobTestIamPermissionCall) (request)
+/// * [locations private connections test iam permissions projects](ProjectLocationPrivateConnectionTestIamPermissionCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
@@ -2355,7 +3325,9 @@ impl client::RequestValue for TestIamPermissionsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations connection profiles test iam permissions projects](ProjectLocationConnectionProfileTestIamPermissionCall) (response)
+/// * [locations conversion workspaces test iam permissions projects](ProjectLocationConversionWorkspaceTestIamPermissionCall) (response)
 /// * [locations migration jobs test iam permissions projects](ProjectLocationMigrationJobTestIamPermissionCall) (response)
+/// * [locations private connections test iam permissions projects](ProjectLocationPrivateConnectionTestIamPermissionCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
@@ -2374,28 +3346,52 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TriggerEntity {
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
-    /// The name of the trigger
+    /// The name of the trigger.
     
     pub name: Option<String>,
-    /// The SQL code which creates the trigger
+    /// The SQL code which creates the trigger.
     #[serde(rename="sqlCode")]
     
     pub sql_code: Option<String>,
-    /// Indicates when the trigger fires, e.g. BEFORE STATEMENT, AFTER EACH ROW
+    /// Indicates when the trigger fires, for example BEFORE STATEMENT, AFTER EACH ROW.
     #[serde(rename="triggerType")]
     
     pub trigger_type: Option<String>,
-    /// The DML, DDL, or database events that fires the trigger, e.g. INSERT, UPDATE
+    /// The DML, DDL, or database events that fire the trigger, for example INSERT, UPDATE.
     #[serde(rename="triggeringEvents")]
     
     pub triggering_events: Option<Vec<String>>,
 }
 
 impl client::Part for TriggerEntity {}
+
+
+/// UDT's parent is a schema.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UDTEntity {
+    /// Custom engine specific features.
+    #[serde(rename="customFeatures")]
+    
+    pub custom_features: Option<HashMap<String, json::Value>>,
+    /// The SQL code which creates the udt body.
+    #[serde(rename="udtBody")]
+    
+    pub udt_body: Option<String>,
+    /// The SQL code which creates the udt.
+    #[serde(rename="udtSqlCode")]
+    
+    pub udt_sql_code: Option<String>,
+}
+
+impl client::Part for UDTEntity {}
 
 
 /// The username/password for a database user. Used for specifying initial users at cluster creation time.
@@ -2420,6 +3416,81 @@ pub struct UserPassword {
 impl client::Part for UserPassword {}
 
 
+/// A list of values to filter by in ConditionalColumnSetValue
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ValueListFilter {
+    /// Required. Whether to ignore case when filtering by values. Defaults to false
+    #[serde(rename="ignoreCase")]
+    
+    pub ignore_case: Option<bool>,
+    /// Required. Indicates whether the filter matches rows with values that are present in the list or those with values not present in it.
+    #[serde(rename="valuePresentList")]
+    
+    pub value_present_list: Option<String>,
+    /// Required. The list to be used to filter by
+    
+    pub values: Option<Vec<String>>,
+}
+
+impl client::Part for ValueListFilter {}
+
+
+/// Description of data transformation during migration as part of the ConditionalColumnSetValue.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ValueTransformation {
+    /// Optional. Applies a hash function on the data
+    #[serde(rename="applyHash")]
+    
+    pub apply_hash: Option<ApplyHash>,
+    /// Optional. Set to max_value - if integer or numeric, will use int.maxvalue, etc
+    #[serde(rename="assignMaxValue")]
+    
+    pub assign_max_value: Option<Empty>,
+    /// Optional. Set to min_value - if integer or numeric, will use int.minvalue, etc
+    #[serde(rename="assignMinValue")]
+    
+    pub assign_min_value: Option<Empty>,
+    /// Optional. Set to null
+    #[serde(rename="assignNull")]
+    
+    pub assign_null: Option<Empty>,
+    /// Optional. Set to a specific value (value is converted to fit the target data type)
+    #[serde(rename="assignSpecificValue")]
+    
+    pub assign_specific_value: Option<AssignSpecificValue>,
+    /// Optional. Filter on relation between source value and compare value of type double.
+    #[serde(rename="doubleComparison")]
+    
+    pub double_comparison: Option<DoubleComparisonFilter>,
+    /// Optional. Filter on relation between source value and compare value of type integer.
+    #[serde(rename="intComparison")]
+    
+    pub int_comparison: Option<IntComparisonFilter>,
+    /// Optional. Value is null
+    #[serde(rename="isNull")]
+    
+    pub is_null: Option<Empty>,
+    /// Optional. Allows the data to change scale
+    #[serde(rename="roundScale")]
+    
+    pub round_scale: Option<RoundToScale>,
+    /// Optional. Value is found in the specified list.
+    #[serde(rename="valueList")]
+    
+    pub value_list: Option<ValueListFilter>,
+}
+
+impl client::Part for ValueTransformation {}
+
+
 /// Request message for ‘VerifyMigrationJob’ request.
 /// 
 /// # Activities
@@ -2430,7 +3501,16 @@ impl client::Part for UserPassword {}
 /// * [locations migration jobs verify projects](ProjectLocationMigrationJobVerifyCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VerifyMigrationJobRequest { _never_set: Option<bool> }
+pub struct VerifyMigrationJobRequest {
+    /// Optional. The changed migration job parameters to verify. It will not update the migration job.
+    #[serde(rename="migrationJob")]
+    
+    pub migration_job: Option<MigrationJob>,
+    /// Optional. Field mask is used to specify the changed fields to be verified. It will not update the migration job.
+    #[serde(rename="updateMask")]
+    
+    pub update_mask: Option<client::FieldMask>,
+}
 
 impl client::RequestValue for VerifyMigrationJobRequest {}
 
@@ -2442,10 +3522,10 @@ impl client::RequestValue for VerifyMigrationJobRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ViewEntity {
-    /// View Constraints.
+    /// View constraints.
     
     pub constraints: Option<Vec<ConstraintEntity>>,
-    /// Custom engine specific features
+    /// Custom engine specific features.
     #[serde(rename="customFeatures")]
     
     pub custom_features: Option<HashMap<String, json::Value>>,
@@ -2497,7 +3577,7 @@ pub struct VmSelectionConfig {
 impl client::Part for VmSelectionConfig {}
 
 
-/// The VPC Peering configuration is used to create VPC peering with the consumer's VPC.
+/// The VPC peering configuration is used to create VPC peering with the consumer's VPC.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2507,7 +3587,7 @@ pub struct VpcPeeringConfig {
     /// Required. A free subnet for peering. (CIDR of /29)
     
     pub subnet: Option<String>,
-    /// Required. Fully qualified name of the VPC DMS will peer to.
+    /// Required. Fully qualified name of the VPC that Database Migration Service will peer to.
     #[serde(rename="vpcName")]
     
     pub vpc_name: Option<String>,
@@ -2559,7 +3639,7 @@ impl client::Part for VpcPeeringConnectivity {}
 ///     ).build().await.unwrap();
 /// let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_connection_profiles_create(...)`, `locations_connection_profiles_delete(...)`, `locations_connection_profiles_get(...)`, `locations_connection_profiles_get_iam_policy(...)`, `locations_connection_profiles_list(...)`, `locations_connection_profiles_patch(...)`, `locations_connection_profiles_set_iam_policy(...)`, `locations_connection_profiles_test_iam_permissions(...)`, `locations_conversion_workspaces_apply(...)`, `locations_conversion_workspaces_commit(...)`, `locations_conversion_workspaces_convert(...)`, `locations_conversion_workspaces_create(...)`, `locations_conversion_workspaces_delete(...)`, `locations_conversion_workspaces_describe_conversion_workspace_revisions(...)`, `locations_conversion_workspaces_describe_database_entities(...)`, `locations_conversion_workspaces_get(...)`, `locations_conversion_workspaces_list(...)`, `locations_conversion_workspaces_mapping_rules_import(...)`, `locations_conversion_workspaces_patch(...)`, `locations_conversion_workspaces_rollback(...)`, `locations_conversion_workspaces_search_background_jobs(...)`, `locations_conversion_workspaces_seed(...)`, `locations_get(...)`, `locations_list(...)`, `locations_migration_jobs_create(...)`, `locations_migration_jobs_delete(...)`, `locations_migration_jobs_generate_ssh_script(...)`, `locations_migration_jobs_get(...)`, `locations_migration_jobs_get_iam_policy(...)`, `locations_migration_jobs_list(...)`, `locations_migration_jobs_patch(...)`, `locations_migration_jobs_promote(...)`, `locations_migration_jobs_restart(...)`, `locations_migration_jobs_resume(...)`, `locations_migration_jobs_set_iam_policy(...)`, `locations_migration_jobs_start(...)`, `locations_migration_jobs_stop(...)`, `locations_migration_jobs_test_iam_permissions(...)`, `locations_migration_jobs_verify(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_private_connections_create(...)`, `locations_private_connections_delete(...)`, `locations_private_connections_get(...)` and `locations_private_connections_list(...)`
+/// // like `locations_connection_profiles_create(...)`, `locations_connection_profiles_delete(...)`, `locations_connection_profiles_get(...)`, `locations_connection_profiles_get_iam_policy(...)`, `locations_connection_profiles_list(...)`, `locations_connection_profiles_patch(...)`, `locations_connection_profiles_set_iam_policy(...)`, `locations_connection_profiles_test_iam_permissions(...)`, `locations_conversion_workspaces_apply(...)`, `locations_conversion_workspaces_commit(...)`, `locations_conversion_workspaces_convert(...)`, `locations_conversion_workspaces_create(...)`, `locations_conversion_workspaces_delete(...)`, `locations_conversion_workspaces_describe_conversion_workspace_revisions(...)`, `locations_conversion_workspaces_describe_database_entities(...)`, `locations_conversion_workspaces_get(...)`, `locations_conversion_workspaces_get_iam_policy(...)`, `locations_conversion_workspaces_list(...)`, `locations_conversion_workspaces_mapping_rules_create(...)`, `locations_conversion_workspaces_mapping_rules_delete(...)`, `locations_conversion_workspaces_mapping_rules_get(...)`, `locations_conversion_workspaces_mapping_rules_import(...)`, `locations_conversion_workspaces_mapping_rules_list(...)`, `locations_conversion_workspaces_patch(...)`, `locations_conversion_workspaces_rollback(...)`, `locations_conversion_workspaces_search_background_jobs(...)`, `locations_conversion_workspaces_seed(...)`, `locations_conversion_workspaces_set_iam_policy(...)`, `locations_conversion_workspaces_test_iam_permissions(...)`, `locations_fetch_static_ips(...)`, `locations_get(...)`, `locations_list(...)`, `locations_migration_jobs_create(...)`, `locations_migration_jobs_delete(...)`, `locations_migration_jobs_demote_destination(...)`, `locations_migration_jobs_generate_ssh_script(...)`, `locations_migration_jobs_generate_tcp_proxy_script(...)`, `locations_migration_jobs_get(...)`, `locations_migration_jobs_get_iam_policy(...)`, `locations_migration_jobs_list(...)`, `locations_migration_jobs_patch(...)`, `locations_migration_jobs_promote(...)`, `locations_migration_jobs_restart(...)`, `locations_migration_jobs_resume(...)`, `locations_migration_jobs_set_iam_policy(...)`, `locations_migration_jobs_start(...)`, `locations_migration_jobs_stop(...)`, `locations_migration_jobs_test_iam_permissions(...)`, `locations_migration_jobs_verify(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_private_connections_create(...)`, `locations_private_connections_delete(...)`, `locations_private_connections_get(...)`, `locations_private_connections_get_iam_policy(...)`, `locations_private_connections_list(...)`, `locations_private_connections_set_iam_policy(...)` and `locations_private_connections_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2581,7 +3661,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent, which owns this collection of connection profiles.
+    /// * `parent` - Required. The parent which owns this collection of connection profiles.
     pub fn locations_connection_profiles_create(&self, request: ConnectionProfile, parent: &str) -> ProjectLocationConnectionProfileCreateCall<'a, S> {
         ProjectLocationConnectionProfileCreateCall {
             hub: self.hub,
@@ -2657,7 +3737,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns this collection of connection profiles.
+    /// * `parent` - Required. The parent which owns this collection of connection profiles.
     pub fn locations_connection_profiles_list(&self, parent: &str) -> ProjectLocationConnectionProfileListCall<'a, S> {
         ProjectLocationConnectionProfileListCall {
             hub: self.hub,
@@ -2735,6 +3815,62 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a new mapping rule for a given conversion workspace.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent which owns this collection of mapping rules.
+    pub fn locations_conversion_workspaces_mapping_rules_create(&self, request: MappingRule, parent: &str) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        ProjectLocationConversionWorkspaceMappingRuleCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _request_id: Default::default(),
+            _mapping_rule_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a single mapping rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the mapping rule resource to delete.
+    pub fn locations_conversion_workspaces_mapping_rules_delete(&self, name: &str) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S> {
+        ProjectLocationConversionWorkspaceMappingRuleDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _request_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the details of a mapping rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the mapping rule resource to get. Example: conversionWorkspaces/123/mappingRules/rule123 In order to retrieve a previous revision of the mapping rule, also provide the revision ID. Example: conversionWorkspace/123/mappingRules/rule123@c7cfa2a8c7cfa2a8c7cfa2a8c7cfa2a8
+    pub fn locations_conversion_workspaces_mapping_rules_get(&self, name: &str) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S> {
+        ProjectLocationConversionWorkspaceMappingRuleGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Imports the mapping rules for a given conversion workspace. Supports various formats of external rules files.
     /// 
     /// # Arguments
@@ -2754,12 +3890,31 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Apply draft tree onto a specific destination database
+    /// Lists the mapping rules for a specific conversion workspace.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. Name of the conversion workspace resource whose mapping rules are listed in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    pub fn locations_conversion_workspaces_mapping_rules_list(&self, parent: &str) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {
+        ProjectLocationConversionWorkspaceMappingRuleListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Applies draft tree onto a specific destination database.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the conversion workspace resource to apply draft to destination for. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// * `name` - Required. The name of the conversion workspace resource for which to apply the draft tree. Must be in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     pub fn locations_conversion_workspaces_apply(&self, request: ApplyConversionWorkspaceRequest, name: &str) -> ProjectLocationConversionWorkspaceApplyCall<'a, S> {
         ProjectLocationConversionWorkspaceApplyCall {
             hub: self.hub,
@@ -2816,7 +3971,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent, which owns this collection of conversion workspaces.
+    /// * `parent` - Required. The parent which owns this collection of conversion workspaces.
     pub fn locations_conversion_workspaces_create(&self, request: ConversionWorkspace, parent: &str) -> ProjectLocationConversionWorkspaceCreateCall<'a, S> {
         ProjectLocationConversionWorkspaceCreateCall {
             hub: self.hub,
@@ -2842,6 +3997,7 @@ impl<'a, S> ProjectMethods<'a, S> {
             hub: self.hub,
             _name: name.to_string(),
             _request_id: Default::default(),
+            _force: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2854,7 +4010,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `conversionWorkspace` - Required. Name of the conversion workspace resource whose revisions are listed. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// * `conversionWorkspace` - Required. Name of the conversion workspace resource whose revisions are listed. Must be in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     pub fn locations_conversion_workspaces_describe_conversion_workspace_revisions(&self, conversion_workspace: &str) -> ProjectLocationConversionWorkspaceDescribeConversionWorkspaceRevisionCall<'a, S> {
         ProjectLocationConversionWorkspaceDescribeConversionWorkspaceRevisionCall {
             hub: self.hub,
@@ -2868,15 +4024,16 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Use this method to describe the database entities tree for a specific conversion workspace and a specific tree type. The DB Entities are not a resource like conversion workspace or mapping rule, and they can not be created, updated or deleted like one. Instead they are simple data objects describing the structure of the client database.
+    /// Describes the database entities tree for a specific conversion workspace and a specific tree type. Database entities are not resources like conversion workspaces or mapping rules, and they can't be created, updated or deleted. Instead, they are simple data objects describing the structure of the client database.
     /// 
     /// # Arguments
     ///
-    /// * `conversionWorkspace` - Required. Name of the conversion workspace resource whose DB entities are described in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// * `conversionWorkspace` - Required. Name of the conversion workspace resource whose database entities are described. Must be in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     pub fn locations_conversion_workspaces_describe_database_entities(&self, conversion_workspace: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
         ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall {
             hub: self.hub,
             _conversion_workspace: conversion_workspace.to_string(),
+            _view: Default::default(),
             _uncommitted: Default::default(),
             _tree: Default::default(),
             _page_token: Default::default(),
@@ -2908,11 +4065,29 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_conversion_workspaces_get_iam_policy(&self, resource: &str) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S> {
+        ProjectLocationConversionWorkspaceGetIamPolicyCall {
+            hub: self.hub,
+            _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists conversion workspaces in a given project and location.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns this collection of conversion workspaces.
+    /// * `parent` - Required. The parent which owns this collection of conversion workspaces.
     pub fn locations_conversion_workspaces_list(&self, parent: &str) -> ProjectLocationConversionWorkspaceListCall<'a, S> {
         ProjectLocationConversionWorkspaceListCall {
             hub: self.hub,
@@ -2949,12 +4124,12 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Rollbacks a conversion workspace to the last committed spanshot.
+    /// Rolls back a conversion workspace to the last committed snapshot.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the conversion workspace resource to rollback to.
+    /// * `name` - Required. Name of the conversion workspace resource to roll back to.
     pub fn locations_conversion_workspaces_rollback(&self, request: RollbackConversionWorkspaceRequest, name: &str) -> ProjectLocationConversionWorkspaceRollbackCall<'a, S> {
         ProjectLocationConversionWorkspaceRollbackCall {
             hub: self.hub,
@@ -2968,11 +4143,11 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Use this method to search/list the background jobs for a specific conversion workspace. The background jobs are not a resource like conversion workspace or mapping rule, and they can not be created, updated or deleted like one. Instead they are a way to expose the data plane jobs log.
+    /// Searches/lists the background jobs for a specific conversion workspace. The background jobs are not resources like conversion workspaces or mapping rules, and they can't be created, updated or deleted. Instead, they are a way to expose the data plane jobs log.
     /// 
     /// # Arguments
     ///
-    /// * `conversionWorkspace` - Required. Name of the conversion workspace resource whos jobs are listed. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// * `conversionWorkspace` - Required. Name of the conversion workspace resource whose jobs are listed, in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     pub fn locations_conversion_workspaces_search_background_jobs(&self, conversion_workspace: &str) -> ProjectLocationConversionWorkspaceSearchBackgroundJobCall<'a, S> {
         ProjectLocationConversionWorkspaceSearchBackgroundJobCall {
             hub: self.hub,
@@ -2993,7 +4168,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Name of the conversion workspace resource to seed with new database structure. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// * `name` - Name of the conversion workspace resource to seed with new database structure, in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     pub fn locations_conversion_workspaces_seed(&self, request: SeedConversionWorkspaceRequest, name: &str) -> ProjectLocationConversionWorkspaceSeedCall<'a, S> {
         ProjectLocationConversionWorkspaceSeedCall {
             hub: self.hub,
@@ -3007,12 +4182,50 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_conversion_workspaces_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S> {
+        ProjectLocationConversionWorkspaceSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_conversion_workspaces_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S> {
+        ProjectLocationConversionWorkspaceTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a new migration job in a given project and location.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent, which owns this collection of migration jobs.
+    /// * `parent` - Required. The parent which owns this collection of migration jobs.
     pub fn locations_migration_jobs_create(&self, request: MigrationJob, parent: &str) -> ProjectLocationMigrationJobCreateCall<'a, S> {
         ProjectLocationMigrationJobCreateCall {
             hub: self.hub,
@@ -3047,6 +4260,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Demotes the destination database to become a read replica of the source. This is applicable for the following migrations: 1. MySQL to Cloud SQL for MySQL 2. PostgreSQL to Cloud SQL for PostgreSQL 3. PostgreSQL to AlloyDB for PostgreSQL.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Name of the migration job resource to demote its destination.
+    pub fn locations_migration_jobs_demote_destination(&self, request: DemoteDestinationRequest, name: &str) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S> {
+        ProjectLocationMigrationJobDemoteDestinationCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Generate a SSH configuration script to configure the reverse SSH connectivity.
     /// 
     /// # Arguments
@@ -3055,6 +4287,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// * `migrationJob` - Name of the migration job resource to generate the SSH script.
     pub fn locations_migration_jobs_generate_ssh_script(&self, request: GenerateSshScriptRequest, migration_job: &str) -> ProjectLocationMigrationJobGenerateSshScriptCall<'a, S> {
         ProjectLocationMigrationJobGenerateSshScriptCall {
+            hub: self.hub,
+            _request: request,
+            _migration_job: migration_job.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generate a TCP Proxy configuration script to configure a cloud-hosted VM running a TCP Proxy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `migrationJob` - Name of the migration job resource to generate the TCP Proxy script.
+    pub fn locations_migration_jobs_generate_tcp_proxy_script(&self, request: GenerateTcpProxyScriptRequest, migration_job: &str) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S> {
+        ProjectLocationMigrationJobGenerateTcpProxyScriptCall {
             hub: self.hub,
             _request: request,
             _migration_job: migration_job.to_string(),
@@ -3105,7 +4356,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns this collection of migrationJobs.
+    /// * `parent` - Required. The parent which owns this collection of migrationJobs.
     pub fn locations_migration_jobs_list(&self, parent: &str) -> ProjectLocationMigrationJobListCall<'a, S> {
         ProjectLocationMigrationJobListCall {
             hub: self.hub,
@@ -3348,7 +4599,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -3425,6 +4676,24 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_private_connections_get_iam_policy(&self, resource: &str) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S> {
+        ProjectLocationPrivateConnectionGetIamPolicyCall {
+            hub: self.hub,
+            _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves a list of private connections in a given project and location.
     /// 
     /// # Arguments
@@ -3438,6 +4707,63 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_size: Default::default(),
             _order_by: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_private_connections_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S> {
+        ProjectLocationPrivateConnectionSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_private_connections_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S> {
+        ProjectLocationPrivateConnectionTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Fetches a set of static IP addresses that need to be allowlisted by the customer when using the static-IP connectivity method.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The resource name for the location for which static IPs should be returned. Must be in the format `projects/*/locations/*`.
+    pub fn locations_fetch_static_ips(&self, name: &str) -> ProjectLocationFetchStaticIpCall<'a, S> {
+        ProjectLocationFetchStaticIpCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3716,7 +5042,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent, which owns this collection of connection profiles.
+    /// Required. The parent which owns this collection of connection profiles.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3740,7 +5066,7 @@ where
         self._skip_validation = Some(new_value);
         self
     }
-    /// Optional. A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationConnectionProfileCreateCall<'a, S> {
@@ -4026,7 +5352,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationConnectionProfileDeleteCall<'a, S> {
@@ -4848,7 +6174,7 @@ where
     }
 
 
-    /// Required. The parent, which owns this collection of connection profiles.
+    /// Required. The parent which owns this collection of connection profiles.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4865,7 +6191,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of connection profiles to return. The service may return fewer than this value. If unspecified, at most 50 connection profiles will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
+    /// The maximum number of connection profiles to return. The service may return fewer than this value. If unspecified, at most 50 connection profiles will be returned. The maximum value is 1000; values above 1000 are coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationConnectionProfileListCall<'a, S> {
@@ -5205,7 +6531,7 @@ where
         self._validate_only = Some(new_value);
         self
     }
-    /// Required. Field mask is used to specify the fields to be overwritten in the connection profile resource by the update.
+    /// Required. Field mask is used to specify the fields to be overwritten by the update in the conversion workspace resource.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationConnectionProfilePatchCall<'a, S> {
@@ -5219,7 +6545,7 @@ where
         self._skip_validation = Some(new_value);
         self
     }
-    /// Optional. A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationConnectionProfilePatchCall<'a, S> {
@@ -5886,6 +7212,858 @@ where
 }
 
 
+/// Creates a new mapping rule for a given conversion workspace.
+///
+/// A builder for the *locations.conversionWorkspaces.mappingRules.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::MappingRule;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = MappingRule::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_mapping_rules_create(req, "parent")
+///              .request_id("dolore")
+///              .mapping_rule_id("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: MappingRule,
+    _parent: String,
+    _request_id: Option<String>,
+    _mapping_rule_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, MappingRule)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.mappingRules.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "requestId", "mappingRuleId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+        if let Some(value) = self._mapping_rule_id.as_ref() {
+            params.push("mappingRuleId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/mappingRules";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: MappingRule) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent which owns this collection of mapping rules.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// Required. The ID of the rule to create.
+    ///
+    /// Sets the *mapping rule id* query property to the given value.
+    pub fn mapping_rule_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        self._mapping_rule_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceMappingRuleCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes a single mapping rule.
+///
+/// A builder for the *locations.conversionWorkspaces.mappingRules.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_mapping_rules_delete("name")
+///              .request_id("amet.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _name: String,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.mappingRules.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the mapping rule resource to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceMappingRuleDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets the details of a mapping rule.
+///
+/// A builder for the *locations.conversionWorkspaces.mappingRules.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_mapping_rules_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, MappingRule)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.mappingRules.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the mapping rule resource to get. Example: conversionWorkspaces/123/mappingRules/rule123 In order to retrieve a previous revision of the mapping rule, also provide the revision ID. Example: conversionWorkspace/123/mappingRules/rule123@c7cfa2a8c7cfa2a8c7cfa2a8c7cfa2a8
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceMappingRuleGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Imports the mapping rules for a given conversion workspace. Supports various formats of external rules files.
 ///
 /// A builder for the *locations.conversionWorkspaces.mappingRules.import* method supported by a *project* resource.
@@ -6178,7 +8356,293 @@ where
 }
 
 
-/// Apply draft tree onto a specific destination database
+/// Lists the mapping rules for a specific conversion workspace.
+///
+/// A builder for the *locations.conversionWorkspaces.mappingRules.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_mapping_rules_list("parent")
+///              .page_token("et")
+///              .page_size(-22)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListMappingRulesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.mappingRules.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/mappingRules";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the conversion workspace resource whose mapping rules are listed in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The nextPageToken value received in the previous call to mappingRules.list, used in the subsequent request to retrieve the next page of results. On first call this should be left blank. When paginating, all other parameters provided to mappingRules.list must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of rules to return. The service may return fewer than this value.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceMappingRuleListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Applies draft tree onto a specific destination database.
 ///
 /// A builder for the *locations.conversionWorkspaces.apply* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -6384,7 +8848,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the conversion workspace resource to apply draft to destination for. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// Required. The name of the conversion workspace resource for which to apply the draft tree. Must be in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7087,8 +9551,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversion_workspaces_create(req, "parent")
-///              .request_id("consetetur")
-///              .conversion_workspace_id("diam")
+///              .request_id("vero")
+///              .conversion_workspace_id("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7270,7 +9734,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent, which owns this collection of conversion workspaces.
+    /// Required. The parent which owns this collection of conversion workspaces.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7280,7 +9744,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceCreateCall<'a, S> {
@@ -7397,7 +9861,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversion_workspaces_delete("name")
-///              .request_id("et")
+///              .request_id("Stet")
+///              .force(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7407,6 +9872,7 @@ pub struct ProjectLocationConversionWorkspaceDeleteCall<'a, S>
     hub: &'a DatabaseMigrationService<S>,
     _name: String,
     _request_id: Option<String>,
+    _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -7435,17 +9901,20 @@ where
         dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["alt", "name", "requestId"].iter() {
+        for &field in ["alt", "name", "requestId", "force"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
         params.push("name", self._name);
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
+        }
+        if let Some(value) = self._force.as_ref() {
+            params.push("force", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -7561,11 +10030,18 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDeleteCall<'a, S> {
         self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// Force delete the conversion workspace, even if there's a running migration that is using the workspace.
+    ///
+    /// Sets the *force* query property to the given value.
+    pub fn force(mut self, new_value: bool) -> ProjectLocationConversionWorkspaceDeleteCall<'a, S> {
+        self._force = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7671,7 +10147,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversion_workspaces_describe_conversion_workspace_revisions("conversionWorkspace")
-///              .commit_id("sadipscing")
+///              .commit_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7825,7 +10301,7 @@ where
     }
 
 
-    /// Required. Name of the conversion workspace resource whose revisions are listed. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// Required. Name of the conversion workspace resource whose revisions are listed. Must be in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     ///
     /// Sets the *conversion workspace* path property to the given value.
     ///
@@ -7835,7 +10311,7 @@ where
         self._conversion_workspace = new_value.to_string();
         self
     }
-    /// Optional. Optional filter to request a specific commit id
+    /// Optional. Optional filter to request a specific commit ID.
     ///
     /// Sets the *commit id* query property to the given value.
     pub fn commit_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeConversionWorkspaceRevisionCall<'a, S> {
@@ -7918,7 +10394,7 @@ where
 }
 
 
-/// Use this method to describe the database entities tree for a specific conversion workspace and a specific tree type. The DB Entities are not a resource like conversion workspace or mapping rule, and they can not be created, updated or deleted like one. Instead they are simple data objects describing the structure of the client database.
+/// Describes the database entities tree for a specific conversion workspace and a specific tree type. Database entities are not resources like conversion workspaces or mapping rules, and they can't be created, updated or deleted. Instead, they are simple data objects describing the structure of the client database.
 ///
 /// A builder for the *locations.conversionWorkspaces.describeDatabaseEntities* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -7945,12 +10421,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversion_workspaces_describe_database_entities("conversionWorkspace")
+///              .view("no")
 ///              .uncommitted(false)
-///              .tree("duo")
-///              .page_token("vero")
-///              .page_size(-76)
-///              .filter("invidunt")
-///              .commit_id("Stet")
+///              .tree("accusam")
+///              .page_token("takimata")
+///              .page_size(-46)
+///              .filter("voluptua.")
+///              .commit_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7959,6 +10436,7 @@ pub struct ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S>
 
     hub: &'a DatabaseMigrationService<S>,
     _conversion_workspace: String,
+    _view: Option<String>,
     _uncommitted: Option<bool>,
     _tree: Option<String>,
     _page_token: Option<String>,
@@ -7993,15 +10471,18 @@ where
         dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.describeDatabaseEntities",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "conversionWorkspace", "uncommitted", "tree", "pageToken", "pageSize", "filter", "commitId"].iter() {
+        for &field in ["alt", "conversionWorkspace", "view", "uncommitted", "tree", "pageToken", "pageSize", "filter", "commitId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
         params.push("conversionWorkspace", self._conversion_workspace);
+        if let Some(value) = self._view.as_ref() {
+            params.push("view", value);
+        }
         if let Some(value) = self._uncommitted.as_ref() {
             params.push("uncommitted", value.to_string());
         }
@@ -8124,7 +10605,7 @@ where
     }
 
 
-    /// Required. Name of the conversion workspace resource whose DB entities are described in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// Required. Name of the conversion workspace resource whose database entities are described. Must be in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     ///
     /// Sets the *conversion workspace* path property to the given value.
     ///
@@ -8134,42 +10615,49 @@ where
         self._conversion_workspace = new_value.to_string();
         self
     }
-    /// Whether to retrieve the latest committed version of the entities or the latest version. This field is ignored if a specific commit_id is specified.
+    /// Optional. Results view based on AIP-157
+    ///
+    /// Sets the *view* query property to the given value.
+    pub fn view(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
+        self._view = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Whether to retrieve the latest committed version of the entities or the latest version. This field is ignored if a specific commit_id is specified.
     ///
     /// Sets the *uncommitted* query property to the given value.
     pub fn uncommitted(mut self, new_value: bool) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
         self._uncommitted = Some(new_value);
         self
     }
-    /// The tree to fetch
+    /// Required. The tree to fetch.
     ///
     /// Sets the *tree* query property to the given value.
     pub fn tree(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
         self._tree = Some(new_value.to_string());
         self
     }
-    /// The nextPageToken value received in the previous call to conversionWorkspace.describeDatabaseEntities, used in the subsequent request to retrieve the next page of results. On first call this should be left blank. When paginating, all other parameters provided to conversionWorkspace.describeDatabaseEntities must match the call that provided the page token.
+    /// Optional. The nextPageToken value received in the previous call to conversionWorkspace.describeDatabaseEntities, used in the subsequent request to retrieve the next page of results. On first call this should be left blank. When paginating, all other parameters provided to conversionWorkspace.describeDatabaseEntities must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of entities to return. The service may return fewer than this value.
+    /// Optional. The maximum number of entities to return. The service may return fewer entities than the value specifies.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
-    /// Filter the returned entities based on AIP-160 standard
+    /// Optional. Filter the returned entities based on AIP-160 standard.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Request a specific commit id. If not specified, the entities from the latest commit are returned.
+    /// Optional. Request a specific commit ID. If not specified, the entities from the latest commit are returned.
     ///
     /// Sets the *commit id* query property to the given value.
     pub fn commit_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceDescribeDatabaseEntityCall<'a, S> {
@@ -8514,6 +11002,280 @@ where
 }
 
 
+/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+///
+/// A builder for the *locations.conversionWorkspaces.getIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_get_iam_policy("resource")
+///              .options_requested_policy_version(-2)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _resource: String,
+    _options_requested_policy_version: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.getIamPolicy",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+        if let Some(value) = self._options_requested_policy_version.as_ref() {
+            params.push("options.requestedPolicyVersion", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceGetIamPolicyCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Lists conversion workspaces in a given project and location.
 ///
 /// A builder for the *locations.conversionWorkspaces.list* method supported by a *project* resource.
@@ -8541,9 +11303,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversion_workspaces_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-29)
-///              .filter("no")
+///              .page_token("takimata")
+///              .page_size(-19)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8705,7 +11467,7 @@ where
     }
 
 
-    /// Required. The parent, which owns this collection of conversion workspaces.
+    /// Required. The parent which owns this collection of conversion workspaces.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8722,14 +11484,14 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of conversion workspaces to return. The service may return fewer than this value. If unspecified, at most 50 sets will be returned.
+    /// The maximum number of conversion workspaces to return. The service may return fewer than this value. If unspecified, at most 50 sets are returned.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationConversionWorkspaceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
-    /// A filter expression that filters conversion workspaces listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <. For example, list conversion workspaces created this year by specifying **createTime %gt; 2020-01-01T00:00:00.000000000Z.** You can also filter nested fields. For example, you could specify **source.version = "12.c.1"** to select all conversion workspaces with source database version equal to 12.c.1
+    /// A filter expression that filters conversion workspaces listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <. For example, list conversion workspaces created this year by specifying **createTime %gt; 2020-01-01T00:00:00.000000000Z.** You can also filter nested fields. For example, you could specify **source.version = "12.c.1"** to select all conversion workspaces with source database version equal to 12.c.1.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceListCall<'a, S> {
@@ -9038,14 +11800,14 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. Field mask is used to specify the fields to be overwritten in the conversion workspace resource by the update.
+    /// Required. Field mask is used to specify the fields to be overwritten by the update in the conversion workspace resource.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationConversionWorkspacePatchCall<'a, S> {
         self._update_mask = Some(new_value);
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationConversionWorkspacePatchCall<'a, S> {
@@ -9128,7 +11890,7 @@ where
 }
 
 
-/// Rollbacks a conversion workspace to the last committed spanshot.
+/// Rolls back a conversion workspace to the last committed snapshot.
 ///
 /// A builder for the *locations.conversionWorkspaces.rollback* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -9334,7 +12096,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the conversion workspace resource to rollback to.
+    /// Required. Name of the conversion workspace resource to roll back to.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9420,7 +12182,7 @@ where
 }
 
 
-/// Use this method to search/list the background jobs for a specific conversion workspace. The background jobs are not a resource like conversion workspace or mapping rule, and they can not be created, updated or deleted like one. Instead they are a way to expose the data plane jobs log.
+/// Searches/lists the background jobs for a specific conversion workspace. The background jobs are not resources like conversion workspaces or mapping rules, and they can't be created, updated or deleted. Instead, they are a way to expose the data plane jobs log.
 ///
 /// A builder for the *locations.conversionWorkspaces.searchBackgroundJobs* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -9448,7 +12210,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversion_workspaces_search_background_jobs("conversionWorkspace")
 ///              .return_most_recent_per_job_type(false)
-///              .max_size(-31)
+///              .max_size(-2)
 ///              .completed_until_time(chrono::Utc::now())
 ///              .doit().await;
 /// # }
@@ -9611,7 +12373,7 @@ where
     }
 
 
-    /// Required. Name of the conversion workspace resource whos jobs are listed. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// Required. Name of the conversion workspace resource whose jobs are listed, in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     ///
     /// Sets the *conversion workspace* path property to the given value.
     ///
@@ -9621,21 +12383,21 @@ where
         self._conversion_workspace = new_value.to_string();
         self
     }
-    /// Optional. Whether or not to return just the most recent job per job type
+    /// Optional. Whether or not to return just the most recent job per job type,
     ///
     /// Sets the *return most recent per job type* query property to the given value.
     pub fn return_most_recent_per_job_type(mut self, new_value: bool) -> ProjectLocationConversionWorkspaceSearchBackgroundJobCall<'a, S> {
         self._return_most_recent_per_job_type = Some(new_value);
         self
     }
-    /// Optional. The maximum number of jobs to return. The service may return fewer than this value. If unspecified, at most 100 jobs will be returned. The maximum value is 100; values above 100 will be coerced to 100.
+    /// Optional. The maximum number of jobs to return. The service may return fewer than this value. If unspecified, at most 100 jobs are returned. The maximum value is 100; values above 100 are coerced to 100.
     ///
     /// Sets the *max size* query property to the given value.
     pub fn max_size(mut self, new_value: i32) -> ProjectLocationConversionWorkspaceSearchBackgroundJobCall<'a, S> {
         self._max_size = Some(new_value);
         self
     }
-    /// Optional. If supplied, will only return jobs that completed until (not including) the given timestamp.
+    /// Optional. If provided, only returns jobs that completed until (not including) the given timestamp.
     ///
     /// Sets the *completed until time* query property to the given value.
     pub fn completed_until_time(mut self, new_value: client::chrono::DateTime<client::chrono::offset::Utc>) -> ProjectLocationConversionWorkspaceSearchBackgroundJobCall<'a, S> {
@@ -9924,7 +12686,7 @@ where
         self._request = new_value;
         self
     }
-    /// Name of the conversion workspace resource to seed with new database structure. in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    /// Name of the conversion workspace resource to seed with new database structure, in the form of: projects/{project}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10010,6 +12772,590 @@ where
 }
 
 
+/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+///
+/// A builder for the *locations.conversionWorkspaces.setIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::SetIamPolicyRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_set_iam_policy(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.setIamPolicy",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceSetIamPolicyCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+///
+/// A builder for the *locations.conversionWorkspaces.testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::TestIamPermissionsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversion_workspaces_test_iam_permissions(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TestIamPermissionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.conversionWorkspaces.testIamPermissions",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversionWorkspaceTestIamPermissionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a new migration job in a given project and location.
 ///
 /// A builder for the *locations.migrationJobs.create* method supported by a *project* resource.
@@ -10043,8 +13389,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_migration_jobs_create(req, "parent")
-///              .request_id("sed")
-///              .migration_job_id("takimata")
+///              .request_id("no")
+///              .migration_job_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10226,7 +13572,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent, which owns this collection of migration jobs.
+    /// Required. The parent which owns this collection of migration jobs.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10236,7 +13582,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationMigrationJobCreateCall<'a, S> {
@@ -10353,7 +13699,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_migration_jobs_delete("name")
-///              .request_id("gubergren")
+///              .request_id("sed")
 ///              .force(false)
 ///              .doit().await;
 /// # }
@@ -10522,7 +13868,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationMigrationJobDeleteCall<'a, S> {
@@ -10606,6 +13952,298 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectLocationMigrationJobDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Demotes the destination database to become a read replica of the source. This is applicable for the following migrations: 1. MySQL to Cloud SQL for MySQL 2. PostgreSQL to Cloud SQL for PostgreSQL 3. PostgreSQL to AlloyDB for PostgreSQL.
+///
+/// A builder for the *locations.migrationJobs.demoteDestination* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::DemoteDestinationRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = DemoteDestinationRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_migration_jobs_demote_destination(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationMigrationJobDemoteDestinationCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: DemoteDestinationRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationMigrationJobDemoteDestinationCall<'a, S> {}
+
+impl<'a, S> ProjectLocationMigrationJobDemoteDestinationCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.migrationJobs.demoteDestination",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:demoteDestination";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: DemoteDestinationRequest) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the migration job resource to demote its destination.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationMigrationJobDemoteDestinationCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -10904,6 +14542,298 @@ where
 }
 
 
+/// Generate a TCP Proxy configuration script to configure a cloud-hosted VM running a TCP Proxy.
+///
+/// A builder for the *locations.migrationJobs.generateTcpProxyScript* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::GenerateTcpProxyScriptRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GenerateTcpProxyScriptRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_migration_jobs_generate_tcp_proxy_script(req, "migrationJob")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: GenerateTcpProxyScriptRequest,
+    _migration_job: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S> {}
+
+impl<'a, S> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TcpProxyScript)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.migrationJobs.generateTcpProxyScript",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "migrationJob"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("migrationJob", self._migration_job);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+migrationJob}:generateTcpProxyScript";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+migrationJob}", "migrationJob")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["migrationJob"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GenerateTcpProxyScriptRequest) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the migration job resource to generate the TCP Proxy script.
+    ///
+    /// Sets the *migration job* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn migration_job(mut self, new_value: &str) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S> {
+        self._migration_job = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationMigrationJobGenerateTcpProxyScriptCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets details of a single migration job.
 ///
 /// A builder for the *locations.migrationJobs.get* method supported by a *project* resource.
@@ -11193,7 +15123,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_migration_jobs_get_iam_policy("resource")
-///              .options_requested_policy_version(-34)
+///              .options_requested_policy_version(-8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11467,10 +15397,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_migration_jobs_list("parent")
-///              .page_token("voluptua.")
-///              .page_size(-2)
-///              .order_by("ea")
-///              .filter("sadipscing")
+///              .page_token("est")
+///              .page_size(-30)
+///              .order_by("diam")
+///              .filter("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11636,7 +15566,7 @@ where
     }
 
 
-    /// Required. The parent, which owns this collection of migrationJobs.
+    /// Required. The parent which owns this collection of migrationJobs.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11653,7 +15583,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of migration jobs to return. The service may return fewer than this value. If unspecified, at most 50 migration jobs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
+    /// The maximum number of migration jobs to return. The service may return fewer than this value. If unspecified, at most 50 migration jobs will be returned. The maximum value is 1000; values above 1000 are coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationMigrationJobListCall<'a, S> {
@@ -11784,7 +15714,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_migration_jobs_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .request_id("invidunt")
+///              .request_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11976,14 +15906,14 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. Field mask is used to specify the fields to be overwritten in the migration job resource by the update.
+    /// Required. Field mask is used to specify the fields to be overwritten by the update in the conversion workspace resource.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationMigrationJobPatchCall<'a, S> {
         self._update_mask = Some(new_value);
         self
     }
-    /// A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationMigrationJobPatchCall<'a, S> {
@@ -15218,7 +19148,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -15245,9 +19175,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("est")
-///              .page_size(-30)
-///              .filter("diam")
+///              .page_token("erat")
+///              .page_size(-82)
+///              .filter("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15549,9 +19479,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_create(req, "parent")
-///              .skip_validation(true)
-///              .request_id("et")
-///              .private_connection_id("sed")
+///              .skip_validation(false)
+///              .request_id("consetetur")
+///              .private_connection_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15754,7 +19684,7 @@ where
         self._skip_validation = Some(new_value);
         self
     }
-    /// Optional. A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationPrivateConnectionCreateCall<'a, S> {
@@ -15871,7 +19801,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_delete("name")
-///              .request_id("et")
+///              .request_id("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16035,7 +19965,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    /// Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationPrivateConnectionDeleteCall<'a, S> {
@@ -16380,6 +20310,280 @@ where
 }
 
 
+/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+///
+/// A builder for the *locations.privateConnections.getIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_private_connections_get_iam_policy("resource")
+///              .options_requested_policy_version(-42)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _resource: String,
+    _options_requested_policy_version: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S> {}
+
+impl<'a, S> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.privateConnections.getIamPolicy",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+        if let Some(value) = self._options_requested_policy_version.as_ref() {
+            params.push("options.requestedPolicyVersion", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationPrivateConnectionGetIamPolicyCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Retrieves a list of private connections in a given project and location.
 ///
 /// A builder for the *locations.privateConnections.list* method supported by a *project* resource.
@@ -16407,10 +20611,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_list("parent")
-///              .page_token("no")
-///              .page_size(-91)
-///              .order_by("At")
-///              .filter("sadipscing")
+///              .page_token("sit")
+///              .page_size(-93)
+///              .order_by("eos")
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16593,7 +20797,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of private connections to return. If unspecified, at most 50 private connections that will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
+    /// Maximum number of private connections to return. If unspecified, at most 50 private connections that are returned. The maximum value is 1000; values above 1000 are coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationPrivateConnectionListCall<'a, S> {
@@ -16684,6 +20888,876 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectLocationPrivateConnectionListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+///
+/// A builder for the *locations.privateConnections.setIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::SetIamPolicyRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_private_connections_set_iam_policy(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S> {}
+
+impl<'a, S> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.privateConnections.setIamPolicy",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationPrivateConnectionSetIamPolicyCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+///
+/// A builder for the *locations.privateConnections.testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// use datamigration1::api::TestIamPermissionsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_private_connections_test_iam_permissions(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S> {}
+
+impl<'a, S> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TestIamPermissionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.privateConnections.testIamPermissions",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationPrivateConnectionTestIamPermissionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Fetches a set of static IP addresses that need to be allowlisted by the customer when using the static-IP connectivity method.
+///
+/// A builder for the *locations.fetchStaticIps* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datamigration1 as datamigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datamigration1::{DatabaseMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = DatabaseMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_fetch_static_ips("name")
+///              .page_token("eos")
+///              .page_size(-68)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationFetchStaticIpCall<'a, S>
+    where S: 'a {
+
+    hub: &'a DatabaseMigrationService<S>,
+    _name: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationFetchStaticIpCall<'a, S> {}
+
+impl<'a, S> ProjectLocationFetchStaticIpCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, FetchStaticIpsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datamigration.projects.locations.fetchStaticIps",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:fetchStaticIps";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The resource name for the location for which static IPs should be returned. Must be in the format `projects/*/locations/*`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationFetchStaticIpCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// A page token, received from a previous `FetchStaticIps` call.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationFetchStaticIpCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of IPs to return.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationFetchStaticIpCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationFetchStaticIpCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationFetchStaticIpCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationFetchStaticIpCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationFetchStaticIpCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationFetchStaticIpCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -16979,9 +22053,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("sadipscing")
-///              .page_size(-31)
-///              .filter("aliquyam")
+///              .page_token("At")
+///              .page_size(-84)
+///              .filter("eirmod")
 ///              .doit().await;
 /// # }
 /// ```

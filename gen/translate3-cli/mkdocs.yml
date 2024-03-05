@@ -1,4 +1,4 @@
-site_name: Translate v5.0.3+20230106
+site_name: Translate v5.0.3+20240131
 site_url: http://byron.github.io/google-apis-rs/google-translate3-cli
 site_description: A complete library to interact with Translate (protocol v3)
 
@@ -12,6 +12,17 @@ nav:
 - 'Projects':
     - 'Detect Language': 'projects_detect-language.md'
     - 'Get Supported Languages': 'projects_get-supported-languages.md'
+    - 'Locations Adaptive Mt Datasets Adaptive Mt Files Adaptive Mt Sentences List': 'projects_locations-adaptive-mt-datasets-adaptive-mt-files-adaptive-mt-sentences-list.md'
+    - 'Locations Adaptive Mt Datasets Adaptive Mt Files Delete': 'projects_locations-adaptive-mt-datasets-adaptive-mt-files-delete.md'
+    - 'Locations Adaptive Mt Datasets Adaptive Mt Files Get': 'projects_locations-adaptive-mt-datasets-adaptive-mt-files-get.md'
+    - 'Locations Adaptive Mt Datasets Adaptive Mt Files List': 'projects_locations-adaptive-mt-datasets-adaptive-mt-files-list.md'
+    - 'Locations Adaptive Mt Datasets Adaptive Mt Sentences List': 'projects_locations-adaptive-mt-datasets-adaptive-mt-sentences-list.md'
+    - 'Locations Adaptive Mt Datasets Create': 'projects_locations-adaptive-mt-datasets-create.md'
+    - 'Locations Adaptive Mt Datasets Delete': 'projects_locations-adaptive-mt-datasets-delete.md'
+    - 'Locations Adaptive Mt Datasets Get': 'projects_locations-adaptive-mt-datasets-get.md'
+    - 'Locations Adaptive Mt Datasets Import Adaptive Mt File': 'projects_locations-adaptive-mt-datasets-import-adaptive-mt-file.md'
+    - 'Locations Adaptive Mt Datasets List': 'projects_locations-adaptive-mt-datasets-list.md'
+    - 'Locations Adaptive Mt Translate': 'projects_locations-adaptive-mt-translate.md'
     - 'Locations Batch Translate Document': 'projects_locations-batch-translate-document.md'
     - 'Locations Batch Translate Text': 'projects_locations-batch-translate-text.md'
     - 'Locations Datasets Create': 'projects_locations-datasets-create.md'
@@ -44,8 +55,10 @@ nav:
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
     - 'Locations Operations Wait': 'projects_locations-operations-wait.md'
+    - 'Locations Romanize Text': 'projects_locations-romanize-text.md'
     - 'Locations Translate Document': 'projects_locations-translate-document.md'
     - 'Locations Translate Text': 'projects_locations-translate-text.md'
+    - 'Romanize Text': 'projects_romanize-text.md'
     - 'Translate Text': 'projects_translate-text.md'
 
 theme: readthedocs

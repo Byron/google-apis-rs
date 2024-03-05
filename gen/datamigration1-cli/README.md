@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Database Migration Service* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Database Migration Service* API at revision *20240221*. The CLI is at version *5.0.3*.
 
 ```bash
 datamigration1 [options]
@@ -46,17 +46,27 @@ datamigration1 [options]
                 locations-conversion-workspaces-describe-conversion-workspace-revisions <conversion-workspace> [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-describe-database-entities <conversion-workspace> [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-get <name> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-list <parent> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-mapping-rules-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-mapping-rules-delete <name> [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-mapping-rules-get <name> [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-mapping-rules-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-mapping-rules-list <parent> [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-search-background-jobs <conversion-workspace> [-p <v>]... [-o <out>]
                 locations-conversion-workspaces-seed <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversion-workspaces-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-fetch-static-ips <name> [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-migration-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-delete <name> [-p <v>]... [-o <out>]
+                locations-migration-jobs-demote-destination <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-generate-ssh-script <migration-job> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-migration-jobs-generate-tcp-proxy-script <migration-job> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-get <name> [-p <v>]... [-o <out>]
                 locations-migration-jobs-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-migration-jobs-list <parent> [-p <v>]... [-o <out>]
@@ -76,7 +86,10 @@ datamigration1 [options]
                 locations-private-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-private-connections-delete <name> [-p <v>]... [-o <out>]
                 locations-private-connections-get <name> [-p <v>]... [-o <out>]
+                locations-private-connections-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-private-connections-list <parent> [-p <v>]... [-o <out>]
+                locations-private-connections-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-private-connections-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   datamigration1 --help
 
 Configuration:

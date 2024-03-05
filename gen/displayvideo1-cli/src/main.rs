@@ -1638,6 +1638,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "ad-server-config.cm-hybrid-config.cm-account-id" => Some(("adServerConfig.cmHybridConfig.cmAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ad-server-config.cm-hybrid-config.cm-advertiser-ids" => Some(("adServerConfig.cmHybridConfig.cmAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ad-server-config.cm-hybrid-config.cm-floodlight-config-id" => Some(("adServerConfig.cmHybridConfig.cmFloodlightConfigId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ad-server-config.cm-hybrid-config.cm-floodlight-linking-authorized" => Some(("adServerConfig.cmHybridConfig.cmFloodlightLinkingAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "ad-server-config.cm-hybrid-config.cm-syncable-site-ids" => Some(("adServerConfig.cmHybridConfig.cmSyncableSiteIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1665,7 +1666,7 @@ where
                     "serving-config.exempt-tv-from-viewability-targeting" => Some(("servingConfig.exemptTvFromViewabilityTargeting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-server-config", "admin-email", "advertiser-id", "cm-account-id", "cm-floodlight-config-id", "cm-floodlight-linking-authorized", "cm-hybrid-config", "cm-syncable-site-ids", "creative-config", "currency-code", "data-access-config", "details", "display-name", "domain-url", "dv360-to-cm-cost-reporting-enabled", "dv360-to-cm-data-sharing-enabled", "dynamic-creative-enabled", "entity-status", "exempt-tv-from-viewability-targeting", "general-config", "ias-client-id", "integration-code", "integration-details", "name", "oba-compliance-disabled", "override-partner-sdf-config", "partner-id", "pixel-order-id-reporting-enabled", "prisma-enabled", "sdf-config", "serving-config", "third-party-only-config", "time-zone", "update-time", "version", "video-creative-data-sharing-authorized"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-server-config", "admin-email", "advertiser-id", "cm-account-id", "cm-advertiser-ids", "cm-floodlight-config-id", "cm-floodlight-linking-authorized", "cm-hybrid-config", "cm-syncable-site-ids", "creative-config", "currency-code", "data-access-config", "details", "display-name", "domain-url", "dv360-to-cm-cost-reporting-enabled", "dv360-to-cm-data-sharing-enabled", "dynamic-creative-enabled", "entity-status", "exempt-tv-from-viewability-targeting", "general-config", "ias-client-id", "integration-code", "integration-details", "name", "oba-compliance-disabled", "override-partner-sdf-config", "partner-id", "pixel-order-id-reporting-enabled", "prisma-enabled", "sdf-config", "serving-config", "third-party-only-config", "time-zone", "update-time", "version", "video-creative-data-sharing-authorized"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5941,6 +5942,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "ad-server-config.cm-hybrid-config.cm-account-id" => Some(("adServerConfig.cmHybridConfig.cmAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ad-server-config.cm-hybrid-config.cm-advertiser-ids" => Some(("adServerConfig.cmHybridConfig.cmAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ad-server-config.cm-hybrid-config.cm-floodlight-config-id" => Some(("adServerConfig.cmHybridConfig.cmFloodlightConfigId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ad-server-config.cm-hybrid-config.cm-floodlight-linking-authorized" => Some(("adServerConfig.cmHybridConfig.cmFloodlightLinkingAuthorized", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "ad-server-config.cm-hybrid-config.cm-syncable-site-ids" => Some(("adServerConfig.cmHybridConfig.cmSyncableSiteIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5968,7 +5970,7 @@ where
                     "serving-config.exempt-tv-from-viewability-targeting" => Some(("servingConfig.exemptTvFromViewabilityTargeting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-server-config", "admin-email", "advertiser-id", "cm-account-id", "cm-floodlight-config-id", "cm-floodlight-linking-authorized", "cm-hybrid-config", "cm-syncable-site-ids", "creative-config", "currency-code", "data-access-config", "details", "display-name", "domain-url", "dv360-to-cm-cost-reporting-enabled", "dv360-to-cm-data-sharing-enabled", "dynamic-creative-enabled", "entity-status", "exempt-tv-from-viewability-targeting", "general-config", "ias-client-id", "integration-code", "integration-details", "name", "oba-compliance-disabled", "override-partner-sdf-config", "partner-id", "pixel-order-id-reporting-enabled", "prisma-enabled", "sdf-config", "serving-config", "third-party-only-config", "time-zone", "update-time", "version", "video-creative-data-sharing-authorized"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-server-config", "admin-email", "advertiser-id", "cm-account-id", "cm-advertiser-ids", "cm-floodlight-config-id", "cm-floodlight-linking-authorized", "cm-hybrid-config", "cm-syncable-site-ids", "creative-config", "currency-code", "data-access-config", "details", "display-name", "domain-url", "dv360-to-cm-cost-reporting-enabled", "dv360-to-cm-data-sharing-enabled", "dynamic-creative-enabled", "entity-status", "exempt-tv-from-viewability-targeting", "general-config", "ias-client-id", "integration-code", "integration-details", "name", "oba-compliance-disabled", "override-partner-sdf-config", "partner-id", "pixel-order-id-reporting-enabled", "prisma-enabled", "sdf-config", "serving-config", "third-party-only-config", "time-zone", "update-time", "version", "video-creative-data-sharing-authorized"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7307,6 +7309,8 @@ where
                     "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-source" => Some(("audienceSource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-info-list.consent.ad-personalization" => Some(("contactInfoList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-info-list.consent.ad-user-data" => Some(("contactInfoList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-audience-size" => Some(("displayAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-desktop-audience-size" => Some(("displayDesktopAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7317,11 +7321,13 @@ where
                     "first-and-third-party-audience-type" => Some(("firstAndThirdPartyAudienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gmail-audience-size" => Some(("gmailAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "membership-duration-days" => Some(("membershipDurationDays", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-device-id-list.consent.ad-personalization" => Some(("mobileDeviceIdList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-device-id-list.consent.ad-user-data" => Some(("mobileDeviceIdList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mobile-device-id-list.mobile-device-ids" => Some(("mobileDeviceIdList.mobileDeviceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "youtube-audience-size" => Some(("youtubeAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-display-audience-size", "app-id", "audience-source", "audience-type", "description", "display-audience-size", "display-desktop-audience-size", "display-mobile-app-audience-size", "display-mobile-web-audience-size", "display-name", "first-and-third-party-audience-id", "first-and-third-party-audience-type", "gmail-audience-size", "membership-duration-days", "mobile-device-id-list", "mobile-device-ids", "name", "youtube-audience-size"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-display-audience-size", "ad-personalization", "ad-user-data", "app-id", "audience-source", "audience-type", "consent", "contact-info-list", "description", "display-audience-size", "display-desktop-audience-size", "display-mobile-app-audience-size", "display-mobile-web-audience-size", "display-name", "first-and-third-party-audience-id", "first-and-third-party-audience-type", "gmail-audience-size", "membership-duration-days", "mobile-device-id-list", "mobile-device-ids", "name", "youtube-audience-size"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7408,10 +7414,19 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "added-contact-info-list.consent.ad-personalization" => Some(("addedContactInfoList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "added-contact-info-list.consent.ad-user-data" => Some(("addedContactInfoList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "added-mobile-device-id-list.consent.ad-personalization" => Some(("addedMobileDeviceIdList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "added-mobile-device-id-list.consent.ad-user-data" => Some(("addedMobileDeviceIdList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "added-mobile-device-id-list.mobile-device-ids" => Some(("addedMobileDeviceIdList.mobileDeviceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "advertiser-id" => Some(("advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "removed-contact-info-list.consent.ad-personalization" => Some(("removedContactInfoList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "removed-contact-info-list.consent.ad-user-data" => Some(("removedContactInfoList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "removed-mobile-device-id-list.consent.ad-personalization" => Some(("removedMobileDeviceIdList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "removed-mobile-device-id-list.consent.ad-user-data" => Some(("removedMobileDeviceIdList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "removed-mobile-device-id-list.mobile-device-ids" => Some(("removedMobileDeviceIdList.mobileDeviceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["added-mobile-device-id-list", "advertiser-id", "mobile-device-ids"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-personalization", "ad-user-data", "added-contact-info-list", "added-mobile-device-id-list", "advertiser-id", "consent", "mobile-device-ids", "removed-contact-info-list", "removed-mobile-device-id-list"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7628,6 +7643,8 @@ where
                     "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-source" => Some(("audienceSource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-info-list.consent.ad-personalization" => Some(("contactInfoList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-info-list.consent.ad-user-data" => Some(("contactInfoList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-audience-size" => Some(("displayAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-desktop-audience-size" => Some(("displayDesktopAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7638,11 +7655,13 @@ where
                     "first-and-third-party-audience-type" => Some(("firstAndThirdPartyAudienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gmail-audience-size" => Some(("gmailAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "membership-duration-days" => Some(("membershipDurationDays", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-device-id-list.consent.ad-personalization" => Some(("mobileDeviceIdList.consent.adPersonalization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-device-id-list.consent.ad-user-data" => Some(("mobileDeviceIdList.consent.adUserData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mobile-device-id-list.mobile-device-ids" => Some(("mobileDeviceIdList.mobileDeviceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "youtube-audience-size" => Some(("youtubeAudienceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-display-audience-size", "app-id", "audience-source", "audience-type", "description", "display-audience-size", "display-desktop-audience-size", "display-mobile-app-audience-size", "display-mobile-web-audience-size", "display-name", "first-and-third-party-audience-id", "first-and-third-party-audience-type", "gmail-audience-size", "membership-duration-days", "mobile-device-id-list", "mobile-device-ids", "name", "youtube-audience-size"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-display-audience-size", "ad-personalization", "ad-user-data", "app-id", "audience-source", "audience-type", "consent", "contact-info-list", "description", "display-audience-size", "display-desktop-audience-size", "display-mobile-app-audience-size", "display-mobile-web-audience-size", "display-name", "first-and-third-party-audience-id", "first-and-third-party-audience-type", "gmail-audience-size", "membership-duration-days", "mobile-device-id-list", "mobile-device-ids", "name", "youtube-audience-size"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9174,12 +9193,11 @@ where
                     "status.entity-status" => Some(("status.entityStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.seller-pause-reason" => Some(("status.sellerPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.seller-status" => Some(("status.sellerStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sub-site-property-id" => Some(("subSitePropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-range.end-time" => Some(("timeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-range.start-time" => Some(("timeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-ids", "advertisers", "commitment", "config-status", "currency-code", "deal-id", "delivery-method", "display-name", "end-time", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "inventory-source-id", "inventory-source-product-type", "inventory-source-rate-type", "inventory-source-type", "minimum-spend", "name", "nanos", "partner", "partner-id", "publisher-name", "rate", "rate-details", "read-advertiser-ids", "read-partner-ids", "read-write-accessors", "seller-pause-reason", "seller-status", "start-time", "status", "sub-site-property-id", "time-range", "units", "units-purchased", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-ids", "advertisers", "commitment", "config-status", "currency-code", "deal-id", "delivery-method", "display-name", "end-time", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "inventory-source-id", "inventory-source-product-type", "inventory-source-rate-type", "inventory-source-type", "minimum-spend", "name", "nanos", "partner", "partner-id", "publisher-name", "rate", "rate-details", "read-advertiser-ids", "read-partner-ids", "read-write-accessors", "seller-pause-reason", "seller-status", "start-time", "status", "time-range", "units", "units-purchased", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9512,12 +9530,11 @@ where
                     "status.entity-status" => Some(("status.entityStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.seller-pause-reason" => Some(("status.sellerPauseReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.seller-status" => Some(("status.sellerStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sub-site-property-id" => Some(("subSitePropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-range.end-time" => Some(("timeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-range.start-time" => Some(("timeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-ids", "advertisers", "commitment", "config-status", "currency-code", "deal-id", "delivery-method", "display-name", "end-time", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "inventory-source-id", "inventory-source-product-type", "inventory-source-rate-type", "inventory-source-type", "minimum-spend", "name", "nanos", "partner", "partner-id", "publisher-name", "rate", "rate-details", "read-advertiser-ids", "read-partner-ids", "read-write-accessors", "seller-pause-reason", "seller-status", "start-time", "status", "sub-site-property-id", "time-range", "units", "units-purchased", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-ids", "advertisers", "commitment", "config-status", "currency-code", "deal-id", "delivery-method", "display-name", "end-time", "entity-pause-reason", "entity-status", "exchange", "guaranteed-order-id", "inventory-source-id", "inventory-source-product-type", "inventory-source-rate-type", "inventory-source-type", "minimum-spend", "name", "nanos", "partner", "partner-id", "publisher-name", "rate", "rate-details", "read-advertiser-ids", "read-partner-ids", "read-write-accessors", "seller-pause-reason", "seller-status", "start-time", "status", "time-range", "units", "units-purchased", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11506,10 +11523,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-login-time" => Some(("lastLoginTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "email", "name", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "email", "last-login-time", "name", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11763,10 +11781,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-login-time" => Some(("lastLoginTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "email", "name", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "email", "last-login-time", "name", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12643,7 +12662,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("campaigns-delete",
-                    Some(r##"Permanently deletes a campaign. A deleted campaign cannot be recovered. The campaign should be archived first, i.e. set entity_status to `ENTITY_STATUS_ARCHIVED`, to be able to delete it."##),
+                    Some(r##"Permanently deletes a campaign. A deleted campaign cannot be recovered. The campaign should be archived first, i.e. set entity_status to `ENTITY_STATUS_ARCHIVED`, to be able to delete it. **This method regularly experiences high latency.** We recommend [increasing your default timeout](/display-video/api/guides/best-practices/timeouts#client_library_timeout) to avoid errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_campaigns-delete",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13071,7 +13090,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("channels-sites-replace",
-                    Some(r##"Replaces all of the sites under a single channel. The operation will replace the sites under a channel with the sites provided in ReplaceSitesRequest.new_sites."##),
+                    Some(r##"Replaces all of the sites under a single channel. The operation will replace the sites under a channel with the sites provided in ReplaceSitesRequest.new_sites. **This method regularly experiences high latency.** We recommend [increasing your default timeout](/display-video/api/guides/best-practices/timeouts#client_library_timeout) to avoid errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_channels-sites-replace",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13105,7 +13124,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates a new advertiser. Returns the newly created advertiser if successful. This method can take up to 180 seconds to complete."##),
+                    Some(r##"Creates a new advertiser. Returns the newly created advertiser if successful. **This method regularly experiences high latency.** We recommend [increasing your default timeout](/display-video/api/guides/best-practices/timeouts#client_library_timeout) to avoid errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_create",
                   vec![
                     (Some(r##"kv"##),
@@ -13127,7 +13146,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("creatives-create",
-                    Some(r##"Creates a new creative. Returns the newly created creative if successful."##),
+                    Some(r##"Creates a new creative. Returns the newly created creative if successful. A ["Standard" user role](//support.google.com/displayvideo/answer/2723011) or greater for the parent advertiser or partner is required to make this request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_creatives-create",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13155,7 +13174,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("creatives-delete",
-                    Some(r##"Deletes a creative. Returns error code `NOT_FOUND` if the creative does not exist. The creative should be archived first, i.e. set entity_status to `ENTITY_STATUS_ARCHIVED`, before it can be deleted."##),
+                    Some(r##"Deletes a creative. Returns error code `NOT_FOUND` if the creative does not exist. The creative should be archived first, i.e. set entity_status to `ENTITY_STATUS_ARCHIVED`, before it can be deleted. A ["Standard" user role](//support.google.com/displayvideo/answer/2723011) or greater for the parent advertiser or partner is required to make this request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_creatives-delete",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13233,7 +13252,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("creatives-patch",
-                    Some(r##"Updates an existing creative. Returns the updated creative if successful."##),
+                    Some(r##"Updates an existing creative. Returns the updated creative if successful. A ["Standard" user role](//support.google.com/displayvideo/answer/2723011) or greater for the parent advertiser or partner is required to make this request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_creatives-patch",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13496,7 +13515,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option."##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY`"##),
                      Some(true),
                      Some(false)),
         
@@ -13536,7 +13555,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list."##),
+                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY`"##),
                      Some(true),
                      Some(false)),
         
@@ -13597,7 +13616,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-bulk-edit-line-item-assigned-targeting-options",
-                    Some(r##"Bulk edits targeting options under a single line item. The operation will delete the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.delete_requests and then create the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.create_requests. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * UpdateLineItem * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Bulk edits targeting options under a single line item. The operation will delete the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.delete_requests and then create the assigned targeting options provided in BulkEditLineItemAssignedTargetingOptionsRequest.create_requests. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * lineItems.patch * assignedTargetingOptions.create * assignedTargetingOptions.delete YouTube & Partners line items cannot be created or updated using the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-bulk-edit-line-item-assigned-targeting-options",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13659,7 +13678,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-create",
-                    Some(r##"Creates a new line item. Returns the newly created line item if successful."##),
+                    Some(r##"Creates a new line item. Returns the newly created line item if successful. YouTube & Partners line items cannot be created or updated using the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-create",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13687,7 +13706,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-delete",
-                    Some(r##"Deletes a line item. Returns error code `NOT_FOUND` if the line item does not exist. The line item should be archived first, i.e. set entity_status to `ENTITY_STATUS_ARCHIVED`, to be able to delete it."##),
+                    Some(r##"Deletes a line item. Returns error code `NOT_FOUND` if the line item does not exist. The line item should be archived first, i.e. set entity_status to `ENTITY_STATUS_ARCHIVED`, to be able to delete it. YouTube & Partners line items cannot be created or updated using the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-delete",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13715,7 +13734,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-generate-default",
-                    Some(r##"Creates a new line item with settings (including targeting) inherited from the insertion order and an `ENTITY_STATUS_DRAFT` entity_status. Returns the newly created line item if successful. There are default values based on the three fields: * The insertion order's insertion_order_type * The insertion order's automation_type * The given line_item_type"##),
+                    Some(r##"Creates a new line item with settings (including targeting) inherited from the insertion order and an `ENTITY_STATUS_DRAFT` entity_status. Returns the newly created line item if successful. There are default values based on the three fields: * The insertion order's insertion_order_type * The insertion order's automation_type * The given line_item_type YouTube & Partners line items cannot be created or updated using the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-generate-default",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13793,7 +13812,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-patch",
-                    Some(r##"Updates an existing line item. Returns the updated line item if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdateLineItems * CreateLineItemAssignedTargetingOption * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Updates an existing line item. Returns the updated line item if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdateLineItems * assignedTargetingOptions.create * assignedTargetingOptions.delete YouTube & Partners line items cannot be created or updated using the API. **This method regularly experiences high latency.** We recommend [increasing your default timeout](/display-video/api/guides/best-practices/timeouts#client_library_timeout) to avoid errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-patch",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13827,7 +13846,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-targeting-types-assigned-targeting-options-create",
-                    Some(r##"Assigns a targeting option to a line item. Returns the assigned targeting option if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdate * UpdateLineItem * DeleteLineItemAssignedTargetingOption"##),
+                    Some(r##"Assigns a targeting option to a line item. Returns the assigned targeting option if successful. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * lineItems.bulkEditAssignedTargetingOptions * lineItems.bulkUpdate * lineItems.patch * DeleteLineItemAssignedTargetingOption YouTube & Partners line items cannot be created or updated using the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-targeting-types-assigned-targeting-options-create",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13844,7 +13863,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option."##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY`"##),
                      Some(true),
                      Some(false)),
         
@@ -13867,7 +13886,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("line-items-targeting-types-assigned-targeting-options-delete",
-                    Some(r##"Deletes an assigned targeting option from a line item. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * BulkEditAssignedTargetingOptions * BulkUpdate * UpdateLineItem * CreateLineItemAssignedTargetingOption"##),
+                    Some(r##"Deletes an assigned targeting option from a line item. Requests to this endpoint cannot be made concurrently with the following requests updating the same line item: * lineItems.bulkEditAssignedTargetingOptions * lineItems.bulkUpdate * lineItems.patch * CreateLineItemAssignedTargetingOption YouTube & Partners line items cannot be created or updated using the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-targeting-types-assigned-targeting-options-delete",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -13884,7 +13903,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option."##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY`"##),
                      Some(true),
                      Some(false)),
         
@@ -13924,7 +13943,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option."##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)"##),
                      Some(true),
                      Some(false)),
         
@@ -13964,7 +13983,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list."##),
+                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)"##),
                      Some(true),
                      Some(false)),
         
@@ -13997,7 +14016,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("location-lists-assigned-locations-bulk-edit",
-                    Some(r##"Bulk edits multiple assignments between locations and a single location list. The operation will delete the assigned locations provided in BulkEditAssignedLocationsRequest.deleted_assigned_locations and then create the assigned locations provided in BulkEditAssignedLocationsRequest.created_assigned_locations."##),
+                    Some(r##"Bulk edits multiple assignments between locations and a single location list. The operation will delete the assigned locations provided in deletedAssignedLocations and then create the assigned locations provided in createdAssignedLocations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_location-lists-assigned-locations-bulk-edit",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14239,7 +14258,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("manual-triggers-activate",
-                    Some(r##"Activates a manual trigger. Each activation of the manual trigger must be at least 5 minutes apart, otherwise an error will be returned."##),
+                    Some(r##"Activates a manual trigger. Each activation of the manual trigger must be at least 5 minutes apart, otherwise an error will be returned. **Warning:** Line Items using manual triggers no longer serve in Display & Video 360. This method will sunset on August 1, 2023. Read our [feature deprecation announcement](/display-video/api/deprecations#features.manual_triggers) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_manual-triggers-activate",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14273,7 +14292,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("manual-triggers-create",
-                    Some(r##"Creates a new manual trigger. Returns the newly created manual trigger if successful."##),
+                    Some(r##"Creates a new manual trigger. Returns the newly created manual trigger if successful. **Warning:** Line Items using manual triggers no longer serve in Display & Video 360. This method will sunset on August 1, 2023. Read our [feature deprecation announcement](/display-video/api/deprecations#features.manual_triggers) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_manual-triggers-create",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14301,7 +14320,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("manual-triggers-deactivate",
-                    Some(r##"Deactivates a manual trigger."##),
+                    Some(r##"Deactivates a manual trigger. **Warning:** Line Items using manual triggers no longer serve in Display & Video 360. This method will sunset on August 1, 2023. Read our [feature deprecation announcement](/display-video/api/deprecations#features.manual_triggers) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_manual-triggers-deactivate",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14335,7 +14354,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("manual-triggers-get",
-                    Some(r##"Gets a manual trigger."##),
+                    Some(r##"Gets a manual trigger. **Warning:** Line Items using manual triggers no longer serve in Display & Video 360. This method will sunset on August 1, 2023. Read our [feature deprecation announcement](/display-video/api/deprecations#features.manual_triggers) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_manual-triggers-get",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14363,7 +14382,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("manual-triggers-list",
-                    Some(r##"Lists manual triggers that are accessible to the current user for a given advertiser ID. The order is defined by the order_by parameter. A single advertiser_id is required."##),
+                    Some(r##"Lists manual triggers that are accessible to the current user for a given advertiser ID. The order is defined by the order_by parameter. A single advertiser_id is required. **Warning:** Line Items using manual triggers no longer serve in Display & Video 360. This method will sunset on August 1, 2023. Read our [feature deprecation announcement](/display-video/api/deprecations#features.manual_triggers) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_manual-triggers-list",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14385,7 +14404,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("manual-triggers-patch",
-                    Some(r##"Updates a manual trigger. Returns the updated manual trigger if successful."##),
+                    Some(r##"Updates a manual trigger. Returns the updated manual trigger if successful. **Warning:** Line Items using manual triggers no longer serve in Display & Video 360. This method will sunset on August 1, 2023. Read our [feature deprecation announcement](/display-video/api/deprecations#features.manual_triggers) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_manual-triggers-patch",
                   vec![
                     (Some(r##"advertiser-id"##),
@@ -14830,7 +14849,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`"##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL`"##),
                      Some(true),
                      Some(false)),
         
@@ -14864,7 +14883,7 @@ async fn main() {
         
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`"##),
+                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL`"##),
                      Some(true),
                      Some(false)),
         
@@ -16156,7 +16175,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("channels-sites-replace",
-                    Some(r##"Replaces all of the sites under a single channel. The operation will replace the sites under a channel with the sites provided in ReplaceSitesRequest.new_sites."##),
+                    Some(r##"Replaces all of the sites under a single channel. The operation will replace the sites under a channel with the sites provided in ReplaceSitesRequest.new_sites. **This method regularly experiences high latency.** We recommend [increasing your default timeout](/display-video/api/guides/best-practices/timeouts#client_library_timeout) to avoid errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/partners_channels-sites-replace",
                   vec![
                     (Some(r##"partner-id"##),
@@ -16489,7 +16508,7 @@ async fn main() {
         
         ("users", "methods: 'bulk-edit-assigned-user-roles', 'create', 'delete', 'get', 'list' and 'patch'", vec![
             ("bulk-edit-assigned-user-roles",
-                    Some(r##"Bulk edits user roles for a user. The operation will delete the assigned user roles provided in BulkEditAssignedUserRolesRequest.deletedAssignedUserRoles and then assign the user roles provided in BulkEditAssignedUserRolesRequest.createdAssignedUserRoles."##),
+                    Some(r##"Bulk edits user roles for a user. The operation will delete the assigned user roles provided in BulkEditAssignedUserRolesRequest.deletedAssignedUserRoles and then assign the user roles provided in BulkEditAssignedUserRolesRequest.createdAssignedUserRoles. This method has unique authentication requirements. Read the prerequisites in our [Managing Users guide](/display-video/api/guides/users/overview#prerequisites) before using this method. The "Try this method" feature does not work for this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/users_bulk-edit-assigned-user-roles",
                   vec![
                     (Some(r##"user-id"##),
@@ -16517,7 +16536,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates a new user. Returns the newly created user if successful."##),
+                    Some(r##"Creates a new user. Returns the newly created user if successful. This method has unique authentication requirements. Read the prerequisites in our [Managing Users guide](/display-video/api/guides/users/overview#prerequisites) before using this method. The "Try this method" feature does not work for this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/users_create",
                   vec![
                     (Some(r##"kv"##),
@@ -16539,7 +16558,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a user."##),
+                    Some(r##"Deletes a user. This method has unique authentication requirements. Read the prerequisites in our [Managing Users guide](/display-video/api/guides/users/overview#prerequisites) before using this method. The "Try this method" feature does not work for this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/users_delete",
                   vec![
                     (Some(r##"user-id"##),
@@ -16561,7 +16580,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets a user."##),
+                    Some(r##"Gets a user. This method has unique authentication requirements. Read the prerequisites in our [Managing Users guide](/display-video/api/guides/users/overview#prerequisites) before using this method. The "Try this method" feature does not work for this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/users_get",
                   vec![
                     (Some(r##"user-id"##),
@@ -16583,7 +16602,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists users that are accessible to the current user. If two users have user roles on the same partner or advertiser, they can access each other."##),
+                    Some(r##"Lists users that are accessible to the current user. If two users have user roles on the same partner or advertiser, they can access each other. This method has unique authentication requirements. Read the prerequisites in our [Managing Users guide](/display-video/api/guides/users/overview#prerequisites) before using this method. The "Try this method" feature does not work for this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/users_list",
                   vec![
                     (Some(r##"v"##),
@@ -16599,7 +16618,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an existing user. Returns the updated user if successful."##),
+                    Some(r##"Updates an existing user. Returns the updated user if successful. This method has unique authentication requirements. Read the prerequisites in our [Managing Users guide](/display-video/api/guides/users/overview#prerequisites) before using this method. The "Try this method" feature does not work for this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/users_patch",
                   vec![
                     (Some(r##"user-id"##),
@@ -16632,7 +16651,7 @@ async fn main() {
     
     let mut app = App::new("displayvideo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.3+20240229")
            .about("Display & Video 360 API allows users to automate complex Display & Video 360 workflows, such as creating insertion orders and setting targeting options for individual line items.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_displayvideo1_cli")
            .arg(Arg::with_name("url")

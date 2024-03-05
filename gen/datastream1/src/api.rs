@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -198,6 +198,10 @@ pub struct BackfillAllStrategy {
     #[serde(rename="postgresqlExcludedObjects")]
     
     pub postgresql_excluded_objects: Option<PostgresqlRdbms>,
+    /// SQLServer data source objects to avoid backfilling
+    #[serde(rename="sqlServerExcludedObjects")]
+    
+    pub sql_server_excluded_objects: Option<SqlServerRdbms>,
 }
 
 impl client::Part for BackfillAllStrategy {}
@@ -221,7 +225,7 @@ pub struct BackfillJob {
     #[serde(rename="lastStartTime")]
     
     pub last_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Backfill job state.
+    /// Output only. Backfill job state.
     
     pub state: Option<String>,
     /// Backfill job's triggering reason.
@@ -243,7 +247,7 @@ pub struct BackfillNoneStrategy { _never_set: Option<bool> }
 impl client::Part for BackfillNoneStrategy {}
 
 
-/// There is no detailed description.
+/// BigQuery destination configuration
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -292,6 +296,30 @@ impl client::Part for BigQueryProfile {}
 pub struct CancelOperationRequest { _never_set: Option<bool> }
 
 impl client::RequestValue for CancelOperationRequest {}
+
+
+/// The strategy that the stream uses for CDC replication.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CdcStrategy {
+    /// Optional. Start replicating from the most recent position in the source.
+    #[serde(rename="mostRecentStartPosition")]
+    
+    pub most_recent_start_position: Option<MostRecentStartPosition>,
+    /// Optional. Resume replication from the next available position in the source.
+    #[serde(rename="nextAvailableStartPosition")]
+    
+    pub next_available_start_position: Option<NextAvailableStartPosition>,
+    /// Optional. Start replicating from a specific position in the source.
+    #[serde(rename="specificStartPosition")]
+    
+    pub specific_start_position: Option<SpecificStartPosition>,
+}
+
+impl client::Part for CdcStrategy {}
 
 
 /// A set of reusable connection configurations to be used as a source or destination for a stream.
@@ -349,6 +377,10 @@ pub struct ConnectionProfile {
     #[serde(rename="privateConnectivity")]
     
     pub private_connectivity: Option<PrivateConnectivity>,
+    /// SQLServer Connection Profile configuration.
+    #[serde(rename="sqlServerProfile")]
+    
+    pub sql_server_profile: Option<SqlServerProfile>,
     /// Static Service IP connectivity.
     #[serde(rename="staticServiceIpConnectivity")]
     
@@ -601,7 +633,7 @@ pub struct GcsDestinationConfig {
     #[serde(rename="avroFileFormat")]
     
     pub avro_file_format: Option<AvroFileFormat>,
-    /// The maximum duration for which new events are added before a file is closed and a new file is created.
+    /// The maximum duration for which new events are added before a file is closed and a new file is created. Values within the range of 15-60 seconds are allowed.
     #[serde(rename="fileRotationInterval")]
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -836,7 +868,7 @@ pub struct ListStreamsResponse {
 impl client::ResponseResult for ListStreamsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -889,6 +921,17 @@ pub struct LookupStreamObjectRequest {
 impl client::RequestValue for LookupStreamObjectRequest {}
 
 
+/// CDC strategy to start replicating from the most recent position in the source.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MostRecentStartPosition { _never_set: Option<bool> }
+
+impl client::Part for MostRecentStartPosition {}
+
+
 /// MySQL Column.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -916,10 +959,16 @@ pub struct MysqlColumn {
     #[serde(rename="ordinalPosition")]
     
     pub ordinal_position: Option<i32>,
+    /// Column precision.
+    
+    pub precision: Option<i32>,
     /// Whether or not the column represents a primary key.
     #[serde(rename="primaryKey")]
     
     pub primary_key: Option<bool>,
+    /// Column scale.
+    
+    pub scale: Option<i32>,
 }
 
 impl client::Part for MysqlColumn {}
@@ -942,6 +991,26 @@ pub struct MysqlDatabase {
 }
 
 impl client::Part for MysqlDatabase {}
+
+
+/// MySQL log position
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MysqlLogPosition {
+    /// Required. The binary log file name.
+    #[serde(rename="logFile")]
+    
+    pub log_file: Option<String>,
+    /// Optional. The position within the binary log file. Default is head of file.
+    #[serde(rename="logPosition")]
+    
+    pub log_position: Option<i32>,
+}
+
+impl client::Part for MysqlLogPosition {}
 
 
 /// Mysql data source object identifier.
@@ -1021,6 +1090,10 @@ pub struct MysqlSourceConfig {
     #[serde(rename="includeObjects")]
     
     pub include_objects: Option<MysqlRdbms>,
+    /// Maximum number of concurrent backfill tasks. The number should be non negative. If not set (or set to 0), the system's default value will be used.
+    #[serde(rename="maxConcurrentBackfillTasks")]
+    
+    pub max_concurrent_backfill_tasks: Option<i32>,
     /// Maximum number of concurrent CDC tasks. The number should be non negative. If not set (or set to 0), the system's default value will be used.
     #[serde(rename="maxConcurrentCdcTasks")]
     
@@ -1085,6 +1158,17 @@ pub struct MysqlTable {
 impl client::Part for MysqlTable {}
 
 
+/// CDC strategy to resume replication from the next available position in the source.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NextAvailableStartPosition { _never_set: Option<bool> }
+
+impl client::Part for NextAvailableStartPosition {}
+
+
 /// This resource represents a long-running operation that is the result of a network API call.
 /// 
 /// # Activities
@@ -1103,6 +1187,7 @@ impl client::Part for MysqlTable {}
 /// * [locations streams create projects](ProjectLocationStreamCreateCall) (response)
 /// * [locations streams delete projects](ProjectLocationStreamDeleteCall) (response)
 /// * [locations streams patch projects](ProjectLocationStreamPatchCall) (response)
+/// * [locations streams run projects](ProjectLocationStreamRunCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
@@ -1118,7 +1203,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1204,6 +1289,10 @@ pub struct OracleProfile {
     /// Required. Hostname for the Oracle connection.
     
     pub hostname: Option<String>,
+    /// Optional. SSL configuration for the Oracle connection.
+    #[serde(rename="oracleSslConfig")]
+    
+    pub oracle_ssl_config: Option<OracleSslConfig>,
     /// Required. Password for the Oracle connection.
     
     pub password: Option<String>,
@@ -1253,6 +1342,22 @@ pub struct OracleSchema {
 impl client::Part for OracleSchema {}
 
 
+/// Oracle SCN position
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OracleScnPosition {
+    /// Required. SCN number from where Logs will be read
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub scn: Option<i64>,
+}
+
+impl client::Part for OracleScnPosition {}
+
+
 /// Oracle data source configuration
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1272,17 +1377,41 @@ pub struct OracleSourceConfig {
     #[serde(rename="includeObjects")]
     
     pub include_objects: Option<OracleRdbms>,
-    /// Maximum number of concurrent CDC tasks. The number should be non negative. If not set (or set to 0), the system's default value will be used.
+    /// Maximum number of concurrent backfill tasks. The number should be non-negative. If not set (or set to 0), the system's default value is used.
+    #[serde(rename="maxConcurrentBackfillTasks")]
+    
+    pub max_concurrent_backfill_tasks: Option<i32>,
+    /// Maximum number of concurrent CDC tasks. The number should be non-negative. If not set (or set to 0), the system's default value is used.
     #[serde(rename="maxConcurrentCdcTasks")]
     
     pub max_concurrent_cdc_tasks: Option<i32>,
-    /// Stream large object values. NOTE: This feature is currently experimental.
+    /// Stream large object values.
     #[serde(rename="streamLargeObjects")]
     
     pub stream_large_objects: Option<StreamLargeObjects>,
 }
 
 impl client::Part for OracleSourceConfig {}
+
+
+/// Oracle SSL configuration information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OracleSslConfig {
+    /// Input only. PEM-encoded certificate of the CA that signed the source database server's certificate.
+    #[serde(rename="caCertificate")]
+    
+    pub ca_certificate: Option<String>,
+    /// Output only. Indicates whether the ca_certificate field has been set for this Connection-Profile.
+    #[serde(rename="caCertificateSet")]
+    
+    pub ca_certificate_set: Option<bool>,
+}
+
+impl client::Part for OracleSslConfig {}
 
 
 /// Oracle table.
@@ -1438,6 +1567,10 @@ pub struct PostgresqlSourceConfig {
     #[serde(rename="includeObjects")]
     
     pub include_objects: Option<PostgresqlRdbms>,
+    /// Maximum number of concurrent backfill tasks. The number should be non negative. If not set (or set to 0), the system's default value will be used.
+    #[serde(rename="maxConcurrentBackfillTasks")]
+    
+    pub max_concurrent_backfill_tasks: Option<i32>,
     /// Required. The name of the publication that includes the set of all tables that are defined in the stream's include_objects.
     
     pub publication: Option<String>,
@@ -1575,6 +1708,26 @@ impl client::RequestValue for Route {}
 impl client::ResponseResult for Route {}
 
 
+/// Request message for running a stream.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations streams run projects](ProjectLocationStreamRunCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RunStreamRequest {
+    /// Optional. The CDC strategy of the stream. If not set, the system's default value will be used.
+    #[serde(rename="cdcStrategy")]
+    
+    pub cdc_strategy: Option<CdcStrategy>,
+}
+
+impl client::RequestValue for RunStreamRequest {}
+
+
 /// A single target dataset to which all data will be streamed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1582,7 +1735,7 @@ impl client::ResponseResult for Route {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SingleTargetDataset {
-    /// The dataset ID of the target dataset.
+    /// The dataset ID of the target dataset. DatasetIds allowed characters: https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#datasetreference.
     #[serde(rename="datasetId")]
     
     pub dataset_id: Option<String>,
@@ -1614,6 +1767,10 @@ pub struct SourceConfig {
     #[serde(rename="sourceConnectionProfile")]
     
     pub source_connection_profile: Option<String>,
+    /// SQLServer data source configuration.
+    #[serde(rename="sqlServerSourceConfig")]
+    
+    pub sql_server_source_config: Option<SqlServerSourceConfig>,
 }
 
 impl client::Part for SourceConfig {}
@@ -1626,7 +1783,7 @@ impl client::Part for SourceConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SourceHierarchyDatasets {
-    /// no description provided
+    /// The dataset template to use for dynamic dataset creation.
     #[serde(rename="datasetTemplate")]
     
     pub dataset_template: Option<DatasetTemplate>,
@@ -1654,9 +1811,196 @@ pub struct SourceObjectIdentifier {
     #[serde(rename="postgresqlIdentifier")]
     
     pub postgresql_identifier: Option<PostgresqlObjectIdentifier>,
+    /// SQLServer data source object identifier.
+    #[serde(rename="sqlServerIdentifier")]
+    
+    pub sql_server_identifier: Option<SqlServerObjectIdentifier>,
 }
 
 impl client::Part for SourceObjectIdentifier {}
+
+
+/// CDC strategy to start replicating from a specific position in the source.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SpecificStartPosition {
+    /// MySQL specific log position to start replicating from.
+    #[serde(rename="mysqlLogPosition")]
+    
+    pub mysql_log_position: Option<MysqlLogPosition>,
+    /// Oracle SCN to start replicating from.
+    #[serde(rename="oracleScnPosition")]
+    
+    pub oracle_scn_position: Option<OracleScnPosition>,
+}
+
+impl client::Part for SpecificStartPosition {}
+
+
+/// SQLServer Column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerColumn {
+    /// Column name.
+    
+    pub column: Option<String>,
+    /// The SQLServer data type.
+    #[serde(rename="dataType")]
+    
+    pub data_type: Option<String>,
+    /// Column length.
+    
+    pub length: Option<i32>,
+    /// Whether or not the column can accept a null value.
+    
+    pub nullable: Option<bool>,
+    /// The ordinal position of the column in the table.
+    #[serde(rename="ordinalPosition")]
+    
+    pub ordinal_position: Option<i32>,
+    /// Column precision.
+    
+    pub precision: Option<i32>,
+    /// Whether or not the column represents a primary key.
+    #[serde(rename="primaryKey")]
+    
+    pub primary_key: Option<bool>,
+    /// Column scale.
+    
+    pub scale: Option<i32>,
+}
+
+impl client::Part for SqlServerColumn {}
+
+
+/// SQLServer data source object identifier.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerObjectIdentifier {
+    /// Required. The schema name.
+    
+    pub schema: Option<String>,
+    /// Required. The table name.
+    
+    pub table: Option<String>,
+}
+
+impl client::Part for SqlServerObjectIdentifier {}
+
+
+/// SQLServer database profile
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerProfile {
+    /// Required. Database for the SQLServer connection.
+    
+    pub database: Option<String>,
+    /// Required. Hostname for the SQLServer connection.
+    
+    pub hostname: Option<String>,
+    /// Required. Password for the SQLServer connection.
+    
+    pub password: Option<String>,
+    /// Port for the SQLServer connection, default value is 1433.
+    
+    pub port: Option<i32>,
+    /// Required. Username for the SQLServer connection.
+    
+    pub username: Option<String>,
+}
+
+impl client::Part for SqlServerProfile {}
+
+
+/// SQLServer database structure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerRdbms {
+    /// SQLServer schemas in the database server.
+    
+    pub schemas: Option<Vec<SqlServerSchema>>,
+}
+
+impl client::Part for SqlServerRdbms {}
+
+
+/// SQLServer schema.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerSchema {
+    /// Schema name.
+    
+    pub schema: Option<String>,
+    /// Tables in the schema.
+    
+    pub tables: Option<Vec<SqlServerTable>>,
+}
+
+impl client::Part for SqlServerSchema {}
+
+
+/// SQLServer data source configuration
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerSourceConfig {
+    /// SQLServer objects to exclude from the stream.
+    #[serde(rename="excludeObjects")]
+    
+    pub exclude_objects: Option<SqlServerRdbms>,
+    /// SQLServer objects to include in the stream.
+    #[serde(rename="includeObjects")]
+    
+    pub include_objects: Option<SqlServerRdbms>,
+    /// Max concurrent backfill tasks.
+    #[serde(rename="maxConcurrentBackfillTasks")]
+    
+    pub max_concurrent_backfill_tasks: Option<i32>,
+    /// Max concurrent CDC tasks.
+    #[serde(rename="maxConcurrentCdcTasks")]
+    
+    pub max_concurrent_cdc_tasks: Option<i32>,
+}
+
+impl client::Part for SqlServerSourceConfig {}
+
+
+/// SQLServer table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlServerTable {
+    /// SQLServer columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.
+    
+    pub columns: Option<Vec<SqlServerColumn>>,
+    /// Table name.
+    
+    pub table: Option<String>,
+}
+
+impl client::Part for SqlServerTable {}
 
 
 /// Request for manually initiating a backfill job for a specific stream object.
@@ -1693,7 +2037,7 @@ pub struct StartBackfillJobResponse {
 impl client::ResponseResult for StartBackfillJobResponse {}
 
 
-/// Static IP address connectivity.
+/// Static IP address connectivity. Used when the source database is configured to allow incoming connections from the Datastream public IP addresses for the region specified in the connection profile.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1802,6 +2146,10 @@ pub struct Stream {
     /// Labels.
     
     pub labels: Option<HashMap<String, String>>,
+    /// Output only. If the stream was recovered, the time of the last recovery. Note: This field is currently experimental.
+    #[serde(rename="lastRecoveryTime")]
+    
+    pub last_recovery_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The stream's name.
     
     pub name: Option<String>,
@@ -1922,7 +2270,7 @@ impl client::Part for VpcPeeringConfig {}
 ///     ).build().await.unwrap();
 /// let mut hub = Datastream::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_connection_profiles_create(...)`, `locations_connection_profiles_delete(...)`, `locations_connection_profiles_discover(...)`, `locations_connection_profiles_get(...)`, `locations_connection_profiles_list(...)`, `locations_connection_profiles_patch(...)`, `locations_fetch_static_ips(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_private_connections_create(...)`, `locations_private_connections_delete(...)`, `locations_private_connections_get(...)`, `locations_private_connections_list(...)`, `locations_private_connections_routes_create(...)`, `locations_private_connections_routes_delete(...)`, `locations_private_connections_routes_get(...)`, `locations_private_connections_routes_list(...)`, `locations_streams_create(...)`, `locations_streams_delete(...)`, `locations_streams_get(...)`, `locations_streams_list(...)`, `locations_streams_objects_get(...)`, `locations_streams_objects_list(...)`, `locations_streams_objects_lookup(...)`, `locations_streams_objects_start_backfill_job(...)`, `locations_streams_objects_stop_backfill_job(...)` and `locations_streams_patch(...)`
+/// // like `locations_connection_profiles_create(...)`, `locations_connection_profiles_delete(...)`, `locations_connection_profiles_discover(...)`, `locations_connection_profiles_get(...)`, `locations_connection_profiles_list(...)`, `locations_connection_profiles_patch(...)`, `locations_fetch_static_ips(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_private_connections_create(...)`, `locations_private_connections_delete(...)`, `locations_private_connections_get(...)`, `locations_private_connections_list(...)`, `locations_private_connections_routes_create(...)`, `locations_private_connections_routes_delete(...)`, `locations_private_connections_routes_get(...)`, `locations_private_connections_routes_list(...)`, `locations_streams_create(...)`, `locations_streams_delete(...)`, `locations_streams_get(...)`, `locations_streams_list(...)`, `locations_streams_objects_get(...)`, `locations_streams_objects_list(...)`, `locations_streams_objects_lookup(...)`, `locations_streams_objects_start_backfill_job(...)`, `locations_streams_objects_stop_backfill_job(...)`, `locations_streams_patch(...)` and `locations_streams_run(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2113,7 +2461,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -2476,6 +2824,25 @@ impl<'a, S> ProjectMethods<'a, S> {
             _update_mask: Default::default(),
             _request_id: Default::default(),
             _force: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Use this method to start, resume or recover a stream with a non default CDC strategy. NOTE: This feature is currently experimental.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. Name of the stream resource to start, in the format: projects/{project_id}/locations/{location}/streams/{stream_name}
+    pub fn locations_streams_run(&self, request: RunStreamRequest, name: &str) -> ProjectLocationStreamRunCall<'a, S> {
+        ProjectLocationStreamRunCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5181,7 +5548,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -10777,6 +11144,298 @@ where
 }
 
 
+/// Use this method to start, resume or recover a stream with a non default CDC strategy. NOTE: This feature is currently experimental.
+///
+/// A builder for the *locations.streams.run* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_datastream1 as datastream1;
+/// use datastream1::api::RunStreamRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use datastream1::{Datastream, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Datastream::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RunStreamRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_streams_run(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationStreamRunCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Datastream<S>,
+    _request: RunStreamRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationStreamRunCall<'a, S> {}
+
+impl<'a, S> ProjectLocationStreamRunCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "datastream.projects.locations.streams.run",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:run";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RunStreamRequest) -> ProjectLocationStreamRunCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Name of the stream resource to start, in the format: projects/{project_id}/locations/{location}/streams/{stream_name}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStreamRunCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationStreamRunCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStreamRunCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationStreamRunCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationStreamRunCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationStreamRunCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// The FetchStaticIps API call exposes the static IP addresses used by Datastream.
 ///
 /// A builder for the *locations.fetchStaticIps* method supported by a *project* resource.
@@ -10804,8 +11463,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_fetch_static_ips("name")
-///              .page_token("ipsum")
-///              .page_size(-18)
+///              .page_token("et")
+///              .page_size(-8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11352,9 +12011,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("est")
-///              .page_size(-30)
-///              .filter("diam")
+///              .page_token("sed")
+///              .page_size(-29)
+///              .filter("dolores")
 ///              .doit().await;
 /// # }
 /// ```

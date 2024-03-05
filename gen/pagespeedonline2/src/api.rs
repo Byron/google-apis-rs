@@ -168,7 +168,7 @@ impl client::Part for PagespeedApiFormatStringV2 {}
 pub struct PagespeedApiImageV2 {
     /// Image data base64 encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Height of screenshot in pixels.
     

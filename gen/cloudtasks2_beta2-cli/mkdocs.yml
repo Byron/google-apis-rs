@@ -1,4 +1,4 @@
-site_name: Cloud Tasks v5.0.3+20230105
+site_name: Cloud Tasks v5.0.3+20240223
 site_url: http://byron.github.io/google-apis-rs/google-cloudtasks2_beta2-cli
 site_description: A complete library to interact with Cloud Tasks (protocol v2beta2)
 
@@ -13,6 +13,7 @@ nav:
     - 'Queue Update': 'api_queue-update.md'
 - 'Projects':
     - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Cmek Config': 'projects_locations-get-cmek-config.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Queues Create': 'projects_locations-queues-create.md'
     - 'Locations Queues Delete': 'projects_locations-queues-delete.md'
@@ -35,6 +36,7 @@ nav:
     - 'Locations Queues Tasks Renew Lease': 'projects_locations-queues-tasks-renew-lease.md'
     - 'Locations Queues Tasks Run': 'projects_locations-queues-tasks-run.md'
     - 'Locations Queues Test Iam Permissions': 'projects_locations-queues-test-iam-permissions.md'
+    - 'Locations Update Cmek Config': 'projects_locations-update-cmek-config.md'
 
 theme: readthedocs
 

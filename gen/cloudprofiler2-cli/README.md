@@ -25,13 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Profiler* API at revision *20230123*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Profiler* API at revision *20240219*. The CLI is at version *5.0.3*.
 
 ```bash
 cloudprofiler2 [options]
         projects
                 profiles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 profiles-create-offline <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                profiles-list <parent> [-p <v>]... [-o <out>]
                 profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudprofiler2 --help
 

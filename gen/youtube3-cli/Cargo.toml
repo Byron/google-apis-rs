@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtube3-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-youtube3]
 path = "../youtube3"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 

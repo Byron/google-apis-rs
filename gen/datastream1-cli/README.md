@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Datastream* API at revision *20230111*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Datastream* API at revision *20240221*. The CLI is at version *5.0.3*.
 
 ```bash
 datastream1 [options]
@@ -61,6 +61,7 @@ datastream1 [options]
                 locations-streams-objects-start-backfill-job <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-streams-objects-stop-backfill-job <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-streams-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-streams-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
   datastream1 --help
 
 Configuration:

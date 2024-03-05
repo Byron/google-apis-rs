@@ -1,4 +1,4 @@
-site_name: Secret Manager v5.0.3+20230114
+site_name: Secret Manager v5.0.3+20240223
 site_url: http://byron.github.io/google-apis-rs/google-secretmanager1-cli
 site_description: A complete library to interact with Secret Manager (protocol v1)
 
@@ -12,6 +12,21 @@ nav:
 - 'Projects':
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Secrets Add Version': 'projects_locations-secrets-add-version.md'
+    - 'Locations Secrets Create': 'projects_locations-secrets-create.md'
+    - 'Locations Secrets Delete': 'projects_locations-secrets-delete.md'
+    - 'Locations Secrets Get': 'projects_locations-secrets-get.md'
+    - 'Locations Secrets Get Iam Policy': 'projects_locations-secrets-get-iam-policy.md'
+    - 'Locations Secrets List': 'projects_locations-secrets-list.md'
+    - 'Locations Secrets Patch': 'projects_locations-secrets-patch.md'
+    - 'Locations Secrets Set Iam Policy': 'projects_locations-secrets-set-iam-policy.md'
+    - 'Locations Secrets Test Iam Permissions': 'projects_locations-secrets-test-iam-permissions.md'
+    - 'Locations Secrets Versions Access': 'projects_locations-secrets-versions-access.md'
+    - 'Locations Secrets Versions Destroy': 'projects_locations-secrets-versions-destroy.md'
+    - 'Locations Secrets Versions Disable': 'projects_locations-secrets-versions-disable.md'
+    - 'Locations Secrets Versions Enable': 'projects_locations-secrets-versions-enable.md'
+    - 'Locations Secrets Versions Get': 'projects_locations-secrets-versions-get.md'
+    - 'Locations Secrets Versions List': 'projects_locations-secrets-versions-list.md'
     - 'Secrets Add Version': 'projects_secrets-add-version.md'
     - 'Secrets Create': 'projects_secrets-create.md'
     - 'Secrets Delete': 'projects_secrets-delete.md'

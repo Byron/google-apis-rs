@@ -1355,7 +1355,7 @@ async fn main() {
     
     let mut app = App::new("doubleclicksearch2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230118")
+           .version("5.0.3+20240227")
            .about("The Search Ads 360 API allows developers to automate uploading conversions and downloading reports from Search Ads 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli")
            .arg(Arg::with_name("url")

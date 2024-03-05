@@ -4,7 +4,7 @@
 [package]
 
 name = "google-policyanalyzer1-cli"
-version = "5.0.3+20230122"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Policy Analyzer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/policyanalyzer1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-policyanalyzer1]
 path = "../policyanalyzer1"
-version = "5.0.3+20230122"
+version = "5.0.3+20240303"
 

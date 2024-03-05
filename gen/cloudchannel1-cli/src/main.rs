@@ -537,6 +537,7 @@ where
                     "cloud-identity-info.language-code" => Some(("cloudIdentityInfo.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.phone-number" => Some(("cloudIdentityInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.primary-domain" => Some(("cloudIdentityInfo.primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "correlation-id" => Some(("correlationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -561,7 +562,7 @@ where
                     "primary-contact-info.title" => Some(("primaryContactInfo.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "correlation-id", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -913,6 +914,7 @@ where
                     "cloud-identity-info.language-code" => Some(("cloudIdentityInfo.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.phone-number" => Some(("cloudIdentityInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.primary-domain" => Some(("cloudIdentityInfo.primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "correlation-id" => Some(("correlationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -937,7 +939,7 @@ where
                     "primary-contact-info.title" => Some(("primaryContactInfo.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "correlation-id", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1342,6 +1344,7 @@ where
                     "cloud-identity-info.language-code" => Some(("cloudIdentityInfo.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.phone-number" => Some(("cloudIdentityInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.primary-domain" => Some(("cloudIdentityInfo.primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "correlation-id" => Some(("correlationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1366,7 +1369,7 @@ where
                     "primary-contact-info.title" => Some(("primaryContactInfo.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "correlation-id", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2021,11 +2024,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "billing-account" => Some(("billingAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer" => Some(("offer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-order-id" => Some(("purchaseOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["offer", "purchase-order-id", "request-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-account", "offer", "purchase-order-id", "request-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2285,6 +2289,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "entitlement.association-info.base-entitlement" => Some(("entitlement.associationInfo.baseEntitlement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entitlement.billing-account" => Some(("entitlement.billingAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entitlement.commitment-settings.end-time" => Some(("entitlement.commitmentSettings.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entitlement.commitment-settings.renewal-settings.enable-renewal" => Some(("entitlement.commitmentSettings.renewalSettings.enableRenewal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entitlement.commitment-settings.renewal-settings.payment-cycle.duration" => Some(("entitlement.commitmentSettings.renewalSettings.paymentCycle.duration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2306,7 +2311,7 @@ where
                     "entitlement.update-time" => Some(("entitlement.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["association-info", "base-entitlement", "commitment-settings", "create-time", "duration", "enable-renewal", "end-time", "entitlement", "name", "offer", "payment-cycle", "payment-plan", "period-type", "product-id", "provisioned-service", "provisioning-id", "provisioning-state", "purchase-order-id", "renewal-settings", "request-id", "resize-unit-count", "sku-id", "start-time", "suspension-reasons", "trial", "trial-settings", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["association-info", "base-entitlement", "billing-account", "commitment-settings", "create-time", "duration", "enable-renewal", "end-time", "entitlement", "name", "offer", "payment-cycle", "payment-plan", "period-type", "product-id", "provisioned-service", "provisioning-id", "provisioning-state", "purchase-order-id", "renewal-settings", "request-id", "resize-unit-count", "sku-id", "start-time", "suspension-reasons", "trial", "trial-settings", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2444,6 +2449,68 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_customers_entitlements_list_entitlement_changes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().customers_entitlements_list_entitlement_changes(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2921,11 +2988,17 @@ where
                 "create-entitlement-purchase-sku" => {
                     call = call.create_entitlement_purchase_sku(value.unwrap_or(""));
                 },
+                "create-entitlement-purchase-billing-account" => {
+                    call = call.create_entitlement_purchase_billing_account(value.unwrap_or(""));
+                },
                 "change-offer-purchase-new-sku" => {
                     call = call.change_offer_purchase_new_sku(value.unwrap_or(""));
                 },
                 "change-offer-purchase-entitlement" => {
                     call = call.change_offer_purchase_entitlement(value.unwrap_or(""));
+                },
+                "change-offer-purchase-billing-account" => {
+                    call = call.change_offer_purchase_billing_account(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -2940,7 +3013,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["change-offer-purchase-entitlement", "change-offer-purchase-new-sku", "create-entitlement-purchase-sku", "language-code", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["change-offer-purchase-billing-account", "change-offer-purchase-entitlement", "change-offer-purchase-new-sku", "create-entitlement-purchase-billing-account", "create-entitlement-purchase-sku", "language-code", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3081,6 +3154,7 @@ where
                     "cloud-identity-info.language-code" => Some(("cloudIdentityInfo.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.phone-number" => Some(("cloudIdentityInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-info.primary-domain" => Some(("cloudIdentityInfo.primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "correlation-id" => Some(("correlationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "domain" => Some(("domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3105,7 +3179,7 @@ where
                     "primary-contact-info.title" => Some(("primaryContactInfo.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-console-uri", "administrative-area", "alternate-email", "channel-partner-id", "cloud-identity-id", "cloud-identity-info", "correlation-id", "create-time", "customer-type", "display-name", "domain", "edu-data", "email", "first-name", "institute-size", "institute-type", "is-domain-verified", "language-code", "last-name", "locality", "name", "org-display-name", "org-postal-address", "organization", "phone", "phone-number", "postal-code", "primary-contact-info", "primary-domain", "recipients", "region-code", "revision", "sorting-code", "sublocality", "title", "update-time", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3234,6 +3308,62 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_customers_query_eligible_billing_accounts(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().customers_query_eligible_billing_accounts(opt.value_of("customer").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "skus" => {
+                    call = call.add_skus(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["skus"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3520,6 +3650,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "billing-account" => Some(("billingAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-identity-id" => Some(("cloudIdentityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-name" => Some(("customerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3527,7 +3658,7 @@ where
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cloud-identity-id", "customer-name", "language-code", "page-size", "page-token", "sku"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-account", "cloud-identity-id", "customer-name", "language-code", "page-size", "page-token", "sku"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3683,6 +3814,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "show-future-offers" => {
+                    call = call.show_future_offers(        value.map(|v| arg_from_str(v, err, "show-future-offers", "boolean")).unwrap_or(false));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -3708,7 +3842,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "language-code", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "language-code", "page-size", "page-token", "show-future-offers"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3852,8 +3986,9 @@ where
                 match &temp_cursor.to_string()[..] {
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-keys" => Some(("partitionKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token", "partition-keys"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4054,6 +4189,124 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_sku_groups_billable_skus_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().sku_groups_billable_skus_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_sku_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().sku_groups_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4652,6 +4905,9 @@ where
                     ("customers-entitlements-list", Some(opt)) => {
                         call_result = self._accounts_customers_entitlements_list(opt, dry_run, &mut err).await;
                     },
+                    ("customers-entitlements-list-entitlement-changes", Some(opt)) => {
+                        call_result = self._accounts_customers_entitlements_list_entitlement_changes(opt, dry_run, &mut err).await;
+                    },
                     ("customers-entitlements-lookup-offer", Some(opt)) => {
                         call_result = self._accounts_customers_entitlements_lookup_offer(opt, dry_run, &mut err).await;
                     },
@@ -4682,6 +4938,9 @@ where
                     ("customers-provision-cloud-identity", Some(opt)) => {
                         call_result = self._accounts_customers_provision_cloud_identity(opt, dry_run, &mut err).await;
                     },
+                    ("customers-query-eligible-billing-accounts", Some(opt)) => {
+                        call_result = self._accounts_customers_query_eligible_billing_accounts(opt, dry_run, &mut err).await;
+                    },
                     ("customers-transfer-entitlements", Some(opt)) => {
                         call_result = self._accounts_customers_transfer_entitlements(opt, dry_run, &mut err).await;
                     },
@@ -4711,6 +4970,12 @@ where
                     },
                     ("reports-run", Some(opt)) => {
                         call_result = self._accounts_reports_run(opt, dry_run, &mut err).await;
+                    },
+                    ("sku-groups-billable-skus-list", Some(opt)) => {
+                        call_result = self._accounts_sku_groups_billable_skus_list(opt, dry_run, &mut err).await;
+                    },
+                    ("sku-groups-list", Some(opt)) => {
+                        call_result = self._accounts_sku_groups_list(opt, dry_run, &mut err).await;
                     },
                     ("unregister", Some(opt)) => {
                         call_result = self._accounts_unregister(opt, dry_run, &mut err).await;
@@ -4828,9 +5093,9 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'channel-partner-links-channel-partner-repricing-configs-create', 'channel-partner-links-channel-partner-repricing-configs-delete', 'channel-partner-links-channel-partner-repricing-configs-get', 'channel-partner-links-channel-partner-repricing-configs-list', 'channel-partner-links-channel-partner-repricing-configs-patch', 'channel-partner-links-create', 'channel-partner-links-customers-create', 'channel-partner-links-customers-delete', 'channel-partner-links-customers-get', 'channel-partner-links-customers-import', 'channel-partner-links-customers-list', 'channel-partner-links-customers-patch', 'channel-partner-links-get', 'channel-partner-links-list', 'channel-partner-links-patch', 'check-cloud-identity-accounts-exist', 'customers-create', 'customers-customer-repricing-configs-create', 'customers-customer-repricing-configs-delete', 'customers-customer-repricing-configs-get', 'customers-customer-repricing-configs-list', 'customers-customer-repricing-configs-patch', 'customers-delete', 'customers-entitlements-activate', 'customers-entitlements-cancel', 'customers-entitlements-change-offer', 'customers-entitlements-change-parameters', 'customers-entitlements-change-renewal-settings', 'customers-entitlements-create', 'customers-entitlements-get', 'customers-entitlements-list', 'customers-entitlements-lookup-offer', 'customers-entitlements-start-paid-service', 'customers-entitlements-suspend', 'customers-get', 'customers-import', 'customers-list', 'customers-list-purchasable-offers', 'customers-list-purchasable-skus', 'customers-patch', 'customers-provision-cloud-identity', 'customers-transfer-entitlements', 'customers-transfer-entitlements-to-google', 'list-subscribers', 'list-transferable-offers', 'list-transferable-skus', 'offers-list', 'register', 'report-jobs-fetch-report-results', 'reports-list', 'reports-run' and 'unregister'", vec![
+        ("accounts", "methods: 'channel-partner-links-channel-partner-repricing-configs-create', 'channel-partner-links-channel-partner-repricing-configs-delete', 'channel-partner-links-channel-partner-repricing-configs-get', 'channel-partner-links-channel-partner-repricing-configs-list', 'channel-partner-links-channel-partner-repricing-configs-patch', 'channel-partner-links-create', 'channel-partner-links-customers-create', 'channel-partner-links-customers-delete', 'channel-partner-links-customers-get', 'channel-partner-links-customers-import', 'channel-partner-links-customers-list', 'channel-partner-links-customers-patch', 'channel-partner-links-get', 'channel-partner-links-list', 'channel-partner-links-patch', 'check-cloud-identity-accounts-exist', 'customers-create', 'customers-customer-repricing-configs-create', 'customers-customer-repricing-configs-delete', 'customers-customer-repricing-configs-get', 'customers-customer-repricing-configs-list', 'customers-customer-repricing-configs-patch', 'customers-delete', 'customers-entitlements-activate', 'customers-entitlements-cancel', 'customers-entitlements-change-offer', 'customers-entitlements-change-parameters', 'customers-entitlements-change-renewal-settings', 'customers-entitlements-create', 'customers-entitlements-get', 'customers-entitlements-list', 'customers-entitlements-list-entitlement-changes', 'customers-entitlements-lookup-offer', 'customers-entitlements-start-paid-service', 'customers-entitlements-suspend', 'customers-get', 'customers-import', 'customers-list', 'customers-list-purchasable-offers', 'customers-list-purchasable-skus', 'customers-patch', 'customers-provision-cloud-identity', 'customers-query-eligible-billing-accounts', 'customers-transfer-entitlements', 'customers-transfer-entitlements-to-google', 'list-subscribers', 'list-transferable-offers', 'list-transferable-skus', 'offers-list', 'register', 'report-jobs-fetch-report-results', 'reports-list', 'reports-run', 'sku-groups-billable-skus-list', 'sku-groups-list' and 'unregister'", vec![
             ("channel-partner-links-channel-partner-repricing-configs-create",
-                    Some(r##"Creates a ChannelPartnerRepricingConfig. Call this method to set modifications for a specific ChannelPartner's bill. You can only create configs if the RepricingConfig.effective_invoice_month is a future month. If needed, you can create a config for the current month, with some restrictions. When creating a config for a future month, make sure there are no existing configs for that RepricingConfig.effective_invoice_month. The following restrictions are for creating configs in the current month. * This functionality is reserved for recovering from an erroneous config, and should not be used for regular business cases. * The new config will not modify exports used with other configs. Changes to the config may be immediate, but may take up to 24 hours. * There is a limit of ten configs for any ChannelPartner or RepricingConfig.effective_invoice_month. * The contained ChannelPartnerRepricingConfig.repricing_config vaule must be different from the value used in the current config for a ChannelPartner. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * INVALID_ARGUMENT: Missing or invalid required parameters in the request. Also displays if the updated config is for the current month or past months. * NOT_FOUND: The ChannelPartnerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the updated ChannelPartnerRepricingConfig resource, otherwise returns an error."##),
+                    Some(r##"Creates a ChannelPartnerRepricingConfig. Call this method to set modifications for a specific ChannelPartner's bill. You can only create configs if the RepricingConfig.effective_invoice_month is a future month. If needed, you can create a config for the current month, with some restrictions. When creating a config for a future month, make sure there are no existing configs for that RepricingConfig.effective_invoice_month. The following restrictions are for creating configs in the current month. * This functionality is reserved for recovering from an erroneous config, and should not be used for regular business cases. * The new config will not modify exports used with other configs. Changes to the config may be immediate, but may take up to 24 hours. * There is a limit of ten configs for any ChannelPartner or RepricingConfig.EntitlementGranularity.entitlement, for any RepricingConfig.effective_invoice_month. * The contained ChannelPartnerRepricingConfig.repricing_config value must be different from the value used in the current config for a ChannelPartner. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * INVALID_ARGUMENT: Missing or invalid required parameters in the request. Also displays if the updated config is for the current month or past months. * NOT_FOUND: The ChannelPartnerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the updated ChannelPartnerRepricingConfig resource, otherwise returns an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_channel-partner-links-channel-partner-repricing-configs-create",
                   vec![
                     (Some(r##"parent"##),
@@ -4902,7 +5167,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("channel-partner-links-channel-partner-repricing-configs-list",
-                    Some(r##"Lists information about how a Reseller modifies their bill before sending it to a ChannelPartner. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * NOT_FOUND: The ChannelPartnerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the ChannelPartnerRepricingConfig resources. The data for each resource is displayed in the ascending order of: * channel partner ID * RepricingConfig.effective_invoice_month * ChannelPartnerRepricingConfig.update_time If unsuccessful, returns an error."##),
+                    Some(r##"Lists information about how a Reseller modifies their bill before sending it to a ChannelPartner. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * NOT_FOUND: The ChannelPartnerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the ChannelPartnerRepricingConfig resources. The data for each resource is displayed in the ascending order of: * Channel Partner ID * RepricingConfig.effective_invoice_month * ChannelPartnerRepricingConfig.update_time If unsuccessful, returns an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_channel-partner-links-channel-partner-repricing-configs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4980,7 +5245,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("channel-partner-links-customers-create",
-                    Some(r##"Creates a new Customer resource under the reseller or distributor account. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: * Required request parameters are missing or invalid. * Domain field value doesn't match the primary email domain. Return value: The newly created Customer resource."##),
+                    Some(r##"Creates a new Customer resource under the reseller or distributor account. Possible error codes: * PERMISSION_DENIED: * The reseller account making the request is different from the reseller account in the API request. * You are not authorized to create a customer. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: * Required request parameters are missing or invalid. * Domain field value doesn't match the primary email domain. Return value: The newly created Customer resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_channel-partner-links-customers-create",
                   vec![
                     (Some(r##"parent"##),
@@ -5052,7 +5317,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("channel-partner-links-customers-import",
-                    Some(r##"Imports a Customer from the Cloud Identity associated with the provided Cloud Identity ID or domain before a TransferEntitlements call. If a linked Customer already exists and overwrite_if_exists is true, it will update that Customer's data. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * NOT_FOUND: Cloud Identity doesn't exist or was deleted. * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is expired or invalid. * ALREADY_EXISTS: A customer already exists and has conflicting critical fields. Requires an overwrite. Return value: The Customer."##),
+                    Some(r##"Imports a Customer from the Cloud Identity associated with the provided Cloud Identity ID or domain before a TransferEntitlements call. If a linked Customer already exists and overwrite_if_exists is true, it will update that Customer's data. Possible error codes: * PERMISSION_DENIED: * The reseller account making the request is different from the reseller account in the API request. * You are not authorized to import the customer. See https://support.google.com/channelservices/answer/9759265 * NOT_FOUND: Cloud Identity doesn't exist or was deleted. * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is expired or invalid. * ALREADY_EXISTS: A customer already exists and has conflicting critical fields. Requires an overwrite. Return value: The Customer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_channel-partner-links-customers-import",
                   vec![
                     (Some(r##"parent"##),
@@ -5230,7 +5495,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-create",
-                    Some(r##"Creates a new Customer resource under the reseller or distributor account. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * INVALID_ARGUMENT: * Required request parameters are missing or invalid. * Domain field value doesn't match the primary email domain. Return value: The newly created Customer resource."##),
+                    Some(r##"Creates a new Customer resource under the reseller or distributor account. Possible error codes: * PERMISSION_DENIED: * The reseller account making the request is different from the reseller account in the API request. * You are not authorized to create a customer. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: * Required request parameters are missing or invalid. * Domain field value doesn't match the primary email domain. Return value: The newly created Customer resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-create",
                   vec![
                     (Some(r##"parent"##),
@@ -5258,7 +5523,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-customer-repricing-configs-create",
-                    Some(r##"Creates a CustomerRepricingConfig. Call this method to set modifications for a specific customer's bill. You can only create configs if the RepricingConfig.effective_invoice_month is a future month. If needed, you can create a config for the current month, with some restrictions. When creating a config for a future month, make sure there are no existing configs for that RepricingConfig.effective_invoice_month. The following restrictions are for creating configs in the current month. * This functionality is reserved for recovering from an erroneous config, and should not be used for regular business cases. * The new config will not modify exports used with other configs. Changes to the config may be immediate, but may take up to 24 hours. * There is a limit of ten configs for any RepricingConfig.EntitlementGranularity.entitlement or RepricingConfig.effective_invoice_month. * The contained CustomerRepricingConfig.repricing_config vaule must be different from the value used in the current config for a RepricingConfig.EntitlementGranularity.entitlement. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * INVALID_ARGUMENT: Missing or invalid required parameters in the request. Also displays if the updated config is for the current month or past months. * NOT_FOUND: The CustomerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the updated CustomerRepricingConfig resource, otherwise returns an error."##),
+                    Some(r##"Creates a CustomerRepricingConfig. Call this method to set modifications for a specific customer's bill. You can only create configs if the RepricingConfig.effective_invoice_month is a future month. If needed, you can create a config for the current month, with some restrictions. When creating a config for a future month, make sure there are no existing configs for that RepricingConfig.effective_invoice_month. The following restrictions are for creating configs in the current month. * This functionality is reserved for recovering from an erroneous config, and should not be used for regular business cases. * The new config will not modify exports used with other configs. Changes to the config may be immediate, but may take up to 24 hours. * There is a limit of ten configs for any RepricingConfig.EntitlementGranularity.entitlement, for any RepricingConfig.effective_invoice_month. * The contained CustomerRepricingConfig.repricing_config value must be different from the value used in the current config for a RepricingConfig.EntitlementGranularity.entitlement. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * INVALID_ARGUMENT: Missing or invalid required parameters in the request. Also displays if the updated config is for the current month or past months. * NOT_FOUND: The CustomerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the updated CustomerRepricingConfig resource, otherwise returns an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-customer-repricing-configs-create",
                   vec![
                     (Some(r##"parent"##),
@@ -5330,7 +5595,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-customer-repricing-configs-list",
-                    Some(r##"Lists information about how a Reseller modifies their bill before sending it to a Customer. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * NOT_FOUND: The CustomerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the CustomerRepricingConfig resources. The data for each resource is displayed in the ascending order of: * customer ID * RepricingConfig.EntitlementGranularity.entitlement * RepricingConfig.effective_invoice_month * CustomerRepricingConfig.update_time If unsuccessful, returns an error."##),
+                    Some(r##"Lists information about how a Reseller modifies their bill before sending it to a Customer. Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different. * NOT_FOUND: The CustomerRepricingConfig specified does not exist or is not associated with the given account. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the CustomerRepricingConfig resources. The data for each resource is displayed in the ascending order of: * Customer ID * RepricingConfig.EntitlementGranularity.entitlement * RepricingConfig.effective_invoice_month * CustomerRepricingConfig.update_time If unsuccessful, returns an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-customer-repricing-configs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5542,7 +5807,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-entitlements-create",
-                    Some(r##"Creates an entitlement for a customer. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller. * INVALID_ARGUMENT: * Required request parameters are missing or invalid. * There is already a customer entitlement for a SKU from the same product family. * INVALID_VALUE: Make sure the OfferId is valid. If it is, contact Google Channel support for further troubleshooting. * NOT_FOUND: The customer or offer resource was not found. * ALREADY_EXISTS: * The SKU was already purchased for the customer. * The customer's primary email already exists. Retry after changing the customer's primary contact email. * CONDITION_NOT_MET or FAILED_PRECONDITION: * The domain required for purchasing a SKU has not been verified. * A pre-requisite SKU required to purchase an Add-On SKU is missing. For example, Google Workspace Business Starter is required to purchase Vault or Drive. * (Developer accounts only) Reseller and resold domain must meet the following naming requirements: * Domain names must start with goog-test. * Domain names must include the reseller domain. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata will contain an instance of OperationMetadata."##),
+                    Some(r##"Creates an entitlement for a customer. Possible error codes: * PERMISSION_DENIED: * The customer doesn't belong to the reseller. * The reseller is not authorized to transact on this Product. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: * Required request parameters are missing or invalid. * There is already a customer entitlement for a SKU from the same product family. * INVALID_VALUE: Make sure the OfferId is valid. If it is, contact Google Channel support for further troubleshooting. * NOT_FOUND: The customer or offer resource was not found. * ALREADY_EXISTS: * The SKU was already purchased for the customer. * The customer's primary email already exists. Retry after changing the customer's primary contact email. * CONDITION_NOT_MET or FAILED_PRECONDITION: * The domain required for purchasing a SKU has not been verified. * A pre-requisite SKU required to purchase an Add-On SKU is missing. For example, Google Workspace Business Starter is required to purchase Vault or Drive. * (Developer accounts only) Reseller and resold domain must meet the following naming requirements: * Domain names must start with goog-test. * Domain names must include the reseller domain. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata will contain an instance of OperationMetadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-entitlements-create",
                   vec![
                     (Some(r##"parent"##),
@@ -5598,6 +5863,28 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The resource name of the reseller's customer account to list entitlements for. Parent uses the format: accounts/{account_id}/customers/{customer_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("customers-entitlements-list-entitlement-changes",
+                    Some(r##"List entitlement history. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different. * INVALID_ARGUMENT: Missing or invalid required fields in the request. * NOT_FOUND: The parent resource doesn't exist. Usually the result of an invalid name parameter. * INTERNAL: Any non-user error related to a technical issue in the backend. In this case, contact CloudChannel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. In this case, contact Cloud Channel support. Return value: List of EntitlementChanges."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-entitlements-list-entitlement-changes",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name of the entitlement for which to list entitlement changes. The `-` wildcard may be used to match entitlements across a customer. Formats: * accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id} * accounts/{account_id}/customers/{customer_id}/entitlements/-"##),
                      Some(true),
                      Some(false)),
         
@@ -5714,7 +6001,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-import",
-                    Some(r##"Imports a Customer from the Cloud Identity associated with the provided Cloud Identity ID or domain before a TransferEntitlements call. If a linked Customer already exists and overwrite_if_exists is true, it will update that Customer's data. Possible error codes: * PERMISSION_DENIED: The reseller account making the request is different from the reseller account in the API request. * NOT_FOUND: Cloud Identity doesn't exist or was deleted. * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is expired or invalid. * ALREADY_EXISTS: A customer already exists and has conflicting critical fields. Requires an overwrite. Return value: The Customer."##),
+                    Some(r##"Imports a Customer from the Cloud Identity associated with the provided Cloud Identity ID or domain before a TransferEntitlements call. If a linked Customer already exists and overwrite_if_exists is true, it will update that Customer's data. Possible error codes: * PERMISSION_DENIED: * The reseller account making the request is different from the reseller account in the API request. * You are not authorized to import the customer. See https://support.google.com/channelservices/answer/9759265 * NOT_FOUND: Cloud Identity doesn't exist or was deleted. * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is expired or invalid. * ALREADY_EXISTS: A customer already exists and has conflicting critical fields. Requires an overwrite. Return value: The Customer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-import",
                   vec![
                     (Some(r##"parent"##),
@@ -5764,7 +6051,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-list-purchasable-offers",
-                    Some(r##"Lists the following: * Offers that you can purchase for a customer. * Offers that you can change for an entitlement. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller * INVALID_ARGUMENT: Required request parameters are missing or invalid."##),
+                    Some(r##"Lists the following: * Offers that you can purchase for a customer. * Offers that you can change for an entitlement. Possible error codes: * PERMISSION_DENIED: * The customer doesn't belong to the reseller * The reseller is not authorized to transact on this Product. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: Required request parameters are missing or invalid."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-list-purchasable-offers",
                   vec![
                     (Some(r##"customer"##),
@@ -5836,7 +6123,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("customers-provision-cloud-identity",
-                    Some(r##"Creates a Cloud Identity for the given customer using the customer's information, or the information provided here. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer was not found. * ALREADY_EXISTS: The customer's primary email already exists. Retry after changing the customer's primary contact email. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata contains an instance of OperationMetadata."##),
+                    Some(r##"Creates a Cloud Identity for the given customer using the customer's information, or the information provided here. Possible error codes: * PERMISSION_DENIED: * The customer doesn't belong to the reseller. * You are not authorized to provision cloud identity id. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer was not found. * ALREADY_EXISTS: The customer's primary email already exists. Retry after changing the customer's primary contact email. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata contains an instance of OperationMetadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-provision-cloud-identity",
                   vec![
                     (Some(r##"customer"##),
@@ -5863,8 +6150,30 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("customers-query-eligible-billing-accounts",
+                    Some(r##"Lists the billing accounts that are eligible to purchase particular SKUs for a given customer. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller. * INVALID_ARGUMENT: Required request parameters are missing or invalid. Return value: Based on the provided list of SKUs, returns a list of SKU groups that must be purchased using the same billing account and the billing accounts eligible to purchase each SKU group."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-query-eligible-billing-accounts",
+                  vec![
+                    (Some(r##"customer"##),
+                     None,
+                     Some(r##"Required. The resource name of the customer to list eligible billing accounts for. Format: accounts/{account_id}/customers/{customer_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("customers-transfer-entitlements",
-                    Some(r##"Transfers customer entitlements to new reseller. Possible error codes: * PERMISSION_DENIED: The customer doesn't belong to the reseller. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer or offer resource was not found. * ALREADY_EXISTS: The SKU was already transferred for the customer. * CONDITION_NOT_MET or FAILED_PRECONDITION: * The SKU requires domain verification to transfer, but the domain is not verified. * An Add-On SKU (example, Vault or Drive) is missing the pre-requisite SKU (example, G Suite Basic). * (Developer accounts only) Reseller and resold domain must meet the following naming requirements: * Domain names must start with goog-test. * Domain names must include the reseller domain. * Specify all transferring entitlements. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata will contain an instance of OperationMetadata."##),
+                    Some(r##"Transfers customer entitlements to new reseller. Possible error codes: * PERMISSION_DENIED: * The customer doesn't belong to the reseller. * The reseller is not authorized to transact on this Product. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The customer or offer resource was not found. * ALREADY_EXISTS: The SKU was already transferred for the customer. * CONDITION_NOT_MET or FAILED_PRECONDITION: * The SKU requires domain verification to transfer, but the domain is not verified. * An Add-On SKU (example, Vault or Drive) is missing the pre-requisite SKU (example, G Suite Basic). * (Developer accounts only) Reseller and resold domain must meet the following naming requirements: * Domain names must start with goog-test. * Domain names must include the reseller domain. * Specify all transferring entitlements. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata will contain an instance of OperationMetadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_customers-transfer-entitlements",
                   vec![
                     (Some(r##"parent"##),
@@ -5942,7 +6251,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list-transferable-offers",
-                    Some(r##"List TransferableOffers of a customer based on Cloud Identity ID or Customer Name in the request. Use this method when a reseller gets the entitlement information of an unowned customer. The reseller should provide the customer's Cloud Identity ID or Customer Name. Possible error codes: * PERMISSION_DENIED: * The customer doesn't belong to the reseller and has no auth token. * The customer provided incorrect reseller information when generating auth token. * The reseller account making the request is different from the reseller account in the query. * INVALID_ARGUMENT: Required request parameters are missing or invalid. Return value: List of TransferableOffer for the given customer and SKU."##),
+                    Some(r##"List TransferableOffers of a customer based on Cloud Identity ID or Customer Name in the request. Use this method when a reseller gets the entitlement information of an unowned customer. The reseller should provide the customer's Cloud Identity ID or Customer Name. Possible error codes: * PERMISSION_DENIED: * The customer doesn't belong to the reseller and has no auth token. * The customer provided incorrect reseller information when generating auth token. * The reseller account making the request is different from the reseller account in the query. * The reseller is not authorized to transact on this Product. See https://support.google.com/channelservices/answer/9759265 * INVALID_ARGUMENT: Required request parameters are missing or invalid. Return value: List of TransferableOffer for the given customer and SKU."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_list-transferable-offers",
                   vec![
                     (Some(r##"parent"##),
@@ -6048,7 +6357,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("report-jobs-fetch-report-results",
-                    Some(r##"Retrieves data generated by CloudChannelReportsService.RunReportJob."##),
+                    Some(r##"Retrieves data generated by CloudChannelReportsService.RunReportJob. Deprecated: Please use [Export Channel Services data to BigQuery](https://cloud.google.com/channel/docs/rebilling/export-data-to-bigquery) instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_report-jobs-fetch-report-results",
                   vec![
                     (Some(r##"report-job"##),
@@ -6076,7 +6385,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("reports-list",
-                    Some(r##"Lists the reports that RunReportJob can run. These reports include an ID, a description, and the list of columns that will be in the result."##),
+                    Some(r##"Lists the reports that RunReportJob can run. These reports include an ID, a description, and the list of columns that will be in the result. Deprecated: Please use [Export Channel Services data to BigQuery](https://cloud.google.com/channel/docs/rebilling/export-data-to-bigquery) instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_reports-list",
                   vec![
                     (Some(r##"parent"##),
@@ -6098,7 +6407,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("reports-run",
-                    Some(r##"Begins generation of data for a given report. The report identifier is a UID (for example, `613bf59q`). Possible error codes: * PERMISSION_DENIED: The user doesn't have access to this report. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The report identifier was not found. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata contains an instance of OperationMetadata. To get the results of report generation, call CloudChannelReportsService.FetchReportResults with the RunReportJobResponse.report_job."##),
+                    Some(r##"Begins generation of data for a given report. The report identifier is a UID (for example, `613bf59q`). Possible error codes: * PERMISSION_DENIED: The user doesn't have access to this report. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The report identifier was not found. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The ID of a long-running operation. To get the results of the operation, call the GetOperation method of CloudChannelOperationsService. The Operation metadata contains an instance of OperationMetadata. To get the results of report generation, call CloudChannelReportsService.FetchReportResults with the RunReportJobResponse.report_job. Deprecated: Please use [Export Channel Services data to BigQuery](https://cloud.google.com/channel/docs/rebilling/export-data-to-bigquery) instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_reports-run",
                   vec![
                     (Some(r##"name"##),
@@ -6112,6 +6421,50 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("sku-groups-billable-skus-list",
+                    Some(r##"Lists the Billable SKUs in a given SKU group. Possible error codes: PERMISSION_DENIED: If the account making the request and the account being queried for are different, or the account doesn't exist. INVALID_ARGUMENT: Missing or invalid required parameters in the request. INTERNAL: Any non-user error related to technical issue in the backend. In this case, contact cloud channel support. Return Value: If successful, the BillableSku resources. The data for each resource is displayed in the ascending order of: * BillableSku.service_display_name * BillableSku.sku_display_name If unsuccessful, returns an error."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_sku-groups-billable-skus-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the SKU group. Format: accounts/{account}/skuGroups/{sku_group}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("sku-groups-list",
+                    Some(r##"Lists the Rebilling supported SKU groups the account is authorized to sell. Reference: https://cloud.google.com/skus/sku-groups Possible Error Codes: * PERMISSION_DENIED: If the account making the request and the account being queried are different, or the account doesn't exist. * INTERNAL: Any non-user error related to technical issues in the backend. In this case, contact Cloud Channel support. Return Value: If successful, the SkuGroup resources. The data for each resource is displayed in the alphabetical order of SKU group display name. The data for each resource is displayed in the ascending order of SkuGroup.display_name If unsuccessful, returns an error."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_sku-groups-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name of the account from which to list SKU groups. Parent uses the format: accounts/{account}."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6229,7 +6582,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/operations_list",
                   vec![
                     (Some(r##"name"##),
@@ -6297,7 +6650,7 @@ async fn main() {
     
     let mut app = App::new("cloudchannel1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.3+20240303")
            .about("The Cloud Channel API enables Google Cloud partners to have a single unified resale platform and APIs across all of Google Cloud including GCP, Workspace, Maps and Chrome.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli")
            .arg(Arg::with_name("url")

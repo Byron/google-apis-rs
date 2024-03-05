@@ -1,4 +1,4 @@
-site_name: Datastream v5.0.3+20230111
+site_name: Datastream v5.0.3+20240221
 site_url: http://byron.github.io/google-apis-rs/google-datastream1-cli
 site_description: A complete library to interact with Datastream (protocol v1)
 
@@ -41,6 +41,7 @@ nav:
     - 'Locations Streams Objects Start Backfill Job': 'projects_locations-streams-objects-start-backfill-job.md'
     - 'Locations Streams Objects Stop Backfill Job': 'projects_locations-streams-objects-stop-backfill-job.md'
     - 'Locations Streams Patch': 'projects_locations-streams-patch.md'
+    - 'Locations Streams Run': 'projects_locations-streams-run.md'
 
 theme: readthedocs
 

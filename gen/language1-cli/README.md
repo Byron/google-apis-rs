@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Natural Language* API at revision *20230121*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Natural Language* API at revision *20240303*. The CLI is at version *5.0.3*.
 
 ```bash
 language1 [options]
@@ -36,6 +36,7 @@ language1 [options]
                 analyze-syntax (-r <kv>)... [-p <v>]... [-o <out>]
                 annotate-text (-r <kv>)... [-p <v>]... [-o <out>]
                 classify-text (-r <kv>)... [-p <v>]... [-o <out>]
+                moderate-text (-r <kv>)... [-p <v>]... [-o <out>]
   language1 --help
 
 Configuration:

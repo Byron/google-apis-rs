@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dialogflow3-cli"
-version = "5.0.3+20230110"
+version = "5.0.3+20240227"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dialogflow (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dialogflow3-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dialogflow3]
 path = "../dialogflow3"
-version = "5.0.3+20230110"
+version = "5.0.3+20240227"
 

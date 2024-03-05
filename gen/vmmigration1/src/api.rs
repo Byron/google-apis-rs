@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -181,6 +181,10 @@ pub struct AccessKeyCredentials {
     #[serde(rename="secretAccessKey")]
     
     pub secret_access_key: Option<String>,
+    /// Input only. AWS session token. Used only when AWS security token service (STS) is responsible for creating the temporary credentials.
+    #[serde(rename="sessionToken")]
+    
+    pub session_token: Option<String>,
 }
 
 impl client::Part for AccessKeyCredentials {}
@@ -282,6 +286,31 @@ pub struct AvailableUpdates {
 impl client::Part for AvailableUpdates {}
 
 
+/// The details of an AWS instance disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AwsDiskDetails {
+    /// The ordinal number of the disk.
+    #[serde(rename="diskNumber")]
+    
+    pub disk_number: Option<i32>,
+    /// Size in GB.
+    #[serde(rename="sizeGb")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub size_gb: Option<i64>,
+    /// AWS volume ID.
+    #[serde(rename="volumeId")]
+    
+    pub volume_id: Option<String>,
+}
+
+impl client::Part for AwsDiskDetails {}
+
+
 /// AwsSecurityGroup describes a security group of an AWS VM.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -354,9 +383,16 @@ pub struct AwsSourceVmDetails {
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub committed_storage_bytes: Option<i64>,
+    /// The disks attached to the source VM.
+    
+    pub disks: Option<Vec<AwsDiskDetails>>,
     /// The firmware type of the source VM.
     
     pub firmware: Option<String>,
+    /// Output only. Information about VM capabilities needed for some Compute Engine features.
+    #[serde(rename="vmCapabilitiesInfo")]
+    
+    pub vm_capabilities_info: Option<VmCapabilities>,
 }
 
 impl client::Part for AwsSourceVmDetails {}
@@ -459,6 +495,204 @@ pub struct AwsVmsDetails {
 impl client::Part for AwsVmsDetails {}
 
 
+/// The details of an Azure VM disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AzureDiskDetails {
+    /// Azure disk ID.
+    #[serde(rename="diskId")]
+    
+    pub disk_id: Option<String>,
+    /// The ordinal number of the disk.
+    #[serde(rename="diskNumber")]
+    
+    pub disk_number: Option<i32>,
+    /// Size in GB.
+    #[serde(rename="sizeGb")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub size_gb: Option<i64>,
+}
+
+impl client::Part for AzureDiskDetails {}
+
+
+/// AzureSourceDetails message describes a specific source details for the Azure source type.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AzureSourceDetails {
+    /// Immutable. The Azure location (region) that the source VMs will be migrated from.
+    #[serde(rename="azureLocation")]
+    
+    pub azure_location: Option<String>,
+    /// Azure Credentials using tenant ID, client ID and secret.
+    #[serde(rename="clientSecretCreds")]
+    
+    pub client_secret_creds: Option<ClientSecretCredentials>,
+    /// Output only. Provides details on the state of the Source in case of an error.
+    
+    pub error: Option<Status>,
+    /// User specified tags to add to every M2VM generated resource in Azure. These tags will be set in addition to the default tags that are set as part of the migration process. The tags must not begin with the reserved prefix `m4ce` or `m2vm`.
+    #[serde(rename="migrationResourcesUserTags")]
+    
+    pub migration_resources_user_tags: Option<HashMap<String, String>>,
+    /// Output only. The ID of the Azure resource group that contains all resources related to the migration process of this source.
+    #[serde(rename="resourceGroupId")]
+    
+    pub resource_group_id: Option<String>,
+    /// Output only. State of the source as determined by the health check.
+    
+    pub state: Option<String>,
+    /// Immutable. Azure subscription ID.
+    #[serde(rename="subscriptionId")]
+    
+    pub subscription_id: Option<String>,
+}
+
+impl client::Part for AzureSourceDetails {}
+
+
+/// Represent the source Azure VM details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AzureSourceVmDetails {
+    /// The total size of the disks being migrated in bytes.
+    #[serde(rename="committedStorageBytes")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub committed_storage_bytes: Option<i64>,
+    /// The disks attached to the source VM.
+    
+    pub disks: Option<Vec<AzureDiskDetails>>,
+    /// The firmware type of the source VM.
+    
+    pub firmware: Option<String>,
+    /// Output only. Information about VM capabilities needed for some Compute Engine features.
+    #[serde(rename="vmCapabilitiesInfo")]
+    
+    pub vm_capabilities_info: Option<VmCapabilities>,
+}
+
+impl client::Part for AzureSourceVmDetails {}
+
+
+/// AzureVmDetails describes a VM in Azure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AzureVmDetails {
+    /// The VM Boot Option.
+    #[serde(rename="bootOption")]
+    
+    pub boot_option: Option<String>,
+    /// The total size of the storage allocated to the VM in MB.
+    #[serde(rename="committedStorageMb")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub committed_storage_mb: Option<i64>,
+    /// The VM's ComputerName.
+    #[serde(rename="computerName")]
+    
+    pub computer_name: Option<String>,
+    /// The number of cpus the VM has.
+    #[serde(rename="cpuCount")]
+    
+    pub cpu_count: Option<i32>,
+    /// The number of disks the VM has, including OS disk.
+    #[serde(rename="diskCount")]
+    
+    pub disk_count: Option<i32>,
+    /// Description of the data disks.
+    
+    pub disks: Option<Vec<Disk>>,
+    /// The memory size of the VM in MB.
+    #[serde(rename="memoryMb")]
+    
+    pub memory_mb: Option<i32>,
+    /// Description of the OS.
+    #[serde(rename="osDescription")]
+    
+    pub os_description: Option<OSDescription>,
+    /// Description of the OS disk.
+    #[serde(rename="osDisk")]
+    
+    pub os_disk: Option<OSDisk>,
+    /// The power state of the VM at the moment list was taken.
+    #[serde(rename="powerState")]
+    
+    pub power_state: Option<String>,
+    /// The tags of the VM.
+    
+    pub tags: Option<HashMap<String, String>>,
+    /// The VM full path in Azure.
+    #[serde(rename="vmId")]
+    
+    pub vm_id: Option<String>,
+    /// VM size as configured in Azure. Determines the VM's hardware spec.
+    #[serde(rename="vmSize")]
+    
+    pub vm_size: Option<String>,
+}
+
+impl client::Part for AzureVmDetails {}
+
+
+/// AzureVmsDetails describes VMs in Azure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AzureVmsDetails {
+    /// The details of the Azure VMs.
+    
+    pub details: Option<Vec<AzureVmDetails>>,
+}
+
+impl client::Part for AzureVmsDetails {}
+
+
+/// BootDiskDefaults hold information about the boot disk of a VM.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BootDiskDefaults {
+    /// Optional. Specifies a unique device name of your choice that is reflected into the /dev/disk/by-id/google-* tree of a Linux operating system running within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks.
+    #[serde(rename="deviceName")]
+    
+    pub device_name: Option<String>,
+    /// Optional. The name of the disk.
+    #[serde(rename="diskName")]
+    
+    pub disk_name: Option<String>,
+    /// Optional. The type of disk provisioning to use for the VM.
+    #[serde(rename="diskType")]
+    
+    pub disk_type: Option<String>,
+    /// Optional. The encryption to apply to the boot disk.
+    
+    pub encryption: Option<Encryption>,
+    /// The image to use when creating the disk.
+    
+    pub image: Option<DiskImageDefaults>,
+}
+
+impl client::Part for BootDiskDefaults {}
+
+
 /// Request message for ‘CancelCloneJob’ request.
 /// 
 /// # Activities
@@ -489,6 +723,21 @@ pub struct CancelCutoverJobRequest { _never_set: Option<bool> }
 impl client::RequestValue for CancelCutoverJobRequest {}
 
 
+/// Request message for ‘CancelImageImportJob’ request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations image imports image import jobs cancel projects](ProjectLocationImageImportImageImportJobCancelCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelImageImportJobRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for CancelImageImportJobRequest {}
+
+
 /// The request message for Operations.CancelOperation.
 /// 
 /// # Activities
@@ -504,6 +753,30 @@ pub struct CancelOperationRequest { _never_set: Option<bool> }
 impl client::RequestValue for CancelOperationRequest {}
 
 
+/// Message describing Azure Credentials using tenant ID, client ID and secret.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClientSecretCredentials {
+    /// Azure client ID.
+    #[serde(rename="clientId")]
+    
+    pub client_id: Option<String>,
+    /// Input only. Azure client secret.
+    #[serde(rename="clientSecret")]
+    
+    pub client_secret: Option<String>,
+    /// Azure tenant ID.
+    #[serde(rename="tenantId")]
+    
+    pub tenant_id: Option<String>,
+}
+
+impl client::Part for ClientSecretCredentials {}
+
+
 /// CloneJob describes the process of creating a clone of a MigratingVM to the requested target based on the latest successful uploaded snapshots. While the migration cycles of a MigratingVm take place, it is possible to verify the uploaded VM can be started in the cloud, by creating a clone. The clone can be created without any downtime, and it is created using the latest snapshots which are already in the cloud. The cloneJob is only responsible for its work, not its products, which means once it is finished, it will never touch the instance it created. It will only delete it in case of the CloneJob being cancelled or upon failure to clone.
 /// 
 /// # Activities
@@ -516,6 +789,10 @@ impl client::RequestValue for CancelOperationRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloneJob {
+    /// Output only. Details of the target Persistent Disks in Compute Engine.
+    #[serde(rename="computeEngineDisksTargetDetails")]
+    
+    pub compute_engine_disks_target_details: Option<ComputeEngineDisksTargetDetails>,
     /// Output only. Details of the target VM in Compute Engine.
     #[serde(rename="computeEngineTargetDetails")]
     
@@ -582,6 +859,59 @@ pub struct CloneStep {
 impl client::Part for CloneStep {}
 
 
+/// ComputeEngineDisksTargetDefaults is a collection of details for creating Persistent Disks in a target Compute Engine project.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ComputeEngineDisksTargetDefaults {
+    /// The details of each Persistent Disk to create.
+    
+    pub disks: Option<Vec<PersistentDiskDefaults>>,
+    /// Details of the disk only migration target.
+    #[serde(rename="disksTargetDefaults")]
+    
+    pub disks_target_defaults: Option<DisksMigrationDisksTargetDefaults>,
+    /// The full path of the resource of type TargetProject which represents the Compute Engine project in which to create the Persistent Disks.
+    #[serde(rename="targetProject")]
+    
+    pub target_project: Option<String>,
+    /// Details of the VM migration target.
+    #[serde(rename="vmTargetDefaults")]
+    
+    pub vm_target_defaults: Option<DisksMigrationVmTargetDefaults>,
+    /// The zone in which to create the Persistent Disks.
+    
+    pub zone: Option<String>,
+}
+
+impl client::Part for ComputeEngineDisksTargetDefaults {}
+
+
+/// ComputeEngineDisksTargetDetails is a collection of created Persistent Disks details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ComputeEngineDisksTargetDetails {
+    /// The details of each created Persistent Disk.
+    
+    pub disks: Option<Vec<PersistentDisk>>,
+    /// Details of the disks-only migration target.
+    #[serde(rename="disksTargetDetails")]
+    
+    pub disks_target_details: Option<DisksMigrationDisksTargetDetails>,
+    /// Details for the VM the migrated data disks are attached to.
+    #[serde(rename="vmTargetDetails")]
+    
+    pub vm_target_details: Option<DisksMigrationVmTargetDetails>,
+}
+
+impl client::Part for ComputeEngineDisksTargetDetails {}
+
+
 /// ComputeEngineTargetDefaults is a collection of details for creating a VM in a target Compute Engine project.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -597,7 +927,7 @@ pub struct ComputeEngineTargetDefaults {
     #[serde(rename="appliedLicense")]
     
     pub applied_license: Option<AppliedLicense>,
-    /// Output only. The VM Boot Option, as set in the source vm.
+    /// Output only. The VM Boot Option, as set in the source VM.
     #[serde(rename="bootOption")]
     
     pub boot_option: Option<String>,
@@ -609,6 +939,9 @@ pub struct ComputeEngineTargetDefaults {
     #[serde(rename="diskType")]
     
     pub disk_type: Option<String>,
+    /// Optional. Immutable. The encryption to apply to the VM disks.
+    
+    pub encryption: Option<Encryption>,
     /// The hostname to assign to the VM.
     
     pub hostname: Option<String>,
@@ -634,11 +967,11 @@ pub struct ComputeEngineTargetDefaults {
     #[serde(rename="networkInterfaces")]
     
     pub network_interfaces: Option<Vec<NetworkInterface>>,
-    /// A map of network tags to associate with the VM.
+    /// A list of network tags to associate with the VM.
     #[serde(rename="networkTags")]
     
     pub network_tags: Option<Vec<String>>,
-    /// Defines whether the instance has Secure Boot enabled. This can be set to true only if the vm boot option is EFI.
+    /// Defines whether the instance has Secure Boot enabled. This can be set to true only if the VM boot option is EFI.
     #[serde(rename="secureBoot")]
     
     pub secure_boot: Option<bool>,
@@ -677,7 +1010,7 @@ pub struct ComputeEngineTargetDetails {
     #[serde(rename="appliedLicense")]
     
     pub applied_license: Option<AppliedLicense>,
-    /// The VM Boot Option, as set in the source vm.
+    /// The VM Boot Option, as set in the source VM.
     #[serde(rename="bootOption")]
     
     pub boot_option: Option<String>,
@@ -689,6 +1022,9 @@ pub struct ComputeEngineTargetDetails {
     #[serde(rename="diskType")]
     
     pub disk_type: Option<String>,
+    /// Optional. The encryption to apply to the VM disks.
+    
+    pub encryption: Option<Encryption>,
     /// The hostname to assign to the VM.
     
     pub hostname: Option<String>,
@@ -714,14 +1050,14 @@ pub struct ComputeEngineTargetDetails {
     #[serde(rename="networkInterfaces")]
     
     pub network_interfaces: Option<Vec<NetworkInterface>>,
-    /// A map of network tags to associate with the VM.
+    /// A list of network tags to associate with the VM.
     #[serde(rename="networkTags")]
     
     pub network_tags: Option<Vec<String>>,
     /// The Google Cloud target project ID or project name.
     
     pub project: Option<String>,
-    /// Defines whether the instance has Secure Boot enabled. This can be set to true only if the vm boot option is EFI.
+    /// Defines whether the instance has Secure Boot enabled. This can be set to true only if the VM boot option is EFI.
     #[serde(rename="secureBoot")]
     
     pub secure_boot: Option<bool>,
@@ -769,6 +1105,34 @@ pub struct ComputeScheduling {
 impl client::Part for ComputeScheduling {}
 
 
+/// CreatingImageStep contains specific step details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreatingImageStep { _never_set: Option<bool> }
+
+impl client::Part for CreatingImageStep {}
+
+
+/// CutoverForecast holds information about future CutoverJobs of a MigratingVm.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CutoverForecast {
+    /// Output only. Estimation of the CutoverJob duration.
+    #[serde(rename="estimatedCutoverJobDuration")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub estimated_cutover_job_duration: Option<client::chrono::Duration>,
+}
+
+impl client::Part for CutoverForecast {}
+
+
 /// CutoverJob message describes a cutover of a migrating VM. The CutoverJob is the operation of shutting down the VM, creating a snapshot and clonning the VM using the replicated snapshot.
 /// 
 /// # Activities
@@ -781,6 +1145,10 @@ impl client::Part for ComputeScheduling {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CutoverJob {
+    /// Output only. Details of the target Persistent Disks in Compute Engine.
+    #[serde(rename="computeEngineDisksTargetDetails")]
+    
+    pub compute_engine_disks_target_details: Option<ComputeEngineDisksTargetDetails>,
     /// Output only. Details of the target VM in Compute Engine.
     #[serde(rename="computeEngineTargetDetails")]
     
@@ -894,6 +1262,17 @@ pub struct CycleStep {
 impl client::Part for CycleStep {}
 
 
+/// Mentions that the image import is not using OS adaptation process.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DataDiskImageImport { _never_set: Option<bool> }
+
+impl client::Part for DataDiskImageImport {}
+
+
 /// DatacenterConnector message describes a connector between the Source and Google Cloud, which is installed on a vmware datacenter (an OVA vm installed by the user) to connect the Datacenter to Google Cloud and support vm migration data transfer.
 /// 
 /// # Activities
@@ -963,6 +1342,195 @@ impl client::RequestValue for DatacenterConnector {}
 impl client::ResponseResult for DatacenterConnector {}
 
 
+/// A message describing a data disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Disk {
+    /// The disk's Logical Unit Number (LUN).
+    
+    pub lun: Option<i32>,
+    /// The disk name.
+    
+    pub name: Option<String>,
+    /// The disk size in GB.
+    #[serde(rename="sizeGb")]
+    
+    pub size_gb: Option<i32>,
+}
+
+impl client::Part for Disk {}
+
+
+/// Contains details about the image source used to create the disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DiskImageDefaults {
+    /// Required. The Image resource used when creating the disk.
+    #[serde(rename="sourceImage")]
+    
+    pub source_image: Option<String>,
+}
+
+impl client::Part for DiskImageDefaults {}
+
+
+/// The target details of the image resource that will be created by the import job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DiskImageTargetDetails {
+    /// Optional. Additional licenses to assign to the image.
+    #[serde(rename="additionalLicenses")]
+    
+    pub additional_licenses: Option<Vec<String>>,
+    /// Optional. Use to skip OS adaptation process.
+    #[serde(rename="dataDiskImageImport")]
+    
+    pub data_disk_image_import: Option<DataDiskImageImport>,
+    /// Optional. An optional description of the image.
+    
+    pub description: Option<String>,
+    /// Optional. Immutable. The encryption to apply to the image.
+    
+    pub encryption: Option<Encryption>,
+    /// Optional. The name of the image family to which the new image belongs.
+    #[serde(rename="familyName")]
+    
+    pub family_name: Option<String>,
+    /// Required. The name of the image to be created.
+    #[serde(rename="imageName")]
+    
+    pub image_name: Option<String>,
+    /// Optional. A map of labels to associate with the image.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. Use to set the parameters relevant for the OS adaptation process.
+    #[serde(rename="osAdaptationParameters")]
+    
+    pub os_adaptation_parameters: Option<ImageImportOsAdaptationParameters>,
+    /// Optional. Set to true to set the image storageLocations to the single region of the import job. When false, the closest multi-region is selected.
+    #[serde(rename="singleRegionStorage")]
+    
+    pub single_region_storage: Option<bool>,
+    /// Required. Reference to the TargetProject resource that represents the target project in which the imported image will be created.
+    #[serde(rename="targetProject")]
+    
+    pub target_project: Option<String>,
+}
+
+impl client::Part for DiskImageTargetDetails {}
+
+
+/// Details for a disk only migration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DisksMigrationDisksTargetDefaults { _never_set: Option<bool> }
+
+impl client::Part for DisksMigrationDisksTargetDefaults {}
+
+
+/// Details for a disks-only migration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DisksMigrationDisksTargetDetails { _never_set: Option<bool> }
+
+impl client::Part for DisksMigrationDisksTargetDetails {}
+
+
+/// Details for creation of a VM that migrated data disks will be attached to.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DisksMigrationVmTargetDefaults {
+    /// Optional. Additional licenses to assign to the VM.
+    #[serde(rename="additionalLicenses")]
+    
+    pub additional_licenses: Option<Vec<String>>,
+    /// Optional. Details of the boot disk of the VM.
+    #[serde(rename="bootDiskDefaults")]
+    
+    pub boot_disk_defaults: Option<BootDiskDefaults>,
+    /// Optional. Compute instance scheduling information (if empty default is used).
+    #[serde(rename="computeScheduling")]
+    
+    pub compute_scheduling: Option<ComputeScheduling>,
+    /// Optional. The encryption to apply to the VM.
+    
+    pub encryption: Option<Encryption>,
+    /// Optional. The hostname to assign to the VM.
+    
+    pub hostname: Option<String>,
+    /// Optional. A map of labels to associate with the VM.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// Required. The machine type to create the VM with.
+    #[serde(rename="machineType")]
+    
+    pub machine_type: Option<String>,
+    /// Optional. The machine type series to create the VM with. For presentation only.
+    #[serde(rename="machineTypeSeries")]
+    
+    pub machine_type_series: Option<String>,
+    /// Optional. The metadata key/value pairs to assign to the VM.
+    
+    pub metadata: Option<HashMap<String, String>>,
+    /// Optional. NICs to attach to the VM.
+    #[serde(rename="networkInterfaces")]
+    
+    pub network_interfaces: Option<Vec<NetworkInterface>>,
+    /// Optional. A list of network tags to associate with the VM.
+    #[serde(rename="networkTags")]
+    
+    pub network_tags: Option<Vec<String>>,
+    /// Optional. Defines whether the instance has Secure Boot enabled. This can be set to true only if the VM boot option is EFI.
+    #[serde(rename="secureBoot")]
+    
+    pub secure_boot: Option<bool>,
+    /// Optional. The service account to associate the VM with.
+    #[serde(rename="serviceAccount")]
+    
+    pub service_account: Option<String>,
+    /// Required. The name of the VM to create.
+    #[serde(rename="vmName")]
+    
+    pub vm_name: Option<String>,
+}
+
+impl client::Part for DisksMigrationVmTargetDefaults {}
+
+
+/// Details for the VM created VM as part of disks migration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DisksMigrationVmTargetDetails {
+    /// Output only. The URI of the Compute Engine VM.
+    #[serde(rename="vmUri")]
+    
+    pub vm_uri: Option<String>,
+}
+
+impl client::Part for DisksMigrationVmTargetDetails {}
+
+
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
 /// 
 /// # Activities
@@ -977,6 +1545,22 @@ impl client::ResponseResult for DatacenterConnector {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl client::ResponseResult for Empty {}
+
+
+/// Encryption message describes the details of the applied encryption.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Encryption {
+    /// Required. The name of the encryption key that is stored in Google Cloud KMS.
+    #[serde(rename="kmsKey")]
+    
+    pub kms_key: Option<String>,
+}
+
+impl client::Part for Encryption {}
 
 
 /// Response message for fetchInventory.
@@ -994,6 +1578,10 @@ pub struct FetchInventoryResponse {
     #[serde(rename="awsVms")]
     
     pub aws_vms: Option<AwsVmsDetails>,
+    /// The description of the VMs in a Source of type Azure.
+    #[serde(rename="azureVms")]
+    
+    pub azure_vms: Option<AzureVmsDetails>,
     /// Output only. A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
     #[serde(rename="nextPageToken")]
     
@@ -1050,6 +1638,10 @@ pub struct Group {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
+    /// Immutable. The target type of this group.
+    #[serde(rename="migrationTargetType")]
+    
+    pub migration_target_type: Option<String>,
     /// Output only. The Group name.
     
     pub name: Option<String>,
@@ -1061,6 +1653,162 @@ pub struct Group {
 
 impl client::RequestValue for Group {}
 impl client::ResponseResult for Group {}
+
+
+/// ImageImport describes the configuration of the image import to run.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations image imports create projects](ProjectLocationImageImportCreateCall) (request)
+/// * [locations image imports get projects](ProjectLocationImageImportGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImageImport {
+    /// Immutable. The path to the Cloud Storage file from which the image should be imported.
+    #[serde(rename="cloudStorageUri")]
+    
+    pub cloud_storage_uri: Option<String>,
+    /// Output only. The time the image import was created.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Immutable. Target details for importing a disk image, will be used by ImageImportJob.
+    #[serde(rename="diskImageTargetDefaults")]
+    
+    pub disk_image_target_defaults: Option<DiskImageTargetDetails>,
+    /// Immutable. The encryption details used by the image import process during the image adaptation for Compute Engine.
+    
+    pub encryption: Option<Encryption>,
+    /// Output only. The resource path of the ImageImport.
+    
+    pub name: Option<String>,
+    /// Output only. The result of the most recent runs for this ImageImport. All jobs for this ImageImport can be listed via ListImageImportJobs.
+    #[serde(rename="recentImageImportJobs")]
+    
+    pub recent_image_import_jobs: Option<Vec<ImageImportJob>>,
+}
+
+impl client::RequestValue for ImageImport {}
+impl client::ResponseResult for ImageImport {}
+
+
+/// ImageImportJob describes the progress and result of an image import.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations image imports image import jobs get projects](ProjectLocationImageImportImageImportJobGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImageImportJob {
+    /// Output only. The path to the Cloud Storage file from which the image should be imported.
+    #[serde(rename="cloudStorageUri")]
+    
+    pub cloud_storage_uri: Option<String>,
+    /// Output only. The time the image import was created (as an API call, not when it was actually created in the target).
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. The resource paths of the resources created by the image import job.
+    #[serde(rename="createdResources")]
+    
+    pub created_resources: Option<Vec<String>>,
+    /// Output only. Target details used to import a disk image.
+    #[serde(rename="diskImageTargetDetails")]
+    
+    pub disk_image_target_details: Option<DiskImageTargetDetails>,
+    /// Output only. The time the image import was ended.
+    #[serde(rename="endTime")]
+    
+    pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. Provides details on the error that led to the image import state in case of an error.
+    
+    pub errors: Option<Vec<Status>>,
+    /// Output only. The resource path of the ImageImportJob.
+    
+    pub name: Option<String>,
+    /// Output only. The state of the image import.
+    
+    pub state: Option<String>,
+    /// Output only. The image import steps list representing its progress.
+    
+    pub steps: Option<Vec<ImageImportStep>>,
+    /// Output only. Warnings that occurred during the image import.
+    
+    pub warnings: Option<Vec<MigrationWarning>>,
+}
+
+impl client::ResponseResult for ImageImportJob {}
+
+
+/// Parameters affecting the OS adaptation process.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImageImportOsAdaptationParameters {
+    /// Optional. Set to true in order to generalize the imported image. The generalization process enables co-existence of multiple VMs created from the same image. For Windows, generalizing the image removes computer-specific information such as installed drivers and the computer security identifier (SID).
+    
+    pub generalize: Option<bool>,
+    /// Optional. Choose which type of license to apply to the imported image.
+    #[serde(rename="licenseType")]
+    
+    pub license_type: Option<String>,
+}
+
+impl client::Part for ImageImportOsAdaptationParameters {}
+
+
+/// ImageImportStep holds information about the image import step progress.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImageImportStep {
+    /// Adapting OS step.
+    #[serde(rename="adaptingOs")]
+    
+    pub adapting_os: Option<AdaptingOSStep>,
+    /// Creating image step.
+    #[serde(rename="creatingImage")]
+    
+    pub creating_image: Option<CreatingImageStep>,
+    /// Output only. The time the step has ended.
+    #[serde(rename="endTime")]
+    
+    pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Initializing step.
+    
+    pub initializing: Option<InitializingImageImportStep>,
+    /// Loading source files step.
+    #[serde(rename="loadingSourceFiles")]
+    
+    pub loading_source_files: Option<LoadingImageSourceFilesStep>,
+    /// Output only. The time the step has started.
+    #[serde(rename="startTime")]
+    
+    pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for ImageImportStep {}
+
+
+/// InitializingImageImportStep contains specific step details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InitializingImageImportStep { _never_set: Option<bool> }
+
+impl client::Part for InitializingImageImportStep {}
 
 
 /// InitializingReplicationStep contains specific step details.
@@ -1083,6 +1831,24 @@ impl client::Part for InitializingReplicationStep {}
 pub struct InstantiatingMigratedVMStep { _never_set: Option<bool> }
 
 impl client::Part for InstantiatingMigratedVMStep {}
+
+
+/// Describes a URL link.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Link {
+    /// Describes what the link offers.
+    
+    pub description: Option<String>,
+    /// The URL of the link.
+    
+    pub url: Option<String>,
+}
+
+impl client::Part for Link {}
 
 
 /// Response message for ‘ListCloneJobs’ request.
@@ -1190,6 +1956,60 @@ pub struct ListGroupsResponse {
 }
 
 impl client::ResponseResult for ListGroupsResponse {}
+
+
+/// Response message for ‘ListImageImportJobs’ call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations image imports image import jobs list projects](ProjectLocationImageImportImageImportJobListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListImageImportJobsResponse {
+    /// Output only. The list of target response.
+    #[serde(rename="imageImportJobs")]
+    
+    pub image_import_jobs: Option<Vec<ImageImportJob>>,
+    /// Output only. A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// Output only. Locations that could not be reached.
+    
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl client::ResponseResult for ListImageImportJobsResponse {}
+
+
+/// Response message for ‘ListImageImports’ call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations image imports list projects](ProjectLocationImageImportListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListImageImportsResponse {
+    /// Output only. The list of target response.
+    #[serde(rename="imageImports")]
+    
+    pub image_imports: Option<Vec<ImageImport>>,
+    /// Output only. A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// Output only. Locations that could not be reached.
+    
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl client::ResponseResult for ListImageImportsResponse {}
 
 
 /// The response message for Locations.ListLocations.
@@ -1372,7 +2192,36 @@ pub struct ListUtilizationReportsResponse {
 impl client::ResponseResult for ListUtilizationReportsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// LoadingImageSourceFilesStep contains specific step details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LoadingImageSourceFilesStep { _never_set: Option<bool> }
+
+impl client::Part for LoadingImageSourceFilesStep {}
+
+
+/// Provides a localized error message that is safe to return to the user which can be attached to an RPC error.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LocalizedMessage {
+    /// The locale used following the specification defined at https://www.rfc-editor.org/rfc/bcp/bcp47.txt. Examples are: "en-US", "fr-CH", "es-MX"
+    
+    pub locale: Option<String>,
+    /// The localized error message in the above locale.
+    
+    pub message: Option<String>,
+}
+
+impl client::Part for LocalizedMessage {}
+
+
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -1422,6 +2271,14 @@ pub struct MigratingVm {
     #[serde(rename="awsSourceVmDetails")]
     
     pub aws_source_vm_details: Option<AwsSourceVmDetails>,
+    /// Output only. Details of the VM from an Azure source.
+    #[serde(rename="azureSourceVmDetails")]
+    
+    pub azure_source_vm_details: Option<AzureSourceVmDetails>,
+    /// Details of the target Persistent Disks in Compute Engine.
+    #[serde(rename="computeEngineDisksTargetDefaults")]
+    
+    pub compute_engine_disks_target_defaults: Option<ComputeEngineDisksTargetDefaults>,
     /// Details of the target VM in Compute Engine.
     #[serde(rename="computeEngineTargetDefaults")]
     
@@ -1434,6 +2291,10 @@ pub struct MigratingVm {
     #[serde(rename="currentSyncInfo")]
     
     pub current_sync_info: Option<ReplicationCycle>,
+    /// Output only. Provides details of future CutoverJobs of a MigratingVm. Set to empty when cutover forecast is unavailable.
+    #[serde(rename="cutoverForecast")]
+    
+    pub cutover_forecast: Option<CutoverForecast>,
     /// The description attached to the migrating VM by the user.
     
     pub description: Option<String>,
@@ -1450,6 +2311,10 @@ pub struct MigratingVm {
     /// The labels of the migrating VM.
     
     pub labels: Option<HashMap<String, String>>,
+    /// Output only. Details of the last replication cycle. This will be updated whenever a replication cycle is finished and is not to be confused with last_sync which is only updated on successful replication cycles.
+    #[serde(rename="lastReplicationCycle")]
+    
+    pub last_replication_cycle: Option<ReplicationCycle>,
     /// Output only. The most updated snapshot created time in the source that finished replication.
     #[serde(rename="lastSync")]
     
@@ -1483,10 +2348,45 @@ pub struct MigratingVm {
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. Details of the VM from a Vmware source.
+    #[serde(rename="vmwareSourceVmDetails")]
+    
+    pub vmware_source_vm_details: Option<VmwareSourceVmDetails>,
 }
 
 impl client::RequestValue for MigratingVm {}
 impl client::ResponseResult for MigratingVm {}
+
+
+/// Represents migration resource warning information that can be used with google.rpc.Status message. MigrationWarning is used to present the user with warning information in migration operations.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MigrationWarning {
+    /// Suggested action for solving the warning.
+    #[serde(rename="actionItem")]
+    
+    pub action_item: Option<LocalizedMessage>,
+    /// The warning code.
+    
+    pub code: Option<String>,
+    /// URL(s) pointing to additional information on handling the current warning.
+    #[serde(rename="helpLinks")]
+    
+    pub help_links: Option<Vec<Link>>,
+    /// The localized warning message.
+    #[serde(rename="warningMessage")]
+    
+    pub warning_message: Option<LocalizedMessage>,
+    /// The time the warning occurred.
+    #[serde(rename="warningTime")]
+    
+    pub warning_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for MigrationWarning {}
 
 
 /// NetworkInterface represents a NIC of a VM.
@@ -1515,6 +2415,54 @@ pub struct NetworkInterface {
 impl client::Part for NetworkInterface {}
 
 
+/// A message describing the VM's OS. Including OS, Publisher, Offer and Plan if applicable.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OSDescription {
+    /// OS offer.
+    
+    pub offer: Option<String>,
+    /// OS plan.
+    
+    pub plan: Option<String>,
+    /// OS publisher.
+    
+    pub publisher: Option<String>,
+    /// OS type.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for OSDescription {}
+
+
+/// A message describing the OS disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OSDisk {
+    /// The disk's full name.
+    
+    pub name: Option<String>,
+    /// The disk's size in GB.
+    #[serde(rename="sizeGb")]
+    
+    pub size_gb: Option<i32>,
+    /// The disk's type.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for OSDisk {}
+
+
 /// This resource represents a long-running operation that is the result of a network API call.
 /// 
 /// # Activities
@@ -1527,6 +2475,9 @@ impl client::Part for NetworkInterface {}
 /// * [locations groups delete projects](ProjectLocationGroupDeleteCall) (response)
 /// * [locations groups patch projects](ProjectLocationGroupPatchCall) (response)
 /// * [locations groups remove group migration projects](ProjectLocationGroupRemoveGroupMigrationCall) (response)
+/// * [locations image imports image import jobs cancel projects](ProjectLocationImageImportImageImportJobCancelCall) (response)
+/// * [locations image imports create projects](ProjectLocationImageImportCreateCall) (response)
+/// * [locations image imports delete projects](ProjectLocationImageImportDeleteCall) (response)
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
 /// * [locations sources datacenter connectors create projects](ProjectLocationSourceDatacenterConnectorCreateCall) (response)
 /// * [locations sources datacenter connectors delete projects](ProjectLocationSourceDatacenterConnectorDeleteCall) (response)
@@ -1565,7 +2516,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1586,6 +2537,61 @@ impl client::ResponseResult for Operation {}
 pub struct PauseMigrationRequest { _never_set: Option<bool> }
 
 impl client::RequestValue for PauseMigrationRequest {}
+
+
+/// Details of a created Persistent Disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PersistentDisk {
+    /// The URI of the Persistent Disk.
+    #[serde(rename="diskUri")]
+    
+    pub disk_uri: Option<String>,
+    /// The ordinal number of the source VM disk.
+    #[serde(rename="sourceDiskNumber")]
+    
+    pub source_disk_number: Option<i32>,
+}
+
+impl client::Part for PersistentDisk {}
+
+
+/// Details for creation of a Persistent Disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PersistentDiskDefaults {
+    /// A map of labels to associate with the Persistent Disk.
+    #[serde(rename="additionalLabels")]
+    
+    pub additional_labels: Option<HashMap<String, String>>,
+    /// Optional. The name of the Persistent Disk to create.
+    #[serde(rename="diskName")]
+    
+    pub disk_name: Option<String>,
+    /// The disk type to use.
+    #[serde(rename="diskType")]
+    
+    pub disk_type: Option<String>,
+    /// Optional. The encryption to apply to the disk.
+    
+    pub encryption: Option<Encryption>,
+    /// Required. The ordinal number of the source VM disk.
+    #[serde(rename="sourceDiskNumber")]
+    
+    pub source_disk_number: Option<i32>,
+    /// Optional. Details for attachment of the disk to a VM. Used when the disk is set to be attacked to a target VM.
+    #[serde(rename="vmAttachmentDetails")]
+    
+    pub vm_attachment_details: Option<VmAttachmentDetails>,
+}
+
+impl client::Part for PersistentDiskDefaults {}
 
 
 /// PostProcessingStep contains specific step details.
@@ -1706,6 +2712,9 @@ pub struct ReplicationCycle {
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
     pub total_pause_duration: Option<client::chrono::Duration>,
+    /// Output only. Warnings that occurred during the cycle.
+    
+    pub warnings: Option<Vec<MigrationWarning>>,
 }
 
 impl client::ResponseResult for ReplicationCycle {}
@@ -1811,6 +2820,9 @@ pub struct Source {
     /// AWS type source details.
     
     pub aws: Option<AwsSourceDetails>,
+    /// Azure type source details.
+    
+    pub azure: Option<AzureSourceDetails>,
     /// Output only. The create time timestamp.
     #[serde(rename="createTime")]
     
@@ -1818,6 +2830,9 @@ pub struct Source {
     /// User-provided description of the source.
     
     pub description: Option<String>,
+    /// Optional. Immutable. The encryption details of the source data stored by the service.
+    
+    pub encryption: Option<Encryption>,
     /// The labels of the source.
     
     pub labels: Option<HashMap<String, String>>,
@@ -1914,7 +2929,7 @@ pub struct TargetProject {
     /// Output only. The name of the target project.
     
     pub name: Option<String>,
-    /// The target project ID (number) or project name.
+    /// Required. The target project ID (number) or project name.
     
     pub project: Option<String>,
     /// Output only. The last time the target project resource was updated.
@@ -1938,7 +2953,7 @@ impl client::ResponseResult for TargetProject {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpgradeApplianceRequest {
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     #[serde(rename="requestId")]
     
     pub request_id: Option<String>,
@@ -2030,6 +3045,42 @@ impl client::RequestValue for UtilizationReport {}
 impl client::ResponseResult for UtilizationReport {}
 
 
+/// Details for attachment of the disk to a VM.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VmAttachmentDetails {
+    /// Optional. Specifies a unique device name of your choice that is reflected into the /dev/disk/by-id/google-* tree of a Linux operating system running within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks.
+    #[serde(rename="deviceName")]
+    
+    pub device_name: Option<String>,
+}
+
+impl client::Part for VmAttachmentDetails {}
+
+
+/// Migrating VM source information about the VM capabilities needed for some Compute Engine features.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VmCapabilities {
+    /// Output only. The last time OS capabilities list was updated.
+    #[serde(rename="lastOsCapabilitiesUpdateTime")]
+    
+    pub last_os_capabilities_update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. Unordered list. List of certain VM OS capabilities needed for some Compute Engine features.
+    #[serde(rename="osCapabilities")]
+    
+    pub os_capabilities: Option<Vec<String>>,
+}
+
+impl client::Part for VmCapabilities {}
+
+
 /// Utilization information of a single VM.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2101,6 +3152,30 @@ pub struct VmUtilizationMetrics {
 impl client::Part for VmUtilizationMetrics {}
 
 
+/// The details of a Vmware VM disk.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VmwareDiskDetails {
+    /// The ordinal number of the disk.
+    #[serde(rename="diskNumber")]
+    
+    pub disk_number: Option<i32>,
+    /// The disk label.
+    
+    pub label: Option<String>,
+    /// Size in GB.
+    #[serde(rename="sizeGb")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub size_gb: Option<i64>,
+}
+
+impl client::Part for VmwareDiskDetails {}
+
+
 /// VmwareSourceDetails message describes a specific source details for the vmware source type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2111,6 +3186,10 @@ pub struct VmwareSourceDetails {
     /// Input only. The credentials password. This is write only and can not be read in a GET operation.
     
     pub password: Option<String>,
+    /// The hostname of the vcenter.
+    #[serde(rename="resolvedVcenterHost")]
+    
+    pub resolved_vcenter_host: Option<String>,
     /// The thumbprint representing the certificate for the vcenter.
     
     pub thumbprint: Option<String>,
@@ -2124,6 +3203,33 @@ pub struct VmwareSourceDetails {
 }
 
 impl client::Part for VmwareSourceDetails {}
+
+
+/// Represent the source Vmware VM details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VmwareSourceVmDetails {
+    /// The total size of the disks being migrated in bytes.
+    #[serde(rename="committedStorageBytes")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub committed_storage_bytes: Option<i64>,
+    /// The disks attached to the source VM.
+    
+    pub disks: Option<Vec<VmwareDiskDetails>>,
+    /// The firmware type of the source VM.
+    
+    pub firmware: Option<String>,
+    /// Output only. Information about VM capabilities needed for some Compute Engine features.
+    #[serde(rename="vmCapabilitiesInfo")]
+    
+    pub vm_capabilities_info: Option<VmCapabilities>,
+}
+
+impl client::Part for VmwareSourceVmDetails {}
 
 
 /// VmwareVmDetails describes a VM in vCenter.
@@ -2229,7 +3335,7 @@ impl client::Part for VmwareVmsDetails {}
 ///     ).build().await.unwrap();
 /// let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_groups_add_group_migration(...)`, `locations_groups_create(...)`, `locations_groups_delete(...)`, `locations_groups_get(...)`, `locations_groups_list(...)`, `locations_groups_patch(...)`, `locations_groups_remove_group_migration(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_sources_create(...)`, `locations_sources_datacenter_connectors_create(...)`, `locations_sources_datacenter_connectors_delete(...)`, `locations_sources_datacenter_connectors_get(...)`, `locations_sources_datacenter_connectors_list(...)`, `locations_sources_datacenter_connectors_upgrade_appliance(...)`, `locations_sources_delete(...)`, `locations_sources_fetch_inventory(...)`, `locations_sources_get(...)`, `locations_sources_list(...)`, `locations_sources_migrating_vms_clone_jobs_cancel(...)`, `locations_sources_migrating_vms_clone_jobs_create(...)`, `locations_sources_migrating_vms_clone_jobs_get(...)`, `locations_sources_migrating_vms_clone_jobs_list(...)`, `locations_sources_migrating_vms_create(...)`, `locations_sources_migrating_vms_cutover_jobs_cancel(...)`, `locations_sources_migrating_vms_cutover_jobs_create(...)`, `locations_sources_migrating_vms_cutover_jobs_get(...)`, `locations_sources_migrating_vms_cutover_jobs_list(...)`, `locations_sources_migrating_vms_delete(...)`, `locations_sources_migrating_vms_finalize_migration(...)`, `locations_sources_migrating_vms_get(...)`, `locations_sources_migrating_vms_list(...)`, `locations_sources_migrating_vms_patch(...)`, `locations_sources_migrating_vms_pause_migration(...)`, `locations_sources_migrating_vms_replication_cycles_get(...)`, `locations_sources_migrating_vms_replication_cycles_list(...)`, `locations_sources_migrating_vms_resume_migration(...)`, `locations_sources_migrating_vms_start_migration(...)`, `locations_sources_patch(...)`, `locations_sources_utilization_reports_create(...)`, `locations_sources_utilization_reports_delete(...)`, `locations_sources_utilization_reports_get(...)`, `locations_sources_utilization_reports_list(...)`, `locations_target_projects_create(...)`, `locations_target_projects_delete(...)`, `locations_target_projects_get(...)`, `locations_target_projects_list(...)` and `locations_target_projects_patch(...)`
+/// // like `locations_get(...)`, `locations_groups_add_group_migration(...)`, `locations_groups_create(...)`, `locations_groups_delete(...)`, `locations_groups_get(...)`, `locations_groups_list(...)`, `locations_groups_patch(...)`, `locations_groups_remove_group_migration(...)`, `locations_image_imports_create(...)`, `locations_image_imports_delete(...)`, `locations_image_imports_get(...)`, `locations_image_imports_image_import_jobs_cancel(...)`, `locations_image_imports_image_import_jobs_get(...)`, `locations_image_imports_image_import_jobs_list(...)`, `locations_image_imports_list(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_sources_create(...)`, `locations_sources_datacenter_connectors_create(...)`, `locations_sources_datacenter_connectors_delete(...)`, `locations_sources_datacenter_connectors_get(...)`, `locations_sources_datacenter_connectors_list(...)`, `locations_sources_datacenter_connectors_upgrade_appliance(...)`, `locations_sources_delete(...)`, `locations_sources_fetch_inventory(...)`, `locations_sources_get(...)`, `locations_sources_list(...)`, `locations_sources_migrating_vms_clone_jobs_cancel(...)`, `locations_sources_migrating_vms_clone_jobs_create(...)`, `locations_sources_migrating_vms_clone_jobs_get(...)`, `locations_sources_migrating_vms_clone_jobs_list(...)`, `locations_sources_migrating_vms_create(...)`, `locations_sources_migrating_vms_cutover_jobs_cancel(...)`, `locations_sources_migrating_vms_cutover_jobs_create(...)`, `locations_sources_migrating_vms_cutover_jobs_get(...)`, `locations_sources_migrating_vms_cutover_jobs_list(...)`, `locations_sources_migrating_vms_delete(...)`, `locations_sources_migrating_vms_finalize_migration(...)`, `locations_sources_migrating_vms_get(...)`, `locations_sources_migrating_vms_list(...)`, `locations_sources_migrating_vms_patch(...)`, `locations_sources_migrating_vms_pause_migration(...)`, `locations_sources_migrating_vms_replication_cycles_get(...)`, `locations_sources_migrating_vms_replication_cycles_list(...)`, `locations_sources_migrating_vms_resume_migration(...)`, `locations_sources_migrating_vms_start_migration(...)`, `locations_sources_patch(...)`, `locations_sources_utilization_reports_create(...)`, `locations_sources_utilization_reports_delete(...)`, `locations_sources_utilization_reports_get(...)`, `locations_sources_utilization_reports_list(...)`, `locations_target_projects_create(...)`, `locations_target_projects_delete(...)`, `locations_target_projects_get(...)`, `locations_target_projects_list(...)` and `locations_target_projects_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2382,6 +3488,140 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Initiates the cancellation of a running clone job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The image import job id.
+    pub fn locations_image_imports_image_import_jobs_cancel(&self, request: CancelImageImportJobRequest, name: &str) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S> {
+        ProjectLocationImageImportImageImportJobCancelCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of a single ImageImportJob.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The ImageImportJob name.
+    pub fn locations_image_imports_image_import_jobs_get(&self, name: &str) -> ProjectLocationImageImportImageImportJobGetCall<'a, S> {
+        ProjectLocationImageImportImageImportJobGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists ImageImportJobs in a given project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent, which owns this collection of targets.
+    pub fn locations_image_imports_image_import_jobs_list(&self, parent: &str) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        ProjectLocationImageImportImageImportJobListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new ImageImport in a given project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The ImageImport's parent.
+    pub fn locations_image_imports_create(&self, request: ImageImport, parent: &str) -> ProjectLocationImageImportCreateCall<'a, S> {
+        ProjectLocationImageImportCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _request_id: Default::default(),
+            _image_import_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a single ImageImport.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The ImageImport name.
+    pub fn locations_image_imports_delete(&self, name: &str) -> ProjectLocationImageImportDeleteCall<'a, S> {
+        ProjectLocationImageImportDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _request_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of a single ImageImport.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The ImageImport name.
+    pub fn locations_image_imports_get(&self, name: &str) -> ProjectLocationImageImportGetCall<'a, S> {
+        ProjectLocationImageImportGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists ImageImports in a given project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent, which owns this collection of targets.
+    pub fn locations_image_imports_list(&self, parent: &str) -> ProjectLocationImageImportListCall<'a, S> {
+        ProjectLocationImageImportListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
     /// 
     /// # Arguments
@@ -2435,7 +3675,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -2608,7 +3848,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists CloneJobs of a given migrating VM.
+    /// Lists the CloneJobs of a migrating VM. Only 25 most recent CloneJobs are listed.
     /// 
     /// # Arguments
     ///
@@ -2686,7 +3926,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists CutoverJobs of a given migrating VM.
+    /// Lists the CutoverJobs of a migrating VM. Only 25 most recent CutoverJobs are listed.
     /// 
     /// # Arguments
     ///
@@ -3777,7 +5017,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationGroupCreateCall<'a, S> {
@@ -4058,7 +5298,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationGroupDeleteCall<'a, S> {
@@ -4946,7 +6186,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationGroupPatchCall<'a, S> {
@@ -5315,6 +6555,2032 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectLocationGroupRemoveGroupMigrationCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Initiates the cancellation of a running clone job.
+///
+/// A builder for the *locations.imageImports.imageImportJobs.cancel* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// use vmmigration1::api::CancelImageImportJobRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CancelImageImportJobRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_image_import_jobs_cancel(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportImageImportJobCancelCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _request: CancelImageImportJobRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportImageImportJobCancelCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportImageImportJobCancelCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.imageImportJobs.cancel",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CancelImageImportJobRequest) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The image import job id.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportImageImportJobCancelCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets details of a single ImageImportJob.
+///
+/// A builder for the *locations.imageImports.imageImportJobs.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_image_import_jobs_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportImageImportJobGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportImageImportJobGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportImageImportJobGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ImageImportJob)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.imageImportJobs.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The ImageImportJob name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationImageImportImageImportJobGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportImageImportJobGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportImageImportJobGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportImageImportJobGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportImageImportJobGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportImageImportJobGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists ImageImportJobs in a given project.
+///
+/// A builder for the *locations.imageImports.imageImportJobs.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_image_import_jobs_list("parent")
+///              .page_token("rebum.")
+///              .page_size(-57)
+///              .order_by("ipsum")
+///              .filter("ipsum")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportImageImportJobListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportImageImportJobListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportImageImportJobListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListImageImportJobsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.imageImportJobs.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/imageImportJobs";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent, which owns this collection of targets.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A page token, received from a previous `ListImageImportJobs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListImageImportJobs` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of targets to return. The service may return fewer than this value. If unspecified, at most 500 targets will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. The order by fields for the result (according to https://google.aip.dev/132#ordering). Currently ordering is only possible by "name" field.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The filter request (according to https://google.aip.dev/160).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportImageImportJobListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportImageImportJobListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportImageImportJobListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportImageImportJobListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Creates a new ImageImport in a given project.
+///
+/// A builder for the *locations.imageImports.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// use vmmigration1::api::ImageImport;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImageImport::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_create(req, "parent")
+///              .request_id("gubergren")
+///              .image_import_id("ea")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _request: ImageImport,
+    _parent: String,
+    _request_id: Option<String>,
+    _image_import_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "requestId", "imageImportId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+        if let Some(value) = self._image_import_id.as_ref() {
+            params.push("imageImportId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/imageImports";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ImageImport) -> ProjectLocationImageImportCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The ImageImport's parent.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationImageImportCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationImageImportCreateCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// Required. The image import identifier. This value maximum length is 63 characters, and valid characters are /a-z-/. It must start with an english letter and must not end with a hyphen.
+    ///
+    /// Sets the *image import id* query property to the given value.
+    pub fn image_import_id(mut self, new_value: &str) -> ProjectLocationImageImportCreateCall<'a, S> {
+        self._image_import_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes a single ImageImport.
+///
+/// A builder for the *locations.imageImports.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_delete("name")
+///              .request_id("Lorem")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _name: String,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The ImageImport name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationImageImportDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationImageImportDeleteCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets details of a single ImageImport.
+///
+/// A builder for the *locations.imageImports.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ImageImport)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The ImageImport name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationImageImportGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists ImageImports in a given project.
+///
+/// A builder for the *locations.imageImports.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_vmmigration1 as vmmigration1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use vmmigration1::{VMMigrationService, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = VMMigrationService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_imports_list("parent")
+///              .page_token("sed")
+///              .page_size(-70)
+///              .order_by("sed")
+///              .filter("no")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationImageImportListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a VMMigrationService<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationImageImportListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationImageImportListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListImageImportsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "vmmigration.projects.locations.imageImports.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/imageImports";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent, which owns this collection of targets.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationImageImportListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A page token, received from a previous `ListImageImports` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListImageImports` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationImageImportListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of targets to return. The service may return fewer than this value. If unspecified, at most 500 targets will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationImageImportListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. The order by fields for the result (according to https://google.aip.dev/132#ordering). Currently ordering is only possible by "name" field.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationImageImportListCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The filter request (according to https://google.aip.dev/160).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationImageImportListCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationImageImportListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageImportListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationImageImportListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationImageImportListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationImageImportListCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -6137,7 +9403,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -6164,9 +9430,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("est")
-///              .page_size(-50)
-///              .filter("ipsum")
+///              .page_token("et")
+///              .page_size(-68)
+///              .filter("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6468,8 +9734,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_datacenter_connectors_create(req, "parent")
-///              .request_id("gubergren")
-///              .datacenter_connector_id("ea")
+///              .request_id("sed")
+///              .datacenter_connector_id("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6661,7 +9927,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceDatacenterConnectorCreateCall<'a, S> {
@@ -6778,7 +10044,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_datacenter_connectors_delete("name")
-///              .request_id("Lorem")
+///              .request_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6942,7 +10208,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceDatacenterConnectorDeleteCall<'a, S> {
@@ -7314,10 +10580,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_datacenter_connectors_list("parent")
-///              .page_token("sed")
-///              .page_size(-70)
-///              .order_by("sed")
-///              .filter("no")
+///              .page_token("consetetur")
+///              .page_size(-92)
+///              .order_by("dolor")
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8214,8 +11480,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_clone_jobs_create(req, "parent")
-///              .request_id("sed")
-///              .clone_job_id("et")
+///              .request_id("dolor")
+///              .clone_job_id("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8407,7 +11673,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceMigratingVmCloneJobCreateCall<'a, S> {
@@ -8759,7 +12025,7 @@ where
 }
 
 
-/// Lists CloneJobs of a given migrating VM.
+/// Lists the CloneJobs of a migrating VM. Only 25 most recent CloneJobs are listed.
 ///
 /// A builder for the *locations.sources.migratingVms.cloneJobs.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -8786,10 +12052,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_clone_jobs_list("parent")
-///              .page_token("erat")
-///              .page_size(-93)
-///              .order_by("duo")
-///              .filter("dolore")
+///              .page_token("invidunt")
+///              .page_size(-65)
+///              .order_by("vero")
+///              .filter("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9394,8 +12660,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_cutover_jobs_create(req, "parent")
-///              .request_id("amet.")
-///              .cutover_job_id("consetetur")
+///              .request_id("no")
+///              .cutover_job_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9587,7 +12853,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceMigratingVmCutoverJobCreateCall<'a, S> {
@@ -9939,7 +13205,7 @@ where
 }
 
 
-/// Lists CutoverJobs of a given migrating VM.
+/// Lists the CutoverJobs of a migrating VM. Only 25 most recent CutoverJobs are listed.
 ///
 /// A builder for the *locations.sources.migratingVms.cutoverJobs.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -9966,10 +13232,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_cutover_jobs_list("parent")
-///              .page_token("et")
-///              .page_size(-22)
-///              .order_by("sadipscing")
-///              .filter("Stet")
+///              .page_token("consetetur")
+///              .page_size(-28)
+///              .order_by("et")
+///              .filter("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10538,10 +13804,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_replication_cycles_list("parent")
-///              .page_token("vero")
-///              .page_size(-76)
-///              .order_by("invidunt")
-///              .filter("Stet")
+///              .page_token("sed")
+///              .page_size(-9)
+///              .order_by("dolores")
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10854,8 +14120,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_create(req, "parent")
-///              .request_id("elitr")
-///              .migrating_vm_id("Lorem")
+///              .request_id("accusam")
+///              .migrating_vm_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11047,7 +14313,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceMigratingVmCreateCall<'a, S> {
@@ -11718,7 +14984,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_get("name")
-///              .view("accusam")
+///              .view("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11992,11 +15258,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_list("parent")
-///              .view("consetetur")
-///              .page_token("voluptua.")
-///              .page_size(-72)
-///              .order_by("erat")
-///              .filter("consetetur")
+///              .view("ea")
+///              .page_token("sadipscing")
+///              .page_size(-6)
+///              .order_by("invidunt")
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12321,7 +15587,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_migrating_vms_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .request_id("sed")
+///              .request_id("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12520,7 +15786,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceMigratingVmPatchCall<'a, S> {
@@ -13512,8 +16778,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_utilization_reports_create(req, "parent")
-///              .utilization_report_id("accusam")
-///              .request_id("voluptua.")
+///              .utilization_report_id("aliquyam")
+///              .request_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13712,7 +16978,7 @@ where
         self._utilization_report_id = Some(new_value.to_string());
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceUtilizationReportCreateCall<'a, S> {
@@ -13822,7 +17088,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_utilization_reports_delete("name")
-///              .request_id("dolore")
+///              .request_id("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13986,7 +17252,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceUtilizationReportDeleteCall<'a, S> {
@@ -14096,7 +17362,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_utilization_reports_get("name")
-///              .view("voluptua.")
+///              .view("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14370,11 +17636,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_utilization_reports_list("parent")
-///              .view("ea")
-///              .page_token("sadipscing")
-///              .page_size(-6)
-///              .order_by("invidunt")
-///              .filter("no")
+///              .view("diam")
+///              .page_token("dolores")
+///              .page_size(-69)
+///              .order_by("et")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14698,8 +17964,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_create(req, "parent")
-///              .source_id("At")
-///              .request_id("sed")
+///              .source_id("et")
+///              .request_id("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14898,7 +18164,7 @@ where
         self._source_id = Some(new_value.to_string());
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceCreateCall<'a, S> {
@@ -15008,7 +18274,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_delete("name")
-///              .request_id("et")
+///              .request_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15172,7 +18438,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourceDeleteCall<'a, S> {
@@ -15282,8 +18548,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_fetch_inventory("source")
-///              .page_token("aliquyam")
-///              .page_size(-5)
+///              .page_token("At")
+///              .page_size(-45)
 ///              .force_refresh(true)
 ///              .doit().await;
 /// # }
@@ -15842,9 +19108,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_list("parent")
-///              .page_token("diam")
-///              .page_size(-19)
-///              .order_by("dolores")
+///              .page_token("aliquyam")
+///              .page_size(-47)
+///              .order_by("est")
 ///              .filter("et")
 ///              .doit().await;
 /// # }
@@ -16159,7 +19425,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sources_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .request_id("no")
+///              .request_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16358,7 +19624,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationSourcePatchCall<'a, S> {
@@ -16474,8 +19740,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_target_projects_create(req, "parent")
-///              .target_project_id("elitr")
-///              .request_id("sed")
+///              .target_project_id("Stet")
+///              .request_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16674,7 +19940,7 @@ where
         self._target_project_id = Some(new_value.to_string());
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationTargetProjectCreateCall<'a, S> {
@@ -16784,7 +20050,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_target_projects_delete("name")
-///              .request_id("nonumy")
+///              .request_id("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16948,7 +20214,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationTargetProjectDeleteCall<'a, S> {
@@ -17320,10 +20586,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_target_projects_list("parent")
-///              .page_token("aliquyam")
-///              .page_size(-69)
-///              .order_by("sadipscing")
-///              .filter("erat")
+///              .page_token("est")
+///              .page_size(-53)
+///              .order_by("sed")
+///              .filter("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17637,7 +20903,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_target_projects_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .request_id("amet")
+///              .request_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17836,7 +21102,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationTargetProjectPatchCall<'a, S> {
@@ -18208,9 +21474,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("sea")
-///              .page_size(-96)
-///              .filter("consetetur")
+///              .page_token("eos")
+///              .page_size(-68)
+///              .filter("sea")
 ///              .doit().await;
 /// # }
 /// ```

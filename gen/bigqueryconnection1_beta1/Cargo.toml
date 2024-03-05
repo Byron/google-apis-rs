@@ -4,12 +4,12 @@
 [package]
 
 name = "google-bigqueryconnection1_beta1"
-version = "5.0.3+20230115"
+version = "5.0.3+20240214"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with BigQuery Connection Service (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/bigqueryconnection1_beta1"
-homepage = "https://cloud.google.com/bigquery/"
-documentation = "https://docs.rs/google-bigqueryconnection1_beta1/5.0.3+20230115"
+homepage = "https://cloud.google.com/bigquery/docs/connections-api-intro"
+documentation = "https://docs.rs/google-bigqueryconnection1_beta1/5.0.3+20240214"
 license = "MIT"
 keywords = ["bigqueryconnection", "google", "protocol", "web", "api"]
 autobins = false

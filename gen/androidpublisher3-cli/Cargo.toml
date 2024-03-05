@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidpublisher3-cli"
-version = "5.0.3+20230124"
+version = "5.0.3+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Publisher (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-androidpublisher3]
 path = "../androidpublisher3"
-version = "5.0.3+20230124"
+version = "5.0.3+20240229"
 

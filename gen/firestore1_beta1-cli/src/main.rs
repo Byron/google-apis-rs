@@ -870,6 +870,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "add-target.documents.documents" => Some(("addTarget.documents.documents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "add-target.expected-count" => Some(("addTarget.expectedCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.once" => Some(("addTarget.once", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.parent" => Some(("addTarget.query.parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.end-at.before" => Some(("addTarget.query.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -897,7 +898,7 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "remove-target" => Some(("removeTarget", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "documents", "double-value", "end-at", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2406,7 +2407,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("databases-documents-listen",
-                    Some(r##"Listens to changes."##),
+                    Some(r##"Listens to changes. This method is only available via gRPC or WebChannel (not REST)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli/projects_databases-documents-listen",
                   vec![
                     (Some(r##"database"##),
@@ -2574,7 +2575,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("databases-documents-write",
-                    Some(r##"Streams batches of document updates and deletes, in order."##),
+                    Some(r##"Streams batches of document updates and deletes, in order. This method is only available via gRPC or WebChannel (not REST)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli/projects_databases-documents-write",
                   vec![
                     (Some(r##"database"##),
@@ -2757,7 +2758,7 @@ async fn main() {
     
     let mut app = App::new("firestore1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230118")
+           .version("5.0.3+20240226")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli")
            .arg(Arg::with_name("url")

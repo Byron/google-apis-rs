@@ -75,6 +75,9 @@ where
                 match &temp_cursor.to_string()[..] {
                     "catalog-attribute.dynamic-facetable-option" => Some(("catalogAttribute.dynamicFacetableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "catalog-attribute.exact-searchable-option" => Some(("catalogAttribute.exactSearchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "catalog-attribute.facet-config.merged-facet.merged-facet-key" => Some(("catalogAttribute.facetConfig.mergedFacet.mergedFacetKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "catalog-attribute.facet-config.rerank-config.facet-values" => Some(("catalogAttribute.facetConfig.rerankConfig.facetValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "catalog-attribute.facet-config.rerank-config.rerank-facet" => Some(("catalogAttribute.facetConfig.rerankConfig.rerankFacet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "catalog-attribute.in-use" => Some(("catalogAttribute.inUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "catalog-attribute.indexable-option" => Some(("catalogAttribute.indexableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "catalog-attribute.key" => Some(("catalogAttribute.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -82,7 +85,7 @@ where
                     "catalog-attribute.searchable-option" => Some(("catalogAttribute.searchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "catalog-attribute.type" => Some(("catalogAttribute.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["catalog-attribute", "dynamic-facetable-option", "exact-searchable-option", "in-use", "indexable-option", "key", "retrievable-option", "searchable-option", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["catalog-attribute", "dynamic-facetable-option", "exact-searchable-option", "facet-config", "facet-values", "in-use", "indexable-option", "key", "merged-facet", "merged-facet-key", "rerank-config", "rerank-facet", "retrievable-option", "searchable-option", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -252,6 +255,9 @@ where
                 match &temp_cursor.to_string()[..] {
                     "catalog-attribute.dynamic-facetable-option" => Some(("catalogAttribute.dynamicFacetableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "catalog-attribute.exact-searchable-option" => Some(("catalogAttribute.exactSearchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "catalog-attribute.facet-config.merged-facet.merged-facet-key" => Some(("catalogAttribute.facetConfig.mergedFacet.mergedFacetKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "catalog-attribute.facet-config.rerank-config.facet-values" => Some(("catalogAttribute.facetConfig.rerankConfig.facetValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "catalog-attribute.facet-config.rerank-config.rerank-facet" => Some(("catalogAttribute.facetConfig.rerankConfig.rerankFacet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "catalog-attribute.in-use" => Some(("catalogAttribute.inUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "catalog-attribute.indexable-option" => Some(("catalogAttribute.indexableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "catalog-attribute.key" => Some(("catalogAttribute.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -260,7 +266,7 @@ where
                     "catalog-attribute.type" => Some(("catalogAttribute.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["catalog-attribute", "dynamic-facetable-option", "exact-searchable-option", "in-use", "indexable-option", "key", "retrievable-option", "searchable-option", "type", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["catalog-attribute", "dynamic-facetable-option", "exact-searchable-option", "facet-config", "facet-values", "in-use", "indexable-option", "key", "merged-facet", "merged-facet-key", "rerank-config", "rerank-facet", "retrievable-option", "searchable-option", "type", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1084,6 +1090,92 @@ where
         }
     }
 
+    async fn _projects_locations_catalogs_branches_products_purge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "force"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2PurgeProductsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_branches_products_purge(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_catalogs_branches_products_remove_fulfillment_places(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1409,6 +1501,9 @@ where
                 "language-codes" => {
                     call = call.add_language_codes(value.unwrap_or(""));
                 },
+                "entity" => {
+                    call = call.entity(value.unwrap_or(""));
+                },
                 "device-type" => {
                     call = call.device_type(value.unwrap_or(""));
                 },
@@ -1428,7 +1523,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dataset", "device-type", "language-codes", "max-suggestions", "query", "visitor-id"].iter().map(|v|*v));
+                                                                           v.extend(["dataset", "device-type", "entity", "language-codes", "max-suggestions", "query", "visitor-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1583,6 +1678,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rule.boost-action.boost" => Some(("rule.boostAction.boost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "rule.boost-action.products-filter" => Some(("rule.boostAction.productsFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rule.condition.page-categories" => Some(("rule.condition.pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.do-not-associate-action.do-not-associate-terms" => Some(("rule.doNotAssociateAction.doNotAssociateTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.do-not-associate-action.query-terms" => Some(("rule.doNotAssociateAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.do-not-associate-action.terms" => Some(("rule.doNotAssociateAction.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1592,6 +1688,7 @@ where
                     "rule.oneway-synonyms-action.query-terms" => Some(("rule.onewaySynonymsAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.oneway-synonyms-action.synonyms" => Some(("rule.onewaySynonymsAction.synonyms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.redirect-action.redirect-uri" => Some(("rule.redirectAction.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rule.remove-facet-action.attribute-names" => Some(("rule.removeFacetAction.attributeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.replacement-action.query-terms" => Some(("rule.replacementAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.replacement-action.replacement-term" => Some(("rule.replacementAction.replacementTerm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rule.replacement-action.term" => Some(("rule.replacementAction.term", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1599,7 +1696,7 @@ where
                     "search-solution-use-case" => Some(("searchSolutionUseCase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["associated-serving-config-ids", "boost", "boost-action", "display-name", "do-not-associate-action", "do-not-associate-terms", "filter", "filter-action", "ignore-action", "ignore-terms", "name", "oneway-synonyms-action", "oneway-terms", "products-filter", "query-terms", "redirect-action", "redirect-uri", "replacement-action", "replacement-term", "rule", "search-solution-use-case", "solution-types", "synonyms", "term", "terms", "twoway-synonyms-action"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["associated-serving-config-ids", "attribute-names", "boost", "boost-action", "condition", "display-name", "do-not-associate-action", "do-not-associate-terms", "filter", "filter-action", "ignore-action", "ignore-terms", "name", "oneway-synonyms-action", "oneway-terms", "page-categories", "products-filter", "query-terms", "redirect-action", "redirect-uri", "remove-facet-action", "replacement-action", "replacement-term", "rule", "search-solution-use-case", "solution-types", "synonyms", "term", "terms", "twoway-synonyms-action"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1857,6 +1954,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rule.boost-action.boost" => Some(("rule.boostAction.boost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "rule.boost-action.products-filter" => Some(("rule.boostAction.productsFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rule.condition.page-categories" => Some(("rule.condition.pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.do-not-associate-action.do-not-associate-terms" => Some(("rule.doNotAssociateAction.doNotAssociateTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.do-not-associate-action.query-terms" => Some(("rule.doNotAssociateAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.do-not-associate-action.terms" => Some(("rule.doNotAssociateAction.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1866,6 +1964,7 @@ where
                     "rule.oneway-synonyms-action.query-terms" => Some(("rule.onewaySynonymsAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.oneway-synonyms-action.synonyms" => Some(("rule.onewaySynonymsAction.synonyms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.redirect-action.redirect-uri" => Some(("rule.redirectAction.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rule.remove-facet-action.attribute-names" => Some(("rule.removeFacetAction.attributeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.replacement-action.query-terms" => Some(("rule.replacementAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rule.replacement-action.replacement-term" => Some(("rule.replacementAction.replacementTerm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rule.replacement-action.term" => Some(("rule.replacementAction.term", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1873,7 +1972,7 @@ where
                     "search-solution-use-case" => Some(("searchSolutionUseCase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["associated-serving-config-ids", "boost", "boost-action", "display-name", "do-not-associate-action", "do-not-associate-terms", "filter", "filter-action", "ignore-action", "ignore-terms", "name", "oneway-synonyms-action", "oneway-terms", "products-filter", "query-terms", "redirect-action", "redirect-uri", "replacement-action", "replacement-term", "rule", "search-solution-use-case", "solution-types", "synonyms", "term", "terms", "twoway-synonyms-action"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["associated-serving-config-ids", "attribute-names", "boost", "boost-action", "condition", "display-name", "do-not-associate-action", "do-not-associate-terms", "filter", "filter-action", "ignore-action", "ignore-terms", "name", "oneway-synonyms-action", "oneway-terms", "page-categories", "products-filter", "query-terms", "redirect-action", "redirect-uri", "remove-facet-action", "replacement-action", "replacement-term", "rule", "search-solution-use-case", "solution-types", "synonyms", "term", "terms", "twoway-synonyms-action"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1904,6 +2003,95 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_export_analytics_metrics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.bigquery-destination.dataset-id" => Some(("outputConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.bigquery-destination.table-id-prefix" => Some(("outputConfig.bigqueryDestination.tableIdPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.bigquery-destination.table-type" => Some(("outputConfig.bigqueryDestination.tableType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.gcs-destination.output-uri-prefix" => Some(("outputConfig.gcsDestination.outputUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "dataset-id", "filter", "gcs-destination", "output-config", "output-uri-prefix", "table-id-prefix", "table-type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2ExportAnalyticsMetricsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_export_analytics_metrics(request, opt.value_of("catalog").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2119,6 +2307,625 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-state" => Some(("dataState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filtering-option" => Some(("filteringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-tune-time" => Some(("lastTuneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-features-config.frequently-bought-together-config.context-products-type" => Some(("modelFeaturesConfig.frequentlyBoughtTogetherConfig.contextProductsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-objective" => Some(("optimizationObjective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "periodic-tuning-state" => Some(("periodicTuningState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-state" => Some(("servingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-state" => Some(("trainingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tuning-operation" => Some(("tuningOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-products-type", "create-time", "data-state", "display-name", "filtering-option", "frequently-bought-together-config", "last-tune-time", "model-features-config", "name", "optimization-objective", "periodic-tuning-state", "serving-state", "training-state", "tuning-operation", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2Model = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_models_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "dry-run" => {
+                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_catalogs_models_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_catalogs_models_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_catalogs_models_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-state" => Some(("dataState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filtering-option" => Some(("filteringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-tune-time" => Some(("lastTuneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-features-config.frequently-bought-together-config.context-products-type" => Some(("modelFeaturesConfig.frequentlyBoughtTogetherConfig.contextProductsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-objective" => Some(("optimizationObjective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "periodic-tuning-state" => Some(("periodicTuningState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-state" => Some(("servingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-state" => Some(("trainingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tuning-operation" => Some(("tuningOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-products-type", "create-time", "data-state", "display-name", "filtering-option", "frequently-bought-together-config", "last-tune-time", "model-features-config", "name", "optimization-objective", "periodic-tuning-state", "serving-state", "training-state", "tuning-operation", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2Model = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_models_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_pause(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2PauseModelRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_models_pause(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_resume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2ResumeModelRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_models_resume(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_models_tune(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2TuneModelRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_models_tune(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2390,6 +3197,7 @@ where
                     "user-event.completion-detail.completion-attribution-token" => Some(("userEvent.completionDetail.completionAttributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.completion-detail.selected-position" => Some(("userEvent.completionDetail.selectedPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "user-event.completion-detail.selected-suggestion" => Some(("userEvent.completionDetail.selectedSuggestion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-event.entity" => Some(("userEvent.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.event-time" => Some(("userEvent.eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.event-type" => Some(("userEvent.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.experiment-ids" => Some(("userEvent.experimentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2414,7 +3222,7 @@ where
                     "user-event.visitor-id" => Some(("userEvent.visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "labels", "offset", "order-by", "page-categories", "page-size", "page-token", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-event", "user-id", "user-info", "validate-only", "visitor-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "entity", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "labels", "offset", "order-by", "page-categories", "page-size", "page-token", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-event", "user-id", "user-info", "validate-only", "visitor-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2501,6 +3309,7 @@ where
                     "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-filter" => Some(("canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2521,7 +3330,7 @@ where
                     "variant-rollup-keys" => Some(("variantRollupKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "direct-user-request", "dynamic-facet-spec", "filter", "ip-address", "labels", "mode", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "query", "query-expansion-spec", "search-mode", "skip-boost-spec-validation", "spell-correction-spec", "user-agent", "user-id", "user-info", "variant-rollup-keys", "visitor-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "direct-user-request", "dynamic-facet-spec", "entity", "filter", "ip-address", "labels", "mode", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "query", "query-expansion-spec", "search-mode", "skip-boost-spec-validation", "spell-correction-spec", "user-agent", "user-id", "user-info", "variant-rollup-keys", "visitor-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3075,6 +3884,7 @@ where
                     "user-event.completion-detail.completion-attribution-token" => Some(("userEvent.completionDetail.completionAttributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.completion-detail.selected-position" => Some(("userEvent.completionDetail.selectedPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "user-event.completion-detail.selected-suggestion" => Some(("userEvent.completionDetail.selectedSuggestion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-event.entity" => Some(("userEvent.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.event-time" => Some(("userEvent.eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.event-type" => Some(("userEvent.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-event.experiment-ids" => Some(("userEvent.experimentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3099,7 +3909,7 @@ where
                     "user-event.visitor-id" => Some(("userEvent.visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "labels", "offset", "order-by", "page-categories", "page-size", "page-token", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-event", "user-id", "user-info", "validate-only", "visitor-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "entity", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "labels", "offset", "order-by", "page-categories", "page-size", "page-token", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-event", "user-id", "user-info", "validate-only", "visitor-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3271,6 +4081,7 @@ where
                     "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-filter" => Some(("canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3291,7 +4102,7 @@ where
                     "variant-rollup-keys" => Some(("variantRollupKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "direct-user-request", "dynamic-facet-spec", "filter", "ip-address", "labels", "mode", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "query", "query-expansion-spec", "search-mode", "skip-boost-spec-validation", "spell-correction-spec", "user-agent", "user-id", "user-info", "variant-rollup-keys", "visitor-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "direct-user-request", "dynamic-facet-spec", "entity", "filter", "ip-address", "labels", "mode", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "query", "query-expansion-spec", "search-mode", "skip-boost-spec-validation", "spell-correction-spec", "user-agent", "user-id", "user-info", "variant-rollup-keys", "visitor-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4010,6 +4821,7 @@ where
                     "completion-detail.completion-attribution-token" => Some(("completionDetail.completionAttributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "completion-detail.selected-position" => Some(("completionDetail.selectedPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "completion-detail.selected-suggestion" => Some(("completionDetail.selectedSuggestion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "experiment-ids" => Some(("experimentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -4033,7 +4845,7 @@ where
                     "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "offset", "order-by", "page-categories", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-id", "user-info", "visitor-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "entity", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "offset", "order-by", "page-categories", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-id", "user-info", "visitor-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4368,6 +5180,9 @@ where
                     ("locations-catalogs-branches-products-patch", Some(opt)) => {
                         call_result = self._projects_locations_catalogs_branches_products_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-catalogs-branches-products-purge", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_branches_products_purge(opt, dry_run, &mut err).await;
+                    },
                     ("locations-catalogs-branches-products-remove-fulfillment-places", Some(opt)) => {
                         call_result = self._projects_locations_catalogs_branches_products_remove_fulfillment_places(opt, dry_run, &mut err).await;
                     },
@@ -4398,6 +5213,9 @@ where
                     ("locations-catalogs-controls-patch", Some(opt)) => {
                         call_result = self._projects_locations_catalogs_controls_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-catalogs-export-analytics-metrics", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_export_analytics_metrics(opt, dry_run, &mut err).await;
+                    },
                     ("locations-catalogs-get-attributes-config", Some(opt)) => {
                         call_result = self._projects_locations_catalogs_get_attributes_config(opt, dry_run, &mut err).await;
                     },
@@ -4409,6 +5227,30 @@ where
                     },
                     ("locations-catalogs-list", Some(opt)) => {
                         call_result = self._projects_locations_catalogs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-create", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-delete", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-get", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-list", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-patch", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-pause", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_pause(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-resume", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_resume(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-catalogs-models-tune", Some(opt)) => {
+                        call_result = self._projects_locations_catalogs_models_tune(opt, dry_run, &mut err).await;
                     },
                     ("locations-catalogs-operations-get", Some(opt)) => {
                         call_result = self._projects_locations_catalogs_operations_get(opt, dry_run, &mut err).await;
@@ -4567,7 +5409,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-catalogs-attributes-config-add-catalog-attribute', 'locations-catalogs-attributes-config-remove-catalog-attribute', 'locations-catalogs-attributes-config-replace-catalog-attribute', 'locations-catalogs-branches-operations-get', 'locations-catalogs-branches-products-add-fulfillment-places', 'locations-catalogs-branches-products-add-local-inventories', 'locations-catalogs-branches-products-create', 'locations-catalogs-branches-products-delete', 'locations-catalogs-branches-products-get', 'locations-catalogs-branches-products-import', 'locations-catalogs-branches-products-list', 'locations-catalogs-branches-products-patch', 'locations-catalogs-branches-products-remove-fulfillment-places', 'locations-catalogs-branches-products-remove-local-inventories', 'locations-catalogs-branches-products-set-inventory', 'locations-catalogs-complete-query', 'locations-catalogs-completion-data-import', 'locations-catalogs-controls-create', 'locations-catalogs-controls-delete', 'locations-catalogs-controls-get', 'locations-catalogs-controls-list', 'locations-catalogs-controls-patch', 'locations-catalogs-get-attributes-config', 'locations-catalogs-get-completion-config', 'locations-catalogs-get-default-branch', 'locations-catalogs-list', 'locations-catalogs-operations-get', 'locations-catalogs-operations-list', 'locations-catalogs-patch', 'locations-catalogs-placements-predict', 'locations-catalogs-placements-search', 'locations-catalogs-serving-configs-add-control', 'locations-catalogs-serving-configs-create', 'locations-catalogs-serving-configs-delete', 'locations-catalogs-serving-configs-get', 'locations-catalogs-serving-configs-list', 'locations-catalogs-serving-configs-patch', 'locations-catalogs-serving-configs-predict', 'locations-catalogs-serving-configs-remove-control', 'locations-catalogs-serving-configs-search', 'locations-catalogs-set-default-branch', 'locations-catalogs-update-attributes-config', 'locations-catalogs-update-completion-config', 'locations-catalogs-user-events-collect', 'locations-catalogs-user-events-import', 'locations-catalogs-user-events-purge', 'locations-catalogs-user-events-rejoin', 'locations-catalogs-user-events-write', 'locations-operations-get', 'locations-operations-list', 'operations-get' and 'operations-list'", vec![
+        ("projects", "methods: 'locations-catalogs-attributes-config-add-catalog-attribute', 'locations-catalogs-attributes-config-remove-catalog-attribute', 'locations-catalogs-attributes-config-replace-catalog-attribute', 'locations-catalogs-branches-operations-get', 'locations-catalogs-branches-products-add-fulfillment-places', 'locations-catalogs-branches-products-add-local-inventories', 'locations-catalogs-branches-products-create', 'locations-catalogs-branches-products-delete', 'locations-catalogs-branches-products-get', 'locations-catalogs-branches-products-import', 'locations-catalogs-branches-products-list', 'locations-catalogs-branches-products-patch', 'locations-catalogs-branches-products-purge', 'locations-catalogs-branches-products-remove-fulfillment-places', 'locations-catalogs-branches-products-remove-local-inventories', 'locations-catalogs-branches-products-set-inventory', 'locations-catalogs-complete-query', 'locations-catalogs-completion-data-import', 'locations-catalogs-controls-create', 'locations-catalogs-controls-delete', 'locations-catalogs-controls-get', 'locations-catalogs-controls-list', 'locations-catalogs-controls-patch', 'locations-catalogs-export-analytics-metrics', 'locations-catalogs-get-attributes-config', 'locations-catalogs-get-completion-config', 'locations-catalogs-get-default-branch', 'locations-catalogs-list', 'locations-catalogs-models-create', 'locations-catalogs-models-delete', 'locations-catalogs-models-get', 'locations-catalogs-models-list', 'locations-catalogs-models-patch', 'locations-catalogs-models-pause', 'locations-catalogs-models-resume', 'locations-catalogs-models-tune', 'locations-catalogs-operations-get', 'locations-catalogs-operations-list', 'locations-catalogs-patch', 'locations-catalogs-placements-predict', 'locations-catalogs-placements-search', 'locations-catalogs-serving-configs-add-control', 'locations-catalogs-serving-configs-create', 'locations-catalogs-serving-configs-delete', 'locations-catalogs-serving-configs-get', 'locations-catalogs-serving-configs-list', 'locations-catalogs-serving-configs-patch', 'locations-catalogs-serving-configs-predict', 'locations-catalogs-serving-configs-remove-control', 'locations-catalogs-serving-configs-search', 'locations-catalogs-set-default-branch', 'locations-catalogs-update-attributes-config', 'locations-catalogs-update-completion-config', 'locations-catalogs-user-events-collect', 'locations-catalogs-user-events-import', 'locations-catalogs-user-events-purge', 'locations-catalogs-user-events-rejoin', 'locations-catalogs-user-events-write', 'locations-operations-get', 'locations-operations-list', 'operations-get' and 'operations-list'", vec![
             ("locations-catalogs-attributes-config-add-catalog-attribute",
                     Some(r##"Adds the specified CatalogAttribute to the AttributesConfig. If the CatalogAttribute to add already exists, an ALREADY_EXISTS error is returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-attributes-config-add-catalog-attribute",
@@ -4675,7 +5517,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-branches-products-add-fulfillment-places",
-                    Some(r##"Incrementally adds place IDs to Product.fulfillment_info.place_ids. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, the added place IDs are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete. This feature is only available for users who have Retail Search enabled. Enable Retail Search on Cloud Console before using this feature."##),
+                    Some(r##"We recommend that you use the ProductService.AddLocalInventories method instead of the ProductService.AddFulfillmentPlaces method. ProductService.AddLocalInventories achieves the same results but provides more fine-grained control over ingesting local inventory data. Incrementally adds place IDs to Product.fulfillment_info.place_ids. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, the added place IDs are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-branches-products-add-fulfillment-places",
                   vec![
                     (Some(r##"product"##),
@@ -4703,7 +5545,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-branches-products-add-local-inventories",
-                    Some(r##"Updates local inventory information for a Product at a list of places, while respecting the last update timestamps of each inventory field. This process is asynchronous and does not require the Product to exist before updating inventory information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, updates are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. Local inventory information can only be modified using this method. ProductService.CreateProduct and ProductService.UpdateProduct has no effect on local inventories. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete. This feature is only available for users who have Retail Search enabled. Enable Retail Search on Cloud Console before using this feature."##),
+                    Some(r##"Updates local inventory information for a Product at a list of places, while respecting the last update timestamps of each inventory field. This process is asynchronous and does not require the Product to exist before updating inventory information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, updates are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. Local inventory information can only be modified using this method. ProductService.CreateProduct and ProductService.UpdateProduct has no effect on local inventories. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-branches-products-add-local-inventories",
                   vec![
                     (Some(r##"product"##),
@@ -4880,8 +5722,36 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-branches-products-purge",
+                    Some(r##"Permanently deletes all selected Products under a branch. This process is asynchronous. If the request is valid, the removal will be enqueued and processed offline. Depending on the number of Products, this operation could take hours to complete. Before the operation completes, some Products may still be returned by ProductService.GetProduct or ProductService.ListProducts. Depending on the number of Products, this operation could take hours to complete. To get a sample of Products that would be deleted, set PurgeProductsRequest.force to false."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-branches-products-purge",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name of the branch under which the products are created. The format is `projects/${projectId}/locations/global/catalogs/${catalogId}/branches/${branchId}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-branches-products-remove-fulfillment-places",
-                    Some(r##"Incrementally removes place IDs from a Product.fulfillment_info.place_ids. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, the removed place IDs are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete. This feature is only available for users who have Retail Search enabled. Enable Retail Search on Cloud Console before using this feature."##),
+                    Some(r##"We recommend that you use the ProductService.RemoveLocalInventories method instead of the ProductService.RemoveFulfillmentPlaces method. ProductService.RemoveLocalInventories achieves the same results but provides more fine-grained control over ingesting local inventory data. Incrementally removes place IDs from a Product.fulfillment_info.place_ids. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update will be enqueued and processed downstream. As a consequence, when a response is returned, the removed place IDs are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-branches-products-remove-fulfillment-places",
                   vec![
                     (Some(r##"product"##),
@@ -4909,7 +5779,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-branches-products-remove-local-inventories",
-                    Some(r##"Remove local inventory information for a Product at a list of places at a removal timestamp. This process is asynchronous. If the request is valid, the removal will be enqueued and processed downstream. As a consequence, when a response is returned, removals are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. Local inventory information can only be removed using this method. ProductService.CreateProduct and ProductService.UpdateProduct has no effect on local inventories. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete. This feature is only available for users who have Retail Search enabled. Enable Retail Search on Cloud Console before using this feature."##),
+                    Some(r##"Remove local inventory information for a Product at a list of places at a removal timestamp. This process is asynchronous. If the request is valid, the removal will be enqueued and processed downstream. As a consequence, when a response is returned, removals are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. Local inventory information can only be removed using this method. ProductService.CreateProduct and ProductService.UpdateProduct has no effect on local inventories. The returned Operations will be obsolete after 1 day, and GetOperation API will return NOT_FOUND afterwards. If conflicting updates are issued, the Operations associated with the stale updates will not be marked as done until being obsolete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-branches-products-remove-local-inventories",
                   vec![
                     (Some(r##"product"##),
@@ -4937,7 +5807,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-branches-products-set-inventory",
-                    Some(r##"Updates inventory information for a Product while respecting the last update timestamps of each inventory field. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update is enqueued and processed downstream. As a consequence, when a response is returned, updates are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. When inventory is updated with ProductService.CreateProduct and ProductService.UpdateProduct, the specified inventory field value(s) overwrite any existing value(s) while ignoring the last update time for this field. Furthermore, the last update times for the specified inventory fields are overwritten by the times of the ProductService.CreateProduct or ProductService.UpdateProduct request. If no inventory fields are set in CreateProductRequest.product, then any pre-existing inventory information for this product is used. If no inventory fields are set in SetInventoryRequest.set_mask, then any existing inventory information is preserved. Pre-existing inventory information can only be updated with ProductService.SetInventory, ProductService.AddFulfillmentPlaces, and ProductService.RemoveFulfillmentPlaces. The returned Operations is obsolete after one day, and the GetOperation API returns `NOT_FOUND` afterwards. If conflicting updates are issued, the Operations associated with the stale updates are not marked as done until they are obsolete. This feature is only available for users who have Retail Search enabled. Enable Retail Search on Cloud Console before using this feature."##),
+                    Some(r##"Updates inventory information for a Product while respecting the last update timestamps of each inventory field. This process is asynchronous and does not require the Product to exist before updating fulfillment information. If the request is valid, the update is enqueued and processed downstream. As a consequence, when a response is returned, updates are not immediately manifested in the Product queried by ProductService.GetProduct or ProductService.ListProducts. When inventory is updated with ProductService.CreateProduct and ProductService.UpdateProduct, the specified inventory field value(s) overwrite any existing value(s) while ignoring the last update time for this field. Furthermore, the last update times for the specified inventory fields are overwritten by the times of the ProductService.CreateProduct or ProductService.UpdateProduct request. If no inventory fields are set in CreateProductRequest.product, then any pre-existing inventory information for this product is used. If no inventory fields are set in SetInventoryRequest.set_mask, then any existing inventory information is preserved. Pre-existing inventory information can only be updated with ProductService.SetInventory, ProductService.AddFulfillmentPlaces, and ProductService.RemoveFulfillmentPlaces. The returned Operations is obsolete after one day, and the GetOperation API returns `NOT_FOUND` afterwards. If conflicting updates are issued, the Operations associated with the stale updates are not marked as done until they are obsolete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-branches-products-set-inventory",
                   vec![
                     (Some(r##"name"##),
@@ -5136,6 +6006,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-export-analytics-metrics",
+                    Some(r##"Exports analytics metrics. `Operation.response` is of type `ExportAnalyticsMetricsResponse`. `Operation.metadata` is of type `ExportMetadata`."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-export-analytics-metrics",
+                  vec![
+                    (Some(r##"catalog"##),
+                     None,
+                     Some(r##"Required. Full resource name of the parent catalog. Expected format: `projects/*/locations/*/catalogs/*`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-get-attributes-config",
                     Some(r##"Gets an AttributesConfig."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-get-attributes-config",
@@ -5224,6 +6122,212 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-models-create",
+                    Some(r##"Creates a new model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource under which to create the model. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-delete",
+                    Some(r##"Deletes an existing model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the Model to delete. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-get",
+                    Some(r##"Gets a model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the Model to get. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog}/models/{model_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-list",
+                    Some(r##"Lists all the models linked to this event store."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent for which to list models. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-patch",
+                    Some(r##"Update of model metadata. Only fields that currently can be updated are: `filtering_option` and `periodic_tuning_state`. If other values are provided, this API method ignores them."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified resource name of the model. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}` catalog_id has char limit of 50. recommendation_model_id has char limit of 40."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-pause",
+                    Some(r##"Pauses the training of an existing model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-pause",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the model to pause. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-resume",
+                    Some(r##"Resumes the training of an existing model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-resume",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the model to resume. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-models-tune",
+                    Some(r##"Tunes an existing model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-models-tune",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the model to tune. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-operations-get",
                     Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-operations-get",
@@ -5247,7 +6351,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -5330,7 +6434,7 @@ async fn main() {
                   vec![
                     (Some(r##"placement"##),
                      None,
-                     Some(r##"Required. The resource name of the Retail Search serving config, such as `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` or the name of the legacy placement resource, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search`. This field is used to identify the serving config name and the set of models that will be used to make the search."##),
+                     Some(r##"Required. The resource name of the Retail Search serving config, such as `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` or the name of the legacy placement resource, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search`. This field is used to identify the serving config name and the set of models that are used to make the search."##),
                      Some(true),
                      Some(false)),
         
@@ -5564,7 +6668,7 @@ async fn main() {
                   vec![
                     (Some(r##"placement"##),
                      None,
-                     Some(r##"Required. The resource name of the Retail Search serving config, such as `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` or the name of the legacy placement resource, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search`. This field is used to identify the serving config name and the set of models that will be used to make the search."##),
+                     Some(r##"Required. The resource name of the Retail Search serving config, such as `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` or the name of the legacy placement resource, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search`. This field is used to identify the serving config name and the set of models that are used to make the search."##),
                      Some(true),
                      Some(false)),
         
@@ -5827,7 +6931,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -5871,7 +6975,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -5898,8 +7002,8 @@ async fn main() {
     
     let mut app = App::new("retail2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
-           .about("Cloud Retail service enables customers to build end-to-end personalized recommendation systems without requiring a high level of expertise in machine learning, recommendation system, or Google Cloud.")
+           .version("5.0.3+20240222")
+           .about("Vertex AI Search for Retail API is made up of Retail Search, Browse and Recommendations. These discovery AI solutions help you implement personalized search, browse and recommendations, based on machine learning models, across your websites and mobile applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_retail2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

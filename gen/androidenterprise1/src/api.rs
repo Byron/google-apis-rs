@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Manage corporate Android devices
     Full,
@@ -536,6 +536,10 @@ pub struct AppVersion {
     #[serde(rename="isProduction")]
     
     pub is_production: Option<bool>,
+    /// The SDK version this app targets, as specified in the manifest of the APK. See http://developer.android.com/guide/topics/manifest/uses-sdk-element.html
+    #[serde(rename="targetSdkVersion")]
+    
+    pub target_sdk_version: Option<i32>,
     /// Deprecated, use trackId instead.
     
     pub track: Option<String>,
@@ -626,7 +630,7 @@ pub struct AutoInstallPolicy {
     #[serde(rename="autoInstallConstraint")]
     
     pub auto_install_constraint: Option<Vec<AutoInstallConstraint>>,
-    /// The auto-install mode. If unset defaults to "doNotAutoInstall".
+    /// The auto-install mode. If unset, defaults to "doNotAutoInstall". An app is automatically installed regardless of a set maintenance window.
     #[serde(rename="autoInstallMode")]
     
     pub auto_install_mode: Option<String>,
@@ -703,16 +707,40 @@ pub struct Device {
     #[serde(rename="androidId")]
     
     pub android_id: Option<String>,
+    /// The internal hardware codename of the device. This comes from android.os.Build.DEVICE. (field named "device" per logs/wireless/android/android_checkin.proto)
+    
+    pub device: Option<String>,
+    /// The build fingerprint of the device if known.
+    #[serde(rename="latestBuildFingerprint")]
+    
+    pub latest_build_fingerprint: Option<String>,
+    /// The manufacturer of the device. This comes from android.os.Build.MANUFACTURER.
+    
+    pub maker: Option<String>,
     /// Identifies the extent to which the device is controlled by a managed Google Play EMM in various deployment configurations. Possible values include: - "managedDevice", a device that has the EMM's device policy controller (DPC) as the device owner. - "managedProfile", a device that has a profile managed by the DPC (DPC is profile owner) in addition to a separate, personal profile that is unavailable to the DPC. - "containerApp", no longer used (deprecated). - "unmanagedProfile", a device that has been allowed (by the domain's admin, using the Admin Console to enable the privilege) to use managed Google Play, but the profile is itself not owned by a DPC. 
     #[serde(rename="managementType")]
     
     pub management_type: Option<String>,
+    /// The model name of the device. This comes from android.os.Build.MODEL.
+    
+    pub model: Option<String>,
     /// The policy enforced on the device.
     
     pub policy: Option<Policy>,
+    /// The product name of the device. This comes from android.os.Build.PRODUCT.
+    
+    pub product: Option<String>,
     /// The device report updated with the latest app states.
     
     pub report: Option<DeviceReport>,
+    /// Retail brand for the device, if set. See android.os.Build.BRAND
+    #[serde(rename="retailBrand")]
+    
+    pub retail_brand: Option<String>,
+    /// API compatibility version.
+    #[serde(rename="sdkVersion")]
+    
+    pub sdk_version: Option<i32>,
 }
 
 impl client::RequestValue for Device {}
@@ -1595,7 +1623,7 @@ impl client::ResponseResult for Permission {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency. When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect. "choiceToTheUser" allows the device's user to configure the app update policy. "always" enables auto updates. "never" disables auto updates. "wifiOnly" enables auto updates only when the device is connected to wifi.
+    /// Controls when automatic app updates on the device can be applied. Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency. When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, autoUpdatePolicy has no effect. "choiceToTheUser" allows the device's user to configure the app update policy. "always" enables auto updates. "never" disables auto updates. "wifiOnly" enables auto updates only when the device is connected to wifi.
     #[serde(rename="autoUpdatePolicy")]
     
     pub auto_update_policy: Option<String>,
@@ -1682,6 +1710,10 @@ pub struct Product {
     /// Noteworthy features (if any) of this product.
     
     pub features: Option<Vec<String>>,
+    /// The localized full app store description, if available.
+    #[serde(rename="fullDescription")]
+    
+    pub full_description: Option<String>,
     /// A link to an image that can be used as an icon for the product. This image is suitable for use at up to 512px x 512px.
     #[serde(rename="iconUrl")]
     
@@ -1831,11 +1863,11 @@ pub struct ProductPolicy {
     #[serde(rename="autoInstallPolicy")]
     
     pub auto_install_policy: Option<AutoInstallPolicy>,
-    /// The auto-update mode for the product.
+    /// The auto-update mode for the product. When autoUpdateMode is used, it always takes precedence over the user's choice. So when a user makes changes to the device settings manually, these changes are ignored.
     #[serde(rename="autoUpdateMode")]
     
     pub auto_update_mode: Option<String>,
-    /// An authentication URL configuration for the authenticator app of an identity provider. This helps to launch the identity provider's authenticator app during the authentication happening in a private app using Android WebView. Authenticator app should already be the [default handler](https://developer.android.com/training/app-links/verify-site-associations) for the authentication url on the device.
+    /// An authentication URL configuration for the authenticator app of an identity provider. This helps to launch the identity provider's authenticator app during the authentication happening in a private app using Android WebView. Authenticator app should already be the default handler for the authentication url on the device.
     #[serde(rename="enterpriseAuthenticationAppLinkConfigs")]
     
     pub enterprise_authentication_app_link_configs: Option<Vec<EnterpriseAuthenticationAppLinkConfig>>,
@@ -3206,7 +3238,7 @@ impl<'a, S> InstallMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.
+    /// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed. A successful response indicates that a removal request has been sent to the device. The call will be considered successful even if the app is not present on the device (e.g. it was never installed, or was removed by the user).
     /// 
     /// # Arguments
     ///
@@ -12354,7 +12386,7 @@ where
 }
 
 
-/// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.
+/// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed. A successful response indicates that a removal request has been sent to the device. The call will be considered successful even if the app is not present on the device (e.g. it was never installed, or was removed by the user).
 ///
 /// A builder for the *delete* method supported by a *install* resource.
 /// It is not used directly, but through a [`InstallMethods`] instance.

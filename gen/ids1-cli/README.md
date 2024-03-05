@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *IDS* API at revision *20221113*. The CLI is at version *5.0.3*.
+This documentation was generated from the *IDS* API at revision *20231203*. The CLI is at version *5.0.3*.
 
 ```bash
 ids1 [options]

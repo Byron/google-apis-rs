@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SAS Portal Testing* API at revision *20230121*. The CLI is at version *5.0.3*.
+This documentation was generated from the *SAS Portal Testing* API at revision *20240226*. The CLI is at version *5.0.3*.
 
 ```bash
 prod-tt-sasportal1-alpha1 [options]
@@ -50,6 +50,9 @@ prod-tt-sasportal1-alpha1 [options]
                 devices-update-signed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                list-gcp-project-deployments [-p <v>]... [-o <out>]
+                list-legacy-organizations [-p <v>]... [-o <out>]
+                migrate-organization (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-delete <name> [-p <v>]... [-o <out>]
                 nodes-deployments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -64,6 +67,8 @@ prod-tt-sasportal1-alpha1 [options]
                 nodes-nodes-list <parent> [-p <v>]... [-o <out>]
                 nodes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                provision-deployment (-r <kv>)... [-p <v>]... [-o <out>]
+                setup-sas-analytics (-r <kv>)... [-p <v>]... [-o <out>]
         deployments
                 devices-delete <name> [-p <v>]... [-o <out>]
                 devices-get <name> [-p <v>]... [-o <out>]

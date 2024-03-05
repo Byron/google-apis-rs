@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *drive* crate version *5.0.3+20240227*, where *20240227* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -13,6 +13,8 @@
 //! 
 //! * [about](api::About)
 //!  * [*get*](api::AboutGetCall)
+//! * [apps](api::App)
+//!  * [*get*](api::AppGetCall) and [*list*](api::AppListCall)
 //! * [changes](api::Change)
 //!  * [*get start page token*](api::ChangeGetStartPageTokenCall), [*list*](api::ChangeListCall) and [*watch*](api::ChangeWatchCall)
 //! * [channels](api::Channel)
@@ -42,14 +44,12 @@
 //! 
 //! * [*export files*](api::FileExportCall)
 //! * [*get files*](api::FileGetCall)
-//! * [*watch files*](api::FileWatchCall)
 //! * [*get revisions*](api::RevisionGetCall)
 //! 
 //! Subscription supported by ...
 //! 
 //! * [*list changes*](api::ChangeListCall)
 //! * [*watch changes*](api::ChangeWatchCall)
-//! * [*create files*](api::FileCreateCall)
 //! * [*get files*](api::FileGetCall)
 //! * [*watch files*](api::FileWatchCall)
 //! 

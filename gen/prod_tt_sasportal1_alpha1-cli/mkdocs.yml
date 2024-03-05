@@ -1,4 +1,4 @@
-site_name: SAS Portal Testing v5.0.3+20230121
+site_name: SAS Portal Testing v5.0.3+20240226
 site_url: http://byron.github.io/google-apis-rs/google-prod_tt_sasportal1_alpha1-cli
 site_description: A complete library to interact with SAS Portal Testing (protocol v1alpha1)
 
@@ -30,6 +30,9 @@ nav:
     - 'Devices Update Signed': 'customers_devices-update-signed.md'
     - 'Get': 'customers_get.md'
     - 'List': 'customers_list.md'
+    - 'List Gcp Project Deployments': 'customers_list-gcp-project-deployments.md'
+    - 'List Legacy Organizations': 'customers_list-legacy-organizations.md'
+    - 'Migrate Organization': 'customers_migrate-organization.md'
     - 'Nodes Create': 'customers_nodes-create.md'
     - 'Nodes Delete': 'customers_nodes-delete.md'
     - 'Nodes Deployments Create': 'customers_nodes-deployments-create.md'
@@ -44,6 +47,8 @@ nav:
     - 'Nodes Nodes List': 'customers_nodes-nodes-list.md'
     - 'Nodes Patch': 'customers_nodes-patch.md'
     - 'Patch': 'customers_patch.md'
+    - 'Provision Deployment': 'customers_provision-deployment.md'
+    - 'Setup Sas Analytics': 'customers_setup-sas-analytics.md'
 - 'Deployments':
     - 'Devices Delete': 'deployments_devices-delete.md'
     - 'Devices Get': 'deployments_devices-get.md'

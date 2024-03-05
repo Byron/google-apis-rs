@@ -1,4 +1,4 @@
-site_name: Certificate Authority Service v5.0.3+20230105
+site_name: Certificate Authority Service v5.0.3+20240221
 site_url: http://byron.github.io/google-apis-rs/google-privateca1_beta1-cli
 site_description: A complete library to interact with Certificate Authority Service (protocol v1beta1)
 
@@ -10,28 +10,10 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
-    - 'Locations Certificate Authorities Activate': 'projects_locations-certificate-authorities-activate.md'
-    - 'Locations Certificate Authorities Certificate Revocation Lists Get': 'projects_locations-certificate-authorities-certificate-revocation-lists-get.md'
     - 'Locations Certificate Authorities Certificate Revocation Lists Get Iam Policy': 'projects_locations-certificate-authorities-certificate-revocation-lists-get-iam-policy.md'
-    - 'Locations Certificate Authorities Certificate Revocation Lists List': 'projects_locations-certificate-authorities-certificate-revocation-lists-list.md'
-    - 'Locations Certificate Authorities Certificate Revocation Lists Patch': 'projects_locations-certificate-authorities-certificate-revocation-lists-patch.md'
     - 'Locations Certificate Authorities Certificate Revocation Lists Set Iam Policy': 'projects_locations-certificate-authorities-certificate-revocation-lists-set-iam-policy.md'
     - 'Locations Certificate Authorities Certificate Revocation Lists Test Iam Permissions': 'projects_locations-certificate-authorities-certificate-revocation-lists-test-iam-permissions.md'
-    - 'Locations Certificate Authorities Certificates Create': 'projects_locations-certificate-authorities-certificates-create.md'
-    - 'Locations Certificate Authorities Certificates Get': 'projects_locations-certificate-authorities-certificates-get.md'
-    - 'Locations Certificate Authorities Certificates List': 'projects_locations-certificate-authorities-certificates-list.md'
-    - 'Locations Certificate Authorities Certificates Patch': 'projects_locations-certificate-authorities-certificates-patch.md'
-    - 'Locations Certificate Authorities Certificates Revoke': 'projects_locations-certificate-authorities-certificates-revoke.md'
-    - 'Locations Certificate Authorities Create': 'projects_locations-certificate-authorities-create.md'
-    - 'Locations Certificate Authorities Disable': 'projects_locations-certificate-authorities-disable.md'
-    - 'Locations Certificate Authorities Enable': 'projects_locations-certificate-authorities-enable.md'
-    - 'Locations Certificate Authorities Fetch': 'projects_locations-certificate-authorities-fetch.md'
-    - 'Locations Certificate Authorities Get': 'projects_locations-certificate-authorities-get.md'
     - 'Locations Certificate Authorities Get Iam Policy': 'projects_locations-certificate-authorities-get-iam-policy.md'
-    - 'Locations Certificate Authorities List': 'projects_locations-certificate-authorities-list.md'
-    - 'Locations Certificate Authorities Patch': 'projects_locations-certificate-authorities-patch.md'
-    - 'Locations Certificate Authorities Restore': 'projects_locations-certificate-authorities-restore.md'
-    - 'Locations Certificate Authorities Schedule Delete': 'projects_locations-certificate-authorities-schedule-delete.md'
     - 'Locations Certificate Authorities Set Iam Policy': 'projects_locations-certificate-authorities-set-iam-policy.md'
     - 'Locations Certificate Authorities Test Iam Permissions': 'projects_locations-certificate-authorities-test-iam-permissions.md'
     - 'Locations Get': 'projects_locations-get.md'
@@ -40,9 +22,7 @@ nav:
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
-    - 'Locations Reusable Configs Get': 'projects_locations-reusable-configs-get.md'
     - 'Locations Reusable Configs Get Iam Policy': 'projects_locations-reusable-configs-get-iam-policy.md'
-    - 'Locations Reusable Configs List': 'projects_locations-reusable-configs-list.md'
     - 'Locations Reusable Configs Set Iam Policy': 'projects_locations-reusable-configs-set-iam-policy.md'
     - 'Locations Reusable Configs Test Iam Permissions': 'projects_locations-reusable-configs-test-iam-permissions.md'
 

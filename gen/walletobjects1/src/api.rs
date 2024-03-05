@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Private Service: https://www.googleapis.com/auth/wallet_object.issuer
     WalletObjectIssuer,
@@ -188,9 +188,6 @@ impl<'a, S> Walletobjects<S> {
     pub fn transitobject(&'a self) -> TransitobjectMethods<'a, S> {
         TransitobjectMethods { hub: &self }
     }
-    pub fn walletobjects(&'a self) -> WalletobjectMethods<'a, S> {
-        WalletobjectMethods { hub: &self }
-    }
 
     /// Set the user-agent header field to use in all requests to the server.
     /// It defaults to `google-api-rust-client/5.0.3`.
@@ -267,6 +264,8 @@ impl client::Part for ActivationStatus {}
 /// * [addmessage eventticketobject](EventticketobjectAddmessageCall) (request)
 /// * [addmessage flightclass](FlightclasAddmessageCall) (request)
 /// * [addmessage flightobject](FlightobjectAddmessageCall) (request)
+/// * [addmessage genericclass](GenericclasAddmessageCall) (request)
+/// * [addmessage genericobject](GenericobjectAddmessageCall) (request)
 /// * [addmessage giftcardclass](GiftcardclasAddmessageCall) (request)
 /// * [addmessage giftcardobject](GiftcardobjectAddmessageCall) (request)
 /// * [addmessage loyaltyclass](LoyaltyclasAddmessageCall) (request)
@@ -372,7 +371,11 @@ impl client::Part for AppLinkDataAppLinkInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppLinkDataAppLinkInfoAppTarget {
-    /// no description provided
+    /// Package name for AppTarget. For example: com.google.android.gm
+    #[serde(rename="packageName")]
+    
+    pub package_name: Option<String>,
+    /// URI for AppTarget. The description on the URI must be set. Prefer setting package field instead, if this target is defined for your application.
     #[serde(rename="targetUri")]
     
     pub target_uri: Option<Uri>,
@@ -469,7 +472,7 @@ pub struct Blobstore2Info {
     /// Read handle passed from Bigstore -> Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.
     #[serde(rename="downloadReadHandle")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub download_read_handle: Option<Vec<u8>>,
     /// The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.
     #[serde(rename="readToken")]
@@ -478,7 +481,7 @@ pub struct Blobstore2Info {
     /// Metadata passed from Blobstore -> Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.
     #[serde(rename="uploadMetadataContainer")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub upload_metadata_container: Option<Vec<u8>>,
 }
 
@@ -735,7 +738,7 @@ pub struct CompositeMedia {
     /// Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.
     #[serde(rename="blobRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_ref: Option<Vec<u8>>,
     /// Blobstore v2 info, set if reference_type is BLOBSTORE_REF and it refers to a v2 blob.
     #[serde(rename="blobstore2Info")]
@@ -744,7 +747,7 @@ pub struct CompositeMedia {
     /// A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn't support JavaScript. This prevents us from including the actual type of this field.
     #[serde(rename="cosmoBinaryReference")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cosmo_binary_reference: Option<Vec<u8>>,
     /// crc32.c hash for the payload.
     #[serde(rename="crc32cHash")]
@@ -752,7 +755,7 @@ pub struct CompositeMedia {
     pub crc32c_hash: Option<u32>,
     /// Media data, set if reference_type is INLINE
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub inline: Option<Vec<u8>>,
     /// Size of the data, in bytes
     
@@ -761,7 +764,7 @@ pub struct CompositeMedia {
     /// MD5 hash for the payload.
     #[serde(rename="md5Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub md5_hash: Option<Vec<u8>>,
     /// Reference to a TI Blob, set if reference_type is BIGSTORE_REF.
     #[serde(rename="objectId")]
@@ -777,7 +780,7 @@ pub struct CompositeMedia {
     /// SHA-1 hash for the payload.
     #[serde(rename="sha1Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha1_hash: Option<Vec<u8>>,
 }
 
@@ -1323,6 +1326,10 @@ pub struct EventTicketClass {
     #[serde(rename="viewUnlockRequirement")]
     
     pub view_unlock_requirement: Option<String>,
+    /// The wide logo of the ticket. When provided, this will be used in place of the logo in the top left of the card view.
+    #[serde(rename="wideLogo")]
+    
+    pub wide_logo: Option<Image>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -1460,6 +1467,10 @@ pub struct EventTicketObject {
     /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
     
     pub messages: Option<Vec<Message>>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// Reservation details for this ticket. This is expected to be shared amongst all tickets that were purchased in the same order.
     #[serde(rename="reservationInfo")]
     
@@ -1571,7 +1582,7 @@ pub struct EventVenue {
 impl client::Part for EventVenue {}
 
 
-/// Indicates that the issuer would like GooglePay to send expiry notifications 2 days prior to the card expiration.
+/// Indicates that the issuer would like Google Wallet to send expiry notifications 2 days prior to the card expiration.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1649,7 +1660,7 @@ impl client::Part for FirstRowOption {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FlightCarrier {
-    /// A logo for the airline alliance, displayed above the QR code that the passenger scans to board.
+    /// A logo for the airline alliance, displayed below the QR code that the passenger scans to board.
     #[serde(rename="airlineAllianceLogo")]
     
     pub airline_alliance_logo: Option<Image>,
@@ -1672,6 +1683,10 @@ pub struct FlightCarrier {
     /// Identifies what kind of resource this is. Value: the fixed string `"walletobjects#flightCarrier"`.
     
     pub kind: Option<String>,
+    /// The wide logo of the airline. When provided, this will be used in place of the airline logo in the top left of the card view.
+    #[serde(rename="wideAirlineLogo")]
+    
+    pub wide_airline_logo: Option<Image>,
 }
 
 impl client::Part for FlightCarrier {}
@@ -1999,6 +2014,10 @@ pub struct FlightObject {
     /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
     
     pub messages: Option<Vec<Message>>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// Required. Passenger name as it would appear on the boarding pass. eg: "Dave M Gahan" or "Gahan/Dave" or "GAHAN/DAVEM"
     #[serde(rename="passengerName")]
     
@@ -2141,6 +2160,9 @@ pub struct GenericClass {
     #[serde(rename="linksModuleData")]
     
     pub links_module_data: Option<LinksModuleData>,
+    /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
+    
+    pub messages: Option<Vec<Message>>,
     /// Identifies whether multiple users and devices will save the same object referencing this class.
     #[serde(rename="multipleDevicesAndHoldersAllowedStatus")]
     
@@ -2168,6 +2190,25 @@ impl client::RequestValue for GenericClass {}
 impl client::ResponseResult for GenericClass {}
 
 
+/// Response to adding a new issuer message to the class. This contains the entire updated GenericClass.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [addmessage genericclass](GenericclasAddmessageCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GenericClassAddMessageResponse {
+    /// The updated EventTicketClass resource.
+    
+    pub resource: Option<GenericClass>,
+}
+
+impl client::ResponseResult for GenericClassAddMessageResponse {}
+
+
 /// List response which contains the list of all generic classes for a given issuer ID.
 /// 
 /// # Activities
@@ -2190,7 +2231,7 @@ pub struct GenericClassListResponse {
 impl client::ResponseResult for GenericClassListResponse {}
 
 
-/// Generic Object Next ID: 119
+/// Generic Object Next ID: 121
 /// 
 /// # Activities
 /// 
@@ -2219,7 +2260,7 @@ pub struct GenericObject {
     #[serde(rename="classId")]
     
     pub class_id: Option<String>,
-    /// Specify which `GenericType` the card belongs to. Deprecated.
+    /// Specify which `GenericType` the card belongs to.
     #[serde(rename="genericType")]
     
     pub generic_type: Option<String>,
@@ -2259,6 +2300,10 @@ pub struct GenericObject {
     /// The notification settings that are enabled for this object.
     
     pub notifications: Option<Notifications>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// The rotating barcode settings/details.
     #[serde(rename="rotatingBarcode")]
     
@@ -2281,10 +2326,33 @@ pub struct GenericObject {
     #[serde(rename="validTimeInterval")]
     
     pub valid_time_interval: Option<TimeInterval>,
+    /// The wide logo of the pass. When provided, this will be used in place of the logo in the top left of the card view.
+    #[serde(rename="wideLogo")]
+    
+    pub wide_logo: Option<Image>,
 }
 
 impl client::RequestValue for GenericObject {}
 impl client::ResponseResult for GenericObject {}
+
+
+/// Response to adding a new issuer message to the object. This contains the entire updated GenericObject.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [addmessage genericobject](GenericobjectAddmessageCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GenericObjectAddMessageResponse {
+    /// The updated GenericObject resource.
+    
+    pub resource: Option<GenericObject>,
+}
+
+impl client::ResponseResult for GenericObjectAddMessageResponse {}
 
 
 /// List response which contains the list of all generic objects for a given issuer ID.
@@ -2459,6 +2527,10 @@ pub struct GiftCardClass {
     #[serde(rename="viewUnlockRequirement")]
     
     pub view_unlock_requirement: Option<String>,
+    /// The wide logo of the gift card program or company. When provided, this will be used in place of the program logo in the top left of the card view.
+    #[serde(rename="wideProgramLogo")]
+    
+    pub wide_program_logo: Option<Image>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -2598,6 +2670,10 @@ pub struct GiftCardObject {
     /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
     
     pub messages: Option<Vec<Message>>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// The card's PIN.
     
     pub pin: Option<String>,
@@ -2691,7 +2767,7 @@ pub struct GroupingInfo {
 impl client::Part for GroupingInfo {}
 
 
-/// Wrapping type for Google hosted images.
+/// Wrapping type for Google hosted images. Next ID: 7
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2789,6 +2865,10 @@ impl client::Part for InfoModuleData {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Issuer {
+    /// Allows the issuer to provide their callback settings.
+    #[serde(rename="callbackOptions")]
+    
+    pub callback_options: Option<CallbackOptions>,
     /// Issuer contact information.
     #[serde(rename="contactInfo")]
     
@@ -2918,7 +2998,7 @@ impl client::ResponseResult for JwtInsertResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JwtResource {
-    /// A string representing a JWT of the format described at https://developers.google.com/pay/passes/reference/s2w-reference#google-pay-api-for-passes-jwt
+    /// A string representing a JWT of the format described at https://developers.google.com/wallet/reference/rest/v1/Jwt
     
     pub jwt: Option<String>,
 }
@@ -3010,15 +3090,15 @@ impl client::Part for LinksModuleData {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTemplateOverride {
-    /// Specifies from a predefined set of options or from a reference to the field what will be displayed in the first row.
+    /// Specifies from a predefined set of options or from a reference to the field what will be displayed in the first row. To set this override, set the FirstRowOption.fieldOption to the FieldSelector of your choice.
     #[serde(rename="firstRowOption")]
     
     pub first_row_option: Option<FirstRowOption>,
-    /// A reference to the field to be displayed in the second row. This option is only displayed if there are not multiple user objects in a group. If there is a group, the second row will always display a field shared by all objects.
+    /// A reference to the field to be displayed in the second row. This option is only displayed if there are not multiple user objects in a group. If there is a group, the second row will always display a field shared by all objects. To set this override, please set secondRowOption to the FieldSelector of you choice.
     #[serde(rename="secondRowOption")]
     
     pub second_row_option: Option<FieldSelector>,
-    /// A reference to the field to be displayed in the third row. This option is only displayed if there are not multiple user objects in a group. If there is a group, the third row will always display the number of objects in the group. Eg: "3 passes"
+    /// An unused/deprecated field. Setting it will have no effect on what the user sees.
     #[serde(rename="thirdRowOption")]
     
     pub third_row_option: Option<FieldSelector>,
@@ -3224,6 +3304,10 @@ pub struct LoyaltyClass {
     #[serde(rename="viewUnlockRequirement")]
     
     pub view_unlock_requirement: Option<String>,
+    /// The wide logo of the loyalty program or company. When provided, this will be used in place of the program logo in the top left of the card view.
+    #[serde(rename="wideProgramLogo")]
+    
+    pub wide_program_logo: Option<Image>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -3365,6 +3449,10 @@ pub struct LoyaltyObject {
     /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
     
     pub messages: Option<Vec<Message>>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// The rotating barcode type and value.
     #[serde(rename="rotatingBarcode")]
     
@@ -3487,8 +3575,12 @@ impl client::Part for LoyaltyPointsBalance {}
 
 /// A reference to data stored on the filesystem, on GFS or in blobstore.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [download media](MediaDownloadCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Media {
@@ -3498,12 +3590,12 @@ pub struct Media {
     /// Use object_id instead.
     #[serde(rename="bigstoreObjectRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub bigstore_object_ref: Option<Vec<u8>>,
     /// Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.
     #[serde(rename="blobRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_ref: Option<Vec<u8>>,
     /// Blobstore v2 info, set if reference_type is BLOBSTORE_REF and it refers to a v2 blob.
     #[serde(rename="blobstore2Info")]
@@ -3524,7 +3616,7 @@ pub struct Media {
     /// A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn't support JavaScript. This prevents us from including the actual type of this field.
     #[serde(rename="cosmoBinaryReference")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cosmo_binary_reference: Option<Vec<u8>>,
     /// For Scotty Uploads: Scotty-provided hashes for uploads For Scotty Downloads: (WARNING: DO NOT USE WITHOUT PERMISSION FROM THE SCOTTY TEAM.) A Hash provided by the agent to be used to verify the data being downloaded. Currently only supported for inline payloads. Further, only crc32c_hash is currently supported.
     #[serde(rename="crc32cHash")]
@@ -3566,7 +3658,7 @@ pub struct Media {
     pub hash_verified: Option<bool>,
     /// Media data, set if reference_type is INLINE
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub inline: Option<Vec<u8>>,
     /// |is_potential_retry| is set false only when Scotty is certain that it has not sent the request before. When a client resumes an upload, this field must be set true in agent calls, because Scotty cannot be certain that it has never sent the request before due to potential failure in the session state persistence.
     #[serde(rename="isPotentialRetry")]
@@ -3579,12 +3671,12 @@ pub struct Media {
     /// Scotty-provided MD5 hash for an upload.
     #[serde(rename="md5Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub md5_hash: Option<Vec<u8>>,
     /// Media id to forward to the operation GetMedia. Can be set if reference_type is GET_MEDIA.
     #[serde(rename="mediaId")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub media_id: Option<Vec<u8>>,
     /// Reference to a TI Blob, set if reference_type is BIGSTORE_REF.
     #[serde(rename="objectId")]
@@ -3600,12 +3692,12 @@ pub struct Media {
     /// Scotty-provided SHA1 hash for an upload.
     #[serde(rename="sha1Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha1_hash: Option<Vec<u8>>,
     /// Scotty-provided SHA256 hash for an upload.
     #[serde(rename="sha256Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha256_hash: Option<Vec<u8>>,
     /// Time at which the media data was last updated, in milliseconds since UNIX epoch
     
@@ -3616,7 +3708,7 @@ pub struct Media {
     pub token: Option<String>,
 }
 
-impl client::Part for Media {}
+impl client::ResponseResult for Media {}
 
 
 /// Extra information added to operations that support Scotty media requests.
@@ -3651,6 +3743,11 @@ pub struct MediaRequestInfo {
     #[serde(rename="requestId")]
     
     pub request_id: Option<String>,
+    /// The partition of the Scotty server handling this request. type is uploader_service.RequestReceivedParamsServingInfo LINT.IfChange(request_received_params_serving_info_annotations) LINT.ThenChange()
+    #[serde(rename="requestReceivedParamsServingInfo")]
+    
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    pub request_received_params_serving_info: Option<Vec<u8>>,
     /// The total size of the file.
     #[serde(rename="totalBytes")]
     
@@ -3696,7 +3793,7 @@ pub struct Message {
     #[serde(rename="localizedHeader")]
     
     pub localized_header: Option<LocalizedString>,
-    /// The type of the message. Currently, this can only be set for offers.
+    /// The message type.
     #[serde(rename="messageType")]
     
     pub message_type: Option<String>,
@@ -3972,6 +4069,10 @@ pub struct OfferClass {
     #[serde(rename="viewUnlockRequirement")]
     
     pub view_unlock_requirement: Option<String>,
+    /// The wide title image of the offer. When provided, this will be used in place of the title image in the top left of the card view.
+    #[serde(rename="wideTitleImage")]
+    
+    pub wide_title_image: Option<Image>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -4096,6 +4197,10 @@ pub struct OfferObject {
     /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
     
     pub messages: Option<Vec<Message>>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// The rotating barcode type and value.
     #[serde(rename="rotatingBarcode")]
     
@@ -4189,6 +4294,26 @@ pub struct Pagination {
 impl client::Part for Pagination {}
 
 
+/// Container for any constraints that may be placed on passes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PassConstraints {
+    /// The NFC constraints for the pass.
+    #[serde(rename="nfcConstraint")]
+    
+    pub nfc_constraint: Option<Vec<String>>,
+    /// The screenshot eligibility for the pass.
+    #[serde(rename="screenshotEligibility")]
+    
+    pub screenshot_eligibility: Option<String>,
+}
+
+impl client::Part for PassConstraints {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -4237,42 +4362,6 @@ pub struct Permissions {
 
 impl client::RequestValue for Permissions {}
 impl client::ResponseResult for Permissions {}
-
-
-/// Private data for TextModule. This data will be rendered as a TextModule for a pass.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PrivateText {
-    /// Translated strings for the body.
-    
-    pub body: Option<LocalizedString>,
-    /// Translated strings for the header.
-    
-    pub header: Option<LocalizedString>,
-}
-
-impl client::Part for PrivateText {}
-
-
-/// Private data for LinkModule. This data will be rendered as the LinkModule for a pass.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PrivateUri {
-    /// The URI's title appearing in the app as text and its translated strings. Recommended maximum is 20 characters to ensure the full string is displayed on smaller screens.
-    
-    pub description: Option<LocalizedString>,
-    /// The location of a web page, image, or other resource. URIs in the `LinksModuleData` can have different prefixes indicating the type of URI (a link to a web page, a link to a map, a telephone number, or an email address).
-    
-    pub uri: Option<String>,
-}
-
-impl client::Part for PrivateUri {}
 
 
 /// There is no detailed description.
@@ -4420,6 +4509,10 @@ pub struct RotatingBarcode {
     #[serde(rename="alternateText")]
     
     pub alternate_text: Option<String>,
+    /// Input only. NOTE: This feature is only available for the transit vertical. Optional set of initial rotating barcode values. This allows a small subset of barcodes to be included with the object. Further rotating barcode values must be uploaded with the UploadRotatingBarcodeValues endpoint.
+    #[serde(rename="initialRotatingBarcodeValues")]
+    
+    pub initial_rotating_barcode_values: Option<RotatingBarcodeValues>,
     /// The render encoding for the barcode. When specified, barcode is rendered in the given encoding. Otherwise best known encoding is chosen by Google.
     #[serde(rename="renderEncoding")]
     
@@ -4485,6 +4578,30 @@ pub struct RotatingBarcodeTotpDetailsTotpParameters {
 }
 
 impl client::Part for RotatingBarcodeTotpDetailsTotpParameters {}
+
+
+/// A payload containing many barcode values and start date/time.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RotatingBarcodeValues {
+    /// Required. The amount of time each barcode is valid for.
+    #[serde(rename="periodMillis")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub period_millis: Option<i64>,
+    /// Required. The date/time the first barcode is valid from. Barcodes will be rotated through using period_millis defined on the object's RotatingBarcodeValueInfo. This is an ISO 8601 extended format date/time, with an offset. Time may be specified up to nanosecond precision. Offsets may be specified with seconds precision (even though offset seconds is not part of ISO 8601). For example: `1985-04-12T23:20:50.52Z` would be 20 minutes and 50.52 seconds after the 23rd hour of April 12th, 1985 in UTC. `1985-04-12T19:20:50.52-04:00` would be 20 minutes and 50.52 seconds after the 19th hour of April 12th, 1985, 4 hours before UTC (same instant in time as the above example). If the event were in New York, this would be the equivalent of Eastern Daylight Time (EDT). Remember that offset varies in regions that observe Daylight Saving Time (or Summer Time), depending on the time of the year.
+    #[serde(rename="startDateTime")]
+    
+    pub start_date_time: Option<String>,
+    /// Required. The values to encode in the barcode. At least one value is required.
+    
+    pub values: Option<Vec<String>>,
+}
+
+impl client::Part for RotatingBarcodeValues {}
 
 
 /// There is no detailed description.
@@ -5001,6 +5118,10 @@ pub struct TransitClass {
     /// Watermark image to display on the user's device.
     
     pub watermark: Option<Image>,
+    /// The wide logo of the ticket. When provided, this will be used in place of the logo in the top left of the card view.
+    #[serde(rename="wideLogo")]
+    
+    pub wide_logo: Option<Image>,
     /// Deprecated.
     #[serde(rename="wordMark")]
     
@@ -5146,6 +5267,10 @@ pub struct TransitObject {
     /// An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.
     
     pub messages: Option<Vec<Message>>,
+    /// Pass constraints for the object. Includes limiting NFC and screenshot behaviors.
+    #[serde(rename="passConstraints")]
+    
+    pub pass_constraints: Option<PassConstraints>,
     /// The name(s) of the passengers the ticket is assigned to. The above `passengerType` field is meant to give Google context on this field.
     #[serde(rename="passengerNames")]
     
@@ -5256,6 +5381,44 @@ pub struct TransitObjectListResponse {
 impl client::ResponseResult for TransitObjectListResponse {}
 
 
+/// Request to upload rotating barcode values.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [upload media](MediaUploadCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransitObjectUploadRotatingBarcodeValuesRequest {
+    /// A reference to the rotating barcode values payload that was uploaded.
+    
+    pub blob: Option<Media>,
+    /// Extra information about the uploaded media.
+    #[serde(rename="mediaRequestInfo")]
+    
+    pub media_request_info: Option<MediaRequestInfo>,
+}
+
+impl client::RequestValue for TransitObjectUploadRotatingBarcodeValuesRequest {}
+
+
+/// Response for uploading rotating barcode values.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [upload media](MediaUploadCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransitObjectUploadRotatingBarcodeValuesResponse { _never_set: Option<bool> }
+
+impl client::ResponseResult for TransitObjectUploadRotatingBarcodeValuesResponse {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -5277,7 +5440,7 @@ pub struct TranslatedString {
 impl client::Part for TranslatedString {}
 
 
-/// Indicates that the issuer would like GooglePay send an upcoming card validity notification 1 day before card becomes valid/usable.
+/// Indicates that the issuer would like Google Wallet to send an upcoming card validity notification 1 day before card becomes valid/usable.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -5291,98 +5454,6 @@ pub struct UpcomingNotification {
 }
 
 impl client::Part for UpcomingNotification {}
-
-
-/// Request for sending user private Text or URI by the Issuer.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [v1 private content upload private data walletobjects](WalletobjectV1PrivateContentUploadPrivateDataCall) (request)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadPrivateDataRequest {
-    /// The ID of the issuer sending the data.
-    #[serde(rename="issuerId")]
-    
-    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
-    pub issuer_id: Option<i64>,
-    /// Private text data of the user.
-    
-    pub text: Option<PrivateText>,
-    /// Private URIs of the user.
-    
-    pub uri: Option<PrivateUri>,
-}
-
-impl client::RequestValue for UploadPrivateDataRequest {}
-
-
-/// Response for uploading user private data (text or URIs)
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [v1 private content upload private data walletobjects](WalletobjectV1PrivateContentUploadPrivateDataCall) (response)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadPrivateDataResponse {
-    /// A 64-bit content id for the private data that was uploaded by the Issuer.
-    #[serde(rename="privateContentId")]
-    
-    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
-    pub private_content_id: Option<i64>,
-}
-
-impl client::ResponseResult for UploadPrivateDataResponse {}
-
-
-/// Request to upload user’s private images by Issuers to be used in passes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [upload media](MediaUploadCall) (request)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadPrivateImageRequest {
-    /// A reference to the image payload that was uploaded by Scotty.
-    
-    pub blob: Option<Media>,
-    /// Extra information about the uploaded media.
-    #[serde(rename="mediaRequestInfo")]
-    
-    pub media_request_info: Option<MediaRequestInfo>,
-}
-
-impl client::RequestValue for UploadPrivateImageRequest {}
-
-
-/// Response for uploading the private image
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [upload media](MediaUploadCall) (response)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UploadPrivateImageResponse {
-    /// A 64-bit content id for the image that was uploaded by the Issuer.
-    #[serde(rename="privateContentId")]
-    
-    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
-    pub private_content_id: Option<i64>,
-}
-
-impl client::ResponseResult for UploadPrivateImageResponse {}
 
 
 /// There is no detailed description.
@@ -6048,7 +6119,7 @@ impl<'a, S> FlightobjectMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `addmessage(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.genericclass();
 /// # }
@@ -6062,6 +6133,25 @@ pub struct GenericclasMethods<'a, S>
 impl<'a, S> client::MethodsBuilder for GenericclasMethods<'a, S> {}
 
 impl<'a, S> GenericclasMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds a message to the generic class referenced by the given class ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resourceId` - The unique identifier for a class. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    pub fn addmessage(&self, request: AddMessageRequest, resource_id: &str) -> GenericclasAddmessageCall<'a, S> {
+        GenericclasAddmessageCall {
+            hub: self.hub,
+            _request: request,
+            _resource_id: resource_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6176,7 +6266,7 @@ impl<'a, S> GenericclasMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `addmessage(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.genericobject();
 /// # }
@@ -6190,6 +6280,25 @@ pub struct GenericobjectMethods<'a, S>
 impl<'a, S> client::MethodsBuilder for GenericobjectMethods<'a, S> {}
 
 impl<'a, S> GenericobjectMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds a message to the generic object referenced by the given object ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resourceId` - The unique identifier for an object. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    pub fn addmessage(&self, request: AddMessageRequest, resource_id: &str) -> GenericobjectAddmessageCall<'a, S> {
+        GenericobjectAddmessageCall {
+            hub: self.hub,
+            _request: request,
+            _resource_id: resource_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7094,7 +7203,7 @@ impl<'a, S> LoyaltyobjectMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `upload(...)`
+/// // like `download(...)` and `upload(...)`
 /// // to build up your call.
 /// let rb = hub.media();
 /// # }
@@ -7111,17 +7220,34 @@ impl<'a, S> MediaMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a private image and returns an Id to be used in its place.
+    /// Downloads rotating barcode values for the transit object referenced by the given object ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resourceId` - The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    pub fn download(&self, resource_id: &str) -> MediaDownloadCall<'a, S> {
+        MediaDownloadCall {
+            hub: self.hub,
+            _resource_id: resource_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads rotating barcode values for the transit object referenced by the given object ID. Note the max upload size is specified in google3/production/config/cdd/apps-upload/customers/payments-consumer-passes/config.gcl and enforced by Scotty.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `issuerId` - The ID of the issuer sending the image.
-    pub fn upload(&self, request: UploadPrivateImageRequest, issuer_id: i64) -> MediaUploadCall<'a, S> {
+    /// * `resourceId` - The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    pub fn upload(&self, request: TransitObjectUploadRotatingBarcodeValuesRequest, resource_id: &str) -> MediaUploadCall<'a, S> {
         MediaUploadCall {
             hub: self.hub,
             _request: request,
-            _issuer_id: issuer_id,
+            _resource_id: resource_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -7845,64 +7971,6 @@ impl<'a, S> TransitobjectMethods<'a, S> {
             hub: self.hub,
             _request: request,
             _resource_id: resource_id.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *walletobject* resources.
-/// It is not used directly, but through the [`Walletobjects`] hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate google_walletobjects1 as walletobjects1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `v1_private_content_upload_private_data(...)`
-/// // to build up your call.
-/// let rb = hub.walletobjects();
-/// # }
-/// ```
-pub struct WalletobjectMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Walletobjects<S>,
-}
-
-impl<'a, S> client::MethodsBuilder for WalletobjectMethods<'a, S> {}
-
-impl<'a, S> WalletobjectMethods<'a, S> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Upload private data (text or URI) and returns an Id to be used in its place.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn v1_private_content_upload_private_data(&self, request: UploadPrivateDataRequest) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S> {
-        WalletobjectV1PrivateContentUploadPrivateDataCall {
-            hub: self.hub,
-            _request: request,
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -14970,6 +15038,298 @@ where
 }
 
 
+/// Adds a message to the generic class referenced by the given class ID.
+///
+/// A builder for the *addmessage* method supported by a *genericclas* resource.
+/// It is not used directly, but through a [`GenericclasMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_walletobjects1 as walletobjects1;
+/// use walletobjects1::api::AddMessageRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddMessageRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.genericclass().addmessage(req, "resourceId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct GenericclasAddmessageCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Walletobjects<S>,
+    _request: AddMessageRequest,
+    _resource_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for GenericclasAddmessageCall<'a, S> {}
+
+impl<'a, S> GenericclasAddmessageCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GenericClassAddMessageResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "walletobjects.genericclass.addmessage",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "resourceId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resourceId", self._resource_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "walletobjects/v1/genericClass/{resourceId}/addMessage";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::WalletObjectIssuer.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{resourceId}", "resourceId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["resourceId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddMessageRequest) -> GenericclasAddmessageCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The unique identifier for a class. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    ///
+    /// Sets the *resource id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_id(mut self, new_value: &str) -> GenericclasAddmessageCall<'a, S> {
+        self._resource_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GenericclasAddmessageCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> GenericclasAddmessageCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::WalletObjectIssuer`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> GenericclasAddmessageCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> GenericclasAddmessageCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> GenericclasAddmessageCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Returns the generic class with the given class ID.
 ///
 /// A builder for the *get* method supported by a *genericclas* resource.
@@ -15532,9 +15892,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.genericclass().list()
-///              .token("ea")
-///              .max_results(-99)
-///              .issuer_id(-56)
+///              .token("dolor")
+///              .max_results(-56)
+///              .issuer_id(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16368,6 +16728,298 @@ where
 }
 
 
+/// Adds a message to the generic object referenced by the given object ID.
+///
+/// A builder for the *addmessage* method supported by a *genericobject* resource.
+/// It is not used directly, but through a [`GenericobjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_walletobjects1 as walletobjects1;
+/// use walletobjects1::api::AddMessageRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddMessageRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.genericobject().addmessage(req, "resourceId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct GenericobjectAddmessageCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Walletobjects<S>,
+    _request: AddMessageRequest,
+    _resource_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for GenericobjectAddmessageCall<'a, S> {}
+
+impl<'a, S> GenericobjectAddmessageCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GenericObjectAddMessageResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "walletobjects.genericobject.addmessage",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "resourceId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resourceId", self._resource_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "walletobjects/v1/genericObject/{resourceId}/addMessage";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::WalletObjectIssuer.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{resourceId}", "resourceId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["resourceId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddMessageRequest) -> GenericobjectAddmessageCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The unique identifier for an object. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    ///
+    /// Sets the *resource id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_id(mut self, new_value: &str) -> GenericobjectAddmessageCall<'a, S> {
+        self._resource_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GenericobjectAddmessageCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> GenericobjectAddmessageCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::WalletObjectIssuer`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> GenericobjectAddmessageCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> GenericobjectAddmessageCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> GenericobjectAddmessageCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Returns the generic object with the given object ID.
 ///
 /// A builder for the *get* method supported by a *genericobject* resource.
@@ -16930,9 +17582,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.genericobject().list()
-///              .token("duo")
-///              .max_results(-80)
-///              .class_id("no")
+///              .token("no")
+///              .max_results(-15)
+///              .class_id("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18620,9 +19272,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.giftcardclass().list()
-///              .token("et")
-///              .max_results(-68)
-///              .issuer_id(-76)
+///              .token("vero")
+///              .max_results(-31)
+///              .issuer_id(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20310,9 +20962,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.giftcardobject().list()
-///              .token("et")
-///              .max_results(-28)
-///              .class_id("amet.")
+///              .token("amet.")
+///              .max_results(-96)
+///              .class_id("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21172,7 +21824,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.issuer().get(-49)
+/// let result = hub.issuer().get(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21956,7 +22608,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.issuer().patch(req, -18)
+/// let result = hub.issuer().patch(req, -95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22248,7 +22900,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.issuer().update(req, -22)
+/// let result = hub.issuer().update(req, -15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23635,9 +24287,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.loyaltyclass().list()
-///              .token("dolor")
-///              .max_results(-20)
-///              .issuer_id(-76)
+///              .token("vero")
+///              .max_results(-76)
+///              .issuer_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25325,9 +25977,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.loyaltyobject().list()
-///              .token("elitr")
-///              .max_results(-6)
-///              .class_id("diam")
+///              .token("diam")
+///              .max_results(-61)
+///              .class_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26453,7 +27105,283 @@ where
 }
 
 
-/// Uploads a private image and returns an Id to be used in its place.
+/// Downloads rotating barcode values for the transit object referenced by the given object ID.
+///
+/// This method supports **media download**. To enable it, adjust the builder like this:
+/// `.param("alt", "media")`.
+/// Please note that due to missing multi-part support on the server side, you will only receive the media,
+/// but not the `Media` structure that you would usually get. The latter will be a default value.
+///
+/// A builder for the *download* method supported by a *media* resource.
+/// It is not used directly, but through a [`MediaMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_walletobjects1 as walletobjects1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.media().download("resourceId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct MediaDownloadCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Walletobjects<S>,
+    _resource_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for MediaDownloadCall<'a, S> {}
+
+impl<'a, S> MediaDownloadCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Media)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "walletobjects.media.download",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["resourceId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(2 + self._additional_params.len());
+        params.push("resourceId", self._resource_id);
+
+        params.extend(self._additional_params.iter());
+
+        let (alt_field_missing, enable_resource_parsing) = {
+            if let Some(value) = params.get("alt") {
+                (false, value == "json")
+            } else {
+                (true, true)
+            }
+        };
+        if alt_field_missing {
+            params.push("alt", "json");
+        }
+        let mut url = self.hub._base_url.clone() + "walletobjects/v1/transitObject/{resourceId}/downloadRotatingBarcodeValues";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::WalletObjectIssuer.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{resourceId}", "resourceId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["resourceId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = if enable_resource_parsing {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    } else { (res, Default::default()) };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
+    ///
+    /// Sets the *resource id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource_id(mut self, new_value: &str) -> MediaDownloadCall<'a, S> {
+        self._resource_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::WalletObjectIssuer`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> MediaDownloadCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MediaDownloadCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> MediaDownloadCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Uploads rotating barcode values for the transit object referenced by the given object ID. Note the max upload size is specified in google3/production/config/cdd/apps-upload/customers/payments-consumer-passes/config.gcl and enforced by Scotty.
 ///
 /// A builder for the *upload* method supported by a *media* resource.
 /// It is not used directly, but through a [`MediaMethods`] instance.
@@ -26466,7 +27394,7 @@ where
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
 /// # extern crate google_walletobjects1 as walletobjects1;
-/// use walletobjects1::api::UploadPrivateImageRequest;
+/// use walletobjects1::api::TransitObjectUploadRotatingBarcodeValuesRequest;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
@@ -26481,12 +27409,12 @@ where
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = UploadPrivateImageRequest::default();
+/// let mut req = TransitObjectUploadRotatingBarcodeValuesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.media().upload(req, -59)
+/// let result = hub.media().upload(req, "resourceId")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -26494,8 +27422,8 @@ pub struct MediaUploadCall<'a, S>
     where S: 'a {
 
     hub: &'a Walletobjects<S>,
-    _request: UploadPrivateImageRequest,
-    _issuer_id: i64,
+    _request: TransitObjectUploadRotatingBarcodeValuesRequest,
+    _resource_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -26513,7 +27441,7 @@ where
 
 
     /// Perform the operation you have build so far.
-    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, UploadPrivateImageResponse)>
+    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, TransitObjectUploadRotatingBarcodeValuesResponse)>
 		where RS: client::ReadSeek {
         use std::io::{Read, Seek};
         use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
@@ -26525,7 +27453,7 @@ where
         dlg.begin(client::MethodInfo { id: "walletobjects.media.upload",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "issuerId"].iter() {
+        for &field in ["alt", "resourceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
@@ -26533,14 +27461,14 @@ where
         }
 
         let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("issuerId", self._issuer_id.to_string());
+        params.push("resourceId", self._resource_id);
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
         let (mut url, upload_type) =
             if protocol == client::UploadProtocol::Simple {
-                (self.hub._root_url.clone() + "upload/walletobjects/v1/privateContent/{issuerId}/uploadPrivateImage", "multipart")
+                (self.hub._root_url.clone() + "upload/walletobjects/v1/transitObject/{resourceId}/uploadRotatingBarcodeValues", "multipart")
             } else {
                 unreachable!()
             };
@@ -26549,11 +27477,11 @@ where
             self._scopes.insert(Scope::WalletObjectIssuer.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{issuerId}", "issuerId")].iter() {
+        for &(find_this, param_name) in [("{resourceId}", "resourceId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
-            let to_remove = ["issuerId"];
+            let to_remove = ["resourceId"];
             params.remove_params(&to_remove);
         }
 
@@ -26677,7 +27605,7 @@ where
     /// * *multipart*: yes
     /// * *max size*: 0kb
     /// * *valid mime types*: '*/*'
-    pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, UploadPrivateImageResponse)>
+    pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, TransitObjectUploadRotatingBarcodeValuesResponse)>
                 where RS: client::ReadSeek {
         self.doit(stream, mime_type, client::UploadProtocol::Simple).await
     }
@@ -26687,18 +27615,18 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UploadPrivateImageRequest) -> MediaUploadCall<'a, S> {
+    pub fn request(mut self, new_value: TransitObjectUploadRotatingBarcodeValuesRequest) -> MediaUploadCall<'a, S> {
         self._request = new_value;
         self
     }
-    /// The ID of the issuer sending the image.
+    /// The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.
     ///
-    /// Sets the *issuer id* path property to the given value.
+    /// Sets the *resource id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn issuer_id(mut self, new_value: i64) -> MediaUploadCall<'a, S> {
-        self._issuer_id = new_value;
+    pub fn resource_id(mut self, new_value: &str) -> MediaUploadCall<'a, S> {
+        self._resource_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -27631,9 +28559,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.offerclass().list()
-///              .token("et")
-///              .max_results(-31)
-///              .issuer_id(-96)
+///              .token("amet.")
+///              .max_results(-30)
+///              .issuer_id(-9)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29321,9 +30249,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.offerobject().list()
-///              .token("gubergren")
-///              .max_results(-74)
-///              .class_id("accusam")
+///              .token("voluptua.")
+///              .max_results(-34)
+///              .class_id("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30183,7 +31111,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.permissions().get(-34)
+/// let result = hub.permissions().get(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30451,7 +31379,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.permissions().update(req, -34)
+/// let result = hub.permissions().update(req, -17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31838,9 +32766,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.transitclass().list()
-///              .token("ea")
-///              .max_results(-95)
-///              .issuer_id(-6)
+///              .token("invidunt")
+///              .max_results(-11)
+///              .issuer_id(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33528,9 +34456,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.transitobject().list()
-///              .token("sed")
-///              .max_results(-98)
-///              .class_id("et")
+///              .token("tempor")
+///              .max_results(-32)
+///              .class_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -34358,279 +35286,6 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> TransitobjectUpdateCall<'a, S> {
-        self._scopes.clear();
-        self
-    }
-}
-
-
-/// Upload private data (text or URI) and returns an Id to be used in its place.
-///
-/// A builder for the *v1.privateContent.uploadPrivateData* method supported by a *walletobject* resource.
-/// It is not used directly, but through a [`WalletobjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_walletobjects1 as walletobjects1;
-/// use walletobjects1::api::UploadPrivateDataRequest;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use walletobjects1::{Walletobjects, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Walletobjects::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = UploadPrivateDataRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.walletobjects().v1_private_content_upload_private_data(req)
-///              .doit().await;
-/// # }
-/// ```
-pub struct WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Walletobjects<S>,
-    _request: UploadPrivateDataRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
-}
-
-impl<'a, S> client::CallBuilder for WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S> {}
-
-impl<'a, S> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S>
-where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
-{
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, UploadPrivateDataResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
-        use std::borrow::Cow;
-
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "walletobjects.walletobjects.v1.privateContent.uploadPrivateData",
-                               http_method: hyper::Method::POST });
-
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "walletobjects/v1/privateContent/uploadPrivateData";
-        if self._scopes.is_empty() {
-            self._scopes.insert(Scope::WalletObjectIssuer.as_ref().to_string());
-        }
-
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
-
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UploadPrivateDataRequest) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::WalletObjectIssuer`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S>
-                                                        where St: AsRef<str> {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> WalletobjectV1PrivateContentUploadPrivateDataCall<'a, S> {
         self._scopes.clear();
         self
     }

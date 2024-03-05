@@ -4,12 +4,12 @@
 [package]
 
 name = "google-securitycenter1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240302"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Security Command Center (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1"
 homepage = "https://cloud.google.com/security-command-center"
-documentation = "https://docs.rs/google-securitycenter1/5.0.3+20230123"
+documentation = "https://docs.rs/google-securitycenter1/5.0.3+20240302"
 license = "MIT"
 keywords = ["securitycenter", "google", "protocol", "web", "api"]
 autobins = false

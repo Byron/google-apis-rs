@@ -94,6 +94,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "observed-generation" => Some(("observedGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.annotations" => Some(("template.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.parallelism" => Some(("template.parallelism", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -116,7 +117,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "reason", "reconciling", "revision-reason", "service-account", "severity", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "reason", "reconciling", "revision-reason", "satisfies-pzs", "service-account", "severity", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -209,6 +210,92 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["etag", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_jobs_executions_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "validate-only"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRunV2CancelExecutionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_jobs_executions_cancel(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -743,6 +830,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "observed-generation" => Some(("observedGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.annotations" => Some(("template.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.parallelism" => Some(("template.parallelism", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -765,7 +853,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "reason", "reconciling", "revision-reason", "service-account", "severity", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "reason", "reconciling", "revision-reason", "satisfies-pzs", "service-account", "severity", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -856,9 +944,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "overrides.task-count" => Some(("overrides.taskCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "overrides.timeout" => Some(("overrides.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "validate-only"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "overrides", "task-count", "timeout", "validate-only"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1371,6 +1461,8 @@ where
                     "client-version" => Some(("clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-audiences" => Some(("customAudiences", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-uri-disabled" => Some(("defaultUriDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1385,15 +1477,19 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "observed-generation" => Some(("observedGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scaling.min-instance-count" => Some(("scaling.minInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.annotations" => Some(("template.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.encryption-key" => Some(("template.encryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.execution-environment" => Some(("template.executionEnvironment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template.health-check-disabled" => Some(("template.healthCheckDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.max-instance-request-concurrency" => Some(("template.maxInstanceRequestConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.revision" => Some(("template.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.scaling.max-instance-count" => Some(("template.scaling.maxInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.scaling.min-instance-count" => Some(("template.scaling.minInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.service-account" => Some(("template.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template.session-affinity" => Some(("template.sessionAffinity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.timeout" => Some(("template.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.vpc-access.connector" => Some(("template.vpcAccess.connector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.vpc-access.egress" => Some(("template.vpcAccess.egress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1409,7 +1505,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "observed-generation", "reason", "reconciling", "revision", "revision-reason", "scaling", "service-account", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "custom-audiences", "default-uri-disabled", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "health-check-disabled", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "observed-generation", "reason", "reconciling", "revision", "revision-reason", "satisfies-pzs", "scaling", "service-account", "session-affinity", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1735,6 +1831,8 @@ where
                     "client-version" => Some(("clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-audiences" => Some(("customAudiences", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-uri-disabled" => Some(("defaultUriDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1749,15 +1847,19 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "observed-generation" => Some(("observedGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scaling.min-instance-count" => Some(("scaling.minInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.annotations" => Some(("template.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.encryption-key" => Some(("template.encryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.execution-environment" => Some(("template.executionEnvironment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template.health-check-disabled" => Some(("template.healthCheckDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.max-instance-request-concurrency" => Some(("template.maxInstanceRequestConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.revision" => Some(("template.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.scaling.max-instance-count" => Some(("template.scaling.maxInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.scaling.min-instance-count" => Some(("template.scaling.minInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.service-account" => Some(("template.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template.session-affinity" => Some(("template.sessionAffinity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.timeout" => Some(("template.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.vpc-access.connector" => Some(("template.vpcAccess.connector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.vpc-access.egress" => Some(("template.vpcAccess.egress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1773,7 +1875,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "observed-generation", "reason", "reconciling", "revision", "revision-reason", "scaling", "service-account", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "custom-audiences", "default-uri-disabled", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "health-check-disabled", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "observed-generation", "reason", "reconciling", "revision", "revision-reason", "satisfies-pzs", "scaling", "service-account", "session-affinity", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2198,6 +2300,9 @@ where
                     ("locations-jobs-delete", Some(opt)) => {
                         call_result = self._projects_locations_jobs_delete(opt, dry_run, &mut err).await;
                     },
+                    ("locations-jobs-executions-cancel", Some(opt)) => {
+                        call_result = self._projects_locations_jobs_executions_cancel(opt, dry_run, &mut err).await;
+                    },
                     ("locations-jobs-executions-delete", Some(opt)) => {
                         call_result = self._projects_locations_jobs_executions_delete(opt, dry_run, &mut err).await;
                     },
@@ -2358,7 +2463,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-jobs-create', 'locations-jobs-delete', 'locations-jobs-executions-delete', 'locations-jobs-executions-get', 'locations-jobs-executions-list', 'locations-jobs-executions-tasks-get', 'locations-jobs-executions-tasks-list', 'locations-jobs-get', 'locations-jobs-get-iam-policy', 'locations-jobs-list', 'locations-jobs-patch', 'locations-jobs-run', 'locations-jobs-set-iam-policy', 'locations-jobs-test-iam-permissions', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-operations-wait', 'locations-services-create', 'locations-services-delete', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-patch', 'locations-services-revisions-delete', 'locations-services-revisions-get', 'locations-services-revisions-list', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-jobs-create', 'locations-jobs-delete', 'locations-jobs-executions-cancel', 'locations-jobs-executions-delete', 'locations-jobs-executions-get', 'locations-jobs-executions-list', 'locations-jobs-executions-tasks-get', 'locations-jobs-executions-tasks-list', 'locations-jobs-get', 'locations-jobs-get-iam-policy', 'locations-jobs-list', 'locations-jobs-patch', 'locations-jobs-run', 'locations-jobs-set-iam-policy', 'locations-jobs-test-iam-permissions', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-operations-wait', 'locations-services-create', 'locations-services-delete', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-patch', 'locations-services-revisions-delete', 'locations-services-revisions-get', 'locations-services-revisions-list', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
             ("locations-jobs-create",
                     Some(r##"Creates a Job."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-create",
@@ -2409,13 +2514,41 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-jobs-executions-cancel",
+                    Some(r##"Cancels an Execution."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-executions-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the Execution to cancel. Format: `projects/{project}/locations/{location}/jobs/{job}/executions/{execution}`, where `{project}` can be project id or number."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-jobs-executions-delete",
                     Some(r##"Deletes an Execution."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-executions-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the Execution to delete. Format: projects/{project}/locations/{location}/jobs/{job}/executions/{execution}, where {project} can be project id or number."##),
+                     Some(r##"Required. The name of the Execution to delete. Format: `projects/{project}/locations/{location}/jobs/{job}/executions/{execution}`, where `{project}` can be project id or number."##),
                      Some(true),
                      Some(false)),
         
@@ -2437,7 +2570,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The full name of the Execution. Format: projects/{project}/locations/{location}/jobs/{job}/executions/{execution}, where {project} can be project id or number."##),
+                     Some(r##"Required. The full name of the Execution. Format: `projects/{project}/locations/{location}/jobs/{job}/executions/{execution}`, where `{project}` can be project id or number."##),
                      Some(true),
                      Some(false)),
         
@@ -2459,7 +2592,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Execution from which the Executions should be listed. To list all Executions across Jobs, use "-" instead of Job name. Format: projects/{project}/locations/{location}/jobs/{job}, where {project} can be project id or number."##),
+                     Some(r##"Required. The Execution from which the Executions should be listed. To list all Executions across Jobs, use "-" instead of Job name. Format: `projects/{project}/locations/{location}/jobs/{job}`, where `{project}` can be project id or number."##),
                      Some(true),
                      Some(false)),
         
@@ -2742,7 +2875,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -3063,7 +3196,7 @@ async fn main() {
     
     let mut app = App::new("run2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230113")
+           .version("5.0.3+20240225")
            .about("Deploy and manage user provided container images that scale automatically based on incoming requests. The Cloud Run Admin API v1 follows the Knative Serving API specification, while v2 is aligned with Google Cloud AIP-based API standards, as described in https://google.aip.dev/.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_run2_cli")
            .arg(Arg::with_name("url")

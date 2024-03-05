@@ -1,4 +1,4 @@
-site_name: Cloud Natural Language v5.0.3+20230121
+site_name: Cloud Natural Language v5.0.3+20240303
 site_url: http://byron.github.io/google-apis-rs/google-language1-cli
 site_description: A complete library to interact with Cloud Natural Language (protocol v1)
 
@@ -16,6 +16,7 @@ nav:
     - 'Analyze Syntax': 'documents_analyze-syntax.md'
     - 'Annotate Text': 'documents_annotate-text.md'
     - 'Classify Text': 'documents_classify-text.md'
+    - 'Moderate Text': 'documents_moderate-text.md'
 
 theme: readthedocs
 

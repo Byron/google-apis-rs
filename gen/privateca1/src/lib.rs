@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Certificate Authority Service* crate version *5.0.3+20230105*, where *20230105* is the exact revision of the *privateca:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Certificate Authority Service* crate version *5.0.3+20240221*, where *20240221* is the exact revision of the *privateca:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Certificate Authority Service* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/).
@@ -88,7 +88,6 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_privateca1 as privateca1;
-//! use privateca1::api::CertificateRevocationList;
 //! use privateca1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -107,17 +106,14 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = CertificateAuthorityService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = CertificateRevocationList::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_ca_pools_certificate_authorities_certificate_revocation_lists_patch(req, "name")
-//!              .update_mask(&Default::default())
-//!              .request_id("ipsum")
+//! let result = hub.projects().locations_ca_pools_certificate_authorities_delete("name")
+//!              .skip_grace_period(true)
+//!              .request_id("gubergren")
+//!              .ignore_dependent_resources(true)
+//!              .ignore_active_certificates(false)
 //!              .doit().await;
 //! 
 //! match result {

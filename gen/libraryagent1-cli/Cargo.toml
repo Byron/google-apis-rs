@@ -4,7 +4,7 @@
 [package]
 
 name = "google-libraryagent1-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Libraryagent (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/libraryagent1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-libraryagent1]
 path = "../libraryagent1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 

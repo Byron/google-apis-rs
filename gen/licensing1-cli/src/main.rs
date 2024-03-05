@@ -899,7 +899,7 @@ async fn main() {
     
     let mut app = App::new("licensing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230121")
+           .version("5.0.3+20240301")
            .about("The Google Enterprise License Manager API lets you manage Google Workspace and related licenses for all users of a customer that you manage.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_licensing1_cli")
            .arg(Arg::with_name("url")

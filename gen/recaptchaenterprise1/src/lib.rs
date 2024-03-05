@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Recaptcha Enterprise* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *recaptchaenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Recaptcha Enterprise* crate version *5.0.3+20240303*, where *20240303* is the exact revision of the *recaptchaenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Recaptcha Enterprise* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/recaptcha-enterprise/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](RecaptchaEnterprise) ... 
 //! 
 //! * projects
-//!  * [*assessments annotate*](api::ProjectAssessmentAnnotateCall), [*assessments create*](api::ProjectAssessmentCreateCall), [*keys create*](api::ProjectKeyCreateCall), [*keys delete*](api::ProjectKeyDeleteCall), [*keys get*](api::ProjectKeyGetCall), [*keys get metrics*](api::ProjectKeyGetMetricCall), [*keys list*](api::ProjectKeyListCall), [*keys migrate*](api::ProjectKeyMigrateCall), [*keys patch*](api::ProjectKeyPatchCall), [*keys retrieve legacy secret key*](api::ProjectKeyRetrieveLegacySecretKeyCall), [*relatedaccountgroupmemberships search*](api::ProjectRelatedaccountgroupmembershipSearchCall), [*relatedaccountgroups list*](api::ProjectRelatedaccountgroupListCall) and [*relatedaccountgroups memberships list*](api::ProjectRelatedaccountgroupMembershipListCall)
+//!  * [*assessments annotate*](api::ProjectAssessmentAnnotateCall), [*assessments create*](api::ProjectAssessmentCreateCall), [*firewallpolicies create*](api::ProjectFirewallpolicyCreateCall), [*firewallpolicies delete*](api::ProjectFirewallpolicyDeleteCall), [*firewallpolicies get*](api::ProjectFirewallpolicyGetCall), [*firewallpolicies list*](api::ProjectFirewallpolicyListCall), [*firewallpolicies patch*](api::ProjectFirewallpolicyPatchCall), [*firewallpolicies reorder*](api::ProjectFirewallpolicyReorderCall), [*keys create*](api::ProjectKeyCreateCall), [*keys delete*](api::ProjectKeyDeleteCall), [*keys get*](api::ProjectKeyGetCall), [*keys get metrics*](api::ProjectKeyGetMetricCall), [*keys list*](api::ProjectKeyListCall), [*keys migrate*](api::ProjectKeyMigrateCall), [*keys patch*](api::ProjectKeyPatchCall), [*keys retrieve legacy secret key*](api::ProjectKeyRetrieveLegacySecretKeyCall), [*relatedaccountgroupmemberships search*](api::ProjectRelatedaccountgroupmembershipSearchCall), [*relatedaccountgroups list*](api::ProjectRelatedaccountgroupListCall) and [*relatedaccountgroups memberships list*](api::ProjectRelatedaccountgroupMembershipListCall)
 //! 
 //! 
 //! 

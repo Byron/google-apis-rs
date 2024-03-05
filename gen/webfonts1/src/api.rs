@@ -59,7 +59,10 @@ use crate::{client, client::GetToken, client::serde_with};
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.webfonts().list()
-///              .sort("no")
+///              .subset("amet.")
+///              .sort("takimata")
+///              .add_family("amet.")
+///              .add_capability("duo")
 ///              .doit().await;
 /// 
 /// match result {
@@ -137,6 +140,27 @@ impl<'a, S> Webfonts<S> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Metadata for a variable font axis.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Axis {
+    /// maximum value
+    
+    pub end: Option<f32>,
+    /// minimum value
+    
+    pub start: Option<f32>,
+    /// tag name.
+    
+    pub tag: Option<String>,
+}
+
+impl client::Part for Axis {}
+
+
 /// Metadata describing a family of fonts.
 /// 
 /// # Activities
@@ -148,6 +172,9 @@ impl<'a, S> Webfonts<S> {
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Webfont {
+    /// Axis for variable fonts.
+    
+    pub axes: Option<Vec<Axis>>,
     /// The category of the font.
     
     pub category: Option<String>,
@@ -164,6 +191,9 @@ pub struct Webfont {
     #[serde(rename="lastModified")]
     
     pub last_modified: Option<String>,
+    /// Font URL for menu subset, a subset of the font that is enough to display the font name
+    
+    pub menu: Option<String>,
     /// The scripts supported by the font.
     
     pub subsets: Option<Vec<String>>,
@@ -249,7 +279,10 @@ impl<'a, S> WebfontMethods<'a, S> {
     pub fn list(&self) -> WebfontListCall<'a, S> {
         WebfontListCall {
             hub: self.hub,
+            _subset: Default::default(),
             _sort: Default::default(),
+            _family: Default::default(),
+            _capability: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -291,7 +324,10 @@ impl<'a, S> WebfontMethods<'a, S> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.webfonts().list()
-///              .sort("ipsum")
+///              .subset("ipsum")
+///              .sort("gubergren")
+///              .add_family("Lorem")
+///              .add_capability("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -299,7 +335,10 @@ pub struct WebfontListCall<'a, S>
     where S: 'a {
 
     hub: &'a Webfonts<S>,
+    _subset: Option<String>,
     _sort: Option<String>,
+    _family: Vec<String>,
+    _capability: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
@@ -327,16 +366,29 @@ where
         dlg.begin(client::MethodInfo { id: "webfonts.webfonts.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "sort"].iter() {
+        for &field in ["alt", "subset", "sort", "family", "capability"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._subset.as_ref() {
+            params.push("subset", value);
+        }
         if let Some(value) = self._sort.as_ref() {
             params.push("sort", value);
+        }
+        if self._family.len() > 0 {
+            for f in self._family.iter() {
+                params.push("family", f);
+            }
+        }
+        if self._capability.len() > 0 {
+            for f in self._capability.iter() {
+                params.push("capability", f);
+            }
         }
 
         params.extend(self._additional_params.iter());
@@ -425,11 +477,34 @@ where
     }
 
 
+    /// Filters by Webfont.subset, if subset is found in Webfont.subsets. If not set, returns all families.
+    ///
+    /// Sets the *subset* query property to the given value.
+    pub fn subset(mut self, new_value: &str) -> WebfontListCall<'a, S> {
+        self._subset = Some(new_value.to_string());
+        self
+    }
     /// Enables sorting of the list.
     ///
     /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> WebfontListCall<'a, S> {
         self._sort = Some(new_value.to_string());
+        self
+    }
+    /// Filters by Webfont.family, using literal match. If not set, returns all families
+    ///
+    /// Append the given value to the *family* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_family(mut self, new_value: &str) -> WebfontListCall<'a, S> {
+        self._family.push(new_value.to_string());
+        self
+    }
+    /// Controls the font urls in `Webfont.files`, by default, static ttf fonts are sent.
+    ///
+    /// Append the given value to the *capability* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_capability(mut self, new_value: &str) -> WebfontListCall<'a, S> {
+        self._capability.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

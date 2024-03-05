@@ -1,4 +1,4 @@
-site_name: AdExchangeBuyerII v5.0.3+20230124
+site_name: AdExchangeBuyerII v5.0.3+20240305
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer2_v2_beta1-cli
 site_description: A complete library to interact with AdExchangeBuyerII (protocol v2beta1)
 
@@ -75,6 +75,21 @@ nav:
     - 'Filter Sets List': 'bidders_filter-sets-list.md'
     - 'Filter Sets Losing Bids List': 'bidders_filter-sets-losing-bids-list.md'
     - 'Filter Sets Non Billable Winning Bids List': 'bidders_filter-sets-non-billable-winning-bids-list.md'
+- 'Buyers':
+    - 'Filter Sets Bid Metrics List': 'buyers_filter-sets-bid-metrics-list.md'
+    - 'Filter Sets Bid Response Errors List': 'buyers_filter-sets-bid-response-errors-list.md'
+    - 'Filter Sets Bid Responses Without Bids List': 'buyers_filter-sets-bid-responses-without-bids-list.md'
+    - 'Filter Sets Create': 'buyers_filter-sets-create.md'
+    - 'Filter Sets Delete': 'buyers_filter-sets-delete.md'
+    - 'Filter Sets Filtered Bid Requests List': 'buyers_filter-sets-filtered-bid-requests-list.md'
+    - 'Filter Sets Filtered Bids Creatives List': 'buyers_filter-sets-filtered-bids-creatives-list.md'
+    - 'Filter Sets Filtered Bids Details List': 'buyers_filter-sets-filtered-bids-details-list.md'
+    - 'Filter Sets Filtered Bids List': 'buyers_filter-sets-filtered-bids-list.md'
+    - 'Filter Sets Get': 'buyers_filter-sets-get.md'
+    - 'Filter Sets Impression Metrics List': 'buyers_filter-sets-impression-metrics-list.md'
+    - 'Filter Sets List': 'buyers_filter-sets-list.md'
+    - 'Filter Sets Losing Bids List': 'buyers_filter-sets-losing-bids-list.md'
+    - 'Filter Sets Non Billable Winning Bids List': 'buyers_filter-sets-non-billable-winning-bids-list.md'
 
 theme: readthedocs
 

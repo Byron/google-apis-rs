@@ -25,13 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20230113*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Run* API at revision *20240225*. The CLI is at version *5.0.3*.
 
 ```bash
 run2 [options]
         projects
                 locations-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-delete <name> [-p <v>]... [-o <out>]
+                locations-jobs-executions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-executions-delete <name> [-p <v>]... [-o <out>]
                 locations-jobs-executions-get <name> [-p <v>]... [-o <out>]
                 locations-jobs-executions-list <parent> [-p <v>]... [-o <out>]

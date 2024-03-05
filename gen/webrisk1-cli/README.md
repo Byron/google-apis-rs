@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Web Risk* API at revision *20230121*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Web Risk* API at revision *20240303*. The CLI is at version *5.0.3*.
 
 ```bash
 webrisk1 [options]
@@ -37,7 +37,6 @@ webrisk1 [options]
                 operations-get <name> [-p <v>]... [-o <out>]
                 operations-list <name> [-p <v>]... [-o <out>]
                 submissions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                uris-submit <parent> (-r <kv>)... [-p <v>]... [-o <out>]
         threat-lists
                 compute-diff [-p <v>]... [-o <out>]
         uris

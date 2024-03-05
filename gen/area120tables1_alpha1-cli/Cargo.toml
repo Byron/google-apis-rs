@@ -4,7 +4,7 @@
 [package]
 
 name = "google-area120tables1_alpha1-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Area120 Tables (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/area120tables1_alpha1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-area120tables1_alpha1]
 path = "../area120tables1_alpha1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240304"
 

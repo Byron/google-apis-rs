@@ -440,8 +440,9 @@ where
                     "features.extract-entities" => Some(("features.extractEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.extract-entity-sentiment" => Some(("features.extractEntitySentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.extract-syntax" => Some(("features.extractSyntax", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "features.moderate-text" => Some(("features.moderateText", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification-model-options", "classify-text", "content", "content-categories-version", "document", "encoding-type", "extract-document-sentiment", "extract-entities", "extract-entity-sentiment", "extract-syntax", "features", "gcs-content-uri", "language", "type", "v2-model"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification-model-options", "classify-text", "content", "content-categories-version", "document", "encoding-type", "extract-document-sentiment", "extract-entities", "extract-entity-sentiment", "extract-syntax", "features", "gcs-content-uri", "language", "moderate-text", "type", "v2-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -590,6 +591,94 @@ where
         }
     }
 
+    async fn _documents_moderate_text(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "document.content" => Some(("document.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document.gcs-content-uri" => Some(("document.gcsContentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document.language" => Some(("document.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document.type" => Some(("document.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "document", "gcs-content-uri", "language", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ModerateTextRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.documents().moderate_text(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -614,6 +703,9 @@ where
                     },
                     ("classify-text", Some(opt)) => {
                         call_result = self._documents_classify_text(opt, dry_run, &mut err).await;
+                    },
+                    ("moderate-text", Some(opt)) => {
+                        call_result = self._documents_moderate_text(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("documents".to_string()));
@@ -694,7 +786,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("documents", "methods: 'analyze-entities', 'analyze-entity-sentiment', 'analyze-sentiment', 'analyze-syntax', 'annotate-text' and 'classify-text'", vec![
+        ("documents", "methods: 'analyze-entities', 'analyze-entity-sentiment', 'analyze-sentiment', 'analyze-syntax', 'annotate-text', 'classify-text' and 'moderate-text'", vec![
             ("analyze-entities",
                     Some(r##"Finds named entities (currently proper names and common nouns) in the text along with entity types, salience, mentions for each entity, and other properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_language1_cli/documents_analyze-entities",
@@ -827,13 +919,35 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("moderate-text",
+                    Some(r##"Moderates a document for harmful and sensitive categories."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_language1_cli/documents_moderate-text",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("language1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230121")
+           .version("5.0.3+20240303")
            .about("Provides natural language understanding technologies, such as sentiment analysis, entity recognition, entity sentiment analysis, and other text annotations, to developers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_language1_cli")
            .arg(Arg::with_name("url")

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Certificate Manager* API at revision *20230104*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Certificate Manager* API at revision *20240221*. The CLI is at version *5.0.3*.
 
 ```bash
 certificatemanager1 [options]
@@ -60,6 +60,11 @@ certificatemanager1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-trust-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-trust-configs-delete <name> [-p <v>]... [-o <out>]
+                locations-trust-configs-get <name> [-p <v>]... [-o <out>]
+                locations-trust-configs-list <parent> [-p <v>]... [-o <out>]
+                locations-trust-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
   certificatemanager1 --help
 
 Configuration:

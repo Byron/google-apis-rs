@@ -246,6 +246,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.location-query" => Some(("query.calendarOptions.locationQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.minus-words" => Some(("query.calendarOptions.minusWords", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.people-query" => Some(("query.calendarOptions.peopleQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.response-statuses" => Some(("query.calendarOptions.responseStatuses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.version-date" => Some(("query.calendarOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.client-side-encrypted-option" => Some(("query.driveOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -255,6 +260,7 @@ where
                     "query.end-time" => Some(("query.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.hangouts-chat-info.room-id" => Some(("query.hangoutsChatInfo.roomId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.hangouts-chat-options.include-rooms" => Some(("query.hangoutsChatOptions.includeRooms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.mail-options.client-side-encrypted-option" => Some(("query.mailOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-options.exclude-drafts" => Some(("query.mailOptions.excludeDrafts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.method" => Some(("query.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -268,7 +274,7 @@ where
                     "query.voice-options.covered-data" => Some(("query.voiceOptions.coveredData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "view" => Some(("view", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "client-side-encrypted-option", "corpus", "covered-data", "data-scope", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "method", "org-unit-id", "org-unit-info", "query", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "sites-url-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "urls", "version-date", "view", "voice-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "calendar-options", "client-side-encrypted-option", "corpus", "covered-data", "data-scope", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "location-query", "mail-options", "method", "minus-words", "org-unit-id", "org-unit-info", "people-query", "query", "response-statuses", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "sites-url-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "urls", "version-date", "view", "voice-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -492,10 +498,12 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-options.calendar-options.export-format" => Some(("exportOptions.calendarOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-options.drive-options.include-access-info" => Some(("exportOptions.driveOptions.includeAccessInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "export-options.groups-options.export-format" => Some(("exportOptions.groupsOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-options.hangouts-chat-options.export-format" => Some(("exportOptions.hangoutsChatOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-options.mail-options.export-format" => Some(("exportOptions.mailOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-options.mail-options.export-linked-drive-files" => Some(("exportOptions.mailOptions.exportLinkedDriveFiles", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "export-options.mail-options.show-confidential-mode-content" => Some(("exportOptions.mailOptions.showConfidentialModeContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "export-options.mail-options.use-new-export" => Some(("exportOptions.mailOptions.useNewExport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "export-options.region" => Some(("exportOptions.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -503,7 +511,13 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-export-id" => Some(("parentExportId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.location-query" => Some(("query.calendarOptions.locationQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.minus-words" => Some(("query.calendarOptions.minusWords", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.people-query" => Some(("query.calendarOptions.peopleQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.response-statuses" => Some(("query.calendarOptions.responseStatuses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.version-date" => Some(("query.calendarOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.client-side-encrypted-option" => Some(("query.driveOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -513,6 +527,7 @@ where
                     "query.end-time" => Some(("query.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.hangouts-chat-info.room-id" => Some(("query.hangoutsChatInfo.roomId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.hangouts-chat-options.include-rooms" => Some(("query.hangoutsChatOptions.includeRooms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.mail-options.client-side-encrypted-option" => Some(("query.mailOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-options.exclude-drafts" => Some(("query.mailOptions.excludeDrafts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.method" => Some(("query.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -531,7 +546,7 @@ where
                     "stats.total-artifact-count" => Some(("stats.totalArtifactCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "client-side-encrypted-option", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "name", "org-unit-id", "org-unit-info", "query", "region", "requester", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "show-confidential-mode-content", "sites-url-info", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "urls", "use-new-export", "version-date", "voice-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "calendar-options", "client-side-encrypted-option", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-linked-drive-files", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-shared-drives", "include-team-drives", "location-query", "mail-options", "matter-id", "method", "minus-words", "name", "org-unit-id", "org-unit-info", "parent-export-id", "people-query", "query", "region", "requester", "response-statuses", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "show-confidential-mode-content", "sites-url-info", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "urls", "use-new-export", "version-date", "voice-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1805,6 +1820,11 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.location-query" => Some(("query.calendarOptions.locationQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.minus-words" => Some(("query.calendarOptions.minusWords", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.people-query" => Some(("query.calendarOptions.peopleQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.response-statuses" => Some(("query.calendarOptions.responseStatuses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.calendar-options.version-date" => Some(("query.calendarOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.client-side-encrypted-option" => Some(("query.driveOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1814,6 +1834,7 @@ where
                     "query.end-time" => Some(("query.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.hangouts-chat-info.room-id" => Some(("query.hangoutsChatInfo.roomId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.hangouts-chat-options.include-rooms" => Some(("query.hangoutsChatOptions.includeRooms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.mail-options.client-side-encrypted-option" => Some(("query.mailOptions.clientSideEncryptedOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-options.exclude-drafts" => Some(("query.mailOptions.excludeDrafts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.method" => Some(("query.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1827,7 +1848,7 @@ where
                     "query.voice-options.covered-data" => Some(("query.voiceOptions.coveredData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "saved-query-id" => Some(("savedQueryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "client-side-encrypted-option", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "org-unit-id", "org-unit-info", "query", "room-id", "saved-query-id", "search-method", "shared-drive-ids", "shared-drive-info", "sites-url-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "urls", "version-date", "voice-options"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "calendar-options", "client-side-encrypted-option", "corpus", "covered-data", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "location-query", "mail-options", "matter-id", "method", "minus-words", "org-unit-id", "org-unit-info", "people-query", "query", "response-statuses", "room-id", "saved-query-id", "search-method", "shared-drive-ids", "shared-drive-info", "sites-url-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "urls", "version-date", "voice-options"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3527,7 +3548,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/operations_list",
                   vec![
                     (Some(r##"name"##),
@@ -3554,7 +3575,7 @@ async fn main() {
     
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.3+20240220")
            .about("Retention and eDiscovery for Google Workspace. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege. For example, to download an export, an account needs the **Manage Exports** privilege and the matter shared with them. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")

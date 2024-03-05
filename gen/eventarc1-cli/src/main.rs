@@ -1700,8 +1700,11 @@ where
                     "destination.gke.namespace" => Some(("destination.gke.namespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.gke.path" => Some(("destination.gke.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.gke.service" => Some(("destination.gke.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.http-endpoint.uri" => Some(("destination.httpEndpoint.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.network-config.network-attachment" => Some(("destination.networkConfig.networkAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.workflow" => Some(("destination.workflow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-data-content-type" => Some(("eventDataContentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1710,7 +1713,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "gke", "labels", "location", "name", "namespace", "path", "pubsub", "region", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "workflow"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "event-data-content-type", "gke", "http-endpoint", "labels", "location", "name", "namespace", "network-attachment", "network-config", "path", "pubsub", "region", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "uri", "workflow"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2046,8 +2049,11 @@ where
                     "destination.gke.namespace" => Some(("destination.gke.namespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.gke.path" => Some(("destination.gke.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.gke.service" => Some(("destination.gke.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.http-endpoint.uri" => Some(("destination.httpEndpoint.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.network-config.network-attachment" => Some(("destination.networkConfig.networkAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.workflow" => Some(("destination.workflow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-data-content-type" => Some(("eventDataContentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2056,7 +2062,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "gke", "labels", "location", "name", "namespace", "path", "pubsub", "region", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "workflow"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "event-data-content-type", "gke", "http-endpoint", "labels", "location", "name", "namespace", "network-attachment", "network-config", "path", "pubsub", "region", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "uri", "workflow"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3086,7 +3092,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_eventarc1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -3385,7 +3391,7 @@ async fn main() {
     
     let mut app = App::new("eventarc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230113")
+           .version("5.0.3+20240223")
            .about("Build event-driven applications on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_eventarc1_cli")
            .arg(Arg::with_name("url")

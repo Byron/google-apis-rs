@@ -3923,12 +3923,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-remarketing-tag",
-                    Some(r##"Gets remarketing tag for a buyer. A remarketing tag is a piece of JavaScript code that can be placed on a web page. When a user visits a page containing a remarketing tag, Google adds the user to a user list."##),
+                    Some(r##"This has been sunset as of October 2023, and will return an error response if called. For more information, see the release notes: https://developers.google.com/authorized-buyers/apis/relnotes#real-time-bidding-api Gets remarketing tag for a buyer. A remarketing tag is a piece of JavaScript code that can be placed on a web page. When a user visits a page containing a remarketing tag, Google adds the user to a user list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli/buyers_get-remarketing-tag",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. To fetch remarketing tag for an account, name must follow the pattern `buyers/{accountId}` where `{accountId}` represents ID of a buyer that owns the remarketing tag. For a bidder accessing remarketing tag on behalf of a child seat buyer, `{accountId}` should represent the ID of the child seat buyer. To fetch remarketing tag for a specific user list, name must follow the pattern `buyers/{accountId}/userLists/{userListId}`. See UserList.name."##),
+                     Some(r##"Required. To fetch the remarketing tag for an account, the name must follow the pattern `buyers/{accountId}`, where `{accountId}` represents the ID of the buyer that owns the remarketing tag. For a bidder accessing the remarketing tag on behalf of a child seat buyer, `{accountId}` should represent the ID of the child seat buyer. To fetch the remarketing tag for a specific user list, the name must follow the pattern `buyers/{accountId}/userLists/{userListId}`. See UserList.name."##),
                      Some(true),
                      Some(false)),
         
@@ -3961,7 +3961,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("user-lists-close",
-                    Some(r##"Change the status of a user list to CLOSED. This prevents new users from being added to the user list."##),
+                    Some(r##"Changes the status of a user list to CLOSED. This prevents new users from being added to the user list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli/buyers_user-lists-close",
                   vec![
                     (Some(r##"name"##),
@@ -3989,12 +3989,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("user-lists-create",
-                    Some(r##"Create a new user list."##),
+                    Some(r##"Creates a new user list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli/buyers_user-lists-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent buyer of the user list to be retrieved that must follow the pattern `buyers/{buyerAccountId}`, where `{buyerAccountId}` represents the account ID of the buyer who owns user lists. For a bidder accessing user lists on behalf of a child seat buyer , `{buyerAccountId}` should represent the account ID of the child seat buyer."##),
+                     Some(r##"Required. The name of the parent buyer of the user list to be retrieved, which must follow the pattern `buyers/{buyerAccountId}`, where `{buyerAccountId}` represents the account ID of the buyer who owns the user list. For a bidder accessing user lists on behalf of a child seat buyer, `{buyerAccountId}` should represent the account ID of the child seat buyer."##),
                      Some(true),
                      Some(false)),
         
@@ -4039,12 +4039,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("user-lists-get-remarketing-tag",
-                    Some(r##"Gets remarketing tag for a buyer. A remarketing tag is a piece of JavaScript code that can be placed on a web page. When a user visits a page containing a remarketing tag, Google adds the user to a user list."##),
+                    Some(r##"This has been sunset as of October 2023, and will return an error response if called. For more information, see the release notes: https://developers.google.com/authorized-buyers/apis/relnotes#real-time-bidding-api Gets remarketing tag for a buyer. A remarketing tag is a piece of JavaScript code that can be placed on a web page. When a user visits a page containing a remarketing tag, Google adds the user to a user list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli/buyers_user-lists-get-remarketing-tag",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. To fetch remarketing tag for an account, name must follow the pattern `buyers/{accountId}` where `{accountId}` represents ID of a buyer that owns the remarketing tag. For a bidder accessing remarketing tag on behalf of a child seat buyer, `{accountId}` should represent the ID of the child seat buyer. To fetch remarketing tag for a specific user list, name must follow the pattern `buyers/{accountId}/userLists/{userListId}`. See UserList.name."##),
+                     Some(r##"Required. To fetch the remarketing tag for an account, the name must follow the pattern `buyers/{accountId}`, where `{accountId}` represents the ID of the buyer that owns the remarketing tag. For a bidder accessing the remarketing tag on behalf of a child seat buyer, `{accountId}` should represent the ID of the child seat buyer. To fetch the remarketing tag for a specific user list, the name must follow the pattern `buyers/{accountId}/userLists/{userListId}`. See UserList.name."##),
                      Some(true),
                      Some(false)),
         
@@ -4083,7 +4083,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("user-lists-open",
-                    Some(r##"Change the status of a user list to OPEN. This allows new users to be added to the user list."##),
+                    Some(r##"Changes the status of a user list to OPEN. This allows new users to be added to the user list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli/buyers_user-lists-open",
                   vec![
                     (Some(r##"name"##),
@@ -4111,7 +4111,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("user-lists-update",
-                    Some(r##"Update the given user list. Only user lists with URLRestrictions can be updated."##),
+                    Some(r##"Updates the given user list. Only user lists with URLRestrictions can be updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli/buyers_user-lists-update",
                   vec![
                     (Some(r##"name"##),
@@ -4144,7 +4144,7 @@ async fn main() {
     
     let mut app = App::new("realtimebidding1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.3+20240305")
            .about("Allows external bidders to manage their RTB integration with Google. This includes managing bidder endpoints, QPS quotas, configuring what ad inventory to receive via pretargeting, submitting creatives for verification, and accessing creative metadata such as approval status.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli")
            .arg(Arg::with_name("url")

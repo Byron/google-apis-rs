@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Build* API at revision *20230120*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Build* API at revision *20240223*. The CLI is at version *5.0.3*.
 
 ```bash
 cloudbuild1 [options]
@@ -64,6 +64,7 @@ cloudbuild1 [options]
                 locations-builds-get <name> [-p <v>]... [-o <out>]
                 locations-builds-list <parent> [-p <v>]... [-o <out>]
                 locations-builds-retry <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get-default-service-account <name> [-p <v>]... [-o <out>]
                 locations-git-lab-configs-connected-repositories-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-git-lab-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-git-lab-configs-delete <name> [-p <v>]... [-o <out>]

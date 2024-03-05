@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Memorystore for Memcached* crate version *5.0.3+20230103*, where *20230103* is the exact revision of the *memcache:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Memorystore for Memcached* crate version *5.0.3+20240222*, where *20240222* is the exact revision of the *memcache:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud Memorystore for Memcached* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/memorystore/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudMemorystoreForMemcached) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations instances apply parameters*](api::ProjectLocationInstanceApplyParameterCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reschedule maintenance*](api::ProjectLocationInstanceRescheduleMaintenanceCall), [*locations instances update parameters*](api::ProjectLocationInstanceUpdateParameterCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations instances apply parameters*](api::ProjectLocationInstanceApplyParameterCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reschedule maintenance*](api::ProjectLocationInstanceRescheduleMaintenanceCall), [*locations instances update parameters*](api::ProjectLocationInstanceUpdateParameterCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -53,6 +53,7 @@
 //! let r = hub.projects().locations_instances_patch(...).doit().await
 //! let r = hub.projects().locations_instances_reschedule_maintenance(...).doit().await
 //! let r = hub.projects().locations_instances_update_parameters(...).doit().await
+//! let r = hub.projects().locations_instances_upgrade(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! ```
 //! 

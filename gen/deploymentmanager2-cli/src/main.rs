@@ -343,6 +343,7 @@ where
                     "operation.progress" => Some(("operation.progress", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "operation.region" => Some(("operation.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.self-link" => Some(("operation.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "operation.set-common-instance-metadata-operation-metadata.client-operation-id" => Some(("operation.setCommonInstanceMetadataOperationMetadata.clientOperationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.start-time" => Some(("operation.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.status" => Some(("operation.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.status-message" => Some(("operation.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -356,7 +357,7 @@ where
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-group-id", "operation-type", "progress", "region", "self-link", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "update-time", "user", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-group-id", "operation-type", "progress", "region", "self-link", "set-common-instance-metadata-operation-metadata", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "update-time", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -532,6 +533,7 @@ where
                     "operation.progress" => Some(("operation.progress", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "operation.region" => Some(("operation.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.self-link" => Some(("operation.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "operation.set-common-instance-metadata-operation-metadata.client-operation-id" => Some(("operation.setCommonInstanceMetadataOperationMetadata.clientOperationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.start-time" => Some(("operation.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.status" => Some(("operation.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.status-message" => Some(("operation.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -545,7 +547,7 @@ where
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-group-id", "operation-type", "progress", "region", "self-link", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "update-time", "user", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-group-id", "operation-type", "progress", "region", "self-link", "set-common-instance-metadata-operation-metadata", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "update-time", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -916,6 +918,7 @@ where
                     "operation.progress" => Some(("operation.progress", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "operation.region" => Some(("operation.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.self-link" => Some(("operation.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "operation.set-common-instance-metadata-operation-metadata.client-operation-id" => Some(("operation.setCommonInstanceMetadataOperationMetadata.clientOperationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.start-time" => Some(("operation.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.status" => Some(("operation.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.status-message" => Some(("operation.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -929,7 +932,7 @@ where
                     "update.manifest" => Some(("update.manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-group-id", "operation-type", "progress", "region", "self-link", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "update-time", "user", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-operation-id", "config", "content", "creation-timestamp", "description", "end-time", "fingerprint", "http-error-message", "http-error-status-code", "id", "insert-time", "kind", "manifest", "name", "operation", "operation-group-id", "operation-type", "progress", "region", "self-link", "set-common-instance-metadata-operation-metadata", "start-time", "status", "status-message", "target", "target-id", "target-link", "update", "update-time", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2140,7 +2143,7 @@ async fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221208")
+           .version("5.0.3+20240229")
            .about("The Google Cloud Deployment Manager v2 API provides services for configuring, deploying, and viewing Google Cloud services and APIs via templates which specify deployments of Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")

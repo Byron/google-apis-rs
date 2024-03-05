@@ -4,7 +4,7 @@
 [package]
 
 name = "google-container1-cli"
-version = "5.0.3+20230104"
+version = "5.0.3+20240214"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/container1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-container1]
 path = "../container1"
-version = "5.0.3+20230104"
+version = "5.0.3+20240214"
 

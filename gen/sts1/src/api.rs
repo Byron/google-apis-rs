@@ -201,13 +201,16 @@ pub struct GoogleIdentityStsV1ExchangeOauthTokenResponse {
     /// The amount of time, in seconds, between the time when the access token was issued and the time when the access token will expires.
     
     pub expires_in: Option<i32>,
+    /// Google issued ID token in response to the OAuth token exchange request for ID token flow.
+    
+    pub id_token: Option<String>,
     /// A refresh token, issued by Google, in response to the OAuth token exchange request for refresh token flow
     
     pub refresh_token: Option<String>,
     /// A list of scopes associated with the returned token.
     
     pub scope: Option<String>,
-    /// The type of token. Field reserved for RFC compliance. See https://www.rfc-editor.org/rfc/rfc6749#section-5.1 Note: No token_type is returned for current implementation
+    /// The type of token. Field reserved for RFC compliance. See https://www.rfc-editor.org/rfc/rfc6749#section-5.1
     
     pub token_type: Option<String>,
 }

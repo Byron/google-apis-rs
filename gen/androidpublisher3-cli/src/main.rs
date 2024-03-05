@@ -50,6 +50,91 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _applications_data_safety(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "safety-labels" => Some(("safetyLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["safety-labels"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SafetyLabelsUpdateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.applications().data_safety(request, opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _applications_device_tier_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -217,6 +302,408 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apprecovery_add_targeting(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "targeting-update.all-users.is-all-users-requested" => Some(("targetingUpdate.allUsers.isAllUsersRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "targeting-update.android-sdks.sdk-levels" => Some(("targetingUpdate.androidSdks.sdkLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting-update.regions.region-code" => Some(("targetingUpdate.regions.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-users", "android-sdks", "is-all-users-requested", "region-code", "regions", "sdk-levels", "targeting-update"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddTargetingRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apprecovery().add_targeting(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("app-recovery-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apprecovery_app_recoveries(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apprecovery().app_recoveries(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version-code" => {
+                    call = call.version_code(        value.map(|v| arg_from_str(v, err, "version-code", "int64")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apprecovery_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelAppRecoveryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apprecovery().cancel(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("app-recovery-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apprecovery_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "remote-in-app-update.is-remote-in-app-update-requested" => Some(("remoteInAppUpdate.isRemoteInAppUpdateRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "targeting.all-users.is-all-users-requested" => Some(("targeting.allUsers.isAllUsersRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "targeting.android-sdks.sdk-levels" => Some(("targeting.androidSdks.sdkLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.regions.region-code" => Some(("targeting.regions.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.version-list.version-codes" => Some(("targeting.versionList.versionCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.version-range.version-code-end" => Some(("targeting.versionRange.versionCodeEnd", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "targeting.version-range.version-code-start" => Some(("targeting.versionRange.versionCodeStart", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-users", "android-sdks", "is-all-users-requested", "is-remote-in-app-update-requested", "region-code", "regions", "remote-in-app-update", "sdk-levels", "targeting", "version-code-end", "version-code-start", "version-codes", "version-list", "version-range"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CreateDraftAppRecoveryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apprecovery().create(request, opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apprecovery_deploy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DeployAppRecoveryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apprecovery().deploy(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("app-recovery-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2221,6 +2708,93 @@ where
         }
     }
 
+    async fn _edits_tracks_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "form-factor" => Some(("formFactor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "track" => Some(("track", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["form-factor", "track", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TrackConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.edits().tracks_create(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _edits_tracks_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.edits().tracks_get(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""), opt.value_of("track").unwrap_or(""));
@@ -2498,6 +3072,254 @@ where
     async fn _edits_validate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.edits().validate(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _externaltransactions_createexternaltransaction(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-pre-tax-amount.currency" => Some(("currentPreTaxAmount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-pre-tax-amount.price-micros" => Some(("currentPreTaxAmount.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-tax-amount.currency" => Some(("currentTaxAmount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-tax-amount.price-micros" => Some(("currentTaxAmount.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-transaction-id" => Some(("externalTransactionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "one-time-transaction.external-transaction-token" => Some(("oneTimeTransaction.externalTransactionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "original-pre-tax-amount.currency" => Some(("originalPreTaxAmount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "original-pre-tax-amount.price-micros" => Some(("originalPreTaxAmount.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "original-tax-amount.currency" => Some(("originalTaxAmount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "original-tax-amount.price-micros" => Some(("originalTaxAmount.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recurring-transaction.external-subscription.subscription-type" => Some(("recurringTransaction.externalSubscription.subscriptionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recurring-transaction.external-transaction-token" => Some(("recurringTransaction.externalTransactionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recurring-transaction.initial-external-transaction-id" => Some(("recurringTransaction.initialExternalTransactionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recurring-transaction.migrated-transaction-program" => Some(("recurringTransaction.migratedTransactionProgram", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction-state" => Some(("transactionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction-time" => Some(("transactionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-tax-address.administrative-area" => Some(("userTaxAddress.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-tax-address.region-code" => Some(("userTaxAddress.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["administrative-area", "create-time", "currency", "current-pre-tax-amount", "current-tax-amount", "external-subscription", "external-transaction-id", "external-transaction-token", "initial-external-transaction-id", "migrated-transaction-program", "one-time-transaction", "original-pre-tax-amount", "original-tax-amount", "package-name", "price-micros", "recurring-transaction", "region-code", "subscription-type", "transaction-state", "transaction-time", "user-tax-address"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ExternalTransaction = json::value::from_value(object).unwrap();
+        let mut call = self.hub.externaltransactions().createexternaltransaction(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "external-transaction-id" => {
+                    call = call.external_transaction_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["external-transaction-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _externaltransactions_getexternaltransaction(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.externaltransactions().getexternaltransaction(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _externaltransactions_refundexternaltransaction(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "partial-refund.refund-id" => Some(("partialRefund.refundId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partial-refund.refund-pre-tax-amount.currency" => Some(("partialRefund.refundPreTaxAmount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partial-refund.refund-pre-tax-amount.price-micros" => Some(("partialRefund.refundPreTaxAmount.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "refund-time" => Some(("refundTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "partial-refund", "price-micros", "refund-id", "refund-pre-tax-amount", "refund-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RefundExternalTransactionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.externaltransactions().refundexternaltransaction(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2881,9 +3703,41 @@ where
         }
     }
 
-    async fn _inappproducts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inappproducts_batch_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.inappproducts().delete(opt.value_of("package-name").unwrap_or(""), opt.value_of("sku").unwrap_or(""));
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InappproductsBatchDeleteRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.inappproducts().batch_delete(request, opt.value_of("package-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2900,6 +3754,194 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _inappproducts_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.inappproducts().batch_get(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "sku" => {
+                    call = call.add_sku(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sku"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _inappproducts_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InappproductsBatchUpdateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.inappproducts().batch_update(request, opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _inappproducts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.inappproducts().delete(opt.value_of("package-name").unwrap_or(""), opt.value_of("sku").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["latency-tolerance"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3005,15 +4047,17 @@ where
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "managed-product-taxes-and-compliance-settings.eea-withdrawal-right-type" => Some(("managedProductTaxesAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-product-taxes-and-compliance-settings.is-tokenized-digital-asset" => Some(("managedProductTaxesAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-taxes-and-compliance-settings.eea-withdrawal-right-type" => Some(("subscriptionTaxesAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription-taxes-and-compliance-settings.is-tokenized-digital-asset" => Some(("subscriptionTaxesAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "eea-withdrawal-right-type", "grace-period", "managed-product-taxes-and-compliance-settings", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "subscription-taxes-and-compliance-settings", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "eea-withdrawal-right-type", "grace-period", "is-tokenized-digital-asset", "managed-product-taxes-and-compliance-settings", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "subscription-taxes-and-compliance-settings", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3167,15 +4211,17 @@ where
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "managed-product-taxes-and-compliance-settings.eea-withdrawal-right-type" => Some(("managedProductTaxesAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-product-taxes-and-compliance-settings.is-tokenized-digital-asset" => Some(("managedProductTaxesAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-taxes-and-compliance-settings.eea-withdrawal-right-type" => Some(("subscriptionTaxesAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription-taxes-and-compliance-settings.is-tokenized-digital-asset" => Some(("subscriptionTaxesAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "eea-withdrawal-right-type", "grace-period", "managed-product-taxes-and-compliance-settings", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "subscription-taxes-and-compliance-settings", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "eea-withdrawal-right-type", "grace-period", "is-tokenized-digital-asset", "managed-product-taxes-and-compliance-settings", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "subscription-taxes-and-compliance-settings", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3189,6 +4235,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                },
                 "auto-convert-missing-prices" => {
                     call = call.auto_convert_missing_prices(        value.map(|v| arg_from_str(v, err, "auto-convert-missing-prices", "boolean")).unwrap_or(false));
                 },
@@ -3205,7 +4254,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["auto-convert-missing-prices"].iter().map(|v|*v));
+                                                                           v.extend(["auto-convert-missing-prices", "latency-tolerance"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3267,15 +4316,17 @@ where
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "managed-product-taxes-and-compliance-settings.eea-withdrawal-right-type" => Some(("managedProductTaxesAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-product-taxes-and-compliance-settings.is-tokenized-digital-asset" => Some(("managedProductTaxesAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-taxes-and-compliance-settings.eea-withdrawal-right-type" => Some(("subscriptionTaxesAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription-taxes-and-compliance-settings.is-tokenized-digital-asset" => Some(("subscriptionTaxesAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "eea-withdrawal-right-type", "grace-period", "managed-product-taxes-and-compliance-settings", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "subscription-taxes-and-compliance-settings", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "eea-withdrawal-right-type", "grace-period", "is-tokenized-digital-asset", "managed-product-taxes-and-compliance-settings", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "subscription-taxes-and-compliance-settings", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3289,6 +4340,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                },
                 "auto-convert-missing-prices" => {
                     call = call.auto_convert_missing_prices(        value.map(|v| arg_from_str(v, err, "auto-convert-missing-prices", "boolean")).unwrap_or(false));
                 },
@@ -3308,7 +4362,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["allow-missing", "auto-convert-missing-prices"].iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "auto-convert-missing-prices", "latency-tolerance"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3646,8 +4700,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-plan-id" => Some(("basePlanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latency-tolerance" => Some(("latencyTolerance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-plan-id", "latency-tolerance", "package-name", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3658,6 +4716,174 @@ where
         }
         let mut request: api::ActivateBasePlanRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.monetization().subscriptions_base_plans_activate(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("base-plan-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_base_plans_batch_migrate_prices(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchMigrateBasePlanPricesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().subscriptions_base_plans_batch_migrate_prices(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_base_plans_batch_update_states(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchUpdateBasePlanStatesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().subscriptions_base_plans_batch_update_states(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3730,8 +4956,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-plan-id" => Some(("basePlanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latency-tolerance" => Some(("latencyTolerance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-plan-id", "latency-tolerance", "package-name", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3858,9 +5088,13 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-plan-id" => Some(("basePlanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latency-tolerance" => Some(("latencyTolerance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "regions-version.version" => Some(("regionsVersion.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["regions-version", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-plan-id", "latency-tolerance", "package-name", "product-id", "regions-version", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3943,8 +5177,13 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-plan-id" => Some(("basePlanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latency-tolerance" => Some(("latencyTolerance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer-id" => Some(("offerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-plan-id", "latency-tolerance", "offer-id", "package-name", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3955,6 +5194,258 @@ where
         }
         let mut request: api::ActivateSubscriptionOfferRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.monetization().subscriptions_base_plans_offers_activate(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("base-plan-id").unwrap_or(""), opt.value_of("offer-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_base_plans_offers_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchGetSubscriptionOffersRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().subscriptions_base_plans_offers_batch_get(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("base-plan-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_base_plans_offers_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchUpdateSubscriptionOffersRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().subscriptions_base_plans_offers_batch_update(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("base-plan-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_base_plans_offers_batch_update_states(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchUpdateSubscriptionOfferStatesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().subscriptions_base_plans_offers_batch_update_states(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("base-plan-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4128,8 +5619,13 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-plan-id" => Some(("basePlanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latency-tolerance" => Some(("latencyTolerance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer-id" => Some(("offerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-plan-id", "latency-tolerance", "offer-id", "package-name", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4398,6 +5894,12 @@ where
                 "regions-version-version" => {
                     call = call.regions_version_version(value.unwrap_or(""));
                 },
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                },
+                "allow-missing" => {
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4411,7 +5913,147 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["regions-version-version", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "latency-tolerance", "regions-version-version", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.monetization().subscriptions_batch_get(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "product-ids" => {
+                    call = call.add_product_ids(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["product-ids"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_subscriptions_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchUpdateSubscriptionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().subscriptions_batch_update(request, opt.value_of("package-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4472,8 +6114,9 @@ where
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tax-and-compliance-settings.eea-withdrawal-right-type" => Some(("taxAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tax-and-compliance-settings.is-tokenized-digital-asset" => Some(("taxAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "package-name", "product-id", "tax-and-compliance-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "is-tokenized-digital-asset", "package-name", "product-id", "tax-and-compliance-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4725,8 +6368,9 @@ where
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tax-and-compliance-settings.eea-withdrawal-right-type" => Some(("taxAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tax-and-compliance-settings.is-tokenized-digital-asset" => Some(("taxAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "package-name", "product-id", "tax-and-compliance-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "is-tokenized-digital-asset", "package-name", "product-id", "tax-and-compliance-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4746,6 +6390,12 @@ where
                 "regions-version-version" => {
                     call = call.regions_version_version(value.unwrap_or(""));
                 },
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                },
+                "allow-missing" => {
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4759,7 +6409,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["regions-version-version", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "latency-tolerance", "regions-version-version", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4877,6 +6527,50 @@ where
         }
         let mut request: api::ProductPurchasesAcknowledgeRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.purchases().products_acknowledge(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("token").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _purchases_products_consume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.purchases().products_consume(opt.value_of("package-name").unwrap_or(""), opt.value_of("product-id").unwrap_or(""), opt.value_of("token").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5369,6 +7063,90 @@ where
         }
     }
 
+    async fn _purchases_subscriptionsv2_revoke(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RevokeSubscriptionPurchaseRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.purchases().subscriptionsv2_revoke(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("token").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _purchases_voidedpurchases_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.purchases().voidedpurchases_list(opt.value_of("package-name").unwrap_or(""));
@@ -5672,9 +7450,12 @@ where
                     "device-spec.screen-density" => Some(("deviceSpec.screenDensity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device-spec.supported-abis" => Some(("deviceSpec.supportedAbis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "device-spec.supported-locales" => Some(("deviceSpec.supportedLocales", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "options.rotated" => Some(("options.rotated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "options.uncompressed-dex-files" => Some(("options.uncompressedDexFiles", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "options.uncompressed-native-libraries" => Some(("options.uncompressedNativeLibraries", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "variant-id" => Some(("variantId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-spec", "screen-density", "supported-abis", "supported-locales", "variant-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-spec", "options", "rotated", "screen-density", "supported-abis", "supported-locales", "uncompressed-dex-files", "uncompressed-native-libraries", "variant-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6192,6 +7973,9 @@ where
         match self.opt.subcommand() {
             ("applications", Some(opt)) => {
                 match opt.subcommand() {
+                    ("data-safety", Some(opt)) => {
+                        call_result = self._applications_data_safety(opt, dry_run, &mut err).await;
+                    },
                     ("device-tier-configs-create", Some(opt)) => {
                         call_result = self._applications_device_tier_configs_create(opt, dry_run, &mut err).await;
                     },
@@ -6203,6 +7987,29 @@ where
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("applications".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("apprecovery", Some(opt)) => {
+                match opt.subcommand() {
+                    ("add-targeting", Some(opt)) => {
+                        call_result = self._apprecovery_add_targeting(opt, dry_run, &mut err).await;
+                    },
+                    ("app-recoveries", Some(opt)) => {
+                        call_result = self._apprecovery_app_recoveries(opt, dry_run, &mut err).await;
+                    },
+                    ("cancel", Some(opt)) => {
+                        call_result = self._apprecovery_cancel(opt, dry_run, &mut err).await;
+                    },
+                    ("create", Some(opt)) => {
+                        call_result = self._apprecovery_create(opt, dry_run, &mut err).await;
+                    },
+                    ("deploy", Some(opt)) => {
+                        call_result = self._apprecovery_deploy(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("apprecovery".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -6302,6 +8109,9 @@ where
                     ("testers-update", Some(opt)) => {
                         call_result = self._edits_testers_update(opt, dry_run, &mut err).await;
                     },
+                    ("tracks-create", Some(opt)) => {
+                        call_result = self._edits_tracks_create(opt, dry_run, &mut err).await;
+                    },
                     ("tracks-get", Some(opt)) => {
                         call_result = self._edits_tracks_get(opt, dry_run, &mut err).await;
                     },
@@ -6319,6 +8129,23 @@ where
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("edits".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("externaltransactions", Some(opt)) => {
+                match opt.subcommand() {
+                    ("createexternaltransaction", Some(opt)) => {
+                        call_result = self._externaltransactions_createexternaltransaction(opt, dry_run, &mut err).await;
+                    },
+                    ("getexternaltransaction", Some(opt)) => {
+                        call_result = self._externaltransactions_getexternaltransaction(opt, dry_run, &mut err).await;
+                    },
+                    ("refundexternaltransaction", Some(opt)) => {
+                        call_result = self._externaltransactions_refundexternaltransaction(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("externaltransactions".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -6356,6 +8183,15 @@ where
             },
             ("inappproducts", Some(opt)) => {
                 match opt.subcommand() {
+                    ("batch-delete", Some(opt)) => {
+                        call_result = self._inappproducts_batch_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("batch-get", Some(opt)) => {
+                        call_result = self._inappproducts_batch_get(opt, dry_run, &mut err).await;
+                    },
+                    ("batch-update", Some(opt)) => {
+                        call_result = self._inappproducts_batch_update(opt, dry_run, &mut err).await;
+                    },
                     ("delete", Some(opt)) => {
                         call_result = self._inappproducts_delete(opt, dry_run, &mut err).await;
                     },
@@ -6405,6 +8241,12 @@ where
                     ("subscriptions-base-plans-activate", Some(opt)) => {
                         call_result = self._monetization_subscriptions_base_plans_activate(opt, dry_run, &mut err).await;
                     },
+                    ("subscriptions-base-plans-batch-migrate-prices", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_base_plans_batch_migrate_prices(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptions-base-plans-batch-update-states", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_base_plans_batch_update_states(opt, dry_run, &mut err).await;
+                    },
                     ("subscriptions-base-plans-deactivate", Some(opt)) => {
                         call_result = self._monetization_subscriptions_base_plans_deactivate(opt, dry_run, &mut err).await;
                     },
@@ -6416,6 +8258,15 @@ where
                     },
                     ("subscriptions-base-plans-offers-activate", Some(opt)) => {
                         call_result = self._monetization_subscriptions_base_plans_offers_activate(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptions-base-plans-offers-batch-get", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_base_plans_offers_batch_get(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptions-base-plans-offers-batch-update", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_base_plans_offers_batch_update(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptions-base-plans-offers-batch-update-states", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_base_plans_offers_batch_update_states(opt, dry_run, &mut err).await;
                     },
                     ("subscriptions-base-plans-offers-create", Some(opt)) => {
                         call_result = self._monetization_subscriptions_base_plans_offers_create(opt, dry_run, &mut err).await;
@@ -6434,6 +8285,12 @@ where
                     },
                     ("subscriptions-base-plans-offers-patch", Some(opt)) => {
                         call_result = self._monetization_subscriptions_base_plans_offers_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptions-batch-get", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_batch_get(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptions-batch-update", Some(opt)) => {
+                        call_result = self._monetization_subscriptions_batch_update(opt, dry_run, &mut err).await;
                     },
                     ("subscriptions-create", Some(opt)) => {
                         call_result = self._monetization_subscriptions_create(opt, dry_run, &mut err).await;
@@ -6472,6 +8329,9 @@ where
                     ("products-acknowledge", Some(opt)) => {
                         call_result = self._purchases_products_acknowledge(opt, dry_run, &mut err).await;
                     },
+                    ("products-consume", Some(opt)) => {
+                        call_result = self._purchases_products_consume(opt, dry_run, &mut err).await;
+                    },
                     ("products-get", Some(opt)) => {
                         call_result = self._purchases_products_get(opt, dry_run, &mut err).await;
                     },
@@ -6495,6 +8355,9 @@ where
                     },
                     ("subscriptionsv2-get", Some(opt)) => {
                         call_result = self._purchases_subscriptionsv2_get(opt, dry_run, &mut err).await;
+                    },
+                    ("subscriptionsv2-revoke", Some(opt)) => {
+                        call_result = self._purchases_subscriptionsv2_revoke(opt, dry_run, &mut err).await;
                     },
                     ("voidedpurchases-list", Some(opt)) => {
                         call_result = self._purchases_voidedpurchases_list(opt, dry_run, &mut err).await;
@@ -6636,7 +8499,35 @@ async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("applications", "methods: 'device-tier-configs-create', 'device-tier-configs-get' and 'device-tier-configs-list'", vec![
+        ("applications", "methods: 'data-safety', 'device-tier-configs-create', 'device-tier-configs-get' and 'device-tier-configs-list'", vec![
+            ("data-safety",
+                    Some(r##"Writes the Safety Labels declaration of an app."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/applications_data-safety",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("device-tier-configs-create",
                     Some(r##"Creates a new device tier config for an app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/applications_device-tier-configs-create",
@@ -6717,7 +8608,162 @@ async fn main() {
                   ]),
             ]),
         
-        ("edits", "methods: 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'bundles-list', 'bundles-upload', 'commit', 'countryavailability-get', 'delete', 'deobfuscationfiles-upload', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
+        ("apprecovery", "methods: 'add-targeting', 'app-recoveries', 'cancel', 'create' and 'deploy'", vec![
+            ("add-targeting",
+                    Some(r##"Incrementally update targeting for a recovery action. Note that only the criteria selected during the creation of recovery action can be expanded."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_add-targeting",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app for which recovery action is to be updated."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"app-recovery-id"##),
+                     None,
+                     Some(r##"Required. ID corresponding to the app recovery action."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("app-recoveries",
+                    Some(r##"List all app recovery action resources associated with a particular package name and app version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_app-recoveries",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app for which list of recovery actions is requested."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("cancel",
+                    Some(r##"Cancel an already executing app recovery action. Note that this action changes status of the recovery action to CANCELED."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_cancel",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app for which recovery action cancellation is requested."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"app-recovery-id"##),
+                     None,
+                     Some(r##"Required. ID corresponding to the app recovery action."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("create",
+                    Some(r##"Create an app recovery action with recovery status as DRAFT. Note that this action does not execute the recovery action."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_create",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app on which recovery action is performed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("deploy",
+                    Some(r##"Deploy an already created app recovery action with recovery status DRAFT. Note that this action activates the recovery action for all targeted users and changes its status to ACTIVE."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_deploy",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app for which recovery action is deployed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"app-recovery-id"##),
+                     None,
+                     Some(r##"Required. ID corresponding to the app recovery action to deploy."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("edits", "methods: 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'bundles-list', 'bundles-upload', 'commit', 'countryavailability-get', 'delete', 'deobfuscationfiles-upload', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-create', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
             ("apks-addexternallyhosted",
                     Some(r##"Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to organizations using Managed Play whose application is configured to restrict distribution to the organizations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_apks-addexternallyhosted",
@@ -7808,6 +9854,40 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("tracks-create",
+                    Some(r##"Creates a new track."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_tracks-create",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"edit-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the edit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("tracks-get",
                     Some(r##"Gets a track."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_tracks-get",
@@ -7826,7 +9906,7 @@ async fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"Identifier of the track."##),
+                     Some(r##"Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)"##),
                      Some(true),
                      Some(false)),
         
@@ -7888,7 +9968,7 @@ async fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"Identifier of the track."##),
+                     Some(r##"Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)"##),
                      Some(true),
                      Some(false)),
         
@@ -7928,7 +10008,7 @@ async fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"Identifier of the track."##),
+                     Some(r##"Identifier of the track. [More on track name](https://developers.google.com/android-publisher/tracks#ff-track-name)"##),
                      Some(true),
                      Some(false)),
         
@@ -7965,6 +10045,87 @@ async fn main() {
                      Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("externaltransactions", "methods: 'createexternaltransaction', 'getexternaltransaction' and 'refundexternaltransaction'", vec![
+            ("createexternaltransaction",
+                    Some(r##"Creates a new external transaction."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/externaltransactions_createexternaltransaction",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource where this external transaction will be created. Format: applications/{package_name}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("getexternaltransaction",
+                    Some(r##"Gets an existing external transaction."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/externaltransactions_getexternaltransaction",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the external transaction to retrieve. Format: applications/{package_name}/externalTransactions/{external_transaction}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("refundexternaltransaction",
+                    Some(r##"Refunds or partially refunds an existing external transaction."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/externaltransactions_refundexternaltransaction",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the external transaction that will be refunded. Format: applications/{package_name}/externalTransactions/{external_transaction}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -8120,9 +10281,81 @@ async fn main() {
                   ]),
             ]),
         
-        ("inappproducts", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("inappproducts", "methods: 'batch-delete', 'batch-get', 'batch-update', 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+            ("batch-delete",
+                    Some(r##"Deletes in-app products (managed products or subscriptions). Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput. This method should not be used to delete subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_batch-delete",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Package name of the app."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("batch-get",
+                    Some(r##"Reads multiple in-app products, which can be managed products or subscriptions. This method should not be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_batch-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Package name of the app."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("batch-update",
+                    Some(r##"Updates or inserts one or more in-app products (managed products or subscriptions). Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput. This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_batch-update",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Package name of the app."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("delete",
-                    Some(r##"Deletes an in-app product (i.e. a managed product or a subscriptions)."##),
+                    Some(r##"Deletes an in-app product (a managed product or a subscription). This method should no longer be used to delete subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_delete",
                   vec![
                     (Some(r##"package-name"##),
@@ -8144,7 +10377,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Gets an in-app product, which can be a managed product or a subscription."##),
+                    Some(r##"Gets an in-app product, which can be a managed product or a subscription. This method should no longer be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_get",
                   vec![
                     (Some(r##"package-name"##),
@@ -8172,7 +10405,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates an in-app product (i.e. a managed product or a subscriptions)."##),
+                    Some(r##"Creates an in-app product (a managed product or a subscription). This method should no longer be used to create subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_insert",
                   vec![
                     (Some(r##"package-name"##),
@@ -8200,7 +10433,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field `tokenPagination.nextPageToken` will be set and the caller should provide its value as a `token` request parameter to retrieve the next page."##),
+                    Some(r##"Lists all in-app products - both managed products and subscriptions. If an app has a large number of in-app products, the response may be paginated. In this case the response field `tokenPagination.nextPageToken` will be set and the caller should provide its value as a `token` request parameter to retrieve the next page. This method should no longer be used to retrieve subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_list",
                   vec![
                     (Some(r##"package-name"##),
@@ -8222,7 +10455,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Patches an in-app product (i.e. a managed product or a subscriptions)."##),
+                    Some(r##"Patches an in-app product (a managed product or a subscription). This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_patch",
                   vec![
                     (Some(r##"package-name"##),
@@ -8256,7 +10489,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an in-app product (i.e. a managed product or a subscriptions)."##),
+                    Some(r##"Updates an in-app product (a managed product or a subscription). This method should no longer be used to update subscriptions. See [this article](https://android-developers.googleblog.com/2023/06/changes-to-google-play-developer-api-june-2023.html) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_update",
                   vec![
                     (Some(r##"package-name"##),
@@ -8350,7 +10583,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("monetization", "methods: 'convert-region-prices', 'subscriptions-archive', 'subscriptions-base-plans-activate', 'subscriptions-base-plans-deactivate', 'subscriptions-base-plans-delete', 'subscriptions-base-plans-migrate-prices', 'subscriptions-base-plans-offers-activate', 'subscriptions-base-plans-offers-create', 'subscriptions-base-plans-offers-deactivate', 'subscriptions-base-plans-offers-delete', 'subscriptions-base-plans-offers-get', 'subscriptions-base-plans-offers-list', 'subscriptions-base-plans-offers-patch', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-list' and 'subscriptions-patch'", vec![
+        ("monetization", "methods: 'convert-region-prices', 'subscriptions-archive', 'subscriptions-base-plans-activate', 'subscriptions-base-plans-batch-migrate-prices', 'subscriptions-base-plans-batch-update-states', 'subscriptions-base-plans-deactivate', 'subscriptions-base-plans-delete', 'subscriptions-base-plans-migrate-prices', 'subscriptions-base-plans-offers-activate', 'subscriptions-base-plans-offers-batch-get', 'subscriptions-base-plans-offers-batch-update', 'subscriptions-base-plans-offers-batch-update-states', 'subscriptions-base-plans-offers-create', 'subscriptions-base-plans-offers-deactivate', 'subscriptions-base-plans-offers-delete', 'subscriptions-base-plans-offers-get', 'subscriptions-base-plans-offers-list', 'subscriptions-base-plans-offers-patch', 'subscriptions-batch-get', 'subscriptions-batch-update', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-list' and 'subscriptions-patch'", vec![
             ("convert-region-prices",
                     Some(r##"Calculates the region prices, using today's exchange rate and country-specific pricing patterns, based on the price in the request for a set of regions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_convert-region-prices",
@@ -8380,7 +10613,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-archive",
-                    Some(r##"Archives a subscription. Can only be done if at least one base plan was active in the past, and no base plan is available for new or existing subscribers currently. This action is irreversible, and the subscription ID will remain reserved."##),
+                    Some(r##"Deprecated: subscription archiving is not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-archive",
                   vec![
                     (Some(r##"package-name"##),
@@ -8432,6 +10665,74 @@ async fn main() {
                     (Some(r##"base-plan-id"##),
                      None,
                      Some(r##"Required. The unique base plan ID of the base plan to activate."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-base-plans-batch-migrate-prices",
+                    Some(r##"Batch variant of the MigrateBasePlanPrices endpoint. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-base-plans-batch-migrate-prices",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the subscriptions should be created or updated. Must be equal to the package_name field on all the Subscription resources."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this batch update spans multiple subscriptions, set this field to "-". Must be set."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-base-plans-batch-update-states",
+                    Some(r##"Activates or deactivates base plans across one or multiple subscriptions. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-base-plans-batch-update-states",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated base plans."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent subscription, if all updated base plans belong to the same subscription. If this batch update spans multiple subscriptions, set this field to "-". Must be set."##),
                      Some(true),
                      Some(false)),
         
@@ -8586,6 +10887,126 @@ async fn main() {
                     (Some(r##"offer-id"##),
                      None,
                      Some(r##"Required. The unique offer ID of the offer to activate."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-base-plans-offers-batch-get",
+                    Some(r##"Reads one or more subscription offers."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-base-plans-offers-batch-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the subscriptions should be created or updated. Must be equal to the package_name field on all the requests."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"base-plan-id"##),
+                     None,
+                     Some(r##"Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read offers from multiple base plans."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-base-plans-offers-batch-update",
+                    Some(r##"Updates a batch of subscription offers. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-base-plans-offers-batch-update",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated subscription offers. Must be equal to the package_name field on all the updated SubscriptionOffer resources."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"base-plan-id"##),
+                     None,
+                     Some(r##"Required. The parent base plan (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple base plans."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-base-plans-offers-batch-update-states",
+                    Some(r##"Updates a batch of subscription offer states. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-base-plans-offers-batch-update-states",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated subscription offers. Must be equal to the package_name field on all the updated SubscriptionOffer resources."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent subscription, if all updated offers belong to the same subscription. If this request spans multiple subscriptions, set this field to "-". Must be set."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"base-plan-id"##),
+                     None,
+                     Some(r##"Required. The parent base plan (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple base plans."##),
                      Some(true),
                      Some(false)),
         
@@ -8779,13 +11200,13 @@ async fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Required. The parent subscription (ID) for which the offers should be read."##),
+                     Some(r##"Required. The parent subscription (ID) for which the offers should be read. May be specified as '-' to read all offers under an app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"base-plan-id"##),
                      None,
-                     Some(r##"Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read all offers under a subscription."##),
+                     Some(r##"Required. The parent base plan (ID) for which the offers should be read. May be specified as '-' to read all offers under a subscription or an app. Must be specified as '-' if product_id is specified as '-'."##),
                      Some(true),
                      Some(false)),
         
@@ -8826,6 +11247,56 @@ async fn main() {
                     (Some(r##"offer-id"##),
                      None,
                      Some(r##"Required. Immutable. Unique ID of this subscription offer. Must be unique within the base plan."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-batch-get",
+                    Some(r##"Reads one or more subscriptions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-batch-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the subscriptions should be retrieved. Must be equal to the package_name field on all the requests."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-batch-update",
+                    Some(r##"Updates a batch of subscriptions. Set the latencyTolerance field on nested requests to PRODUCT_UPDATE_LATENCY_TOLERANCE_LATENCY_TOLERANT to achieve maximum update throughput."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-batch-update",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the subscriptions should be updated. Must be equal to the package_name field on all the Subscription resources."##),
                      Some(true),
                      Some(false)),
         
@@ -8985,7 +11456,7 @@ async fn main() {
         
         ("orders", "methods: 'refund'", vec![
             ("refund",
-                    Some(r##"Refunds a user's subscription or in-app purchase order. Orders older than 1 year cannot be refunded."##),
+                    Some(r##"Refunds a user's subscription or in-app purchase order. Orders older than 3 years cannot be refunded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/orders_refund",
                   vec![
                     (Some(r##"package-name"##),
@@ -9008,7 +11479,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("purchases", "methods: 'products-acknowledge', 'products-get', 'subscriptions-acknowledge', 'subscriptions-cancel', 'subscriptions-defer', 'subscriptions-get', 'subscriptions-refund', 'subscriptions-revoke', 'subscriptionsv2-get' and 'voidedpurchases-list'", vec![
+        ("purchases", "methods: 'products-acknowledge', 'products-consume', 'products-get', 'subscriptions-acknowledge', 'subscriptions-cancel', 'subscriptions-defer', 'subscriptions-get', 'subscriptions-refund', 'subscriptions-revoke', 'subscriptionsv2-get', 'subscriptionsv2-revoke' and 'voidedpurchases-list'", vec![
             ("products-acknowledge",
                     Some(r##"Acknowledges a purchase of an inapp item."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_products-acknowledge",
@@ -9036,6 +11507,34 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("products-consume",
+                    Some(r##"Consumes a purchase for an inapp item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_products-consume",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"The package name of the application the inapp product was sold in (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"The inapp product SKU (for example, 'com.some.thing.inapp1')."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"token"##),
+                     None,
+                     Some(r##"The token provided to the user's device when the inapp product was purchased."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -9284,6 +11783,40 @@ async fn main() {
                      Some(r##"Required. The token provided to the user's device when the subscription was purchased."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptionsv2-revoke",
+                    Some(r##"Revoke a subscription purchase for the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptionsv2-revoke",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The package of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"token"##),
+                     None,
+                     Some(r##"Required. The token provided to the user's device when the subscription was purchased."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -9642,7 +12175,7 @@ async fn main() {
     
     let mut app = App::new("androidpublisher3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.3+20240229")
            .about("Lets Android application developers access their Google Play accounts. At a high level, the expected workflow is to \"insert\" an Edit, make changes as necessary, and then \"commit\" it. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli")
            .arg(Arg::with_name("url")

@@ -77,8 +77,10 @@ where
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-bytes" => Some(("downloadBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "source-file-share" => Some(("sourceFileShare", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-instance" => Some(("sourceInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -86,7 +88,7 @@ where
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-bytes" => Some(("storageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "labels", "name", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "kms-key", "labels", "name", "satisfies-pzi", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -346,8 +348,10 @@ where
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-bytes" => Some(("downloadBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "source-file-share" => Some(("sourceFileShare", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-instance" => Some(("sourceInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -355,7 +359,7 @@ where
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-bytes" => Some(("storageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "labels", "name", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "kms-key", "labels", "name", "satisfies-pzi", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -500,13 +504,14 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "etag", "kms-key-name", "labels", "name", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "etag", "kms-key-name", "labels", "name", "satisfies-pzi", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -772,13 +777,14 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "etag", "kms-key-name", "labels", "name", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "etag", "kms-key-name", "labels", "name", "satisfies-pzi", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -879,6 +885,91 @@ where
         }
         let mut request: api::RestoreInstanceRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_instances_restore(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_revert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "target-snapshot-id" => Some(("targetSnapshotId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["target-snapshot-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RevertInstanceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_revert(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1643,6 +1734,9 @@ where
                     ("locations-instances-restore", Some(opt)) => {
                         call_result = self._projects_locations_instances_restore(opt, dry_run, &mut err).await;
                     },
+                    ("locations-instances-revert", Some(opt)) => {
+                        call_result = self._projects_locations_instances_revert(opt, dry_run, &mut err).await;
+                    },
                     ("locations-instances-snapshots-create", Some(opt)) => {
                         call_result = self._projects_locations_instances_snapshots_create(opt, dry_run, &mut err).await;
                     },
@@ -1752,7 +1846,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-backups-create', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-backups-patch', 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-restore', 'locations-instances-snapshots-create', 'locations-instances-snapshots-delete', 'locations-instances-snapshots-get', 'locations-instances-snapshots-list', 'locations-instances-snapshots-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-backups-create', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-backups-patch', 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-restore', 'locations-instances-revert', 'locations-instances-snapshots-create', 'locations-instances-snapshots-delete', 'locations-instances-snapshots-get', 'locations-instances-snapshots-list', 'locations-instances-snapshots-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-backups-create",
                     Some(r##"Creates a backup."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-backups-create",
@@ -2047,6 +2141,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-instances-revert",
+                    Some(r##"Revert an existing instance's file system to a specified snapshot."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-instances-revert",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. `projects/{project_id}/locations/{location_id}/instances/{instance_id}`. The resource name of the instance, in the format"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-instances-snapshots-create",
                     Some(r##"Creates a snapshot."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-instances-snapshots-create",
@@ -2264,7 +2386,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2291,7 +2413,7 @@ async fn main() {
     
     let mut app = App::new("file1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230103")
+           .version("5.0.3+20240126")
            .about("The Cloud Filestore API is used for creating and managing cloud file servers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_file1_cli")
            .arg(Arg::with_name("url")

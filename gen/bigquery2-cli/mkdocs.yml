@@ -1,6 +1,6 @@
-site_name: bigquery v5.0.3+20230114
+site_name: Bigquery v5.0.3+20240214
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
-site_description: A complete library to interact with bigquery (protocol v2)
+site_description: A complete library to interact with Bigquery (protocol v2)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigquery2-cli
 
@@ -15,6 +15,7 @@ nav:
     - 'Insert': 'datasets_insert.md'
     - 'List': 'datasets_list.md'
     - 'Patch': 'datasets_patch.md'
+    - 'Undelete': 'datasets_undelete.md'
     - 'Update': 'datasets_update.md'
 - 'Jobs':
     - 'Cancel': 'jobs_cancel.md'
@@ -41,7 +42,6 @@ nav:
 - 'Row Access Policies':
     - 'Get Iam Policy': 'row-access-policies_get-iam-policy.md'
     - 'List': 'row-access-policies_list.md'
-    - 'Set Iam Policy': 'row-access-policies_set-iam-policy.md'
     - 'Test Iam Permissions': 'row-access-policies_test-iam-permissions.md'
 - 'Tabledata':
     - 'Insert All': 'tabledata_insert-all.md'

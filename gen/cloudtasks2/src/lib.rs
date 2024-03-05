@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *5.0.3+20230105*, where *20230105* is the exact revision of the *cloudtasks:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Tasks* crate version *5.0.3+20240223*, where *20240223* is the exact revision of the *cloudtasks:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudTasks) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations queues create*](api::ProjectLocationQueueCreateCall), [*locations queues delete*](api::ProjectLocationQueueDeleteCall), [*locations queues get*](api::ProjectLocationQueueGetCall), [*locations queues get iam policy*](api::ProjectLocationQueueGetIamPolicyCall), [*locations queues list*](api::ProjectLocationQueueListCall), [*locations queues patch*](api::ProjectLocationQueuePatchCall), [*locations queues pause*](api::ProjectLocationQueuePauseCall), [*locations queues purge*](api::ProjectLocationQueuePurgeCall), [*locations queues resume*](api::ProjectLocationQueueResumeCall), [*locations queues set iam policy*](api::ProjectLocationQueueSetIamPolicyCall), [*locations queues tasks create*](api::ProjectLocationQueueTaskCreateCall), [*locations queues tasks delete*](api::ProjectLocationQueueTaskDeleteCall), [*locations queues tasks get*](api::ProjectLocationQueueTaskGetCall), [*locations queues tasks list*](api::ProjectLocationQueueTaskListCall), [*locations queues tasks run*](api::ProjectLocationQueueTaskRunCall) and [*locations queues test iam permissions*](api::ProjectLocationQueueTestIamPermissionCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations get cmek config*](api::ProjectLocationGetCmekConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations queues create*](api::ProjectLocationQueueCreateCall), [*locations queues delete*](api::ProjectLocationQueueDeleteCall), [*locations queues get*](api::ProjectLocationQueueGetCall), [*locations queues get iam policy*](api::ProjectLocationQueueGetIamPolicyCall), [*locations queues list*](api::ProjectLocationQueueListCall), [*locations queues patch*](api::ProjectLocationQueuePatchCall), [*locations queues pause*](api::ProjectLocationQueuePauseCall), [*locations queues purge*](api::ProjectLocationQueuePurgeCall), [*locations queues resume*](api::ProjectLocationQueueResumeCall), [*locations queues set iam policy*](api::ProjectLocationQueueSetIamPolicyCall), [*locations queues tasks buffer*](api::ProjectLocationQueueTaskBufferCall), [*locations queues tasks create*](api::ProjectLocationQueueTaskCreateCall), [*locations queues tasks delete*](api::ProjectLocationQueueTaskDeleteCall), [*locations queues tasks get*](api::ProjectLocationQueueTaskGetCall), [*locations queues tasks list*](api::ProjectLocationQueueTaskListCall), [*locations queues tasks run*](api::ProjectLocationQueueTaskRunCall), [*locations queues test iam permissions*](api::ProjectLocationQueueTestIamPermissionCall) and [*locations update cmek config*](api::ProjectLocationUpdateCmekConfigCall)
 //! 
 //! 
 //! 

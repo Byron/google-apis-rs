@@ -1,4 +1,4 @@
-site_name: Contactcenterinsights v5.0.3+20230115
+site_name: Contactcenterinsights v5.0.3+20240226
 site_url: http://byron.github.io/google-apis-rs/google-contactcenterinsights1-cli
 site_description: A complete library to interact with Contactcenterinsights (protocol v1)
 
@@ -15,6 +15,7 @@ nav:
     - 'Locations Conversations Analyses Get': 'projects_locations-conversations-analyses-get.md'
     - 'Locations Conversations Analyses List': 'projects_locations-conversations-analyses-list.md'
     - 'Locations Conversations Bulk Analyze': 'projects_locations-conversations-bulk-analyze.md'
+    - 'Locations Conversations Bulk Delete': 'projects_locations-conversations-bulk-delete.md'
     - 'Locations Conversations Calculate Stats': 'projects_locations-conversations-calculate-stats.md'
     - 'Locations Conversations Create': 'projects_locations-conversations-create.md'
     - 'Locations Conversations Delete': 'projects_locations-conversations-delete.md'
@@ -22,13 +23,16 @@ nav:
     - 'Locations Conversations Ingest': 'projects_locations-conversations-ingest.md'
     - 'Locations Conversations List': 'projects_locations-conversations-list.md'
     - 'Locations Conversations Patch': 'projects_locations-conversations-patch.md'
+    - 'Locations Conversations Upload': 'projects_locations-conversations-upload.md'
     - 'Locations Get Settings': 'projects_locations-get-settings.md'
     - 'Locations Insightsdata Export': 'projects_locations-insightsdata-export.md'
     - 'Locations Issue Models Calculate Issue Model Stats': 'projects_locations-issue-models-calculate-issue-model-stats.md'
     - 'Locations Issue Models Create': 'projects_locations-issue-models-create.md'
     - 'Locations Issue Models Delete': 'projects_locations-issue-models-delete.md'
     - 'Locations Issue Models Deploy': 'projects_locations-issue-models-deploy.md'
+    - 'Locations Issue Models Export': 'projects_locations-issue-models-export.md'
     - 'Locations Issue Models Get': 'projects_locations-issue-models-get.md'
+    - 'Locations Issue Models Import': 'projects_locations-issue-models-import.md'
     - 'Locations Issue Models Issues Delete': 'projects_locations-issue-models-issues-delete.md'
     - 'Locations Issue Models Issues Get': 'projects_locations-issue-models-issues-get.md'
     - 'Locations Issue Models Issues List': 'projects_locations-issue-models-issues-list.md'

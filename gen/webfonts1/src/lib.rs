@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Webfonts* crate version *5.0.3+20221206*, where *20221206* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Webfonts* crate version *5.0.3+20240227*, where *20240227* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Webfonts* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fonts/docs/developer_api).
@@ -96,7 +96,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.webfonts().list()
-//!              .sort("magna")
+//!              .subset("voluptua.")
+//!              .sort("At")
+//!              .add_family("sanctus")
+//!              .add_capability("sed")
 //!              .doit().await;
 //! 
 //! match result {

@@ -1,4 +1,4 @@
-site_name: Cloud Identity v5.0.3+20230117
+site_name: Cloud Identity v5.0.3+20240227
 site_url: http://byron.github.io/google-apis-rs/google-cloudidentity1-cli
 site_description: A complete library to interact with Cloud Identity (protocol v1)
 
@@ -48,6 +48,7 @@ nav:
     - 'Memberships List': 'groups_memberships-list.md'
     - 'Memberships Lookup': 'groups_memberships-lookup.md'
     - 'Memberships Modify Membership Roles': 'groups_memberships-modify-membership-roles.md'
+    - 'Memberships Search Direct Groups': 'groups_memberships-search-direct-groups.md'
     - 'Memberships Search Transitive Groups': 'groups_memberships-search-transitive-groups.md'
     - 'Memberships Search Transitive Memberships': 'groups_memberships-search-transitive-memberships.md'
     - 'Patch': 'groups_patch.md'

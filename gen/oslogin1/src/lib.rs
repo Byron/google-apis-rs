@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud OS Login* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *oslogin:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud OS Login* crate version *5.0.3+20240225*, where *20240225* is the exact revision of the *oslogin:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud OS Login* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/oslogin/).
@@ -104,8 +104,9 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.users().ssh_public_keys_patch(req, "name")
-//!              .update_mask(&Default::default())
+//! let result = hub.users().import_ssh_public_key(req, "parent")
+//!              .add_regions("voluptua.")
+//!              .project_id("At")
 //!              .doit().await;
 //! 
 //! match result {

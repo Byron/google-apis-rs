@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Create, edit, organize, and delete all your tasks
     Full,
@@ -3741,7 +3741,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
+    /// Maximum number of tasks returned on one page. Optional. The default is 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a, S> {

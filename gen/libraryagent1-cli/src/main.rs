@@ -613,7 +613,7 @@ async fn main() {
     
     let mut app = App::new("libraryagent1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.3+20240303")
            .about("A simple Google Example Library API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_libraryagent1_cli")
            .arg(Arg::with_name("url")

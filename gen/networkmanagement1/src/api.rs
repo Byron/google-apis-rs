@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -175,7 +175,11 @@ pub struct AbortInfo {
     /// Causes that the analysis is aborted.
     
     pub cause: Option<String>,
-    /// List of project IDs that the user has specified in the request but does not have permission to access network configs. Analysis is aborted in this case with the PERMISSION_DENIED cause.
+    /// IP address that caused the abort.
+    #[serde(rename="ipAddress")]
+    
+    pub ip_address: Option<String>,
+    /// List of project IDs the user specified in the request but lacks access to. In this case, analysis is aborted with the PERMISSION_DENIED cause.
     #[serde(rename="projectsMissingPermission")]
     
     pub projects_missing_permission: Option<Vec<String>>,
@@ -188,7 +192,7 @@ pub struct AbortInfo {
 impl client::Part for AbortInfo {}
 
 
-/// Wrapper for app engine service version attributes.
+/// Wrapper for the App Engine service version attributes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -277,10 +281,10 @@ pub struct Binding {
     /// The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
     pub condition: Option<Expr>,
-    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. 
+    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.
     
     pub members: Option<Vec<String>>,
-    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).
     
     pub role: Option<String>,
 }
@@ -453,6 +457,10 @@ pub struct ConnectivityTest {
     /// Required. Unique name of the resource using the form: `projects/{project_id}/locations/global/connectivityTests/{test_id}`
     
     pub name: Option<String>,
+    /// Output only. The probing details of this test from the latest run, present for applicable tests only. The details are updated when creating a new test, updating an existing test, or triggering a one-time rerun of an existing test.
+    #[serde(rename="probingDetails")]
+    
+    pub probing_details: Option<ProbingDetails>,
     /// IP Protocol of the test. When not provided, "TCP" is assumed.
     
     pub protocol: Option<String>,
@@ -484,6 +492,10 @@ impl client::ResponseResult for ConnectivityTest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeliverInfo {
+    /// IP address of the target (if applicable).
+    #[serde(rename="ipAddress")]
+    
+    pub ip_address: Option<String>,
     /// URI of the resource that the packet is delivered to.
     #[serde(rename="resourceUri")]
     
@@ -506,13 +518,40 @@ pub struct DropInfo {
     /// Cause that the packet is dropped.
     
     pub cause: Option<String>,
+    /// Destination IP address of the dropped packet (if relevant).
+    #[serde(rename="destinationIp")]
+    
+    pub destination_ip: Option<String>,
+    /// Region of the dropped packet (if relevant).
+    
+    pub region: Option<String>,
     /// URI of the resource that caused the drop.
     #[serde(rename="resourceUri")]
     
     pub resource_uri: Option<String>,
+    /// Source IP address of the dropped packet (if relevant).
+    #[serde(rename="sourceIp")]
+    
+    pub source_ip: Option<String>,
 }
 
 impl client::Part for DropInfo {}
+
+
+/// Representation of a network edge location as per https://cloud.google.com/vpc/docs/edge-locations.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EdgeLocation {
+    /// Name of the metropolitan area.
+    #[serde(rename="metropolitanArea")]
+    
+    pub metropolitan_area: Option<String>,
+}
+
+impl client::Part for EdgeLocation {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
@@ -554,6 +593,14 @@ pub struct Endpoint {
     #[serde(rename="cloudSqlInstance")]
     
     pub cloud_sql_instance: Option<String>,
+    /// A forwarding rule and its corresponding IP address represent the frontend configuration of a Google Cloud load balancer. Forwarding rules are also used for protocol forwarding, Private Service Connect and other network services to provide forwarding information in the control plane. Format: projects/{project}/global/forwardingRules/{id} or projects/{project}/regions/{region}/forwardingRules/{id}
+    #[serde(rename="forwardingRule")]
+    
+    pub forwarding_rule: Option<String>,
+    /// Output only. Specifies the type of the target of the forwarding rule.
+    #[serde(rename="forwardingRuleTarget")]
+    
+    pub forwarding_rule_target: Option<String>,
     /// A cluster URI for [Google Kubernetes Engine master](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
     #[serde(rename="gkeMasterCluster")]
     
@@ -561,10 +608,18 @@ pub struct Endpoint {
     /// A Compute Engine instance URI.
     
     pub instance: Option<String>,
-    /// The IP address of the endpoint, which can be an external or internal IP. An IPv6 address is only allowed when the test’s destination is a [global load balancer VIP](https://cloud.google.com/load-balancing/docs/load-balancing-overview).
+    /// The IP address of the endpoint, which can be an external or internal IP.
     #[serde(rename="ipAddress")]
     
     pub ip_address: Option<String>,
+    /// Output only. ID of the load balancer the forwarding rule points to. Empty for forwarding rules not related to load balancers.
+    #[serde(rename="loadBalancerId")]
+    
+    pub load_balancer_id: Option<String>,
+    /// Output only. Type of the load balancer the forwarding rule points to.
+    #[serde(rename="loadBalancerType")]
+    
+    pub load_balancer_type: Option<String>,
     /// A Compute Engine network URI.
     
     pub network: Option<String>,
@@ -575,7 +630,7 @@ pub struct Endpoint {
     /// The IP protocol port of the endpoint. Only applicable when protocol is TCP or UDP.
     
     pub port: Option<i32>,
-    /// Project ID where the endpoint is located. The Project ID can be derived from the URI if you provide a VM instance or network URI. The following are two cases where you must provide the project ID: 1. Only the IP address is specified, and the IP address is within a GCP project. 2. When you are using Shared VPC and the IP address that you provide is from the service project. In this case, the network that the IP address resides in is defined in the host project.
+    /// Project ID where the endpoint is located. The Project ID can be derived from the URI if you provide a VM instance or network URI. The following are two cases where you must provide the project ID: 1. Only the IP address is specified, and the IP address is within a Google Cloud project. 2. When you are using Shared VPC and the IP address that you provide is from the service project. In this case, the network that the IP address resides in is defined in the host project.
     #[serde(rename="projectId")]
     
     pub project_id: Option<String>,
@@ -606,6 +661,10 @@ pub struct EndpointInfo {
     /// IP protocol in string format, for example: "TCP", "UDP", "ICMP".
     
     pub protocol: Option<String>,
+    /// URI of the source telemetry agent this packet originates from.
+    #[serde(rename="sourceAgentUri")]
+    
+    pub source_agent_uri: Option<String>,
     /// Source IP address.
     #[serde(rename="sourceIp")]
     
@@ -654,7 +713,7 @@ impl client::Part for Expr {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirewallInfo {
-    /// Possible values: ALLOW, DENY
+    /// Possible values: ALLOW, DENY, APPLY_SECURITY_PROFILE_GROUP
     
     pub action: Option<String>,
     /// Possible values: INGRESS, EGRESS
@@ -701,6 +760,10 @@ impl client::Part for FirewallInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ForwardInfo {
+    /// IP address of the target (if applicable).
+    #[serde(rename="ipAddress")]
+    
+    pub ip_address: Option<String>,
     /// URI of the resource that the packet is forwarded to.
     #[serde(rename="resourceUri")]
     
@@ -778,6 +841,26 @@ pub struct GKEMasterInfo {
 impl client::Part for GKEMasterInfo {}
 
 
+/// For display only. Details of a Google Service sending packets to a VPC network. Although the source IP might be a publicly routable address, some Google Services use special routes within Google production infrastructure to reach Compute Engine Instances. https://cloud.google.com/vpc/docs/routes#special_return_paths
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleServiceInfo {
+    /// Recognized type of a Google Service.
+    #[serde(rename="googleServiceType")]
+    
+    pub google_service_type: Option<String>,
+    /// Source IP address.
+    #[serde(rename="sourceIp")]
+    
+    pub source_ip: Option<String>,
+}
+
+impl client::Part for GoogleServiceInfo {}
+
+
 /// For display only. Metadata associated with a Compute Engine instance.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -818,6 +901,42 @@ pub struct InstanceInfo {
 }
 
 impl client::Part for InstanceInfo {}
+
+
+/// Describes measured latency distribution.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LatencyDistribution {
+    /// Representative latency percentiles.
+    #[serde(rename="latencyPercentiles")]
+    
+    pub latency_percentiles: Option<Vec<LatencyPercentile>>,
+}
+
+impl client::Part for LatencyDistribution {}
+
+
+/// Latency percentile rank and value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LatencyPercentile {
+    /// percent-th percentile of latency observed, in microseconds. Fraction of percent/100 of samples have latency lower or equal to the value of this field.
+    #[serde(rename="latencyMicros")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub latency_micros: Option<i64>,
+    /// Percentage of samples this data point applies to.
+    
+    pub percent: Option<i32>,
+}
+
+impl client::Part for LatencyPercentile {}
 
 
 /// Response for the `ListConnectivityTests` method.
@@ -923,6 +1042,57 @@ pub struct LoadBalancerBackend {
 impl client::Part for LoadBalancerBackend {}
 
 
+/// For display only. Metadata associated with the load balancer backend.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LoadBalancerBackendInfo {
+    /// URI of the backend bucket this backend targets (if applicable).
+    #[serde(rename="backendBucketUri")]
+    
+    pub backend_bucket_uri: Option<String>,
+    /// URI of the backend service this backend belongs to (if applicable).
+    #[serde(rename="backendServiceUri")]
+    
+    pub backend_service_uri: Option<String>,
+    /// Output only. Health check firewalls configuration state for the backend. This is a result of the static firewall analysis (verifying that health check traffic from required IP ranges to the backend is allowed or not). The backend might still be unhealthy even if these firewalls are configured. Please refer to the documentation for more information: https://cloud.google.com/load-balancing/docs/firewall-rules
+    #[serde(rename="healthCheckFirewallsConfigState")]
+    
+    pub health_check_firewalls_config_state: Option<String>,
+    /// URI of the health check attached to this backend (if applicable).
+    #[serde(rename="healthCheckUri")]
+    
+    pub health_check_uri: Option<String>,
+    /// URI of the instance group this backend belongs to (if applicable).
+    #[serde(rename="instanceGroupUri")]
+    
+    pub instance_group_uri: Option<String>,
+    /// URI of the backend instance (if applicable). Populated for instance group backends, and zonal NEG backends.
+    #[serde(rename="instanceUri")]
+    
+    pub instance_uri: Option<String>,
+    /// Display name of the backend. For example, it might be an instance name for the instance group backends, or an IP address and port for zonal network endpoint group backends.
+    
+    pub name: Option<String>,
+    /// URI of the network endpoint group this backend belongs to (if applicable).
+    #[serde(rename="networkEndpointGroupUri")]
+    
+    pub network_endpoint_group_uri: Option<String>,
+    /// PSC Google API target this PSC NEG backend targets (if applicable).
+    #[serde(rename="pscGoogleApiTarget")]
+    
+    pub psc_google_api_target: Option<String>,
+    /// URI of the PSC service attachment this PSC NEG backend targets (if applicable).
+    #[serde(rename="pscServiceAttachmentUri")]
+    
+    pub psc_service_attachment_uri: Option<String>,
+}
+
+impl client::Part for LoadBalancerBackendInfo {}
+
+
 /// For display only. Metadata associated with a load balancer.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -941,7 +1111,7 @@ pub struct LoadBalancerInfo {
     /// Information for the loadbalancer backends.
     
     pub backends: Option<Vec<LoadBalancerBackend>>,
-    /// URI of the health check for the load balancer.
+    /// URI of the health check for the load balancer. Deprecated and no longer populated as different load balancer backends might have different health checks.
     #[serde(rename="healthCheckUri")]
     
     pub health_check_uri: Option<String>,
@@ -954,7 +1124,7 @@ pub struct LoadBalancerInfo {
 impl client::Part for LoadBalancerInfo {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -985,6 +1155,69 @@ pub struct Location {
 }
 
 impl client::ResponseResult for Location {}
+
+
+/// For display only. Metadata associated with NAT.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NatInfo {
+    /// The name of Cloud NAT Gateway. Only valid when type is CLOUD_NAT.
+    #[serde(rename="natGatewayName")]
+    
+    pub nat_gateway_name: Option<String>,
+    /// URI of the network where NAT translation takes place.
+    #[serde(rename="networkUri")]
+    
+    pub network_uri: Option<String>,
+    /// Destination IP address after NAT translation.
+    #[serde(rename="newDestinationIp")]
+    
+    pub new_destination_ip: Option<String>,
+    /// Destination port after NAT translation. Only valid when protocol is TCP or UDP.
+    #[serde(rename="newDestinationPort")]
+    
+    pub new_destination_port: Option<i32>,
+    /// Source IP address after NAT translation.
+    #[serde(rename="newSourceIp")]
+    
+    pub new_source_ip: Option<String>,
+    /// Source port after NAT translation. Only valid when protocol is TCP or UDP.
+    #[serde(rename="newSourcePort")]
+    
+    pub new_source_port: Option<i32>,
+    /// Destination IP address before NAT translation.
+    #[serde(rename="oldDestinationIp")]
+    
+    pub old_destination_ip: Option<String>,
+    /// Destination port before NAT translation. Only valid when protocol is TCP or UDP.
+    #[serde(rename="oldDestinationPort")]
+    
+    pub old_destination_port: Option<i32>,
+    /// Source IP address before NAT translation.
+    #[serde(rename="oldSourceIp")]
+    
+    pub old_source_ip: Option<String>,
+    /// Source port before NAT translation. Only valid when protocol is TCP or UDP.
+    #[serde(rename="oldSourcePort")]
+    
+    pub old_source_port: Option<i32>,
+    /// IP protocol in string format, for example: "TCP", "UDP", "ICMP".
+    
+    pub protocol: Option<String>,
+    /// Uri of the Cloud Router. Only valid when type is CLOUD_NAT.
+    #[serde(rename="routerUri")]
+    
+    pub router_uri: Option<String>,
+    /// Type of NAT.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for NatInfo {}
 
 
 /// For display only. Metadata associated with a Compute Engine network.
@@ -1037,7 +1270,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1045,7 +1278,7 @@ pub struct Operation {
 impl client::ResponseResult for Operation {}
 
 
-/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { “bindings”: \[ { “role”: “roles/resourcemanager.organizationAdmin”, “members”: \[ “user:mike@example.com”, “group:admins@example.com”, “domain:google.com”, “serviceAccount:my-project-id@appspot.gserviceaccount.com” \] }, { “role”: “roles/resourcemanager.organizationViewer”, “members”: \[ “user:eve@example.com” \], “condition”: { “title”: “expirable access”, “description”: “Does not grant access after Sep 2020”, “expression”: “request.time \< timestamp(‘2020-10-01T00:00:00.000Z’)”, } } \], “etag”: “BwWWja0YfJA=”, “version”: 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time \< timestamp(‘2020-10-01T00:00:00.000Z’) etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
+/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** `{ "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 }` **YAML example:** `bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -1066,7 +1299,7 @@ pub struct Policy {
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub etag: Option<Vec<u8>>,
     /// Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
@@ -1074,6 +1307,107 @@ pub struct Policy {
 }
 
 impl client::ResponseResult for Policy {}
+
+
+/// Results of active probing from the last run of the test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProbingDetails {
+    /// The reason probing was aborted.
+    #[serde(rename="abortCause")]
+    
+    pub abort_cause: Option<String>,
+    /// The EdgeLocation from which a packet destined for/originating from the internet will egress/ingress the Google network. This will only be populated for a connectivity test which has an internet destination/source address. The absence of this field *must not* be used as an indication that the destination/source is part of the Google network.
+    #[serde(rename="destinationEgressLocation")]
+    
+    pub destination_egress_location: Option<EdgeLocation>,
+    /// The source and destination endpoints derived from the test input and used for active probing.
+    #[serde(rename="endpointInfo")]
+    
+    pub endpoint_info: Option<EndpointInfo>,
+    /// Details about an internal failure or the cancellation of active probing.
+    
+    pub error: Option<Status>,
+    /// Latency as measured by active probing in one direction: from the source to the destination endpoint.
+    #[serde(rename="probingLatency")]
+    
+    pub probing_latency: Option<LatencyDistribution>,
+    /// The overall result of active probing.
+    
+    pub result: Option<String>,
+    /// Number of probes sent.
+    #[serde(rename="sentProbeCount")]
+    
+    pub sent_probe_count: Option<i32>,
+    /// Number of probes that reached the destination.
+    #[serde(rename="successfulProbeCount")]
+    
+    pub successful_probe_count: Option<i32>,
+    /// The time that reachability was assessed through active probing.
+    #[serde(rename="verifyTime")]
+    
+    pub verify_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for ProbingDetails {}
+
+
+/// For display only. Metadata associated with ProxyConnection.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProxyConnectionInfo {
+    /// URI of the network where connection is proxied.
+    #[serde(rename="networkUri")]
+    
+    pub network_uri: Option<String>,
+    /// Destination IP address of a new connection.
+    #[serde(rename="newDestinationIp")]
+    
+    pub new_destination_ip: Option<String>,
+    /// Destination port of a new connection. Only valid when protocol is TCP or UDP.
+    #[serde(rename="newDestinationPort")]
+    
+    pub new_destination_port: Option<i32>,
+    /// Source IP address of a new connection.
+    #[serde(rename="newSourceIp")]
+    
+    pub new_source_ip: Option<String>,
+    /// Source port of a new connection. Only valid when protocol is TCP or UDP.
+    #[serde(rename="newSourcePort")]
+    
+    pub new_source_port: Option<i32>,
+    /// Destination IP address of an original connection
+    #[serde(rename="oldDestinationIp")]
+    
+    pub old_destination_ip: Option<String>,
+    /// Destination port of an original connection. Only valid when protocol is TCP or UDP.
+    #[serde(rename="oldDestinationPort")]
+    
+    pub old_destination_port: Option<i32>,
+    /// Source IP address of an original connection.
+    #[serde(rename="oldSourceIp")]
+    
+    pub old_source_ip: Option<String>,
+    /// Source port of an original connection. Only valid when protocol is TCP or UDP.
+    #[serde(rename="oldSourcePort")]
+    
+    pub old_source_port: Option<i32>,
+    /// IP protocol in string format, for example: "TCP", "UDP", "ICMP".
+    
+    pub protocol: Option<String>,
+    /// Uri of proxy subnet.
+    #[serde(rename="subnetUri")]
+    
+    pub subnet_uri: Option<String>,
+}
+
+impl client::Part for ProxyConnectionInfo {}
 
 
 /// Results of the configuration analysis from the last run of the test.
@@ -1131,7 +1465,7 @@ pub struct RouteInfo {
     #[serde(rename="destPortRanges")]
     
     pub dest_port_ranges: Option<Vec<String>>,
-    /// Name of a Compute Engine route.
+    /// Name of a route.
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
@@ -1139,7 +1473,15 @@ pub struct RouteInfo {
     #[serde(rename="instanceTags")]
     
     pub instance_tags: Option<Vec<String>>,
-    /// URI of a Compute Engine network.
+    /// URI of a NCC Hub. NCC_HUB routes only.
+    #[serde(rename="nccHubUri")]
+    
+    pub ncc_hub_uri: Option<String>,
+    /// URI of a NCC Spoke. NCC_HUB routes only.
+    #[serde(rename="nccSpokeUri")]
+    
+    pub ncc_spoke_uri: Option<String>,
+    /// URI of a Compute Engine network. NETWORK routes only.
     #[serde(rename="networkUri")]
     
     pub network_uri: Option<String>,
@@ -1157,6 +1499,10 @@ pub struct RouteInfo {
     /// Protocols of the route. Policy based routes only.
     
     pub protocols: Option<Vec<String>>,
+    /// Indicates where route is applicable.
+    #[serde(rename="routeScope")]
+    
+    pub route_scope: Option<String>,
     /// Type of route.
     #[serde(rename="routeType")]
     
@@ -1169,7 +1515,7 @@ pub struct RouteInfo {
     #[serde(rename="srcPortRanges")]
     
     pub src_port_ranges: Option<Vec<String>>,
-    /// URI of a Compute Engine route. Dynamic route from cloud router does not have a URI. Advertised route from Google Cloud VPC to on-premises network also does not have a URI.
+    /// URI of a route. Dynamic, peering static and peering dynamic routes do not have an URI. Advertised route from Google Cloud VPC to on-premises network also does not have an URI.
     
     pub uri: Option<String>,
 }
@@ -1277,13 +1623,24 @@ pub struct Step {
     #[serde(rename="gkeMaster")]
     
     pub gke_master: Option<GKEMasterInfo>,
+    /// Display information of a Google service
+    #[serde(rename="googleService")]
+    
+    pub google_service: Option<GoogleServiceInfo>,
     /// Display information of a Compute Engine instance.
     
     pub instance: Option<InstanceInfo>,
-    /// Display information of the load balancers.
+    /// Display information of the load balancers. Deprecated in favor of the `load_balancer_backend_info` field, not used in new tests.
     #[serde(rename="loadBalancer")]
     
     pub load_balancer: Option<LoadBalancerInfo>,
+    /// Display information of a specific load balancer backend.
+    #[serde(rename="loadBalancerBackendInfo")]
+    
+    pub load_balancer_backend_info: Option<LoadBalancerBackendInfo>,
+    /// Display information of a NAT.
+    
+    pub nat: Option<NatInfo>,
     /// Display information of a Google Cloud network.
     
     pub network: Option<NetworkInfo>,
@@ -1291,12 +1648,20 @@ pub struct Step {
     #[serde(rename="projectId")]
     
     pub project_id: Option<String>,
+    /// Display information of a ProxyConnection.
+    #[serde(rename="proxyConnection")]
+    
+    pub proxy_connection: Option<ProxyConnectionInfo>,
     /// Display information of a Compute Engine route.
     
     pub route: Option<RouteInfo>,
     /// Each step is in one of the pre-defined states.
     
     pub state: Option<String>,
+    /// Display information of a Storage Bucket. Used only for return traces.
+    #[serde(rename="storageBucket")]
+    
+    pub storage_bucket: Option<StorageBucketInfo>,
     /// Display information of a VPC connector.
     #[serde(rename="vpcConnector")]
     
@@ -1312,6 +1677,21 @@ pub struct Step {
 }
 
 impl client::Part for Step {}
+
+
+/// For display only. Metadata associated with Storage Bucket.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StorageBucketInfo {
+    /// Cloud Storage Bucket name.
+    
+    pub bucket: Option<String>,
+}
+
+impl client::Part for StorageBucketInfo {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -1363,6 +1743,10 @@ pub struct Trace {
     #[serde(rename="endpointInfo")]
     
     pub endpoint_info: Option<EndpointInfo>,
+    /// ID of trace. For forward traces, this ID is unique for each trace. For return traces, it matches ID of associated forward trace. A single forward trace can be associated with none, one or more than one return trace.
+    #[serde(rename="forwardTraceId")]
+    
+    pub forward_trace_id: Option<i32>,
     /// A trace of a test contains multiple steps from the initial state to the final state (delivered, dropped, forwarded, or aborted). The steps are ordered by the processing sequence within the simulated network state machine. It is critical to preserve the order of the steps and avoid reordering or sorting them.
     
     pub steps: Option<Vec<Step>>,
@@ -1741,7 +2125,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -5213,7 +5597,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.global.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.

@@ -1688,10 +1688,20 @@ where
                 match &temp_cursor.to_string()[..] {
                     "ack-deadline-seconds" => Some(("ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "bigquery-config.drop-unknown-fields" => Some(("bigqueryConfig.dropUnknownFields", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "bigquery-config.service-account-email" => Some(("bigqueryConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bigquery-config.state" => Some(("bigqueryConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bigquery-config.table" => Some(("bigqueryConfig.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-config.use-table-schema" => Some(("bigqueryConfig.useTableSchema", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "bigquery-config.use-topic-schema" => Some(("bigqueryConfig.useTopicSchema", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "bigquery-config.write-metadata" => Some(("bigqueryConfig.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.avro-config.write-metadata" => Some(("cloudStorageConfig.avroConfig.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.bucket" => Some(("cloudStorageConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.filename-prefix" => Some(("cloudStorageConfig.filenamePrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.filename-suffix" => Some(("cloudStorageConfig.filenameSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.max-bytes" => Some(("cloudStorageConfig.maxBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.max-duration" => Some(("cloudStorageConfig.maxDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.service-account-email" => Some(("cloudStorageConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-config.state" => Some(("cloudStorageConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dead-letter-policy.dead-letter-topic" => Some(("deadLetterPolicy.deadLetterTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dead-letter-policy.max-delivery-attempts" => Some(("deadLetterPolicy.maxDeliveryAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "detached" => Some(("detached", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1703,6 +1713,7 @@ where
                     "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "push-config.no-wrapper.write-metadata" => Some(("pushConfig.noWrapper.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "push-config.oidc-token.audience" => Some(("pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.oidc-token.service-account-email" => Some(("pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1713,7 +1724,7 @@ where
                     "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic-message-retention-duration" => Some(("topicMessageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "bigquery-config", "dead-letter-policy", "dead-letter-topic", "detached", "drop-unknown-fields", "enable-exactly-once-delivery", "enable-message-ordering", "expiration-policy", "filter", "labels", "max-delivery-attempts", "maximum-backoff", "message-retention-duration", "minimum-backoff", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "retry-policy", "service-account-email", "state", "table", "topic", "topic-message-retention-duration", "ttl", "use-topic-schema", "write-metadata"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "avro-config", "bigquery-config", "bucket", "cloud-storage-config", "dead-letter-policy", "dead-letter-topic", "detached", "drop-unknown-fields", "enable-exactly-once-delivery", "enable-message-ordering", "expiration-policy", "filename-prefix", "filename-suffix", "filter", "labels", "max-bytes", "max-delivery-attempts", "max-duration", "maximum-backoff", "message-retention-duration", "minimum-backoff", "name", "no-wrapper", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "retry-policy", "service-account-email", "state", "table", "topic", "topic-message-retention-duration", "ttl", "use-table-schema", "use-topic-schema", "write-metadata"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2154,11 +2165,12 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "push-config.no-wrapper.write-metadata" => Some(("pushConfig.noWrapper.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "push-config.oidc-token.audience" => Some(("pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.oidc-token.service-account-email" => Some(("pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attributes", "audience", "oidc-token", "push-config", "push-endpoint", "service-account-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attributes", "audience", "no-wrapper", "oidc-token", "push-config", "push-endpoint", "service-account-email", "write-metadata"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2243,10 +2255,20 @@ where
                 match &temp_cursor.to_string()[..] {
                     "subscription.ack-deadline-seconds" => Some(("subscription.ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "subscription.bigquery-config.drop-unknown-fields" => Some(("subscription.bigqueryConfig.dropUnknownFields", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "subscription.bigquery-config.service-account-email" => Some(("subscription.bigqueryConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.bigquery-config.state" => Some(("subscription.bigqueryConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.bigquery-config.table" => Some(("subscription.bigqueryConfig.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.bigquery-config.use-table-schema" => Some(("subscription.bigqueryConfig.useTableSchema", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "subscription.bigquery-config.use-topic-schema" => Some(("subscription.bigqueryConfig.useTopicSchema", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "subscription.bigquery-config.write-metadata" => Some(("subscription.bigqueryConfig.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.avro-config.write-metadata" => Some(("subscription.cloudStorageConfig.avroConfig.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.bucket" => Some(("subscription.cloudStorageConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.filename-prefix" => Some(("subscription.cloudStorageConfig.filenamePrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.filename-suffix" => Some(("subscription.cloudStorageConfig.filenameSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.max-bytes" => Some(("subscription.cloudStorageConfig.maxBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.max-duration" => Some(("subscription.cloudStorageConfig.maxDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.service-account-email" => Some(("subscription.cloudStorageConfig.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.cloud-storage-config.state" => Some(("subscription.cloudStorageConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.dead-letter-policy.dead-letter-topic" => Some(("subscription.deadLetterPolicy.deadLetterTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.dead-letter-policy.max-delivery-attempts" => Some(("subscription.deadLetterPolicy.maxDeliveryAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "subscription.detached" => Some(("subscription.detached", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2258,6 +2280,7 @@ where
                     "subscription.message-retention-duration" => Some(("subscription.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.name" => Some(("subscription.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.push-config.attributes" => Some(("subscription.pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "subscription.push-config.no-wrapper.write-metadata" => Some(("subscription.pushConfig.noWrapper.writeMetadata", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "subscription.push-config.oidc-token.audience" => Some(("subscription.pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.push-config.oidc-token.service-account-email" => Some(("subscription.pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.push-config.push-endpoint" => Some(("subscription.pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2269,7 +2292,7 @@ where
                     "subscription.topic-message-retention-duration" => Some(("subscription.topicMessageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "bigquery-config", "dead-letter-policy", "dead-letter-topic", "detached", "drop-unknown-fields", "enable-exactly-once-delivery", "enable-message-ordering", "expiration-policy", "filter", "labels", "max-delivery-attempts", "maximum-backoff", "message-retention-duration", "minimum-backoff", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "retry-policy", "service-account-email", "state", "subscription", "table", "topic", "topic-message-retention-duration", "ttl", "update-mask", "use-topic-schema", "write-metadata"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "avro-config", "bigquery-config", "bucket", "cloud-storage-config", "dead-letter-policy", "dead-letter-topic", "detached", "drop-unknown-fields", "enable-exactly-once-delivery", "enable-message-ordering", "expiration-policy", "filename-prefix", "filename-suffix", "filter", "labels", "max-bytes", "max-delivery-attempts", "max-duration", "maximum-backoff", "message-retention-duration", "minimum-backoff", "name", "no-wrapper", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "retry-policy", "service-account-email", "state", "subscription", "table", "topic", "topic-message-retention-duration", "ttl", "update-mask", "use-table-schema", "use-topic-schema", "write-metadata"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2695,18 +2718,25 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "ingestion-data-source-settings.aws-kinesis.aws-role-arn" => Some(("ingestionDataSourceSettings.awsKinesis.awsRoleArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ingestion-data-source-settings.aws-kinesis.consumer-arn" => Some(("ingestionDataSourceSettings.awsKinesis.consumerArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ingestion-data-source-settings.aws-kinesis.gcp-service-account" => Some(("ingestionDataSourceSettings.awsKinesis.gcpServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ingestion-data-source-settings.aws-kinesis.state" => Some(("ingestionDataSourceSettings.awsKinesis.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ingestion-data-source-settings.aws-kinesis.stream-arn" => Some(("ingestionDataSourceSettings.awsKinesis.streamArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-storage-policy.allowed-persistence-regions" => Some(("messageStoragePolicy.allowedPersistenceRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "message-storage-policy.enforce-in-transit" => Some(("messageStoragePolicy.enforceInTransit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schema-settings.encoding" => Some(("schemaSettings.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schema-settings.first-revision-id" => Some(("schemaSettings.firstRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schema-settings.last-revision-id" => Some(("schemaSettings.lastRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schema-settings.schema" => Some(("schemaSettings.schema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-persistence-regions", "encoding", "first-revision-id", "kms-key-name", "labels", "last-revision-id", "message-retention-duration", "message-storage-policy", "name", "satisfies-pzs", "schema", "schema-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-persistence-regions", "aws-kinesis", "aws-role-arn", "consumer-arn", "encoding", "enforce-in-transit", "first-revision-id", "gcp-service-account", "ingestion-data-source-settings", "kms-key-name", "labels", "last-revision-id", "message-retention-duration", "message-storage-policy", "name", "satisfies-pzs", "schema", "schema-settings", "state", "stream-arn"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3008,19 +3038,26 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "topic.ingestion-data-source-settings.aws-kinesis.aws-role-arn" => Some(("topic.ingestionDataSourceSettings.awsKinesis.awsRoleArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic.ingestion-data-source-settings.aws-kinesis.consumer-arn" => Some(("topic.ingestionDataSourceSettings.awsKinesis.consumerArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic.ingestion-data-source-settings.aws-kinesis.gcp-service-account" => Some(("topic.ingestionDataSourceSettings.awsKinesis.gcpServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic.ingestion-data-source-settings.aws-kinesis.state" => Some(("topic.ingestionDataSourceSettings.awsKinesis.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic.ingestion-data-source-settings.aws-kinesis.stream-arn" => Some(("topic.ingestionDataSourceSettings.awsKinesis.streamArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.kms-key-name" => Some(("topic.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.labels" => Some(("topic.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "topic.message-retention-duration" => Some(("topic.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.message-storage-policy.allowed-persistence-regions" => Some(("topic.messageStoragePolicy.allowedPersistenceRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "topic.message-storage-policy.enforce-in-transit" => Some(("topic.messageStoragePolicy.enforceInTransit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "topic.name" => Some(("topic.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.satisfies-pzs" => Some(("topic.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "topic.schema-settings.encoding" => Some(("topic.schemaSettings.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.schema-settings.first-revision-id" => Some(("topic.schemaSettings.firstRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.schema-settings.last-revision-id" => Some(("topic.schemaSettings.lastRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic.schema-settings.schema" => Some(("topic.schemaSettings.schema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic.state" => Some(("topic.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-persistence-regions", "encoding", "first-revision-id", "kms-key-name", "labels", "last-revision-id", "message-retention-duration", "message-storage-policy", "name", "satisfies-pzs", "schema", "schema-settings", "topic", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-persistence-regions", "aws-kinesis", "aws-role-arn", "consumer-arn", "encoding", "enforce-in-transit", "first-revision-id", "gcp-service-account", "ingestion-data-source-settings", "kms-key-name", "labels", "last-revision-id", "message-retention-duration", "message-storage-policy", "name", "satisfies-pzs", "schema", "schema-settings", "state", "stream-arn", "topic", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3762,7 +3799,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the schema revision to be deleted, with a revision ID explicitly included. Example: projects/123/schemas/my-schema@c7cfa2a8"##),
+                     Some(r##"Required. The name of the schema revision to be deleted, with a revision ID explicitly included. Example: `projects/123/schemas/my-schema@c7cfa2a8`"##),
                      Some(true),
                      Some(false)),
         
@@ -4007,12 +4044,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("snapshots-create",
-                    Some(r##"Creates a snapshot from the requested subscription. Snapshots are used in [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations, which allow you to manage message acknowledgments in bulk. That is, you can set the acknowledgment state of messages in an existing subscription to the state captured by a snapshot. If the snapshot already exists, returns `ALREADY_EXISTS`. If the requested subscription doesn't exist, returns `NOT_FOUND`. If the backlog in the subscription is too old -- and the resulting snapshot would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned. See also the `Snapshot.expire_time` field. If the name is not provided in the request, the server will assign a random name for this snapshot on the same project as the subscription, conforming to the [resource name format] (https://cloud.google.com/pubsub/docs/admin#resource_names). The generated name is populated in the returned Snapshot object. Note that for REST API requests, you must specify a name in the request."##),
+                    Some(r##"Creates a snapshot from the requested subscription. Snapshots are used in [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations, which allow you to manage message acknowledgments in bulk. That is, you can set the acknowledgment state of messages in an existing subscription to the state captured by a snapshot. If the snapshot already exists, returns `ALREADY_EXISTS`. If the requested subscription doesn't exist, returns `NOT_FOUND`. If the backlog in the subscription is too old -- and the resulting snapshot would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned. See also the `Snapshot.expire_time` field. If the name is not provided in the request, the server will assign a random name for this snapshot on the same project as the subscription, conforming to the [resource name format] (https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). The generated name is populated in the returned Snapshot object. Note that for REST API requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. User-provided name for this snapshot. If the name is not provided in the request, the server will assign a random name for this snapshot on the same project as the subscription. Note that for REST API requests, you must specify a name. See the [resource name rules](https://cloud.google.com/pubsub/docs/admin#resource_names). Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(r##"Required. User-provided name for this snapshot. If the name is not provided in the request, the server will assign a random name for this snapshot on the same project as the subscription. Note that for REST API requests, you must specify a name. See the [resource name rules](https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
         
@@ -4123,12 +4160,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("snapshots-patch",
-                    Some(r##"Updates an existing snapshot. Snapshots are used in [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations, which allow you to manage message acknowledgments in bulk. That is, you can set the acknowledgment state of messages in an existing subscription to the state captured by a snapshot."##),
+                    Some(r##"Updates an existing snapshot by updating the fields specified in the update mask. Snapshots are used in [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations, which allow you to manage message acknowledgments in bulk. That is, you can set the acknowledgment state of messages in an existing subscription to the state captured by a snapshot."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the snapshot."##),
+                     Some(r##"Optional. The name of the snapshot."##),
                      Some(true),
                      Some(false)),
         
@@ -4235,7 +4272,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-create",
-                    Some(r##"Creates a subscription to a given topic. See the [resource name rules] (https://cloud.google.com/pubsub/docs/admin#resource_names). If the subscription already exists, returns `ALREADY_EXISTS`. If the corresponding topic doesn't exist, returns `NOT_FOUND`. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic, conforming to the [resource name format] (https://cloud.google.com/pubsub/docs/admin#resource_names). The generated name is populated in the returned Subscription object. Note that for REST API requests, you must specify a name in the request."##),
+                    Some(r##"Creates a subscription to a given topic. See the [resource name rules] (https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). If the subscription already exists, returns `ALREADY_EXISTS`. If the corresponding topic doesn't exist, returns `NOT_FOUND`. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic, conforming to the [resource name format] (https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). The generated name is populated in the returned Subscription object. Note that for REST API requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-create",
                   vec![
                     (Some(r##"name"##),
@@ -4429,7 +4466,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-patch",
-                    Some(r##"Updates an existing subscription. Note that certain properties of a subscription, such as its topic, are not modifiable."##),
+                    Some(r##"Updates an existing subscription by updating the fields specified in the update mask. Note that certain properties of a subscription, such as its topic, are not modifiable."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-patch",
                   vec![
                     (Some(r##"name"##),
@@ -4569,7 +4606,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("topics-create",
-                    Some(r##"Creates the given topic with the given name. See the [resource name rules] (https://cloud.google.com/pubsub/docs/admin#resource_names)."##),
+                    Some(r##"Creates the given topic with the given name. See the [resource name rules] (https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-create",
                   vec![
                     (Some(r##"name"##),
@@ -4685,7 +4722,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("topics-patch",
-                    Some(r##"Updates an existing topic. Note that certain properties of a topic are not modifiable."##),
+                    Some(r##"Updates an existing topic by updating the fields specified in the update mask. Note that certain properties of a topic are not modifiable."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-patch",
                   vec![
                     (Some(r##"name"##),
@@ -4846,7 +4883,7 @@ async fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.3+20240227")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")
            .arg(Arg::with_name("url")

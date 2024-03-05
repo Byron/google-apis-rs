@@ -4,7 +4,7 @@
 [package]
 
 name = "google-metastore1_beta-cli"
-version = "5.0.3+20230111"
+version = "5.0.3+20240228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dataproc Metastore (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/metastore1_beta-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-metastore1_beta]
 path = "../metastore1_beta"
-version = "5.0.3+20230111"
+version = "5.0.3+20240228"
 

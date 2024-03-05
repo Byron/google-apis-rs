@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudprofiler2-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240219"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Profiler (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprofiler2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudprofiler2]
 path = "../cloudprofiler2"
-version = "5.0.3+20230123"
+version = "5.0.3+20240219"
 

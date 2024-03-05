@@ -20,6 +20,28 @@ use crate::{client, client::GetToken, client::serde_with};
 // UTILITIES ###
 // ############
 
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
+pub enum Scope {
+    /// Associate you with your personal info on Google
+    Openid,
+}
+
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
+        match *self {
+            Scope::Openid => "openid",
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+        Scope::Openid
+    }
+}
 
 
 
@@ -164,7 +186,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Amount {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Amount {}
 
 
-/// There is no detailed description.
+/// Request to cancel a subscription.
 /// 
 /// # Activities
 /// 
@@ -175,7 +197,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Amount {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {
-    /// Optional. If true, Google will cancel the subscription immediately, and issue a prorated refund for the remainder of the billing cycle. Otherwise, Google defers the cancelation at renewal_time, and therefore, will not issue a refund.
+    /// Optional. If true, Google will cancel the subscription immediately, and may or may not (based on the contract) issue a prorated refund for the remainder of the billing cycle. Otherwise, Google defers the cancelation at renewal_time, and will not issue a refund.
     #[serde(rename="cancelImmediately")]
     
     pub cancel_immediately: Option<bool>,
@@ -188,7 +210,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {
 impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {}
 
 
-/// There is no detailed description.
+/// Response that contains the cancelled subscription resource.
 /// 
 /// # Activities
 /// 
@@ -235,12 +257,36 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Duration {}
 /// * [subscriptions entitle partners](PartnerSubscriptionEntitleCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest { _never_set: Option<bool> }
+pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest {
+    /// Optional. The line items to be entitled. If unspecified, all line items will be entitled.
+    #[serde(rename="lineItemEntitlementDetails")]
+    
+    pub line_item_entitlement_details: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequestLineItemEntitlementDetails>>,
+}
 
 impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest {}
 
 
-/// There is no detailed description.
+/// The details of the line item to be entitled.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequestLineItemEntitlementDetails {
+    /// Required. The index of the line item to be entitled.
+    #[serde(rename="lineItemIndex")]
+    
+    pub line_item_index: Option<i32>,
+    /// Optional. Only applicable if the line item corresponds to a hard bundle. Product resource names that identify the bundle elements to be entitled in the line item. If unspecified, all bundle elements will be entitled. The format is 'partners/{partner_id}/products/{product_id}'.
+    
+    pub products: Option<Vec<String>>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequestLineItemEntitlementDetails {}
+
+
+/// Response that contains the entitled subscription resource.
 /// 
 /// # Activities
 /// 
@@ -273,7 +319,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest {
     /// Required. Specifies details of the extension. Currently, the duration of the extension must be exactly one billing cycle of the original subscription.
     
     pub extension: Option<GoogleCloudPaymentsResellerSubscriptionV1Extension>,
-    /// Required. Restricted to 36 ASCII characters. A random UUID is recommended. The idempotency key for the request. The ID generation logic is controlled by the partner. request_id should be the same as on retries of the same request. A different request_id must be used for a extension of a different cycle. A random UUID is recommended.
+    /// Required. Restricted to 36 ASCII characters. A random UUID is recommended. The idempotency key for the request. The ID generation logic is controlled by the partner. request_id should be the same as on retries of the same request. A different request_id must be used for a extension of a different cycle.
     #[serde(rename="requestId")]
     
     pub request_id: Option<String>,
@@ -282,7 +328,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest {
 impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest {}
 
 
-/// There is no detailed description.
+/// Response that contains the timestamps after the extension.
 /// 
 /// # Activities
 /// 
@@ -317,7 +363,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ExtendS
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Extension {
-    /// Specifies the period of access the subscription should grant.
+    /// Required. Specifies the period of access the subscription should grant.
     
     pub duration: Option<GoogleCloudPaymentsResellerSubscriptionV1Duration>,
     /// Required. Identifier of the end-user in partner’s system.
@@ -329,7 +375,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Extension {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Extension {}
 
 
-/// There is no detailed description.
+/// Request to find eligible promotions for the current user.
 /// 
 /// # Activities
 /// 
@@ -340,7 +386,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Extension {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest {
-    /// Optional. Specifies the filters for the promotion results. The syntax is defined in https://google.aip.dev/160 with the following caveats: - Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) - Only the following fields are supported: - `applicableProducts` - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` - Unless explicitly mentioned above, other features are not supported. Example: `applicableProducts:partners/partner1/products/product1 AND regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
+    /// Optional. Specifies the filters for the promotion results. The syntax is defined in https://google.aip.dev/160 with the following caveats: 1. Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) 2. Only the following fields are supported: - `applicableProducts` - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` 3. Unless explicitly mentioned above, other features are not supported. Example: `applicableProducts:partners/partner1/products/product1 AND regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
     
     pub filter: Option<String>,
     /// Optional. The maximum number of promotions to return. The service may return fewer than this value. If unspecified, at most 50 products will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
@@ -379,6 +425,23 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRespon
 impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsResponse {}
 
 
+/// Details for a subscriptiin line item with finite billing cycles.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1FiniteBillingCycleDetails {
+    /// Required. The number of a subscription line item billing cycles after which billing will stop automatically.
+    #[serde(rename="billingCycleCountLimit")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub billing_cycle_count_limit: Option<i64>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1FiniteBillingCycleDetails {}
+
+
 /// Payload specific to Google One products.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -405,7 +468,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload {}
 
 
-/// There is no detailed description.
+/// Response that contains the products.
 /// 
 /// # Activities
 /// 
@@ -428,7 +491,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1ListProductsResponse {
 impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ListProductsResponse {}
 
 
-/// There is no detailed description.
+/// Response that contains the promotions.
 /// 
 /// # Activities
 /// 
@@ -478,13 +541,25 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Location {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Product {
-    /// Output only. Response only. Resource name of the product. It will have the format of "partners/{partner_id}/products/{product_id}"
+    /// Output only. Output Only. Specifies the details for a bundle product.
+    #[serde(rename="bundleDetails")]
+    
+    pub bundle_details: Option<ProductBundleDetails>,
+    /// Optional. Details for a subscription line item with finite billing cycles. If unset, the line item will be charged indefinitely.
+    #[serde(rename="finiteBillingCycleDetails")]
+    
+    pub finite_billing_cycle_details: Option<GoogleCloudPaymentsResellerSubscriptionV1FiniteBillingCycleDetails>,
+    /// Identifier. Response only. Resource name of the product. It will have the format of "partners/{partner_id}/products/{product_id}"
     
     pub name: Option<String>,
     /// Output only. Price configs for the product in the available regions.
     #[serde(rename="priceConfigs")]
     
     pub price_configs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1ProductPriceConfig>>,
+    /// Output only. Output Only. Specifies the type of the product.
+    #[serde(rename="productType")]
+    
+    pub product_type: Option<String>,
     /// Output only. 2-letter ISO region code where the product is available in. Ex. "US" Please refers to: https://en.wikipedia.org/wiki/ISO_3166-1
     #[serde(rename="regionCodes")]
     
@@ -501,6 +576,21 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Product {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Product {}
 
 
+/// The individual product that is included in the bundle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductBundleDetailsBundleElement {
+    /// Required. Output only. Product resource name that identifies the bundle element. The format is 'partners/{partner_id}/products/{product_id}'.
+    
+    pub product: Option<String>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ProductBundleDetailsBundleElement {}
+
+
 /// Specifies product specific payload.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -508,7 +598,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Product {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductPayload {
-    /// Payload specific to Google One products.
+    /// Product-specific payloads. Payload specific to Google One products.
     #[serde(rename="googleOnePayload")]
     
     pub google_one_payload: Option<GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload>,
@@ -563,7 +653,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Promotion {
     #[serde(rename="introductoryPricingDetails")]
     
     pub introductory_pricing_details: Option<GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetails>,
-    /// Output only. Response only. Resource name of the subscription promotion. It will have the format of "partners/{partner_id}/promotion/{promotion_id}"
+    /// Identifier. Response only. Resource name of the subscription promotion. It will have the format of "partners/{partner_id}/promotion/{promotion_id}"
     
     pub name: Option<String>,
     /// Output only. Output Only. Specifies the type of the promotion.
@@ -593,7 +683,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Promotion {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetails {
-    /// Specifies the introductory pricing periods.
+    /// Output only. Specifies the introductory pricing periods.
     #[serde(rename="introductoryPricingSpecs")]
     
     pub introductory_pricing_specs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetailsIntroductoryPricingSpec>>,
@@ -651,7 +741,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod {}
 
 
-/// A Subscription resource managed by 3P Partners.
+/// A subscription serves as a central billing entity between an external partner and Google. The underlying Google services rely on the subscription state to grant or revoke the user’s service entitlement. It’s important to note that the subscription state may not always perfectly align with the user’s service entitlement. For example, some Google services may continue providing access to the user until the current billing cycle ends, even if the subscription has been immediately canceled. However, other services may not do the same. To fully understand the specific details, please consult the relevant contract or product policy.
 /// 
 /// # Activities
 /// 
@@ -688,7 +778,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
     #[serde(rename="lineItems")]
     
     pub line_items: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem>>,
-    /// Optional. Resource name of the subscription. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}". This is available for authorizeAddon, but otherwise is response only.
+    /// Identifier. Resource name of the subscription. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}". This is available for authorizeAddon, but otherwise is response only.
     
     pub name: Option<String>,
     /// Required. Identifier of the end-user in partner’s system. The value is restricted to 63 ASCII characters at the maximum.
@@ -699,7 +789,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
     #[serde(rename="processingState")]
     
     pub processing_state: Option<String>,
-    /// Required. Deprecated: consider using `line_items` as the input. Required. Resource name that identifies the purchased products. The format will be 'partners/{partner_id}/products/{product_id}'.
+    /// Optional. Deprecated: consider using `line_items` as the input. Required. Resource name that identifies the purchased products. The format will be 'partners/{partner_id}/products/{product_id}'.
     
     pub products: Option<Vec<String>>,
     /// Optional. Subscription-level promotions. Only free trial is supported on this level. It determines the first renewal time of the subscription to be the end of the free trial period. Specify the promotion resource name only when used as input.
@@ -745,7 +835,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1Subscri
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails {
-    /// The reason of the cancellation.
+    /// Output only. The reason of the cancellation.
     
     pub reason: Option<String>,
 }
@@ -760,13 +850,28 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCance
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {
+    /// Output only. The price of the product/service in this line item. The amount could be the wholesale price, or it can include a cost of sale based on the contract.
+    
+    pub amount: Option<GoogleCloudPaymentsResellerSubscriptionV1Amount>,
+    /// Output only. The bundle details for the line item. Only populated if the line item corresponds to a hard bundle.
+    #[serde(rename="bundleDetails")]
+    
+    pub bundle_details: Option<SubscriptionLineItemBundleDetails>,
     /// Output only. Description of this line item.
     
     pub description: Option<String>,
-    /// Output only. It is set only if the line item has its own free trial applied. End time of the line item free trial period, in ISO 8061 format. For example, "2019-08-31T17:28:54.564Z". It will be set the same as createTime if no free trial promotion is specified.
+    /// Optional. Details for a subscription line item with finite billing cycles. If unset, the line item will be charged indefinitely. Used only with LINE_ITEM_RECURRENCE_TYPE_PERIODIC.
+    #[serde(rename="finiteBillingCycleDetails")]
+    
+    pub finite_billing_cycle_details: Option<GoogleCloudPaymentsResellerSubscriptionV1FiniteBillingCycleDetails>,
+    /// Output only. The free trial end time will be populated after the line item is successfully processed. End time of the line item free trial period, in ISO 8061 format. For example, "2019-08-31T17:28:54.564Z". It will be set the same as createTime if no free trial promotion is specified.
     #[serde(rename="lineItemFreeTrialEndTime")]
     
     pub line_item_free_trial_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. A unique index of the subscription line item.
+    #[serde(rename="lineItemIndex")]
+    
+    pub line_item_index: Option<i32>,
     /// Optional. The promotions applied on the line item. It can be: - a free trial promotion, which overrides the subscription-level free trial promotion. - an introductory pricing promotion. When used as input in Create or Provision API, specify its resource name only.
     #[serde(rename="lineItemPromotionSpecs")]
     
@@ -794,6 +899,25 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {}
 
 
+/// The details for an element in the hard bundle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemBundleDetailsBundleElementDetails {
+    /// Output only. Product resource name that identifies the bundle element. The format is 'partners/{partner_id}/products/{product_id}'.
+    
+    pub product: Option<String>,
+    /// Output only. The time when this product is linked to an end user.
+    #[serde(rename="userAccountLinkedTime")]
+    
+    pub user_account_linked_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemBundleDetailsBundleElementDetails {}
+
+
 /// Details for a ONE_TIME recurrence line item.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -801,7 +925,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineI
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemOneTimeRecurrenceDetails {
-    /// The service period of the ONE_TIME line item.
+    /// Output only. The service period of the ONE_TIME line item.
     #[serde(rename="servicePeriod")]
     
     pub service_period: Option<GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod>,
@@ -898,10 +1022,18 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1UndoCan
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload {
+    /// Output only. The access expiration time for this line item.
+    #[serde(rename="accessEndTime")]
+    
+    pub access_end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The list of eligibility_ids which are applicable for the line item.
     #[serde(rename="partnerEligibilityIds")]
     
     pub partner_eligibility_ids: Option<Vec<String>>,
+    /// Optional. Specifies the plan type offered to the end user by the partner.
+    #[serde(rename="partnerPlanType")]
+    
+    pub partner_plan_type: Option<String>,
 }
 
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload {}
@@ -918,12 +1050,48 @@ pub struct GoogleTypeLocalizedText {
     #[serde(rename="languageCode")]
     
     pub language_code: Option<String>,
-    /// Localized string in the language corresponding to `language_code' below.
+    /// Localized string in the language corresponding to language_code below.
     
     pub text: Option<String>,
 }
 
 impl client::Part for GoogleTypeLocalizedText {}
+
+
+/// Details for a bundle product.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductBundleDetails {
+    /// The individual products that are included in the bundle.
+    #[serde(rename="bundleElements")]
+    
+    pub bundle_elements: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1ProductBundleDetailsBundleElement>>,
+    /// The entitlement mode of the bundle product.
+    #[serde(rename="entitlementMode")]
+    
+    pub entitlement_mode: Option<String>,
+}
+
+impl client::Part for ProductBundleDetails {}
+
+
+/// The bundle details for a line item corresponding to a hard bundle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionLineItemBundleDetails {
+    /// Output only. The details for each element in the hard bundle.
+    #[serde(rename="bundleElementDetails")]
+    
+    pub bundle_element_details: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemBundleDetailsBundleElementDetails>>,
+}
+
+impl client::Part for SubscriptionLineItemBundleDetails {}
 
 
 
@@ -985,12 +1153,13 @@ impl<'a, S> PartnerMethods<'a, S> {
             _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
     /// Create a builder to help you perform the following task:
     ///
-    /// To find eligible promotions for the current user. The API requires user authorization via OAuth. The user is inferred from the authenticated OAuth credential.
+    /// To find eligible promotions for the current user. The API requires user authorization via OAuth. The bare minimum oauth scope `openid` is sufficient, which will skip the consent screen.
     /// 
     /// # Arguments
     ///
@@ -1003,6 +1172,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1022,6 +1192,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1040,6 +1211,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1059,6 +1231,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _subscription_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1077,12 +1250,13 @@ impl<'a, S> PartnerMethods<'a, S> {
             _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
     /// Create a builder to help you perform the following task:
     ///
-    /// [Deprecated] New partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
+    /// [Opt-in only] Most partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
     /// 
     /// # Arguments
     ///
@@ -1095,6 +1269,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1111,6 +1286,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1130,6 +1306,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _subscription_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -1148,6 +1325,7 @@ impl<'a, S> PartnerMethods<'a, S> {
             _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
 }
@@ -1203,6 +1381,7 @@ pub struct PartnerProductListCall<'a, S>
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerProductListCall<'a, S> {}
@@ -1251,13 +1430,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/products";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -1273,6 +1447,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1281,6 +1467,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -1364,7 +1553,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Specifies the filters for the product results. The syntax is defined in https://google.aip.dev/160 with the following caveats: - Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) - Only the following fields are supported: - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` - Unless explicitly mentioned above, other features are not supported. Example: `regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
+    /// Optional. Specifies the filters for the product results. The syntax is defined in https://google.aip.dev/160 with the following caveats: 1. Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) 2. Only the following fields are supported: - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` 3. Unless explicitly mentioned above, other features are not supported. Example: `regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> PartnerProductListCall<'a, S> {
@@ -1410,10 +1599,44 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerProductListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerProductListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerProductListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
-/// To find eligible promotions for the current user. The API requires user authorization via OAuth. The user is inferred from the authenticated OAuth credential.
+/// To find eligible promotions for the current user. The API requires user authorization via OAuth. The bare minimum oauth scope `openid` is sufficient, which will skip the consent screen.
 ///
 /// A builder for the *promotions.findEligible* method supported by a *partner* resource.
 /// It is not used directly, but through a [`PartnerMethods`] instance.
@@ -1457,6 +1680,7 @@ pub struct PartnerPromotionFindEligibleCall<'a, S>
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerPromotionFindEligibleCall<'a, S> {}
@@ -1496,13 +1720,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/promotions:findEligible";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -1529,6 +1748,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1538,6 +1769,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -1657,6 +1891,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerPromotionFindEligibleCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerPromotionFindEligibleCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerPromotionFindEligibleCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -1703,6 +1971,7 @@ pub struct PartnerPromotionListCall<'a, S>
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerPromotionListCall<'a, S> {}
@@ -1751,13 +2020,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/promotions";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -1773,6 +2037,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1781,6 +2057,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -1864,7 +2143,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Specifies the filters for the promotion results. The syntax is defined in https://google.aip.dev/160 with the following caveats: - Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) - Only the following fields are supported: - `applicableProducts` - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` - Unless explicitly mentioned above, other features are not supported. Example: `applicableProducts:partners/partner1/products/product1 AND regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
+    /// Optional. Specifies the filters for the promotion results. The syntax is defined in https://google.aip.dev/160 with the following caveats: 1. Only the following features are supported: - Logical operator `AND` - Comparison operator `=` (no wildcards `*`) - Traversal operator `.` - Has operator `:` (no wildcards `*`) 2. Only the following fields are supported: - `applicableProducts` - `regionCodes` - `youtubePayload.partnerEligibilityId` - `youtubePayload.postalCode` 3. Unless explicitly mentioned above, other features are not supported. Example: `applicableProducts:partners/partner1/products/product1 AND regionCodes:US AND youtubePayload.postalCode=94043 AND youtubePayload.partnerEligibilityId=eligibility-id`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> PartnerPromotionListCall<'a, S> {
@@ -1910,6 +2189,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerPromotionListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerPromotionListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerPromotionListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -1957,6 +2270,7 @@ pub struct PartnerSubscriptionCancelCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionCancelCall<'a, S> {}
@@ -1996,13 +2310,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -2029,6 +2338,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2038,6 +2359,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -2157,6 +2481,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionCancelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionCancelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionCancelCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -2206,6 +2564,7 @@ pub struct PartnerSubscriptionCreateCall<'a, S>
     _subscription_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionCreateCall<'a, S> {}
@@ -2248,13 +2607,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/subscriptions";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -2281,6 +2635,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2290,6 +2656,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -2416,6 +2785,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -2463,6 +2866,7 @@ pub struct PartnerSubscriptionEntitleCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionEntitleCall<'a, S> {}
@@ -2502,13 +2906,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:entitle";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -2535,6 +2934,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2544,6 +2955,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -2663,10 +3077,44 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionEntitleCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionEntitleCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionEntitleCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
-/// [Deprecated] New partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
+/// [Opt-in only] Most partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.extend* method supported by a *partner* resource.
 /// It is not used directly, but through a [`PartnerMethods`] instance.
@@ -2710,6 +3158,7 @@ pub struct PartnerSubscriptionExtendCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionExtendCall<'a, S> {}
@@ -2749,13 +3198,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:extend";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -2782,6 +3226,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2791,6 +3247,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -2910,6 +3369,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionExtendCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionExtendCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionExtendCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -2950,6 +3443,7 @@ pub struct PartnerSubscriptionGetCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionGetCall<'a, S> {}
@@ -2989,13 +3483,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -3011,6 +3500,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -3019,6 +3520,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -3127,6 +3631,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -3176,6 +3714,7 @@ pub struct PartnerSubscriptionProvisionCall<'a, S>
     _subscription_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionProvisionCall<'a, S> {}
@@ -3218,13 +3757,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/subscriptions:provision";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -3251,6 +3785,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3260,6 +3806,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -3386,6 +3935,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionProvisionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionProvisionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionProvisionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -3433,6 +4016,7 @@ pub struct PartnerSubscriptionUndoCancelCall<'a, S>
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
 }
 
 impl<'a, S> client::CallBuilder for PartnerSubscriptionUndoCancelCall<'a, S> {}
@@ -3472,13 +4056,8 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}:undoCancel";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Openid.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -3505,6 +4084,18 @@ where
 
 
         loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3514,6 +4105,9 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
 
 
                         let request = req_builder
@@ -3633,6 +4227,40 @@ where
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Openid`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> PartnerSubscriptionUndoCancelCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> PartnerSubscriptionUndoCancelCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> PartnerSubscriptionUndoCancelCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 

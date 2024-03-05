@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -238,7 +238,7 @@ impl client::ResponseResult for Trace {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TraceSpan {
-    /// End time of the span in nanoseconds from the UNIX epoch.
+    /// End time of the span in seconds and nanoseconds from the UNIX epoch.
     #[serde(rename="endTime")]
     
     pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -261,7 +261,7 @@ pub struct TraceSpan {
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub span_id: Option<u64>,
-    /// Start time of the span in nanoseconds from the UNIX epoch.
+    /// Start time of the span in seconds and nanoseconds from the UNIX epoch.
     #[serde(rename="startTime")]
     
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,

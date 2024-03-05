@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AI Platform Notebooks* API at revision *20221213*. The CLI is at version *5.0.3*.
+This documentation was generated from the *AI Platform Notebooks* API at revision *20231227*. The CLI is at version *5.0.3*.
 
 ```bash
 notebooks1 [options]
@@ -47,8 +47,10 @@ notebooks1 [options]
                 locations-instances-get-instance-health <name> [-p <v>]... [-o <out>]
                 locations-instances-is-upgradeable <notebook-instance> [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]
+                locations-instances-migrate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-register <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-report <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-report-event <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-reset <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-set-accelerator <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -74,6 +76,7 @@ notebooks1 [options]
                 locations-runtimes-get <name> [-p <v>]... [-o <out>]
                 locations-runtimes-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-runtimes-list <parent> [-p <v>]... [-o <out>]
+                locations-runtimes-migrate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-refresh-runtime-token-internal <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-runtimes-report-event <name> (-r <kv>)... [-p <v>]... [-o <out>]

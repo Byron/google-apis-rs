@@ -783,6 +783,90 @@ where
         }
     }
 
+    async fn _projects_locations_global_domains_check_migration_permission(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CheckMigrationPermissionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_global_domains_check_migration_permission(request, opt.value_of("domain").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_global_domains_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -981,6 +1065,261 @@ where
         }
         let mut request: api::DetachTrustRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_global_domains_detach_trust(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_global_domains_disable_migration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DisableMigrationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_global_domains_disable_migration(request, opt.value_of("domain").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_global_domains_domain_join_machine(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "ou-name" => Some(("ouName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vm-id-token" => Some(("vmIdToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["force", "ou-name", "vm-id-token"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DomainJoinMachineRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_global_domains_domain_join_machine(request, opt.value_of("domain").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_global_domains_enable_migration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EnableMigrationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_global_domains_enable_migration(request, opt.value_of("domain").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3114,6 +3453,9 @@ where
                     ("locations-global-domains-backups-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_locations_global_domains_backups_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
+                    ("locations-global-domains-check-migration-permission", Some(opt)) => {
+                        call_result = self._projects_locations_global_domains_check_migration_permission(opt, dry_run, &mut err).await;
+                    },
                     ("locations-global-domains-create", Some(opt)) => {
                         call_result = self._projects_locations_global_domains_create(opt, dry_run, &mut err).await;
                     },
@@ -3122,6 +3464,15 @@ where
                     },
                     ("locations-global-domains-detach-trust", Some(opt)) => {
                         call_result = self._projects_locations_global_domains_detach_trust(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-global-domains-disable-migration", Some(opt)) => {
+                        call_result = self._projects_locations_global_domains_disable_migration(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-global-domains-domain-join-machine", Some(opt)) => {
+                        call_result = self._projects_locations_global_domains_domain_join_machine(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-global-domains-enable-migration", Some(opt)) => {
+                        call_result = self._projects_locations_global_domains_enable_migration(opt, dry_run, &mut err).await;
                     },
                     ("locations-global-domains-extend-schema", Some(opt)) => {
                         call_result = self._projects_locations_global_domains_extend_schema(opt, dry_run, &mut err).await;
@@ -3286,7 +3637,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-global-domains-attach-trust', 'locations-global-domains-backups-create', 'locations-global-domains-backups-delete', 'locations-global-domains-backups-get', 'locations-global-domains-backups-get-iam-policy', 'locations-global-domains-backups-list', 'locations-global-domains-backups-patch', 'locations-global-domains-backups-set-iam-policy', 'locations-global-domains-backups-test-iam-permissions', 'locations-global-domains-create', 'locations-global-domains-delete', 'locations-global-domains-detach-trust', 'locations-global-domains-extend-schema', 'locations-global-domains-get', 'locations-global-domains-get-iam-policy', 'locations-global-domains-get-ldapssettings', 'locations-global-domains-list', 'locations-global-domains-patch', 'locations-global-domains-reconfigure-trust', 'locations-global-domains-reset-admin-password', 'locations-global-domains-restore', 'locations-global-domains-set-iam-policy', 'locations-global-domains-sql-integrations-get', 'locations-global-domains-sql-integrations-list', 'locations-global-domains-test-iam-permissions', 'locations-global-domains-update-ldapssettings', 'locations-global-domains-validate-trust', 'locations-global-operations-cancel', 'locations-global-operations-delete', 'locations-global-operations-get', 'locations-global-operations-list', 'locations-global-peerings-create', 'locations-global-peerings-delete', 'locations-global-peerings-get', 'locations-global-peerings-get-iam-policy', 'locations-global-peerings-list', 'locations-global-peerings-patch', 'locations-global-peerings-set-iam-policy', 'locations-global-peerings-test-iam-permissions' and 'locations-list'", vec![
+        ("projects", "methods: 'locations-get', 'locations-global-domains-attach-trust', 'locations-global-domains-backups-create', 'locations-global-domains-backups-delete', 'locations-global-domains-backups-get', 'locations-global-domains-backups-get-iam-policy', 'locations-global-domains-backups-list', 'locations-global-domains-backups-patch', 'locations-global-domains-backups-set-iam-policy', 'locations-global-domains-backups-test-iam-permissions', 'locations-global-domains-check-migration-permission', 'locations-global-domains-create', 'locations-global-domains-delete', 'locations-global-domains-detach-trust', 'locations-global-domains-disable-migration', 'locations-global-domains-domain-join-machine', 'locations-global-domains-enable-migration', 'locations-global-domains-extend-schema', 'locations-global-domains-get', 'locations-global-domains-get-iam-policy', 'locations-global-domains-get-ldapssettings', 'locations-global-domains-list', 'locations-global-domains-patch', 'locations-global-domains-reconfigure-trust', 'locations-global-domains-reset-admin-password', 'locations-global-domains-restore', 'locations-global-domains-set-iam-policy', 'locations-global-domains-sql-integrations-get', 'locations-global-domains-sql-integrations-list', 'locations-global-domains-test-iam-permissions', 'locations-global-domains-update-ldapssettings', 'locations-global-domains-validate-trust', 'locations-global-operations-cancel', 'locations-global-operations-delete', 'locations-global-operations-get', 'locations-global-operations-list', 'locations-global-peerings-create', 'locations-global-peerings-delete', 'locations-global-peerings-get', 'locations-global-peerings-get-iam-policy', 'locations-global-peerings-list', 'locations-global-peerings-patch', 'locations-global-peerings-set-iam-policy', 'locations-global-peerings-test-iam-permissions' and 'locations-list'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-get",
@@ -3537,6 +3888,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-global-domains-check-migration-permission",
+                    Some(r##"CheckMigrationPermission API gets the current state of DomainMigration"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-global-domains-check-migration-permission",
+                  vec![
+                    (Some(r##"domain"##),
+                     None,
+                     Some(r##"Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-global-domains-create",
                     Some(r##"Creates a Microsoft AD domain."##),
                     "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-global-domains-create",
@@ -3594,6 +3973,90 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The resource domain name, project name, and location using the form: `projects/{project_id}/locations/global/domains/{domain_name}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-global-domains-disable-migration",
+                    Some(r##"Disable Domain Migration"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-global-domains-disable-migration",
+                  vec![
+                    (Some(r##"domain"##),
+                     None,
+                     Some(r##"Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-global-domains-domain-join-machine",
+                    Some(r##"DomainJoinMachine API joins a Compute Engine VM to the domain"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-global-domains-domain-join-machine",
+                  vec![
+                    (Some(r##"domain"##),
+                     None,
+                     Some(r##"Required. The domain resource name using the form: projects/{project_id}/locations/global/domains/{domain_name}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-global-domains-enable-migration",
+                    Some(r##"Enable Domain Migration"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-global-domains-enable-migration",
+                  vec![
+                    (Some(r##"domain"##),
+                     None,
+                     Some(r##"Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`"##),
                      Some(true),
                      Some(false)),
         
@@ -4072,7 +4535,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-global-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_managedidentities1_cli/projects_locations-global-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -4321,7 +4784,7 @@ async fn main() {
     
     let mut app = App::new("managedidentities1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221227")
+           .version("5.0.3+20240112")
            .about("The Managed Service for Microsoft Active Directory API is used for managing a highly available, hardened service running Microsoft Active Directory (AD).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_managedidentities1_cli")
            .arg(Arg::with_name("url")

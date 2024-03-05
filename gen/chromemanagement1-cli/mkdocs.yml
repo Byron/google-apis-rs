@@ -1,4 +1,4 @@
-site_name: Chrome Management v5.0.3+20230123
+site_name: Chrome Management v5.0.3+20240303
 site_url: http://byron.github.io/google-apis-rs/google-chromemanagement1-cli
 site_description: A complete library to interact with Chrome Management (protocol v1)
 
@@ -14,15 +14,24 @@ nav:
     - 'Apps Chrome Get': 'customers_apps-chrome-get.md'
     - 'Apps Count Chrome App Requests': 'customers_apps-count-chrome-app-requests.md'
     - 'Apps Web Get': 'customers_apps-web-get.md'
+    - 'Reports Count Chrome Browsers Needing Attention': 'customers_reports-count-chrome-browsers-needing-attention.md'
     - 'Reports Count Chrome Devices Reaching Auto Expiration Date': 'customers_reports-count-chrome-devices-reaching-auto-expiration-date.md'
     - 'Reports Count Chrome Devices That Need Attention': 'customers_reports-count-chrome-devices-that-need-attention.md'
     - 'Reports Count Chrome Hardware Fleet Devices': 'customers_reports-count-chrome-hardware-fleet-devices.md'
     - 'Reports Count Chrome Versions': 'customers_reports-count-chrome-versions.md'
     - 'Reports Count Installed Apps': 'customers_reports-count-installed-apps.md'
+    - 'Reports Count Print Jobs By Printer': 'customers_reports-count-print-jobs-by-printer.md'
+    - 'Reports Count Print Jobs By User': 'customers_reports-count-print-jobs-by-user.md'
+    - 'Reports Enumerate Print Jobs': 'customers_reports-enumerate-print-jobs.md'
     - 'Reports Find Installed App Devices': 'customers_reports-find-installed-app-devices.md'
     - 'Telemetry Devices Get': 'customers_telemetry-devices-get.md'
     - 'Telemetry Devices List': 'customers_telemetry-devices-list.md'
     - 'Telemetry Events List': 'customers_telemetry-events-list.md'
+    - 'Telemetry Notification Configs Create': 'customers_telemetry-notification-configs-create.md'
+    - 'Telemetry Notification Configs Delete': 'customers_telemetry-notification-configs-delete.md'
+    - 'Telemetry Notification Configs List': 'customers_telemetry-notification-configs-list.md'
+    - 'Telemetry Users Get': 'customers_telemetry-users-get.md'
+    - 'Telemetry Users List': 'customers_telemetry-users-list.md'
 
 theme: readthedocs
 

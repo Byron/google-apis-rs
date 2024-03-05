@@ -25,15 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Assuredworkloads* API at revision *20230116*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Assuredworkloads* API at revision *20240222*. The CLI is at version *5.0.3*.
 
 ```bash
 assuredworkloads1 [options]
         organizations
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-workloads-analyze-workload-move <target> [-p <v>]... [-o <out>]
                 locations-workloads-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workloads-delete <name> [-p <v>]... [-o <out>]
+                locations-workloads-enable-resource-monitoring <name> [-p <v>]... [-o <out>]
                 locations-workloads-get <name> [-p <v>]... [-o <out>]
                 locations-workloads-list <parent> [-p <v>]... [-o <out>]
                 locations-workloads-mutate-partner-permissions <name> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, create, and delete all your Google Docs documents
     Document,
@@ -882,6 +882,10 @@ pub struct DocumentStyle {
     #[serde(rename="firstPageHeaderId")]
     
     pub first_page_header_id: Option<String>,
+    /// Optional. Indicates whether to flip the dimensions of the page_size, which allows changing the page orientation between portrait and landscape.
+    #[serde(rename="flipPageOrientation")]
+    
+    pub flip_page_orientation: Option<bool>,
     /// The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles.
     #[serde(rename="marginBottom")]
     
@@ -966,6 +970,10 @@ pub struct DocumentStyleSuggestionState {
     #[serde(rename="firstPageHeaderIdSuggested")]
     
     pub first_page_header_id_suggested: Option<bool>,
+    /// Optional. Indicates if there was a suggested change to flip_page_orientation.
+    #[serde(rename="flipPageOrientationSuggested")]
+    
+    pub flip_page_orientation_suggested: Option<bool>,
     /// Indicates if there was a suggested change to margin_bottom.
     #[serde(rename="marginBottomSuggested")]
     
@@ -1547,7 +1555,7 @@ pub struct InsertInlineImageRequest {
     #[serde(rename="objectSize")]
     
     pub object_size: Option<Size>,
-    /// The image URI. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format. The provided URI can be at most 2 kB in length. The URI itself is saved with the image, and exposed via the ImageProperties.content_uri field.
+    /// The image URI. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format. The provided URI must be publicly accessible and at most 2 kB in length. The URI itself is saved with the image, and exposed via the ImageProperties.content_uri field.
     
     pub uri: Option<String>,
 }
@@ -3094,6 +3102,10 @@ pub struct SectionStyle {
     #[serde(rename="firstPageHeaderId")]
     
     pub first_page_header_id: Option<String>,
+    /// Optional. Indicates whether to flip the dimensions of DocumentStyle's page_size for this section, which allows changing the page orientation between portrait and landscape. If unset, the value inherits from DocumentStyle's flip_page_orientation. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    #[serde(rename="flipPageOrientation")]
+    
+    pub flip_page_orientation: Option<bool>,
     /// The bottom page margin of the section. If unset, the value defaults to margin_bottom from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename="marginBottom")]
     

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *GKE Hub* crate version *5.0.3+20230106*, where *20230106* is the exact revision of the *gkehub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *GKE Hub* crate version *5.0.3+20240225*, where *20240225* is the exact revision of the *gkehub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *GKE Hub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/anthos/multicluster-management/connect/registering-a-cluster).
@@ -11,8 +11,10 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](GKEHub) ... 
 //! 
+//! * organizations
+//!  * [*locations fleets list*](api::OrganizationLocationFleetListCall)
 //! * projects
-//!  * [*locations features create*](api::ProjectLocationFeatureCreateCall), [*locations features delete*](api::ProjectLocationFeatureDeleteCall), [*locations features get*](api::ProjectLocationFeatureGetCall), [*locations features get iam policy*](api::ProjectLocationFeatureGetIamPolicyCall), [*locations features list*](api::ProjectLocationFeatureListCall), [*locations features patch*](api::ProjectLocationFeaturePatchCall), [*locations features set iam policy*](api::ProjectLocationFeatureSetIamPolicyCall), [*locations features test iam permissions*](api::ProjectLocationFeatureTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations memberships create*](api::ProjectLocationMembershipCreateCall), [*locations memberships delete*](api::ProjectLocationMembershipDeleteCall), [*locations memberships generate connect manifest*](api::ProjectLocationMembershipGenerateConnectManifestCall), [*locations memberships get*](api::ProjectLocationMembershipGetCall), [*locations memberships get iam policy*](api::ProjectLocationMembershipGetIamPolicyCall), [*locations memberships list*](api::ProjectLocationMembershipListCall), [*locations memberships patch*](api::ProjectLocationMembershipPatchCall), [*locations memberships set iam policy*](api::ProjectLocationMembershipSetIamPolicyCall), [*locations memberships test iam permissions*](api::ProjectLocationMembershipTestIamPermissionCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations features create*](api::ProjectLocationFeatureCreateCall), [*locations features delete*](api::ProjectLocationFeatureDeleteCall), [*locations features get*](api::ProjectLocationFeatureGetCall), [*locations features get iam policy*](api::ProjectLocationFeatureGetIamPolicyCall), [*locations features list*](api::ProjectLocationFeatureListCall), [*locations features patch*](api::ProjectLocationFeaturePatchCall), [*locations features set iam policy*](api::ProjectLocationFeatureSetIamPolicyCall), [*locations features test iam permissions*](api::ProjectLocationFeatureTestIamPermissionCall), [*locations fleets create*](api::ProjectLocationFleetCreateCall), [*locations fleets delete*](api::ProjectLocationFleetDeleteCall), [*locations fleets get*](api::ProjectLocationFleetGetCall), [*locations fleets list*](api::ProjectLocationFleetListCall), [*locations fleets patch*](api::ProjectLocationFleetPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations memberships bindings create*](api::ProjectLocationMembershipBindingCreateCall), [*locations memberships bindings delete*](api::ProjectLocationMembershipBindingDeleteCall), [*locations memberships bindings get*](api::ProjectLocationMembershipBindingGetCall), [*locations memberships bindings list*](api::ProjectLocationMembershipBindingListCall), [*locations memberships bindings patch*](api::ProjectLocationMembershipBindingPatchCall), [*locations memberships create*](api::ProjectLocationMembershipCreateCall), [*locations memberships delete*](api::ProjectLocationMembershipDeleteCall), [*locations memberships generate connect manifest*](api::ProjectLocationMembershipGenerateConnectManifestCall), [*locations memberships get*](api::ProjectLocationMembershipGetCall), [*locations memberships get iam policy*](api::ProjectLocationMembershipGetIamPolicyCall), [*locations memberships list*](api::ProjectLocationMembershipListCall), [*locations memberships patch*](api::ProjectLocationMembershipPatchCall), [*locations memberships set iam policy*](api::ProjectLocationMembershipSetIamPolicyCall), [*locations memberships test iam permissions*](api::ProjectLocationMembershipTestIamPermissionCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations scopes create*](api::ProjectLocationScopeCreateCall), [*locations scopes delete*](api::ProjectLocationScopeDeleteCall), [*locations scopes get*](api::ProjectLocationScopeGetCall), [*locations scopes get iam policy*](api::ProjectLocationScopeGetIamPolicyCall), [*locations scopes list*](api::ProjectLocationScopeListCall), [*locations scopes namespaces create*](api::ProjectLocationScopeNamespaceCreateCall), [*locations scopes namespaces delete*](api::ProjectLocationScopeNamespaceDeleteCall), [*locations scopes namespaces get*](api::ProjectLocationScopeNamespaceGetCall), [*locations scopes namespaces list*](api::ProjectLocationScopeNamespaceListCall), [*locations scopes namespaces patch*](api::ProjectLocationScopeNamespacePatchCall), [*locations scopes patch*](api::ProjectLocationScopePatchCall), [*locations scopes rbacrolebindings create*](api::ProjectLocationScopeRbacrolebindingCreateCall), [*locations scopes rbacrolebindings delete*](api::ProjectLocationScopeRbacrolebindingDeleteCall), [*locations scopes rbacrolebindings get*](api::ProjectLocationScopeRbacrolebindingGetCall), [*locations scopes rbacrolebindings list*](api::ProjectLocationScopeRbacrolebindingListCall), [*locations scopes rbacrolebindings patch*](api::ProjectLocationScopeRbacrolebindingPatchCall), [*locations scopes set iam policy*](api::ProjectLocationScopeSetIamPolicyCall) and [*locations scopes test iam permissions*](api::ProjectLocationScopeTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -50,10 +52,25 @@
 //! let r = hub.projects().locations_features_create(...).doit().await
 //! let r = hub.projects().locations_features_delete(...).doit().await
 //! let r = hub.projects().locations_features_patch(...).doit().await
+//! let r = hub.projects().locations_fleets_create(...).doit().await
+//! let r = hub.projects().locations_fleets_delete(...).doit().await
+//! let r = hub.projects().locations_fleets_patch(...).doit().await
+//! let r = hub.projects().locations_memberships_bindings_create(...).doit().await
+//! let r = hub.projects().locations_memberships_bindings_delete(...).doit().await
+//! let r = hub.projects().locations_memberships_bindings_patch(...).doit().await
 //! let r = hub.projects().locations_memberships_create(...).doit().await
 //! let r = hub.projects().locations_memberships_delete(...).doit().await
 //! let r = hub.projects().locations_memberships_patch(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_scopes_namespaces_create(...).doit().await
+//! let r = hub.projects().locations_scopes_namespaces_delete(...).doit().await
+//! let r = hub.projects().locations_scopes_namespaces_patch(...).doit().await
+//! let r = hub.projects().locations_scopes_rbacrolebindings_create(...).doit().await
+//! let r = hub.projects().locations_scopes_rbacrolebindings_delete(...).doit().await
+//! let r = hub.projects().locations_scopes_rbacrolebindings_patch(...).doit().await
+//! let r = hub.projects().locations_scopes_create(...).doit().await
+//! let r = hub.projects().locations_scopes_delete(...).doit().await
+//! let r = hub.projects().locations_scopes_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

@@ -682,11 +682,14 @@ where
                     "data-disk-type" => Some(("dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption" => Some(("diskEncryption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "install-gpu-driver" => Some(("installGpuDriver", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-migration-eligibility.errors" => Some(("instanceMigrationEligibility.errors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-migration-eligibility.warnings" => Some(("instanceMigrationEligibility.warnings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "instance-owners" => Some(("instanceOwners", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "machine-type" => Some(("machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "migrated" => Some(("migrated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nic-type" => Some(("nicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -711,7 +714,7 @@ where
                     "vm-image.image-name" => Some(("vmImage.imageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vm-image.project" => Some(("vmImage.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "boot-disk-size-gb", "boot-disk-type", "can-ip-forward", "consume-reservation-type", "container-image", "core-count", "create-time", "creator", "custom-gpu-driver-path", "data-disk-size-gb", "data-disk-type", "disk-encryption", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "image-family", "image-name", "install-gpu-driver", "instance-owners", "key", "kms-key", "labels", "machine-type", "metadata", "name", "network", "nic-type", "no-proxy-access", "no-public-ip", "no-remove-data-disk", "post-startup-script", "project", "proxy-uri", "repository", "reservation-affinity", "service-account", "service-account-scopes", "shielded-instance-config", "state", "subnet", "tag", "tags", "type", "update-time", "values", "vm-image"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "boot-disk-size-gb", "boot-disk-type", "can-ip-forward", "consume-reservation-type", "container-image", "core-count", "create-time", "creator", "custom-gpu-driver-path", "data-disk-size-gb", "data-disk-type", "disk-encryption", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "errors", "image-family", "image-name", "install-gpu-driver", "instance-migration-eligibility", "instance-owners", "key", "kms-key", "labels", "machine-type", "metadata", "migrated", "name", "network", "nic-type", "no-proxy-access", "no-public-ip", "no-remove-data-disk", "post-startup-script", "project", "proxy-uri", "repository", "reservation-affinity", "service-account", "service-account-scopes", "shielded-instance-config", "state", "subnet", "tag", "tags", "type", "update-time", "values", "vm-image", "warnings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -855,8 +858,9 @@ where
                     "diagnostic-config.packet-capture-flag-enabled" => Some(("diagnosticConfig.packetCaptureFlagEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "diagnostic-config.relative-path" => Some(("diagnosticConfig.relativePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "diagnostic-config.repair-flag-enabled" => Some(("diagnosticConfig.repairFlagEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "timeout-minutes" => Some(("timeoutMinutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["copy-home-files-flag-enabled", "diagnostic-config", "gcs-bucket", "packet-capture-flag-enabled", "relative-path", "repair-flag-enabled"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["copy-home-files-flag-enabled", "diagnostic-config", "gcs-bucket", "packet-capture-flag-enabled", "relative-path", "repair-flag-enabled", "timeout-minutes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1144,6 +1148,12 @@ where
                 "page-size" => {
                     call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1157,7 +1167,92 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_migrate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "post-startup-script-option" => Some(("postStartupScriptOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["post-startup-script-option"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::MigrateInstanceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_migrate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1313,6 +1408,94 @@ where
         }
         let mut request: api::ReportInstanceInfoRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_instances_report(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_report_event(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "event.details" => Some(("event.details", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "event.report-time" => Some(("event.reportTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event.type" => Some(("event.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vm-id" => Some(("vmId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["details", "event", "report-time", "type", "vm-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ReportInstanceEventRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_report_event(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2895,14 +3078,19 @@ where
                     "access-config.runtime-owner" => Some(("accessConfig.runtimeOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-state" => Some(("healthState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metrics.system-metrics" => Some(("metrics.systemMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "migrated" => Some(("migrated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-migration-eligibility.errors" => Some(("runtimeMigrationEligibility.errors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "runtime-migration-eligibility.warnings" => Some(("runtimeMigrationEligibility.warnings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "software-config.custom-gpu-driver-path" => Some(("softwareConfig.customGpuDriverPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "software-config.disable-terminal" => Some(("softwareConfig.disableTerminal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.enable-health-monitoring" => Some(("softwareConfig.enableHealthMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.idle-shutdown" => Some(("softwareConfig.idleShutdown", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.idle-shutdown-timeout" => Some(("softwareConfig.idleShutdownTimeout", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "software-config.install-gpu-driver" => Some(("softwareConfig.installGpuDriver", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "software-config.mixer-disabled" => Some(("softwareConfig.mixerDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.notebook-upgrade-schedule" => Some(("softwareConfig.notebookUpgradeSchedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "software-config.post-startup-script" => Some(("softwareConfig.postStartupScript", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "software-config.post-startup-script-behavior" => Some(("softwareConfig.postStartupScriptBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2945,7 +3133,7 @@ where
                     "virtual-machine.virtual-machine-config.tags" => Some(("virtualMachine.virtualMachineConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "virtual-machine.virtual-machine-config.zone" => Some(("virtualMachine.virtualMachineConfig.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "access-config", "access-type", "auto-delete", "boot", "core-count", "create-time", "custom-gpu-driver-path", "data-disk", "description", "device-name", "disable-terminal", "disk-name", "disk-size-gb", "disk-type", "enable-health-monitoring", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "encryption-config", "guest-attributes", "health-state", "idle-shutdown", "idle-shutdown-timeout", "index", "initialize-params", "install-gpu-driver", "instance-id", "instance-name", "interface", "internal-ip-only", "kind", "kms-key", "labels", "licenses", "machine-type", "metadata", "metrics", "mode", "name", "network", "nic-type", "notebook-upgrade-schedule", "post-startup-script", "post-startup-script-behavior", "proxy-uri", "reserved-ip-range", "runtime-owner", "shielded-instance-config", "software-config", "source", "state", "subnet", "system-metrics", "tags", "type", "update-time", "upgradeable", "version", "virtual-machine", "virtual-machine-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "access-config", "access-type", "auto-delete", "boot", "core-count", "create-time", "custom-gpu-driver-path", "data-disk", "description", "device-name", "disable-terminal", "disk-name", "disk-size-gb", "disk-type", "enable-health-monitoring", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "encryption-config", "errors", "guest-attributes", "health-state", "idle-shutdown", "idle-shutdown-timeout", "index", "initialize-params", "install-gpu-driver", "instance-id", "instance-name", "interface", "internal-ip-only", "kind", "kms-key", "labels", "licenses", "machine-type", "metadata", "metrics", "migrated", "mixer-disabled", "mode", "name", "network", "nic-type", "notebook-upgrade-schedule", "post-startup-script", "post-startup-script-behavior", "proxy-uri", "reserved-ip-range", "runtime-migration-eligibility", "runtime-owner", "shielded-instance-config", "software-config", "source", "state", "subnet", "system-metrics", "tags", "type", "update-time", "upgradeable", "version", "virtual-machine", "virtual-machine-config", "warnings", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3096,8 +3284,9 @@ where
                     "diagnostic-config.packet-capture-flag-enabled" => Some(("diagnosticConfig.packetCaptureFlagEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "diagnostic-config.relative-path" => Some(("diagnosticConfig.relativePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "diagnostic-config.repair-flag-enabled" => Some(("diagnosticConfig.repairFlagEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "timeout-minutes" => Some(("timeoutMinutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["copy-home-files-flag-enabled", "diagnostic-config", "gcs-bucket", "packet-capture-flag-enabled", "relative-path", "repair-flag-enabled"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["copy-home-files-flag-enabled", "diagnostic-config", "gcs-bucket", "packet-capture-flag-enabled", "relative-path", "repair-flag-enabled", "timeout-minutes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3277,6 +3466,12 @@ where
                 "page-size" => {
                     call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3290,7 +3485,96 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_runtimes_migrate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "post-startup-script-option" => Some(("postStartupScriptOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subnet" => Some(("subnet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["network", "post-startup-script-option", "request-id", "service-account", "subnet"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::MigrateRuntimeRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_runtimes_migrate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3352,14 +3636,19 @@ where
                     "access-config.runtime-owner" => Some(("accessConfig.runtimeOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-state" => Some(("healthState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metrics.system-metrics" => Some(("metrics.systemMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "migrated" => Some(("migrated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-migration-eligibility.errors" => Some(("runtimeMigrationEligibility.errors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "runtime-migration-eligibility.warnings" => Some(("runtimeMigrationEligibility.warnings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "software-config.custom-gpu-driver-path" => Some(("softwareConfig.customGpuDriverPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "software-config.disable-terminal" => Some(("softwareConfig.disableTerminal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.enable-health-monitoring" => Some(("softwareConfig.enableHealthMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.idle-shutdown" => Some(("softwareConfig.idleShutdown", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.idle-shutdown-timeout" => Some(("softwareConfig.idleShutdownTimeout", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "software-config.install-gpu-driver" => Some(("softwareConfig.installGpuDriver", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "software-config.mixer-disabled" => Some(("softwareConfig.mixerDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "software-config.notebook-upgrade-schedule" => Some(("softwareConfig.notebookUpgradeSchedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "software-config.post-startup-script" => Some(("softwareConfig.postStartupScript", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "software-config.post-startup-script-behavior" => Some(("softwareConfig.postStartupScriptBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3402,7 +3691,7 @@ where
                     "virtual-machine.virtual-machine-config.tags" => Some(("virtualMachine.virtualMachineConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "virtual-machine.virtual-machine-config.zone" => Some(("virtualMachine.virtualMachineConfig.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "access-config", "access-type", "auto-delete", "boot", "core-count", "create-time", "custom-gpu-driver-path", "data-disk", "description", "device-name", "disable-terminal", "disk-name", "disk-size-gb", "disk-type", "enable-health-monitoring", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "encryption-config", "guest-attributes", "health-state", "idle-shutdown", "idle-shutdown-timeout", "index", "initialize-params", "install-gpu-driver", "instance-id", "instance-name", "interface", "internal-ip-only", "kind", "kms-key", "labels", "licenses", "machine-type", "metadata", "metrics", "mode", "name", "network", "nic-type", "notebook-upgrade-schedule", "post-startup-script", "post-startup-script-behavior", "proxy-uri", "reserved-ip-range", "runtime-owner", "shielded-instance-config", "software-config", "source", "state", "subnet", "system-metrics", "tags", "type", "update-time", "upgradeable", "version", "virtual-machine", "virtual-machine-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "access-config", "access-type", "auto-delete", "boot", "core-count", "create-time", "custom-gpu-driver-path", "data-disk", "description", "device-name", "disable-terminal", "disk-name", "disk-size-gb", "disk-type", "enable-health-monitoring", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "encryption-config", "errors", "guest-attributes", "health-state", "idle-shutdown", "idle-shutdown-timeout", "index", "initialize-params", "install-gpu-driver", "instance-id", "instance-name", "interface", "internal-ip-only", "kind", "kms-key", "labels", "licenses", "machine-type", "metadata", "metrics", "migrated", "mixer-disabled", "mode", "name", "network", "nic-type", "notebook-upgrade-schedule", "post-startup-script", "post-startup-script-behavior", "proxy-uri", "reserved-ip-range", "runtime-migration-eligibility", "runtime-owner", "shielded-instance-config", "software-config", "source", "state", "subnet", "system-metrics", "tags", "type", "update-time", "upgradeable", "version", "virtual-machine", "virtual-machine-config", "warnings", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4665,11 +4954,17 @@ where
                     ("locations-instances-list", Some(opt)) => {
                         call_result = self._projects_locations_instances_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-instances-migrate", Some(opt)) => {
+                        call_result = self._projects_locations_instances_migrate(opt, dry_run, &mut err).await;
+                    },
                     ("locations-instances-register", Some(opt)) => {
                         call_result = self._projects_locations_instances_register(opt, dry_run, &mut err).await;
                     },
                     ("locations-instances-report", Some(opt)) => {
                         call_result = self._projects_locations_instances_report(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-instances-report-event", Some(opt)) => {
+                        call_result = self._projects_locations_instances_report_event(opt, dry_run, &mut err).await;
                     },
                     ("locations-instances-reset", Some(opt)) => {
                         call_result = self._projects_locations_instances_reset(opt, dry_run, &mut err).await;
@@ -4745,6 +5040,9 @@ where
                     },
                     ("locations-runtimes-list", Some(opt)) => {
                         call_result = self._projects_locations_runtimes_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-runtimes-migrate", Some(opt)) => {
+                        call_result = self._projects_locations_runtimes_migrate(opt, dry_run, &mut err).await;
                     },
                     ("locations-runtimes-patch", Some(opt)) => {
                         call_result = self._projects_locations_runtimes_patch(opt, dry_run, &mut err).await;
@@ -4870,7 +5168,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-environments-create', 'locations-environments-delete', 'locations-environments-get', 'locations-environments-list', 'locations-executions-create', 'locations-executions-delete', 'locations-executions-get', 'locations-executions-list', 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-diagnose', 'locations-instances-get', 'locations-instances-get-iam-policy', 'locations-instances-get-instance-health', 'locations-instances-is-upgradeable', 'locations-instances-list', 'locations-instances-register', 'locations-instances-report', 'locations-instances-reset', 'locations-instances-rollback', 'locations-instances-set-accelerator', 'locations-instances-set-iam-policy', 'locations-instances-set-labels', 'locations-instances-set-machine-type', 'locations-instances-start', 'locations-instances-stop', 'locations-instances-test-iam-permissions', 'locations-instances-update-config', 'locations-instances-update-metadata-items', 'locations-instances-update-shielded-instance-config', 'locations-instances-upgrade', 'locations-instances-upgrade-internal', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-runtimes-create', 'locations-runtimes-delete', 'locations-runtimes-diagnose', 'locations-runtimes-get', 'locations-runtimes-get-iam-policy', 'locations-runtimes-list', 'locations-runtimes-patch', 'locations-runtimes-refresh-runtime-token-internal', 'locations-runtimes-report-event', 'locations-runtimes-reset', 'locations-runtimes-set-iam-policy', 'locations-runtimes-start', 'locations-runtimes-stop', 'locations-runtimes-switch', 'locations-runtimes-test-iam-permissions', 'locations-runtimes-upgrade', 'locations-schedules-create', 'locations-schedules-delete', 'locations-schedules-get', 'locations-schedules-list' and 'locations-schedules-trigger'", vec![
+        ("projects", "methods: 'locations-environments-create', 'locations-environments-delete', 'locations-environments-get', 'locations-environments-list', 'locations-executions-create', 'locations-executions-delete', 'locations-executions-get', 'locations-executions-list', 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-diagnose', 'locations-instances-get', 'locations-instances-get-iam-policy', 'locations-instances-get-instance-health', 'locations-instances-is-upgradeable', 'locations-instances-list', 'locations-instances-migrate', 'locations-instances-register', 'locations-instances-report', 'locations-instances-report-event', 'locations-instances-reset', 'locations-instances-rollback', 'locations-instances-set-accelerator', 'locations-instances-set-iam-policy', 'locations-instances-set-labels', 'locations-instances-set-machine-type', 'locations-instances-start', 'locations-instances-stop', 'locations-instances-test-iam-permissions', 'locations-instances-update-config', 'locations-instances-update-metadata-items', 'locations-instances-update-shielded-instance-config', 'locations-instances-upgrade', 'locations-instances-upgrade-internal', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-runtimes-create', 'locations-runtimes-delete', 'locations-runtimes-diagnose', 'locations-runtimes-get', 'locations-runtimes-get-iam-policy', 'locations-runtimes-list', 'locations-runtimes-migrate', 'locations-runtimes-patch', 'locations-runtimes-refresh-runtime-token-internal', 'locations-runtimes-report-event', 'locations-runtimes-reset', 'locations-runtimes-set-iam-policy', 'locations-runtimes-start', 'locations-runtimes-stop', 'locations-runtimes-switch', 'locations-runtimes-test-iam-permissions', 'locations-runtimes-upgrade', 'locations-schedules-create', 'locations-schedules-delete', 'locations-schedules-get', 'locations-schedules-list' and 'locations-schedules-trigger'", vec![
             ("locations-environments-create",
                     Some(r##"Creates a new Environment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-environments-create",
@@ -5204,7 +5502,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-instances-get-instance-health",
-                    Some(r##"Check if a notebook instance is healthy."##),
+                    Some(r##"Checks whether a notebook instance is healthy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-instances-get-instance-health",
                   vec![
                     (Some(r##"name"##),
@@ -5226,7 +5524,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-instances-is-upgradeable",
-                    Some(r##"Check if a notebook instance is upgradable."##),
+                    Some(r##"Checks whether a notebook instance is upgradable."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-instances-is-upgradeable",
                   vec![
                     (Some(r##"notebook-instance"##),
@@ -5256,6 +5554,34 @@ async fn main() {
                      Some(r##"Required. Format: `parent=projects/{project_id}/locations/{location}`"##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-instances-migrate",
+                    Some(r##"Migrates an existing User-Managed Notebook to Workbench Instances."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-instances-migrate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Format: `projects/{project_id}/locations/{location}/instances/{instance_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -5300,6 +5626,34 @@ async fn main() {
             ("locations-instances-report",
                     Some(r##"Allows notebook instances to report their latest instance information to the Notebooks API server. The server will merge the reported information to the instance metadata store. Do not use this method directly."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-instances-report",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Format: `projects/{project_id}/locations/{location}/instances/{instance_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-instances-report-event",
+                    Some(r##"Reports and processes an instance event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-instances-report-event",
                   vec![
                     (Some(r##"name"##),
                      None,
@@ -5812,7 +6166,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -5977,6 +6331,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-runtimes-migrate",
+                    Some(r##"Migrate an existing Runtime to a new Workbench Instance."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-runtimes-migrate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Format: `projects/{project_id}/locations/{location}/runtimes/{runtime_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-runtimes-patch",
                     Some(r##"Update Notebook Runtime configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-runtimes-patch",
@@ -6034,7 +6416,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-runtimes-report-event",
-                    Some(r##"Report and process a runtime event."##),
+                    Some(r##"Reports and processes a runtime event."##),
                     "Details at http://byron.github.io/google-apis-rs/google_notebooks1_cli/projects_locations-runtimes-report-event",
                   vec![
                     (Some(r##"name"##),
@@ -6385,7 +6767,7 @@ async fn main() {
     
     let mut app = App::new("notebooks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221213")
+           .version("5.0.3+20231227")
            .about("Notebooks API is used to manage notebook resources in Google Cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_notebooks1_cli")
            .arg(Arg::with_name("url")

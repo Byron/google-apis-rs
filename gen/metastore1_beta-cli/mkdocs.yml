@@ -1,4 +1,4 @@
-site_name: Dataproc Metastore v5.0.3+20230111
+site_name: Dataproc Metastore v5.0.3+20240228
 site_url: http://byron.github.io/google-apis-rs/google-metastore1_beta-cli
 site_description: A complete library to interact with Dataproc Metastore (protocol v1beta)
 
@@ -20,10 +20,12 @@ nav:
     - 'Locations Federations Test Iam Permissions': 'projects_locations-federations-test-iam-permissions.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
     - 'Locations Services Alter Location': 'projects_locations-services-alter-location.md'
+    - 'Locations Services Alter Table Properties': 'projects_locations-services-alter-table-properties.md'
     - 'Locations Services Backups Create': 'projects_locations-services-backups-create.md'
     - 'Locations Services Backups Delete': 'projects_locations-services-backups-delete.md'
     - 'Locations Services Backups Get': 'projects_locations-services-backups-get.md'
@@ -47,6 +49,7 @@ nav:
     - 'Locations Services Metadata Imports Get': 'projects_locations-services-metadata-imports-get.md'
     - 'Locations Services Metadata Imports List': 'projects_locations-services-metadata-imports-list.md'
     - 'Locations Services Metadata Imports Patch': 'projects_locations-services-metadata-imports-patch.md'
+    - 'Locations Services Migration Executions Delete': 'projects_locations-services-migration-executions-delete.md'
     - 'Locations Services Move Table To Database': 'projects_locations-services-move-table-to-database.md'
     - 'Locations Services Patch': 'projects_locations-services-patch.md'
     - 'Locations Services Query Metadata': 'projects_locations-services-query-metadata.md'

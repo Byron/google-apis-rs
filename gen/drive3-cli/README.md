@@ -25,12 +25,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *drive* API at revision *20240227*. The CLI is at version *5.0.3*.
 
 ```bash
 drive3 [options]
         about
                 get [-p <v>]... [-o <out>]
+        apps
+                get <app-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
         changes
                 get-start-page-token [-p <v>]... [-o <out>]
                 list <page-token> [-p <v>]... [-o <out>]

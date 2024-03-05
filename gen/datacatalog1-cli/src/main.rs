@@ -73,6 +73,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "admin-search" => Some(("adminSearch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -84,7 +85,7 @@ where
                     "scope.restricted-locations" => Some(("scope.restrictedLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "scope.starred-only" => Some(("scope.starredOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["include-gcp-public-datasets", "include-org-ids", "include-project-ids", "include-public-tag-templates", "order-by", "page-size", "page-token", "query", "restricted-locations", "scope", "starred-only"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-search", "include-gcp-public-datasets", "include-org-ids", "include-project-ids", "include-public-tag-templates", "order-by", "page-size", "page-token", "query", "restricted-locations", "scope", "starred-only"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -153,6 +154,12 @@ where
                 "sql-resource" => {
                     call = call.sql_resource(value.unwrap_or(""));
                 },
+                "project" => {
+                    call = call.project(value.unwrap_or(""));
+                },
+                "location" => {
+                    call = call.location(value.unwrap_or(""));
+                },
                 "linked-resource" => {
                     call = call.linked_resource(value.unwrap_or(""));
                 },
@@ -172,7 +179,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["fully-qualified-name", "linked-resource", "sql-resource"].iter().map(|v|*v));
+                                                                           v.extend(["fully-qualified-name", "linked-resource", "location", "project", "sql-resource"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -387,6 +394,7 @@ where
                     "bigquery-table-spec.table-spec.grouped-entry" => Some(("bigqueryTableSpec.tableSpec.groupedEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bigquery-table-spec.view-spec.view-query" => Some(("bigqueryTableSpec.viewSpec.viewQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "business-context.entry-overview.overview" => Some(("businessContext.entryOverview.overview", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-bigtable-system-spec.instance-display-name" => Some(("cloudBigtableSystemSpec.instanceDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source.resource" => Some(("dataSource.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source.service" => Some(("dataSource.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source.source-entry" => Some(("dataSource.sourceEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -408,8 +416,11 @@ where
                     "database-table-spec.dataplex-table.dataplex-spec.project-id" => Some(("databaseTableSpec.dataplexTable.dataplexSpec.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database-table-spec.dataplex-table.user-managed" => Some(("databaseTableSpec.dataplexTable.userManaged", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "database-table-spec.type" => Some(("databaseTableSpec.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-spec.vertex-dataset-spec.data-item-count" => Some(("datasetSpec.vertexDatasetSpec.dataItemCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "dataset-spec.vertex-dataset-spec.data-type" => Some(("datasetSpec.vertexDatasetSpec.dataType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "feature-online-store-spec.storage-type" => Some(("featureOnlineStoreSpec.storageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fileset-spec.dataplex-fileset.dataplex-spec.asset" => Some(("filesetSpec.dataplexFileset.dataplexSpec.asset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fileset-spec.dataplex-fileset.dataplex-spec.compression-format" => Some(("filesetSpec.dataplexFileset.dataplexSpec.compressionFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fileset-spec.dataplex-fileset.dataplex-spec.data-format.avro.text" => Some(("filesetSpec.dataplexFileset.dataplexSpec.dataFormat.avro.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -427,6 +438,12 @@ where
                     "looker-system-spec.parent-model-id" => Some(("lookerSystemSpec.parentModelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "looker-system-spec.parent-view-display-name" => Some(("lookerSystemSpec.parentViewDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "looker-system-spec.parent-view-id" => Some(("lookerSystemSpec.parentViewId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.container-image-uri" => Some(("modelSpec.vertexModelSpec.containerImageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.version-aliases" => Some(("modelSpec.vertexModelSpec.versionAliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "model-spec.vertex-model-spec.version-description" => Some(("modelSpec.vertexModelSpec.versionDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.version-id" => Some(("modelSpec.vertexModelSpec.versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.vertex-model-source-info.copy" => Some(("modelSpec.vertexModelSpec.vertexModelSourceInfo.copy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.vertex-model-source-info.source-type" => Some(("modelSpec.vertexModelSpec.vertexModelSourceInfo.sourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "personal-details.star-time" => Some(("personalDetails.starTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "personal-details.starred" => Some(("personalDetails.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -447,7 +464,7 @@ where
                     "user-specified-system" => Some(("userSpecifiedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-specified-type" => Some(("userSpecifiedType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset", "avro", "base-table", "bigquery-connection-spec", "bigquery-date-sharded-spec", "bigquery-routine-spec", "bigquery-table-spec", "business-context", "cloud-sql", "compression-format", "connection-type", "create-time", "data-format", "data-source", "data-source-connection-spec", "database", "database-table-spec", "database-version", "database-view-spec", "dataplex-fileset", "dataplex-spec", "dataplex-table", "dataset", "definition-body", "description", "display-name", "entry-overview", "expire-time", "favorite-count", "file-pattern", "file-patterns", "file-type", "fileset-spec", "fully-qualified-name", "gcs-fileset-spec", "grouped-entry", "has-credential", "imported-libraries", "instance-host", "instance-id", "integrated-system", "labels", "language", "latest-shard-resource", "linked-resource", "looker-system-spec", "name", "overview", "parent-instance-display-name", "parent-instance-id", "parent-model-display-name", "parent-model-id", "parent-view-display-name", "parent-view-id", "personal-details", "project-id", "protobuf", "resource", "return-type", "routine-spec", "routine-type", "service", "shard-count", "source-entry", "source-system-timestamps", "sql-database-system-spec", "sql-engine", "sql-query", "star-time", "starred", "storage-properties", "table-prefix", "table-source-type", "table-spec", "text", "thrift", "type", "update-time", "usage-signal", "user-managed", "user-specified-system", "user-specified-type", "view-query", "view-spec", "view-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset", "avro", "base-table", "bigquery-connection-spec", "bigquery-date-sharded-spec", "bigquery-routine-spec", "bigquery-table-spec", "business-context", "cloud-bigtable-system-spec", "cloud-sql", "compression-format", "connection-type", "container-image-uri", "copy", "create-time", "data-format", "data-item-count", "data-source", "data-source-connection-spec", "data-type", "database", "database-table-spec", "database-version", "database-view-spec", "dataplex-fileset", "dataplex-spec", "dataplex-table", "dataset", "dataset-spec", "definition-body", "description", "display-name", "entry-overview", "expire-time", "favorite-count", "feature-online-store-spec", "file-pattern", "file-patterns", "file-type", "fileset-spec", "fully-qualified-name", "gcs-fileset-spec", "grouped-entry", "has-credential", "imported-libraries", "instance-display-name", "instance-host", "instance-id", "integrated-system", "labels", "language", "latest-shard-resource", "linked-resource", "looker-system-spec", "model-spec", "name", "overview", "parent-instance-display-name", "parent-instance-id", "parent-model-display-name", "parent-model-id", "parent-view-display-name", "parent-view-id", "personal-details", "project-id", "protobuf", "resource", "return-type", "routine-spec", "routine-type", "service", "shard-count", "source-entry", "source-system-timestamps", "source-type", "sql-database-system-spec", "sql-engine", "sql-query", "star-time", "starred", "storage-properties", "storage-type", "table-prefix", "table-source-type", "table-spec", "text", "thrift", "type", "update-time", "usage-signal", "user-managed", "user-specified-system", "user-specified-type", "version-aliases", "version-description", "version-id", "vertex-dataset-spec", "vertex-model-source-info", "vertex-model-spec", "view-query", "view-spec", "view-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -724,8 +741,9 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "gcs-bucket-path" => Some(("gcsBucketPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job-id" => Some(("jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcs-bucket-path"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcs-bucket-path", "job-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1047,6 +1065,7 @@ where
                     "bigquery-table-spec.table-spec.grouped-entry" => Some(("bigqueryTableSpec.tableSpec.groupedEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bigquery-table-spec.view-spec.view-query" => Some(("bigqueryTableSpec.viewSpec.viewQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "business-context.entry-overview.overview" => Some(("businessContext.entryOverview.overview", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-bigtable-system-spec.instance-display-name" => Some(("cloudBigtableSystemSpec.instanceDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source.resource" => Some(("dataSource.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source.service" => Some(("dataSource.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source.source-entry" => Some(("dataSource.sourceEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1068,8 +1087,11 @@ where
                     "database-table-spec.dataplex-table.dataplex-spec.project-id" => Some(("databaseTableSpec.dataplexTable.dataplexSpec.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database-table-spec.dataplex-table.user-managed" => Some(("databaseTableSpec.dataplexTable.userManaged", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "database-table-spec.type" => Some(("databaseTableSpec.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-spec.vertex-dataset-spec.data-item-count" => Some(("datasetSpec.vertexDatasetSpec.dataItemCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "dataset-spec.vertex-dataset-spec.data-type" => Some(("datasetSpec.vertexDatasetSpec.dataType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "feature-online-store-spec.storage-type" => Some(("featureOnlineStoreSpec.storageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fileset-spec.dataplex-fileset.dataplex-spec.asset" => Some(("filesetSpec.dataplexFileset.dataplexSpec.asset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fileset-spec.dataplex-fileset.dataplex-spec.compression-format" => Some(("filesetSpec.dataplexFileset.dataplexSpec.compressionFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fileset-spec.dataplex-fileset.dataplex-spec.data-format.avro.text" => Some(("filesetSpec.dataplexFileset.dataplexSpec.dataFormat.avro.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1087,6 +1109,12 @@ where
                     "looker-system-spec.parent-model-id" => Some(("lookerSystemSpec.parentModelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "looker-system-spec.parent-view-display-name" => Some(("lookerSystemSpec.parentViewDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "looker-system-spec.parent-view-id" => Some(("lookerSystemSpec.parentViewId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.container-image-uri" => Some(("modelSpec.vertexModelSpec.containerImageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.version-aliases" => Some(("modelSpec.vertexModelSpec.versionAliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "model-spec.vertex-model-spec.version-description" => Some(("modelSpec.vertexModelSpec.versionDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.version-id" => Some(("modelSpec.vertexModelSpec.versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.vertex-model-source-info.copy" => Some(("modelSpec.vertexModelSpec.vertexModelSourceInfo.copy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "model-spec.vertex-model-spec.vertex-model-source-info.source-type" => Some(("modelSpec.vertexModelSpec.vertexModelSourceInfo.sourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "personal-details.star-time" => Some(("personalDetails.starTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "personal-details.starred" => Some(("personalDetails.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1107,7 +1135,7 @@ where
                     "user-specified-system" => Some(("userSpecifiedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-specified-type" => Some(("userSpecifiedType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset", "avro", "base-table", "bigquery-connection-spec", "bigquery-date-sharded-spec", "bigquery-routine-spec", "bigquery-table-spec", "business-context", "cloud-sql", "compression-format", "connection-type", "create-time", "data-format", "data-source", "data-source-connection-spec", "database", "database-table-spec", "database-version", "database-view-spec", "dataplex-fileset", "dataplex-spec", "dataplex-table", "dataset", "definition-body", "description", "display-name", "entry-overview", "expire-time", "favorite-count", "file-pattern", "file-patterns", "file-type", "fileset-spec", "fully-qualified-name", "gcs-fileset-spec", "grouped-entry", "has-credential", "imported-libraries", "instance-host", "instance-id", "integrated-system", "labels", "language", "latest-shard-resource", "linked-resource", "looker-system-spec", "name", "overview", "parent-instance-display-name", "parent-instance-id", "parent-model-display-name", "parent-model-id", "parent-view-display-name", "parent-view-id", "personal-details", "project-id", "protobuf", "resource", "return-type", "routine-spec", "routine-type", "service", "shard-count", "source-entry", "source-system-timestamps", "sql-database-system-spec", "sql-engine", "sql-query", "star-time", "starred", "storage-properties", "table-prefix", "table-source-type", "table-spec", "text", "thrift", "type", "update-time", "usage-signal", "user-managed", "user-specified-system", "user-specified-type", "view-query", "view-spec", "view-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset", "avro", "base-table", "bigquery-connection-spec", "bigquery-date-sharded-spec", "bigquery-routine-spec", "bigquery-table-spec", "business-context", "cloud-bigtable-system-spec", "cloud-sql", "compression-format", "connection-type", "container-image-uri", "copy", "create-time", "data-format", "data-item-count", "data-source", "data-source-connection-spec", "data-type", "database", "database-table-spec", "database-version", "database-view-spec", "dataplex-fileset", "dataplex-spec", "dataplex-table", "dataset", "dataset-spec", "definition-body", "description", "display-name", "entry-overview", "expire-time", "favorite-count", "feature-online-store-spec", "file-pattern", "file-patterns", "file-type", "fileset-spec", "fully-qualified-name", "gcs-fileset-spec", "grouped-entry", "has-credential", "imported-libraries", "instance-display-name", "instance-host", "instance-id", "integrated-system", "labels", "language", "latest-shard-resource", "linked-resource", "looker-system-spec", "model-spec", "name", "overview", "parent-instance-display-name", "parent-instance-id", "parent-model-display-name", "parent-model-id", "parent-view-display-name", "parent-view-id", "personal-details", "project-id", "protobuf", "resource", "return-type", "routine-spec", "routine-type", "service", "shard-count", "source-entry", "source-system-timestamps", "source-type", "sql-database-system-spec", "sql-engine", "sql-query", "star-time", "starred", "storage-properties", "storage-type", "table-prefix", "table-source-type", "table-spec", "text", "thrift", "type", "update-time", "usage-signal", "user-managed", "user-specified-system", "user-specified-type", "version-aliases", "version-description", "version-id", "vertex-dataset-spec", "vertex-model-source-info", "vertex-model-spec", "view-query", "view-spec", "view-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1513,6 +1541,92 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_entry_groups_entries_tags_reconcile(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "force-delete-missing" => Some(("forceDeleteMissing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tag-template" => Some(("tagTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["force-delete-missing", "tag-template"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDatacatalogV1ReconcileTagsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_entry_groups_entries_tags_reconcile(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5172,6 +5286,9 @@ where
                     ("locations-entry-groups-entries-tags-patch", Some(opt)) => {
                         call_result = self._projects_locations_entry_groups_entries_tags_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-entry-groups-entries-tags-reconcile", Some(opt)) => {
+                        call_result = self._projects_locations_entry_groups_entries_tags_reconcile(opt, dry_run, &mut err).await;
+                    },
                     ("locations-entry-groups-entries-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_locations_entry_groups_entries_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
@@ -5436,7 +5553,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-entry-groups-create', 'locations-entry-groups-delete', 'locations-entry-groups-entries-create', 'locations-entry-groups-entries-delete', 'locations-entry-groups-entries-get', 'locations-entry-groups-entries-get-iam-policy', 'locations-entry-groups-entries-import', 'locations-entry-groups-entries-list', 'locations-entry-groups-entries-modify-entry-contacts', 'locations-entry-groups-entries-modify-entry-overview', 'locations-entry-groups-entries-patch', 'locations-entry-groups-entries-star', 'locations-entry-groups-entries-tags-create', 'locations-entry-groups-entries-tags-delete', 'locations-entry-groups-entries-tags-list', 'locations-entry-groups-entries-tags-patch', 'locations-entry-groups-entries-test-iam-permissions', 'locations-entry-groups-entries-unstar', 'locations-entry-groups-get', 'locations-entry-groups-get-iam-policy', 'locations-entry-groups-list', 'locations-entry-groups-patch', 'locations-entry-groups-set-iam-policy', 'locations-entry-groups-tags-create', 'locations-entry-groups-tags-delete', 'locations-entry-groups-tags-list', 'locations-entry-groups-tags-patch', 'locations-entry-groups-test-iam-permissions', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-tag-templates-create', 'locations-tag-templates-delete', 'locations-tag-templates-fields-create', 'locations-tag-templates-fields-delete', 'locations-tag-templates-fields-enum-values-rename', 'locations-tag-templates-fields-patch', 'locations-tag-templates-fields-rename', 'locations-tag-templates-get', 'locations-tag-templates-get-iam-policy', 'locations-tag-templates-patch', 'locations-tag-templates-set-iam-policy', 'locations-tag-templates-test-iam-permissions', 'locations-taxonomies-create', 'locations-taxonomies-delete', 'locations-taxonomies-export', 'locations-taxonomies-get', 'locations-taxonomies-get-iam-policy', 'locations-taxonomies-import', 'locations-taxonomies-list', 'locations-taxonomies-patch', 'locations-taxonomies-policy-tags-create', 'locations-taxonomies-policy-tags-delete', 'locations-taxonomies-policy-tags-get', 'locations-taxonomies-policy-tags-get-iam-policy', 'locations-taxonomies-policy-tags-list', 'locations-taxonomies-policy-tags-patch', 'locations-taxonomies-policy-tags-set-iam-policy', 'locations-taxonomies-policy-tags-test-iam-permissions', 'locations-taxonomies-replace', 'locations-taxonomies-set-iam-policy' and 'locations-taxonomies-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-entry-groups-create', 'locations-entry-groups-delete', 'locations-entry-groups-entries-create', 'locations-entry-groups-entries-delete', 'locations-entry-groups-entries-get', 'locations-entry-groups-entries-get-iam-policy', 'locations-entry-groups-entries-import', 'locations-entry-groups-entries-list', 'locations-entry-groups-entries-modify-entry-contacts', 'locations-entry-groups-entries-modify-entry-overview', 'locations-entry-groups-entries-patch', 'locations-entry-groups-entries-star', 'locations-entry-groups-entries-tags-create', 'locations-entry-groups-entries-tags-delete', 'locations-entry-groups-entries-tags-list', 'locations-entry-groups-entries-tags-patch', 'locations-entry-groups-entries-tags-reconcile', 'locations-entry-groups-entries-test-iam-permissions', 'locations-entry-groups-entries-unstar', 'locations-entry-groups-get', 'locations-entry-groups-get-iam-policy', 'locations-entry-groups-list', 'locations-entry-groups-patch', 'locations-entry-groups-set-iam-policy', 'locations-entry-groups-tags-create', 'locations-entry-groups-tags-delete', 'locations-entry-groups-tags-list', 'locations-entry-groups-tags-patch', 'locations-entry-groups-test-iam-permissions', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-tag-templates-create', 'locations-tag-templates-delete', 'locations-tag-templates-fields-create', 'locations-tag-templates-fields-delete', 'locations-tag-templates-fields-enum-values-rename', 'locations-tag-templates-fields-patch', 'locations-tag-templates-fields-rename', 'locations-tag-templates-get', 'locations-tag-templates-get-iam-policy', 'locations-tag-templates-patch', 'locations-tag-templates-set-iam-policy', 'locations-tag-templates-test-iam-permissions', 'locations-taxonomies-create', 'locations-taxonomies-delete', 'locations-taxonomies-export', 'locations-taxonomies-get', 'locations-taxonomies-get-iam-policy', 'locations-taxonomies-import', 'locations-taxonomies-list', 'locations-taxonomies-patch', 'locations-taxonomies-policy-tags-create', 'locations-taxonomies-policy-tags-delete', 'locations-taxonomies-policy-tags-get', 'locations-taxonomies-policy-tags-get-iam-policy', 'locations-taxonomies-policy-tags-list', 'locations-taxonomies-policy-tags-patch', 'locations-taxonomies-policy-tags-set-iam-policy', 'locations-taxonomies-policy-tags-test-iam-permissions', 'locations-taxonomies-replace', 'locations-taxonomies-set-iam-policy' and 'locations-taxonomies-test-iam-permissions'", vec![
             ("locations-entry-groups-create",
                     Some(r##"Creates an entry group. An entry group contains logically related entries together with [Cloud Identity and Access Management](/data-catalog/docs/concepts/iam) policies. These policies specify users who can create, edit, and view entries within entry groups. Data Catalog automatically creates entry groups with names that start with the `@` symbol for the following resources: * BigQuery entries (`@bigquery`) * Pub/Sub topics (`@pubsub`) * Dataproc Metastore services (`@dataproc_metastore_{SERVICE_NAME_HASH}`) You can create your own entry groups for Cloud Storage fileset entries and custom entries together with the corresponding IAM policies. User-created entry groups can't contain the `@` symbol, it is reserved for automatically created groups. Entry groups, like entries, can be searched. A maximum of 10,000 entry groups may be created per organization across all locations. You must enable the Data Catalog API in the project identified by the `parent` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-entry-groups-create",
@@ -5588,7 +5705,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-import",
-                    Some(r##"Imports entries from some source (e.g. dump in a Cloud Storage bucket) to the Data Catalog. Dump here is a snapshot of the third-party system state, that needs to be ingested in the Data Catalog. Import of entries is a sync operation that reconciles state of the third-party system and Data Catalog. ImportEntries is a long-running operation done in the background, so this method returns long-running operation resource. The resource can be queried with Operations.GetOperation which contains metadata and response."##),
+                    Some(r##"Imports entries from a source, such as data previously dumped into a Cloud Storage bucket, into Data Catalog. Import of entries is a sync operation that reconciles the state of the third-party system with the Data Catalog. `ImportEntries` accepts source data snapshots of a third-party system. Snapshot should be delivered as a .wire or base65-encoded .txt file containing a sequence of Protocol Buffer messages of DumpItem type. `ImportEntries` returns a long-running operation resource that can be queried with Operations.GetOperation to return ImportEntriesMetadata and an ImportEntriesResponse message."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-entry-groups-entries-import",
                   vec![
                     (Some(r##"parent"##),
@@ -5828,6 +5945,34 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the tag in URL format where tag ID is a system-generated identifier. Note: The tag itself might not be stored in the location specified in its name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-entry-groups-entries-tags-reconcile",
+                    Some(r##"`ReconcileTags` creates or updates a list of tags on the entry. If the ReconcileTagsRequest.force_delete_missing parameter is set, the operation deletes tags not included in the input tag list. `ReconcileTags` returns a long-running operation resource that can be queried with Operations.GetOperation to return ReconcileTagsMetadata and a ReconcileTagsResponse message."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-entry-groups-entries-tags-reconcile",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of Entry to be tagged."##),
                      Some(true),
                      Some(false)),
         
@@ -6228,7 +6373,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -6745,7 +6890,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of this taxonomy in URL format. Note: Policy tag manager generates unique taxonomy IDs."##),
+                     Some(r##"Identifier. Resource name of this taxonomy in URL format. Note: Policy tag manager generates unique taxonomy IDs."##),
                      Some(true),
                      Some(false)),
         
@@ -6895,7 +7040,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of this policy tag in the URL format. The policy tag manager generates unique taxonomy IDs and policy tag IDs."##),
+                     Some(r##"Identifier. Resource name of this policy tag in the URL format. The policy tag manager generates unique taxonomy IDs and policy tag IDs."##),
                      Some(true),
                      Some(false)),
         
@@ -7063,7 +7208,7 @@ async fn main() {
     
     let mut app = App::new("datacatalog1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.3+20240222")
            .about("A fully managed and highly scalable data discovery and metadata management service. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datacatalog1_cli")
            .arg(Arg::with_name("url")

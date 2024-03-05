@@ -889,6 +889,123 @@ where
         }
     }
 
+    async fn _organizations_locations_column_data_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_column_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_column_data_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_column_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_locations_deidentify_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1190,6 +1307,362 @@ where
         }
         let mut request: api::GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.organizations().locations_deidentify_templates_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_discovery_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "config-id" => Some(("configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config-id", "create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "project-id", "status", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GooglePrivacyDlpV2CreateDiscoveryConfigRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().locations_discovery_configs_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_discovery_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_discovery_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_discovery_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_discovery_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_discovery_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_discovery_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_discovery_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "project-id", "status", "update-mask", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GooglePrivacyDlpV2UpdateDiscoveryConfigRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().locations_discovery_configs_patch(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2096,6 +2569,123 @@ where
         }
     }
 
+    async fn _organizations_locations_project_data_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_project_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_project_data_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_project_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_locations_stored_info_types_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2427,6 +3017,123 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_table_data_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_table_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_table_data_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_table_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4811,6 +5518,123 @@ where
         }
     }
 
+    async fn _projects_locations_column_data_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_column_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_column_data_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_column_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_content_deidentify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -5399,6 +6223,362 @@ where
         }
         let mut request: api::GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_deidentify_templates_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_discovery_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "config-id" => Some(("configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config-id", "create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "project-id", "status", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GooglePrivacyDlpV2CreateDiscoveryConfigRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_discovery_configs_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_discovery_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_discovery_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_discovery_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_discovery_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_discovery_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_discovery_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_discovery_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "project-id", "status", "update-mask", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GooglePrivacyDlpV2UpdateDiscoveryConfigRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_discovery_configs_patch(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7076,6 +8256,123 @@ where
         }
     }
 
+    async fn _projects_locations_project_data_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_project_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_project_data_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_project_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_stored_info_types_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -7407,6 +8704,123 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_table_data_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_table_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_table_data_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_table_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -7863,6 +9277,12 @@ where
                     ("inspect-templates-patch", Some(opt)) => {
                         call_result = self._organizations_inspect_templates_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-column-data-profiles-get", Some(opt)) => {
+                        call_result = self._organizations_locations_column_data_profiles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-column-data-profiles-list", Some(opt)) => {
+                        call_result = self._organizations_locations_column_data_profiles_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-deidentify-templates-create", Some(opt)) => {
                         call_result = self._organizations_locations_deidentify_templates_create(opt, dry_run, &mut err).await;
                     },
@@ -7877,6 +9297,21 @@ where
                     },
                     ("locations-deidentify-templates-patch", Some(opt)) => {
                         call_result = self._organizations_locations_deidentify_templates_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-create", Some(opt)) => {
+                        call_result = self._organizations_locations_discovery_configs_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-delete", Some(opt)) => {
+                        call_result = self._organizations_locations_discovery_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-get", Some(opt)) => {
+                        call_result = self._organizations_locations_discovery_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-list", Some(opt)) => {
+                        call_result = self._organizations_locations_discovery_configs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-patch", Some(opt)) => {
+                        call_result = self._organizations_locations_discovery_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-dlp-jobs-list", Some(opt)) => {
                         call_result = self._organizations_locations_dlp_jobs_list(opt, dry_run, &mut err).await;
@@ -7911,6 +9346,12 @@ where
                     ("locations-job-triggers-patch", Some(opt)) => {
                         call_result = self._organizations_locations_job_triggers_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-project-data-profiles-get", Some(opt)) => {
+                        call_result = self._organizations_locations_project_data_profiles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-project-data-profiles-list", Some(opt)) => {
+                        call_result = self._organizations_locations_project_data_profiles_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-stored-info-types-create", Some(opt)) => {
                         call_result = self._organizations_locations_stored_info_types_create(opt, dry_run, &mut err).await;
                     },
@@ -7925,6 +9366,12 @@ where
                     },
                     ("locations-stored-info-types-patch", Some(opt)) => {
                         call_result = self._organizations_locations_stored_info_types_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-table-data-profiles-get", Some(opt)) => {
+                        call_result = self._organizations_locations_table_data_profiles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-table-data-profiles-list", Some(opt)) => {
+                        call_result = self._organizations_locations_table_data_profiles_list(opt, dry_run, &mut err).await;
                     },
                     ("stored-info-types-create", Some(opt)) => {
                         call_result = self._organizations_stored_info_types_create(opt, dry_run, &mut err).await;
@@ -8024,6 +9471,12 @@ where
                     ("job-triggers-patch", Some(opt)) => {
                         call_result = self._projects_job_triggers_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-column-data-profiles-get", Some(opt)) => {
+                        call_result = self._projects_locations_column_data_profiles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-column-data-profiles-list", Some(opt)) => {
+                        call_result = self._projects_locations_column_data_profiles_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-content-deidentify", Some(opt)) => {
                         call_result = self._projects_locations_content_deidentify(opt, dry_run, &mut err).await;
                     },
@@ -8047,6 +9500,21 @@ where
                     },
                     ("locations-deidentify-templates-patch", Some(opt)) => {
                         call_result = self._projects_locations_deidentify_templates_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-create", Some(opt)) => {
+                        call_result = self._projects_locations_discovery_configs_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-delete", Some(opt)) => {
+                        call_result = self._projects_locations_discovery_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-get", Some(opt)) => {
+                        call_result = self._projects_locations_discovery_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-list", Some(opt)) => {
+                        call_result = self._projects_locations_discovery_configs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-discovery-configs-patch", Some(opt)) => {
+                        call_result = self._projects_locations_discovery_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-dlp-jobs-cancel", Some(opt)) => {
                         call_result = self._projects_locations_dlp_jobs_cancel(opt, dry_run, &mut err).await;
@@ -8108,6 +9576,12 @@ where
                     ("locations-job-triggers-patch", Some(opt)) => {
                         call_result = self._projects_locations_job_triggers_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-project-data-profiles-get", Some(opt)) => {
+                        call_result = self._projects_locations_project_data_profiles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-project-data-profiles-list", Some(opt)) => {
+                        call_result = self._projects_locations_project_data_profiles_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-stored-info-types-create", Some(opt)) => {
                         call_result = self._projects_locations_stored_info_types_create(opt, dry_run, &mut err).await;
                     },
@@ -8122,6 +9596,12 @@ where
                     },
                     ("locations-stored-info-types-patch", Some(opt)) => {
                         call_result = self._projects_locations_stored_info_types_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-table-data-profiles-get", Some(opt)) => {
+                        call_result = self._projects_locations_table_data_profiles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-table-data-profiles-list", Some(opt)) => {
+                        call_result = self._projects_locations_table_data_profiles_list(opt, dry_run, &mut err).await;
                     },
                     ("stored-info-types-create", Some(opt)) => {
                         call_result = self._projects_stored_info_types_create(opt, dry_run, &mut err).await;
@@ -8219,7 +9699,7 @@ async fn main() {
     let arg_data = [
         ("info-types", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of the sensitive information types that DLP API supports. See https://cloud.google.com/dlp/docs/infotypes-reference to learn more."##),
+                    Some(r##"Returns a list of the sensitive information types that DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/info-types_list",
                   vec![
                     (Some(r##"v"##),
@@ -8238,7 +9718,7 @@ async fn main() {
         
         ("locations", "methods: 'info-types-list'", vec![
             ("info-types-list",
-                    Some(r##"Returns a list of the sensitive information types that DLP API supports. See https://cloud.google.com/dlp/docs/infotypes-reference to learn more."##),
+                    Some(r##"Returns a list of the sensitive information types that DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/locations_info-types-list",
                   vec![
                     (Some(r##"parent"##),
@@ -8261,14 +9741,14 @@ async fn main() {
                   ]),
             ]),
         
-        ("organizations", "methods: 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-dlp-jobs-list', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
+        ("organizations", "methods: 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'locations-column-data-profiles-get', 'locations-column-data-profiles-list', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-discovery-configs-create', 'locations-discovery-configs-delete', 'locations-discovery-configs-get', 'locations-discovery-configs-list', 'locations-discovery-configs-patch', 'locations-dlp-jobs-list', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-project-data-profiles-get', 'locations-project-data-profiles-list', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'locations-table-data-profiles-get', 'locations-table-data-profiles-list', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
             ("deidentify-templates-create",
-                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_deidentify-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8291,7 +9771,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-delete",
-                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_deidentify-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -8313,7 +9793,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-get",
-                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_deidentify-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -8335,12 +9815,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-list",
-                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_deidentify-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8357,7 +9837,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-patch",
-                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_deidentify-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -8385,12 +9865,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-create",
-                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_inspect-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8413,7 +9893,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-delete",
-                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_inspect-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -8435,7 +9915,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-get",
-                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_inspect-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -8457,12 +9937,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-list",
-                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_inspect-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8479,7 +9959,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-patch",
-                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_inspect-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -8506,13 +9986,57 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-column-data-profiles-get",
+                    Some(r##"Gets a column data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-column-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/columnDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-column-data-profiles-list",
+                    Some(r##"Lists data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-column-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example `organizations/433245324/locations/europe` or projects/project-id/locations/asia."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-deidentify-templates-create",
-                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-deidentify-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8535,7 +10059,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-delete",
-                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-deidentify-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -8557,7 +10081,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-get",
-                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-deidentify-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -8579,12 +10103,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-list",
-                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-deidentify-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8601,7 +10125,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-patch",
-                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-deidentify-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -8628,13 +10152,135 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-discovery-configs-create",
+                    Some(r##"Creates a config for discovery to scan and profile storage."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-discovery-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/`PROJECT_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-delete",
+                    Some(r##"Deletes a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-discovery-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the project and the config, for example `projects/dlp-test-project/discoveryConfigs/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-get",
+                    Some(r##"Gets a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-discovery-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the project and the configuration, for example `projects/dlp-test-project/discoveryConfigs/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-list",
+                    Some(r##"Lists discovery configurations."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-discovery-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/`PROJECT_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-patch",
+                    Some(r##"Updates a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-discovery-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the project and the configuration, for example `projects/dlp-test-project/discoveryConfigs/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-dlp-jobs-list",
-                    Some(r##"Lists DlpJobs that match the specified filter in the request. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Lists DlpJobs that match the specified filter in the request. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-dlp-jobs-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8651,12 +10297,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-create",
-                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-inspect-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8679,7 +10325,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-delete",
-                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-inspect-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -8701,7 +10347,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-get",
-                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-inspect-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -8723,12 +10369,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-list",
-                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-inspect-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8745,7 +10391,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-patch",
-                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-inspect-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -8773,12 +10419,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-create",
-                    Some(r##"Creates a job trigger to run DLP actions such as scanning storage for sensitive information on a set schedule. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Creates a job trigger to run DLP actions such as scanning storage for sensitive information on a set schedule. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-job-triggers-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8801,7 +10447,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-delete",
-                    Some(r##"Deletes a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Deletes a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-job-triggers-delete",
                   vec![
                     (Some(r##"name"##),
@@ -8823,7 +10469,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-get",
-                    Some(r##"Gets a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Gets a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-job-triggers-get",
                   vec![
                     (Some(r##"name"##),
@@ -8845,12 +10491,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-list",
-                    Some(r##"Lists job triggers. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Lists job triggers. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-job-triggers-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8867,7 +10513,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-patch",
-                    Some(r##"Updates a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Updates a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-job-triggers-patch",
                   vec![
                     (Some(r##"name"##),
@@ -8894,13 +10540,57 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-project-data-profiles-get",
+                    Some(r##"Gets a project data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-project-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/projectDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-project-data-profiles-list",
+                    Some(r##"Lists data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-project-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. organizations/{org_id}/locations/{loc_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-stored-info-types-create",
-                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-stored-info-types-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8923,7 +10613,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-delete",
-                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-stored-info-types-delete",
                   vec![
                     (Some(r##"name"##),
@@ -8945,7 +10635,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-get",
-                    Some(r##"Gets a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Gets a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-stored-info-types-get",
                   vec![
                     (Some(r##"name"##),
@@ -8967,12 +10657,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-list",
-                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-stored-info-types-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -8989,7 +10679,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-patch",
-                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-stored-info-types-patch",
                   vec![
                     (Some(r##"name"##),
@@ -9016,13 +10706,57 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-table-data-profiles-get",
+                    Some(r##"Gets a table data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-table-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/tableDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-table-data-profiles-list",
+                    Some(r##"Lists data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-table-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example `organizations/433245324/locations/europe` or `projects/project-id/locations/asia`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("stored-info-types-create",
-                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_stored-info-types-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9045,7 +10779,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-delete",
-                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_stored-info-types-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9067,7 +10801,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-get",
-                    Some(r##"Gets a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Gets a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_stored-info-types-get",
                   vec![
                     (Some(r##"name"##),
@@ -9089,12 +10823,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-list",
-                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_stored-info-types-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9111,7 +10845,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-patch",
-                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_stored-info-types-patch",
                   vec![
                     (Some(r##"name"##),
@@ -9140,14 +10874,14 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'content-deidentify', 'content-inspect', 'content-reidentify', 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'dlp-jobs-cancel', 'dlp-jobs-create', 'dlp-jobs-delete', 'dlp-jobs-get', 'dlp-jobs-list', 'image-redact', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'job-triggers-activate', 'job-triggers-create', 'job-triggers-delete', 'job-triggers-get', 'job-triggers-list', 'job-triggers-patch', 'locations-content-deidentify', 'locations-content-inspect', 'locations-content-reidentify', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-dlp-jobs-cancel', 'locations-dlp-jobs-create', 'locations-dlp-jobs-delete', 'locations-dlp-jobs-finish', 'locations-dlp-jobs-get', 'locations-dlp-jobs-hybrid-inspect', 'locations-dlp-jobs-list', 'locations-image-redact', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-activate', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-hybrid-inspect', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
+        ("projects", "methods: 'content-deidentify', 'content-inspect', 'content-reidentify', 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'dlp-jobs-cancel', 'dlp-jobs-create', 'dlp-jobs-delete', 'dlp-jobs-get', 'dlp-jobs-list', 'image-redact', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'job-triggers-activate', 'job-triggers-create', 'job-triggers-delete', 'job-triggers-get', 'job-triggers-list', 'job-triggers-patch', 'locations-column-data-profiles-get', 'locations-column-data-profiles-list', 'locations-content-deidentify', 'locations-content-inspect', 'locations-content-reidentify', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-discovery-configs-create', 'locations-discovery-configs-delete', 'locations-discovery-configs-get', 'locations-discovery-configs-list', 'locations-discovery-configs-patch', 'locations-dlp-jobs-cancel', 'locations-dlp-jobs-create', 'locations-dlp-jobs-delete', 'locations-dlp-jobs-finish', 'locations-dlp-jobs-get', 'locations-dlp-jobs-hybrid-inspect', 'locations-dlp-jobs-list', 'locations-image-redact', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-activate', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-hybrid-inspect', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-project-data-profiles-get', 'locations-project-data-profiles-list', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'locations-table-data-profiles-get', 'locations-table-data-profiles-list', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
             ("content-deidentify",
-                    Some(r##"De-identifies potentially sensitive info from a ContentItem. This method has limits on input size and output size. See https://cloud.google.com/dlp/docs/deidentify-sensitive-data to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"De-identifies potentially sensitive info from a ContentItem. This method has limits on input size and output size. See https://cloud.google.com/sensitive-data-protection/docs/deidentify-sensitive-data to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_content-deidentify",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9170,12 +10904,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("content-inspect",
-                    Some(r##"Finds potentially sensitive info in content. This method has limits on input size, processing time, and output size. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. For how to guides, see https://cloud.google.com/dlp/docs/inspecting-images and https://cloud.google.com/dlp/docs/inspecting-text,"##),
+                    Some(r##"Finds potentially sensitive info in content. This method has limits on input size, processing time, and output size. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. For how to guides, see https://cloud.google.com/sensitive-data-protection/docs/inspecting-images and https://cloud.google.com/sensitive-data-protection/docs/inspecting-text,"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_content-inspect",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9198,12 +10932,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("content-reidentify",
-                    Some(r##"Re-identifies content that has been de-identified. See https://cloud.google.com/dlp/docs/pseudonymization#re-identification_in_free_text_code_example to learn more."##),
+                    Some(r##"Re-identifies content that has been de-identified. See https://cloud.google.com/sensitive-data-protection/docs/pseudonymization#re-identification_in_free_text_code_example to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_content-reidentify",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9226,12 +10960,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-create",
-                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_deidentify-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9254,7 +10988,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-delete",
-                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_deidentify-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9276,7 +11010,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-get",
-                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_deidentify-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -9298,12 +11032,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-list",
-                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_deidentify-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9320,7 +11054,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("deidentify-templates-patch",
-                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_deidentify-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -9348,7 +11082,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("dlp-jobs-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running DlpJob. The server makes a best effort to cancel the DlpJob, but success is not guaranteed. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running DlpJob. The server makes a best effort to cancel the DlpJob, but success is not guaranteed. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_dlp-jobs-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -9376,12 +11110,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("dlp-jobs-create",
-                    Some(r##"Creates a new job to inspect storage or calculate risk metrics. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more. When no InfoTypes or CustomInfoTypes are specified in inspect jobs, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"Creates a new job to inspect storage or calculate risk metrics. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more. When no InfoTypes or CustomInfoTypes are specified in inspect jobs, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_dlp-jobs-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9404,7 +11138,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("dlp-jobs-delete",
-                    Some(r##"Deletes a long-running DlpJob. This method indicates that the client is no longer interested in the DlpJob result. The job will be canceled if possible. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Deletes a long-running DlpJob. This method indicates that the client is no longer interested in the DlpJob result. The job will be canceled if possible. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_dlp-jobs-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9426,7 +11160,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("dlp-jobs-get",
-                    Some(r##"Gets the latest state of a long-running DlpJob. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Gets the latest state of a long-running DlpJob. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_dlp-jobs-get",
                   vec![
                     (Some(r##"name"##),
@@ -9448,12 +11182,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("dlp-jobs-list",
-                    Some(r##"Lists DlpJobs that match the specified filter in the request. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Lists DlpJobs that match the specified filter in the request. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_dlp-jobs-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9470,12 +11204,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("image-redact",
-                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/dlp/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/sensitive-data-protection/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_image-redact",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9498,12 +11232,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-create",
-                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_inspect-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9526,7 +11260,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-delete",
-                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_inspect-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9548,7 +11282,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-get",
-                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_inspect-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -9570,12 +11304,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-list",
-                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_inspect-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9592,7 +11326,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("inspect-templates-patch",
-                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_inspect-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -9648,12 +11382,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("job-triggers-create",
-                    Some(r##"Creates a job trigger to run DLP actions such as scanning storage for sensitive information on a set schedule. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Creates a job trigger to run DLP actions such as scanning storage for sensitive information on a set schedule. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_job-triggers-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9676,7 +11410,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("job-triggers-delete",
-                    Some(r##"Deletes a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Deletes a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_job-triggers-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9698,7 +11432,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("job-triggers-get",
-                    Some(r##"Gets a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Gets a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_job-triggers-get",
                   vec![
                     (Some(r##"name"##),
@@ -9720,12 +11454,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("job-triggers-list",
-                    Some(r##"Lists job triggers. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Lists job triggers. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_job-triggers-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9742,7 +11476,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("job-triggers-patch",
-                    Some(r##"Updates a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Updates a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_job-triggers-patch",
                   vec![
                     (Some(r##"name"##),
@@ -9769,13 +11503,57 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-column-data-profiles-get",
+                    Some(r##"Gets a column data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-column-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/columnDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-column-data-profiles-list",
+                    Some(r##"Lists data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-column-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example `organizations/433245324/locations/europe` or projects/project-id/locations/asia."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-content-deidentify",
-                    Some(r##"De-identifies potentially sensitive info from a ContentItem. This method has limits on input size and output size. See https://cloud.google.com/dlp/docs/deidentify-sensitive-data to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"De-identifies potentially sensitive info from a ContentItem. This method has limits on input size and output size. See https://cloud.google.com/sensitive-data-protection/docs/deidentify-sensitive-data to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-content-deidentify",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9798,12 +11576,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-content-inspect",
-                    Some(r##"Finds potentially sensitive info in content. This method has limits on input size, processing time, and output size. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. For how to guides, see https://cloud.google.com/dlp/docs/inspecting-images and https://cloud.google.com/dlp/docs/inspecting-text,"##),
+                    Some(r##"Finds potentially sensitive info in content. This method has limits on input size, processing time, and output size. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. For how to guides, see https://cloud.google.com/sensitive-data-protection/docs/inspecting-images and https://cloud.google.com/sensitive-data-protection/docs/inspecting-text,"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-content-inspect",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9826,12 +11604,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-content-reidentify",
-                    Some(r##"Re-identifies content that has been de-identified. See https://cloud.google.com/dlp/docs/pseudonymization#re-identification_in_free_text_code_example to learn more."##),
+                    Some(r##"Re-identifies content that has been de-identified. See https://cloud.google.com/sensitive-data-protection/docs/pseudonymization#re-identification_in_free_text_code_example to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-content-reidentify",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9854,12 +11632,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-create",
-                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-deidentify-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9882,7 +11660,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-delete",
-                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Deletes a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-deidentify-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9904,7 +11682,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-get",
-                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Gets a DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-deidentify-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -9926,12 +11704,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-list",
-                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Lists DeidentifyTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-deidentify-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -9948,7 +11726,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-deidentify-templates-patch",
-                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/dlp/docs/creating-templates-deid to learn more."##),
+                    Some(r##"Updates the DeidentifyTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-deidentify-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -9975,8 +11753,130 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-discovery-configs-create",
+                    Some(r##"Creates a config for discovery to scan and profile storage."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-discovery-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/`PROJECT_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-delete",
+                    Some(r##"Deletes a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-discovery-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the project and the config, for example `projects/dlp-test-project/discoveryConfigs/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-get",
+                    Some(r##"Gets a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-discovery-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the project and the configuration, for example `projects/dlp-test-project/discoveryConfigs/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-list",
+                    Some(r##"Lists discovery configurations."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-discovery-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/`PROJECT_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-discovery-configs-patch",
+                    Some(r##"Updates a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-discovery-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the project and the configuration, for example `projects/dlp-test-project/discoveryConfigs/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-dlp-jobs-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running DlpJob. The server makes a best effort to cancel the DlpJob, but success is not guaranteed. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running DlpJob. The server makes a best effort to cancel the DlpJob, but success is not guaranteed. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-dlp-jobs-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -10004,12 +11904,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-dlp-jobs-create",
-                    Some(r##"Creates a new job to inspect storage or calculate risk metrics. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more. When no InfoTypes or CustomInfoTypes are specified in inspect jobs, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"Creates a new job to inspect storage or calculate risk metrics. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more. When no InfoTypes or CustomInfoTypes are specified in inspect jobs, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-dlp-jobs-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10032,7 +11932,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-dlp-jobs-delete",
-                    Some(r##"Deletes a long-running DlpJob. This method indicates that the client is no longer interested in the DlpJob result. The job will be canceled if possible. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Deletes a long-running DlpJob. This method indicates that the client is no longer interested in the DlpJob result. The job will be canceled if possible. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-dlp-jobs-delete",
                   vec![
                     (Some(r##"name"##),
@@ -10059,7 +11959,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the DlpJob resource to be cancelled."##),
+                     Some(r##"Required. The name of the DlpJob resource to be finished."##),
                      Some(true),
                      Some(false)),
         
@@ -10082,7 +11982,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-dlp-jobs-get",
-                    Some(r##"Gets the latest state of a long-running DlpJob. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Gets the latest state of a long-running DlpJob. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-dlp-jobs-get",
                   vec![
                     (Some(r##"name"##),
@@ -10132,12 +12032,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-dlp-jobs-list",
-                    Some(r##"Lists DlpJobs that match the specified filter in the request. See https://cloud.google.com/dlp/docs/inspecting-storage and https://cloud.google.com/dlp/docs/compute-risk-analysis to learn more."##),
+                    Some(r##"Lists DlpJobs that match the specified filter in the request. See https://cloud.google.com/sensitive-data-protection/docs/inspecting-storage and https://cloud.google.com/sensitive-data-protection/docs/compute-risk-analysis to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-dlp-jobs-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10154,12 +12054,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-image-redact",
-                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/dlp/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/sensitive-data-protection/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-image-redact",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10182,12 +12082,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-create",
-                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-inspect-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10210,7 +12110,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-delete",
-                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Deletes an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-inspect-templates-delete",
                   vec![
                     (Some(r##"name"##),
@@ -10232,7 +12132,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-get",
-                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Gets an InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-inspect-templates-get",
                   vec![
                     (Some(r##"name"##),
@@ -10254,12 +12154,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-list",
-                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Lists InspectTemplates. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-inspect-templates-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10276,7 +12176,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-inspect-templates-patch",
-                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/dlp/docs/creating-templates to learn more."##),
+                    Some(r##"Updates the InspectTemplate. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-inspect-templates-patch",
                   vec![
                     (Some(r##"name"##),
@@ -10332,12 +12232,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-create",
-                    Some(r##"Creates a job trigger to run DLP actions such as scanning storage for sensitive information on a set schedule. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Creates a job trigger to run DLP actions such as scanning storage for sensitive information on a set schedule. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-job-triggers-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10360,7 +12260,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-delete",
-                    Some(r##"Deletes a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Deletes a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-job-triggers-delete",
                   vec![
                     (Some(r##"name"##),
@@ -10382,7 +12282,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-get",
-                    Some(r##"Gets a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Gets a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-job-triggers-get",
                   vec![
                     (Some(r##"name"##),
@@ -10432,12 +12332,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-list",
-                    Some(r##"Lists job triggers. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Lists job triggers. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-job-triggers-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10454,7 +12354,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-job-triggers-patch",
-                    Some(r##"Updates a job trigger. See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more."##),
+                    Some(r##"Updates a job trigger. See https://cloud.google.com/sensitive-data-protection/docs/creating-job-triggers to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-job-triggers-patch",
                   vec![
                     (Some(r##"name"##),
@@ -10481,13 +12381,57 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-project-data-profiles-get",
+                    Some(r##"Gets a project data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-project-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/projectDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-project-data-profiles-list",
+                    Some(r##"Lists data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-project-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. organizations/{org_id}/locations/{loc_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-stored-info-types-create",
-                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-stored-info-types-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10510,7 +12454,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-delete",
-                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-stored-info-types-delete",
                   vec![
                     (Some(r##"name"##),
@@ -10532,7 +12476,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-get",
-                    Some(r##"Gets a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Gets a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-stored-info-types-get",
                   vec![
                     (Some(r##"name"##),
@@ -10554,12 +12498,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-list",
-                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-stored-info-types-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10576,7 +12520,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-stored-info-types-patch",
-                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-stored-info-types-patch",
                   vec![
                     (Some(r##"name"##),
@@ -10603,13 +12547,57 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-table-data-profiles-get",
+                    Some(r##"Gets a table data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-table-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/tableDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-table-data-profiles-list",
+                    Some(r##"Lists data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-table-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example `organizations/433245324/locations/europe` or `projects/project-id/locations/asia`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("stored-info-types-create",
-                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Creates a pre-built stored infoType to be used for inspection. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_stored-info-types-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10632,7 +12620,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-delete",
-                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Deletes a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_stored-info-types-delete",
                   vec![
                     (Some(r##"name"##),
@@ -10654,7 +12642,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-get",
-                    Some(r##"Gets a stored infoType. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Gets a stored infoType. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_stored-info-types-get",
                   vec![
                     (Some(r##"name"##),
@@ -10676,12 +12664,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-list",
-                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Lists stored infoTypes. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_stored-info-types-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/dlp/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
         
@@ -10698,7 +12686,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("stored-info-types-patch",
-                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/dlp/docs/creating-stored-infotypes to learn more."##),
+                    Some(r##"Updates the stored infoType by creating a new version. The existing version will continue to be used until the new version is ready. See https://cloud.google.com/sensitive-data-protection/docs/creating-stored-infotypes to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_stored-info-types-patch",
                   vec![
                     (Some(r##"name"##),
@@ -10731,8 +12719,8 @@ async fn main() {
     
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230121")
-           .about("Provides methods for detection, risk analysis, and de-identification of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
+           .version("5.0.3+20240225")
+           .about("Discover and protect your sensitive data. A fully managed service designed to help you discover, classify, and protect your valuable data assets with ease.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

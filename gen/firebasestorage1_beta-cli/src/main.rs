@@ -434,7 +434,7 @@ async fn main() {
                   vec![
                     (Some(r##"bucket"##),
                      None,
-                     Some(r##"Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`."##),
+                     Some(r##"Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -462,7 +462,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`."##),
+                     Some(r##"Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -484,7 +484,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent Firebase project, `projects/{project_number}`."##),
+                     Some(r##"Required. Resource name of the parent Firebase project, `projects/{project_id_or_number}`."##),
                      Some(true),
                      Some(false)),
         
@@ -506,7 +506,7 @@ async fn main() {
                   vec![
                     (Some(r##"bucket"##),
                      None,
-                     Some(r##"Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`."##),
+                     Some(r##"Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -534,7 +534,7 @@ async fn main() {
     
     let mut app = App::new("firebasestorage1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230106")
+           .version("5.0.3+20240301")
            .about("The Cloud Storage for Firebase API enables programmatic management of Cloud Storage buckets for use in Firebase projects")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasestorage1_beta_cli")
            .arg(Arg::with_name("url")

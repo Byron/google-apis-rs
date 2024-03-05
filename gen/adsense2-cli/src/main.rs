@@ -2932,7 +2932,7 @@ async fn main() {
     
     let mut app = App::new("adsense2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.3+20240305")
            .about("The AdSense Management API allows publishers to access their inventory and run earnings and performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsense2_cli")
            .arg(Arg::with_name("url")

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, upload, and organize items in your Google Photos library
     Full,
@@ -530,7 +530,7 @@ pub struct Date {
 impl client::Part for Date {}
 
 
-/// This filter defines the allowed dates or date ranges for the media returned. It's possible to pick a set of specific dates and a set of date ranges.
+/// This filter defines the allowed dates or date ranges for the media returned. It's possible to pick a set of specific dates and a set of date ranges. Media items uploaded without metadata specifying the date the media item was captured will not be returned in queries using date filters. Google Photos server upload time is not used as a fallback in this case.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 

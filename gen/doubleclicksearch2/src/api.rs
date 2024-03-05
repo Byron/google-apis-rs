@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your advertising data in DoubleClick Search
     Full,
@@ -225,6 +225,10 @@ pub struct Conversion {
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub ad_id: Option<i64>,
+    /// Represents consent for core platform services (CPS) preferences in settings. No default value. Acceptable values are: GRANTED: The desired consent status is to grant. Read the CPS preferences from GTE settings. DENIED: The desired consent status is to deny; CPS list is empty.
+    #[serde(rename="adUserDataConsent")]
+    
+    pub ad_user_data_consent: Option<String>,
     /// DS advertiser ID.
     #[serde(rename="advertiserId")]
     

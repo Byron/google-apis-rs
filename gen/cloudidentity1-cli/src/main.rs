@@ -480,10 +480,14 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "android-specific-attributes.cts-profile-match" => Some(("androidSpecificAttributes.ctsProfileMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "android-specific-attributes.enabled-unknown-sources" => Some(("androidSpecificAttributes.enabledUnknownSources", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "android-specific-attributes.has-potentially-harmful-apps" => Some(("androidSpecificAttributes.hasPotentiallyHarmfulApps", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "android-specific-attributes.owner-profile-account" => Some(("androidSpecificAttributes.ownerProfileAccount", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "android-specific-attributes.ownership-privilege" => Some(("androidSpecificAttributes.ownershipPrivilege", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "android-specific-attributes.supports-work-profile" => Some(("androidSpecificAttributes.supportsWorkProfile", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "android-specific-attributes.verified-boot" => Some(("androidSpecificAttributes.verifiedBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "android-specific-attributes.verify-apps-enabled" => Some(("androidSpecificAttributes.verifyAppsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "asset-tag" => Some(("assetTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "baseband-version" => Some(("basebandVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bootloader-version" => Some(("bootloaderVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -496,6 +500,7 @@ where
                     "enabled-developer-options" => Some(("enabledDeveloperOptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enabled-usb-debugging" => Some(("enabledUsbDebugging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "encryption-state" => Some(("encryptionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hostname" => Some(("hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "imei" => Some(("imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kernel-version" => Some(("kernelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-sync-time" => Some(("lastSyncTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -513,7 +518,7 @@ where
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wifi-mac-addresses" => Some(("wifiMacAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-specific-attributes", "asset-tag", "baseband-version", "bootloader-version", "brand", "build-number", "compromised-state", "create-time", "device-id", "device-type", "enabled-developer-options", "enabled-unknown-sources", "enabled-usb-debugging", "encryption-state", "imei", "kernel-version", "last-sync-time", "management-state", "manufacturer", "meid", "model", "name", "network-operator", "os-version", "other-accounts", "owner-profile-account", "owner-type", "ownership-privilege", "release-version", "security-patch-time", "serial-number", "supports-work-profile", "wifi-mac-addresses"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-specific-attributes", "asset-tag", "baseband-version", "bootloader-version", "brand", "build-number", "compromised-state", "create-time", "cts-profile-match", "device-id", "device-type", "enabled-developer-options", "enabled-unknown-sources", "enabled-usb-debugging", "encryption-state", "has-potentially-harmful-apps", "hostname", "imei", "kernel-version", "last-sync-time", "management-state", "manufacturer", "meid", "model", "name", "network-operator", "os-version", "other-accounts", "owner-profile-account", "owner-type", "ownership-privilege", "release-version", "security-patch-time", "serial-number", "supports-work-profile", "verified-boot", "verify-apps-enabled", "wifi-mac-addresses"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2120,13 +2125,14 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-setting" => Some(("deliverySetting", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferred-member-key.id" => Some(("preferredMemberKey.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferred-member-key.namespace" => Some(("preferredMemberKey.namespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "name", "namespace", "preferred-member-key", "type", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delivery-setting", "id", "name", "namespace", "preferred-member-key", "type", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2519,6 +2525,71 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _groups_memberships_search_direct_groups(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.groups().memberships_search_direct_groups(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "query" => {
+                    call = call.query(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "page-token", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4017,6 +4088,9 @@ where
                     ("memberships-modify-membership-roles", Some(opt)) => {
                         call_result = self._groups_memberships_modify_membership_roles(opt, dry_run, &mut err).await;
                     },
+                    ("memberships-search-direct-groups", Some(opt)) => {
+                        call_result = self._groups_memberships_search_direct_groups(opt, dry_run, &mut err).await;
+                    },
                     ("memberships-search-transitive-groups", Some(opt)) => {
                         call_result = self._groups_memberships_search_transitive_groups(opt, dry_run, &mut err).await;
                     },
@@ -4707,7 +4781,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("groups", "methods: 'create', 'delete', 'get', 'get-security-settings', 'list', 'lookup', 'memberships-check-transitive-membership', 'memberships-create', 'memberships-delete', 'memberships-get', 'memberships-get-membership-graph', 'memberships-list', 'memberships-lookup', 'memberships-modify-membership-roles', 'memberships-search-transitive-groups', 'memberships-search-transitive-memberships', 'patch', 'search' and 'update-security-settings'", vec![
+        ("groups", "methods: 'create', 'delete', 'get', 'get-security-settings', 'list', 'lookup', 'memberships-check-transitive-membership', 'memberships-create', 'memberships-delete', 'memberships-get', 'memberships-get-membership-graph', 'memberships-list', 'memberships-lookup', 'memberships-modify-membership-roles', 'memberships-search-direct-groups', 'memberships-search-transitive-groups', 'memberships-search-transitive-memberships', 'patch', 'search' and 'update-security-settings'", vec![
             ("create",
                     Some(r##"Creates a Group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/groups_create",
@@ -5003,6 +5077,28 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("memberships-search-direct-groups",
+                    Some(r##"Searches direct groups of a member."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/groups_memberships-search-direct-groups",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: groups/{group_id}, where group_id is always '-' as this API will search across all groups for a given member."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -5458,7 +5554,7 @@ async fn main() {
     
     let mut app = App::new("cloudidentity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.3+20240227")
            .about("API for provisioning and managing identity resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli")
            .arg(Arg::with_name("url")

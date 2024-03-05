@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Management* API at revision *20230119*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Android Management* API at revision *20240221*. The CLI is at version *5.0.3*.
 
 ```bash
 androidmanagement1 [options]
@@ -38,7 +38,6 @@ androidmanagement1 [options]
                 devices-issue-command <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-list <parent> [-p <v>]... [-o <out>]
                 devices-operations-cancel <name> [-p <v>]... [-o <out>]
-                devices-operations-delete <name> [-p <v>]... [-o <out>]
                 devices-operations-get <name> [-p <v>]... [-o <out>]
                 devices-operations-list <name> [-p <v>]... [-o <out>]
                 devices-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -48,6 +47,9 @@ androidmanagement1 [options]
                 enrollment-tokens-list <parent> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                migration-tokens-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                migration-tokens-get <name> [-p <v>]... [-o <out>]
+                migration-tokens-list <parent> [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-delete <name> [-p <v>]... [-o <out>]
                 policies-get <name> [-p <v>]... [-o <out>]
@@ -59,6 +61,8 @@ androidmanagement1 [options]
                 web-apps-list <parent> [-p <v>]... [-o <out>]
                 web-apps-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 web-tokens-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+        provisioning-info
+                get <name> [-p <v>]... [-o <out>]
         signup-urls
                 create [-p <v>]... [-o <out>]
   androidmanagement1 --help

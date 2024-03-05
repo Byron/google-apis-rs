@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -279,6 +279,10 @@ pub struct Artifacts {
     #[serde(rename="mavenArtifacts")]
     
     pub maven_artifacts: Option<Vec<MavenArtifact>>,
+    /// A list of npm packages to be uploaded to Artifact Registry upon successful completion of all build steps. Npm packages in the specified paths will be uploaded to the specified Artifact Registry repository using the builder service account's credentials. If any packages fail to be pushed, the build is marked FAILURE.
+    #[serde(rename="npmPackages")]
+    
+    pub npm_packages: Option<Vec<NpmPackage>>,
     /// A list of objects to be uploaded to Cloud Storage upon successful completion of all build steps. Files in the workspace matching specified paths globs will be uploaded to the specified Cloud Storage location using the builder service account's credentials. The location and generation of the uploaded objects will be stored in the Build resource's results field. If any objects fail to be pushed, the build is marked FAILURE.
     
     pub objects: Option<ArtifactObjects>,
@@ -365,6 +369,10 @@ pub struct BitbucketServerConfig {
     #[serde(rename="peeredNetwork")]
     
     pub peered_network: Option<String>,
+    /// Immutable. IP range within the peered network. This is specified in CIDR notation with a slash and the subnet prefix size. You can optionally specify an IP address before the subnet prefix value. e.g. `192.168.0.0/29` would specify an IP range starting at 192.168.0.0 with a 29 bit prefix size. `/16` would specify a prefix size of 16 bits, with an automatically determined IP within the peered VPC. If unspecified, a value of `/24` will be used. The field only has an effect if peered_network is set.
+    #[serde(rename="peeredNetworkIpRange")]
+    
+    pub peered_network_ip_range: Option<String>,
     /// Required. Secret Manager secrets needed by the config.
     
     pub secrets: Option<BitbucketServerSecrets>,
@@ -571,7 +579,7 @@ pub struct Build {
     #[serde(rename="logUrl")]
     
     pub log_url: Option<String>,
-    /// Google Cloud Storage bucket where logs should be written (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)). Logs file names will be of the format `${logs_bucket}/log-${build_id}.txt`.
+    /// Cloud Storage bucket where logs should be written (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)). Logs file names will be of the format `${logs_bucket}/log-${build_id}.txt`.
     #[serde(rename="logsBucket")]
     
     pub logs_bucket: Option<String>,
@@ -671,6 +679,14 @@ impl client::Part for BuildApproval {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildOptions {
+    /// Option to include built-in and custom substitutions as env variables for all build steps.
+    #[serde(rename="automapSubstitutions")]
+    
+    pub automap_substitutions: Option<bool>,
+    /// Optional. Option to specify how default logs buckets are setup.
+    #[serde(rename="defaultLogsBucketBehavior")]
+    
+    pub default_logs_bucket_behavior: Option<String>,
     /// Requested disk size for the VM that runs the build. Note that this is *NOT* "disk free"; some of the space will be used by the operating system and build utilities. Also note that this is the minimum disk size that will be allocated for the build -- the build may run with a larger disk than requested. At present, the maximum disk size is 2000GB; builds that request more than the maximum are rejected with an error.
     #[serde(rename="diskSizeGb")]
     
@@ -683,7 +699,7 @@ pub struct BuildOptions {
     /// A list of global environment variable definitions that will exist for all build steps in this build. If a variable is defined in both globally and in a build step, the variable will use the build step value. The elements are of the form "KEY=VALUE" for the environment variable "KEY" being given the value "VALUE".
     
     pub env: Option<Vec<String>>,
-    /// Option to define build log streaming behavior to Google Cloud Storage.
+    /// Option to define build log streaming behavior to Cloud Storage.
     #[serde(rename="logStreamingOption")]
     
     pub log_streaming_option: Option<String>,
@@ -743,6 +759,10 @@ pub struct BuildStep {
     /// A list of arguments that will be presented to the step when it is started. If the image used to run the step's container has an entrypoint, the `args` are used as arguments to that entrypoint. If the image does not define an entrypoint, the first element in args is used as the entrypoint, and the remainder will be used as arguments.
     
     pub args: Option<Vec<String>>,
+    /// Option to include built-in and custom substitutions as env variables for this build step. This option will override the global option in BuildOption.
+    #[serde(rename="automapSubstitutions")]
+    
+    pub automap_substitutions: Option<bool>,
     /// Working directory to use when running this step's container. If this value is a relative path, it is relative to the build's working directory. If this value is absolute, it may be outside the build's working directory, in which case the contents of the path may not be persisted across build step executions, unless a `volume` for that path is specified. If the build specifies a `RepoSource` with `dir` and a step with a `dir`, which specifies an absolute path, the `RepoSource` `dir` is ignored for the step's execution.
     
     pub dir: Option<String>,
@@ -979,6 +999,27 @@ pub struct CancelOperationRequest { _never_set: Option<bool> }
 impl client::RequestValue for CancelOperationRequest {}
 
 
+/// Location of the source in a 2nd-gen Google Cloud Build repository resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConnectedRepository {
+    /// Directory, relative to the source root, in which to run the build.
+    
+    pub dir: Option<String>,
+    /// Required. Name of the Google Cloud Build repository, formatted as `projects/*/locations/*/connections/*/repositories/*`.
+    
+    pub repository: Option<String>,
+    /// The revision to fetch from the Git repository such as a branch, a tag, a commit SHA, or any Git ref.
+    
+    pub revision: Option<String>,
+}
+
+impl client::Part for ConnectedRepository {}
+
+
 /// Request to connect a repository from a connected Bitbucket Server host.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1015,6 +1056,29 @@ pub struct CreateGitLabConnectedRepositoryRequest {
 }
 
 impl client::Part for CreateGitLabConnectedRepositoryRequest {}
+
+
+/// The default service account used for `Builds`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations get default service account projects](ProjectLocationGetDefaultServiceAccountCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DefaultServiceAccount {
+    /// Identifier. Format: `projects/{project}/locations/{location}/defaultServiceAccount
+    
+    pub name: Option<String>,
+    /// Output only. The email address of the service account identity that will be used for a build by default. This is returned in the format `projects/{project}/serviceAccounts/{service_account}` where `{service_account}` could be the legacy Cloud Build SA, in the format [PROJECT_NUMBER]@cloudbuild.gserviceaccount.com or the Compute SA, in the format [PROJECT_NUMBER]-compute@developer.gserviceaccount.com. If no service account will be used by default, this will be empty.
+    #[serde(rename="serviceAccountEmail")]
+    
+    pub service_account_email: Option<String>,
+}
+
+impl client::ResponseResult for DefaultServiceAccount {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
@@ -1097,6 +1161,9 @@ pub struct GitFileSource {
     #[serde(rename="repoType")]
     
     pub repo_type: Option<String>,
+    /// The fully qualified resource name of the Repos API repository. Either URI or repository can be specified. If unspecified, the repo from which the trigger invocation originated is assumed to be the repo from which to read the specified path.
+    
+    pub repository: Option<String>,
     /// The branch, tag, arbitrary ref, or SHA version of the repo to use when resolving the filename (optional). This field respects the same syntax/resolution as described here: https://git-scm.com/docs/gitrevisions If unspecified, the revision from which the trigger invocation originated is assumed to be the revision from which to read the specified path.
     
     pub revision: Option<String>,
@@ -1463,12 +1530,36 @@ pub struct GitRepoSource {
     #[serde(rename="repoType")]
     
     pub repo_type: Option<String>,
-    /// The URI of the repo. Either uri or repository can be specified and is required.
+    /// The connected repository resource name, in the format `projects/*/locations/*/connections/*/repositories/*`. Either `uri` or `repository` can be specified and is required.
+    
+    pub repository: Option<String>,
+    /// The URI of the repo (e.g. https://github.com/user/repo.git). Either `uri` or `repository` can be specified and is required.
     
     pub uri: Option<String>,
 }
 
 impl client::Part for GitRepoSource {}
+
+
+/// Location of the source in any accessible Git repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GitSource {
+    /// Directory, relative to the source root, in which to run the build. This must be a relative path. If a step's `dir` is specified and is an absolute path, this value is ignored for that step's execution.
+    
+    pub dir: Option<String>,
+    /// The revision to fetch from the Git repository such as a branch, a tag, a commit SHA, or any Git ref. Cloud Build uses `git fetch` to fetch the revision from the Git repository; therefore make sure that the string you provide for `revision` is parsable by the command. For information on string values accepted by `git fetch`, see https://git-scm.com/docs/gitrevisions#_specifying_revisions. For information on `git fetch`, see https://git-scm.com/docs/git-fetch.
+    
+    pub revision: Option<String>,
+    /// Location of the Git repo to build. This will be used as a `git remote`, see https://git-scm.com/docs/git-remote.
+    
+    pub url: Option<String>,
+}
+
+impl client::Part for GitSource {}
 
 
 /// Container message for hash values.
@@ -1484,7 +1575,7 @@ pub struct Hash {
     pub type_: Option<String>,
     /// The hash value.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub value: Option<Vec<u8>>,
 }
 
@@ -1512,7 +1603,7 @@ pub struct HttpBody {
     pub content_type: Option<String>,
     /// The HTTP request/response body as raw binary.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Application specific response metadata. Must be set in the first response for streaming APIs.
     
@@ -1532,7 +1623,7 @@ pub struct InlineSecret {
     /// Map of environment variable name to its encrypted value. Secret environment variables must be unique across all of a build's secrets, and must be used by at least one build step. Values can be at most 64 KB in size. There can be at most 100 secret values across all of a build's secrets.
     #[serde(rename="envMap")]
     
-    #[serde_as(as = "Option<HashMap<_, ::client::serde::urlsafe_base64::Wrapper>>")]
+    #[serde_as(as = "Option<HashMap<_, ::client::serde::standard_base64::Wrapper>>")]
     pub env_map: Option<HashMap<String, Vec<u8>>>,
     /// Resource name of Cloud KMS crypto key to decrypt the encrypted value. In format: projects/*/locations/*/keyRings/*/cryptoKeys/*
     #[serde(rename="kmsKeyName")]
@@ -1784,6 +1875,25 @@ pub struct NetworkConfig {
 impl client::Part for NetworkConfig {}
 
 
+/// Npm package to upload to Artifact Registry upon successful completion of all build steps.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NpmPackage {
+    /// Path to the package.json. e.g. workspace/path/to/package
+    #[serde(rename="packagePath")]
+    
+    pub package_path: Option<String>,
+    /// Artifact Registry repository, in the form "https://$REGION-npm.pkg.dev/$PROJECT/$REPOSITORY" Npm package in the workspace specified by path will be zipped and uploaded to Artifact Registry with this location as a prefix.
+    
+    pub repository: Option<String>,
+}
+
+impl client::Part for NpmPackage {}
+
+
 /// This resource represents a long-running operation that is the result of a network API call.
 /// 
 /// # Activities
@@ -1834,7 +1944,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1869,6 +1979,10 @@ pub struct PrivatePoolV1Config {
     #[serde(rename="networkConfig")]
     
     pub network_config: Option<NetworkConfig>,
+    /// Immutable. Private Service Connect(PSC) Network configuration for the pool.
+    #[serde(rename="privateServiceConnect")]
+    
+    pub private_service_connect: Option<PrivateServiceConnect>,
     /// Machine configuration for the workers in the pool.
     #[serde(rename="workerConfig")]
     
@@ -1876,6 +1990,30 @@ pub struct PrivatePoolV1Config {
 }
 
 impl client::Part for PrivatePoolV1Config {}
+
+
+/// Defines the Private Service Connect network configuration for the pool.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PrivateServiceConnect {
+    /// Required. Immutable. The network attachment that the worker network interface is peered to. Must be in the format `projects/{project}/regions/{region}/networkAttachments/{networkAttachment}`. The region of network attachment must be the same as the worker pool. See [Network Attachments](https://cloud.google.com/vpc/docs/about-network-attachments)
+    #[serde(rename="networkAttachment")]
+    
+    pub network_attachment: Option<String>,
+    /// Required. Immutable. Disable public IP on the primary network interface. If true, workers are created without any public address, which prevents network egress to public IPs unless a network proxy is configured. If false, workers are created with a public address which allows for public internet egress. The public address only applies to traffic through the primary network interface. If `route_all_traffic` is set to true, all traffic will go through the non-primary network interface, this boolean has no effect.
+    #[serde(rename="publicIpAddressDisabled")]
+    
+    pub public_ip_address_disabled: Option<bool>,
+    /// Immutable. Route all traffic through PSC interface. Enable this if you want full control of traffic in the private pool. Configure Cloud NAT for the subnet of network attachment if you need to access public Internet. If false, Only route private IPs, e.g. 10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16 through PSC interface.
+    #[serde(rename="routeAllTraffic")]
+    
+    pub route_all_traffic: Option<bool>,
+}
+
+impl client::Part for PrivateServiceConnect {}
 
 
 /// PubsubConfig describes the configuration of a trigger that creates a build whenever a Pub/Sub message is published.
@@ -1913,7 +2051,7 @@ pub struct PullRequestFilter {
     /// Regex of branches to match. The syntax of the regular expressions accepted is the syntax accepted by RE2 and described at https://github.com/google/re2/wiki/Syntax
     
     pub branch: Option<String>,
-    /// Configure builds to run whether a repository owner or collaborator need to comment `/gcbrun`.
+    /// If CommentControl is enabled, depending on the setting, builds may not fire until a repository writer comments `/gcbrun` on a pull request or `/gcbrun` is in the pull request description. Only PR comments that contain `/gcbrun` will trigger builds. If CommentControl is set to disabled, comments with `/gcbrun` from a user with repository write permission or above will still trigger builds to run.
     #[serde(rename="commentControl")]
     
     pub comment_control: Option<String>,
@@ -2113,10 +2251,10 @@ pub struct Results {
     #[serde(rename="buildStepImages")]
     
     pub build_step_images: Option<Vec<String>>,
-    /// List of build step outputs, produced by builder images, in the order corresponding to build step indices. [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders) can produce this output by writing to `$BUILDER_OUTPUT/output`. Only the first 4KB of data is stored.
+    /// List of build step outputs, produced by builder images, in the order corresponding to build step indices. [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders) can produce this output by writing to `$BUILDER_OUTPUT/output`. Only the first 50KB of data is stored.
     #[serde(rename="buildStepOutputs")]
     
-    #[serde_as(as = "Option<Vec<::client::serde::urlsafe_base64::Wrapper>>")]
+    #[serde_as(as = "Option<Vec<::client::serde::standard_base64::Wrapper>>")]
     pub build_step_outputs: Option<Vec<Vec<u8>>>,
     /// Container images that were built as a part of the build.
     
@@ -2125,6 +2263,10 @@ pub struct Results {
     #[serde(rename="mavenArtifacts")]
     
     pub maven_artifacts: Option<Vec<UploadedMavenArtifact>>,
+    /// Npm packages uploaded to Artifact Registry at the end of the build.
+    #[serde(rename="npmPackages")]
+    
+    pub npm_packages: Option<Vec<UploadedNpmPackage>>,
     /// Number of non-container artifacts uploaded to Cloud Storage. Only populated when artifacts are uploaded to Cloud Storage.
     #[serde(rename="numArtifacts")]
     
@@ -2207,7 +2349,7 @@ pub struct Secret {
     /// Map of environment variable name to its encrypted value. Secret environment variables must be unique across all of a build's secrets, and must be used by at least one build step. Values can be at most 64 KB in size. There can be at most 100 secret values across all of a build's secrets.
     #[serde(rename="secretEnv")]
     
-    #[serde_as(as = "Option<HashMap<_, ::client::serde::urlsafe_base64::Wrapper>>")]
+    #[serde_as(as = "Option<HashMap<_, ::client::serde::standard_base64::Wrapper>>")]
     pub secret_env: Option<HashMap<String, Vec<u8>>>,
 }
 
@@ -2274,15 +2416,23 @@ impl client::Part for ServiceDirectoryConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Source {
+    /// Optional. If provided, get the source from this 2nd-gen Google Cloud Build repository resource.
+    #[serde(rename="connectedRepository")]
+    
+    pub connected_repository: Option<ConnectedRepository>,
+    /// If provided, get the source from this Git repository.
+    #[serde(rename="gitSource")]
+    
+    pub git_source: Option<GitSource>,
     /// If provided, get the source from this location in a Cloud Source Repository.
     #[serde(rename="repoSource")]
     
     pub repo_source: Option<RepoSource>,
-    /// If provided, get the source from this location in Google Cloud Storage.
+    /// If provided, get the source from this location in Cloud Storage.
     #[serde(rename="storageSource")]
     
     pub storage_source: Option<StorageSource>,
-    /// If provided, get the source from this manifest in Google Cloud Storage. This feature is in Preview; see description [here](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcs-fetcher).
+    /// If provided, get the source from this manifest in Cloud Storage. This feature is in Preview; see description [here](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcs-fetcher).
     #[serde(rename="storageSourceManifest")]
     
     pub storage_source_manifest: Option<StorageSourceManifest>,
@@ -2302,6 +2452,14 @@ pub struct SourceProvenance {
     #[serde(rename="fileHashes")]
     
     pub file_hashes: Option<HashMap<String, FileHashes>>,
+    /// Output only. A copy of the build's `source.connected_repository`, if exists, with any revisions resolved.
+    #[serde(rename="resolvedConnectedRepository")]
+    
+    pub resolved_connected_repository: Option<ConnectedRepository>,
+    /// Output only. A copy of the build's `source.git_source`, if exists, with any revisions resolved.
+    #[serde(rename="resolvedGitSource")]
+    
+    pub resolved_git_source: Option<GitSource>,
     /// A copy of the build's `source.repo_source`, if exists, with any revisions resolved.
     #[serde(rename="resolvedRepoSource")]
     
@@ -2340,43 +2498,47 @@ pub struct Status {
 impl client::Part for Status {}
 
 
-/// Location of the source in an archive file in Google Cloud Storage.
+/// Location of the source in an archive file in Cloud Storage.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StorageSource {
-    /// Google Cloud Storage bucket containing the source (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
+    /// Cloud Storage bucket containing the source (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
     
     pub bucket: Option<String>,
-    /// Google Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.
+    /// Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub generation: Option<i64>,
-    /// Google Cloud Storage object containing the source. This object must be a zipped (`.zip`) or gzipped archive file (`.tar.gz`) containing source to build.
+    /// Cloud Storage object containing the source. This object must be a zipped (`.zip`) or gzipped archive file (`.tar.gz`) containing source to build.
     
     pub object: Option<String>,
+    /// Optional. Option to specify the tool to fetch the source file for the build.
+    #[serde(rename="sourceFetcher")]
+    
+    pub source_fetcher: Option<String>,
 }
 
 impl client::Part for StorageSource {}
 
 
-/// Location of the source manifest in Google Cloud Storage. This feature is in Preview; see description [here](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcs-fetcher).
+/// Location of the source manifest in Cloud Storage. This feature is in Preview; see description [here](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcs-fetcher).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StorageSourceManifest {
-    /// Google Cloud Storage bucket containing the source manifest (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
+    /// Cloud Storage bucket containing the source manifest (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
     
     pub bucket: Option<String>,
-    /// Google Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.
+    /// Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub generation: Option<i64>,
-    /// Google Cloud Storage object containing the source manifest. This object must be a JSON file.
+    /// Cloud Storage object containing the source manifest. This object must be a JSON file.
     
     pub object: Option<String>,
 }
@@ -2425,6 +2587,29 @@ pub struct UploadedMavenArtifact {
 }
 
 impl client::Part for UploadedMavenArtifact {}
+
+
+/// An npm package uploaded to Artifact Registry using the NpmPackage directive.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadedNpmPackage {
+    /// Hash types and values of the npm package.
+    #[serde(rename="fileHashes")]
+    
+    pub file_hashes: Option<FileHashes>,
+    /// Output only. Stores timing information for pushing the specified artifact.
+    #[serde(rename="pushTiming")]
+    
+    pub push_timing: Option<TimeSpan>,
+    /// URI of the uploaded npm package.
+    
+    pub uri: Option<String>,
+}
+
+impl client::Part for UploadedNpmPackage {}
 
 
 /// Artifact uploaded using the PythonPackage directive.
@@ -2802,7 +2987,7 @@ impl<'a, S> OperationMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = CloudBuild::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `builds_approve(...)`, `builds_cancel(...)`, `builds_create(...)`, `builds_get(...)`, `builds_list(...)`, `builds_retry(...)`, `github_enterprise_configs_create(...)`, `github_enterprise_configs_delete(...)`, `github_enterprise_configs_get(...)`, `github_enterprise_configs_list(...)`, `github_enterprise_configs_patch(...)`, `locations_bitbucket_server_configs_connected_repositories_batch_create(...)`, `locations_bitbucket_server_configs_create(...)`, `locations_bitbucket_server_configs_delete(...)`, `locations_bitbucket_server_configs_get(...)`, `locations_bitbucket_server_configs_list(...)`, `locations_bitbucket_server_configs_patch(...)`, `locations_bitbucket_server_configs_remove_bitbucket_server_connected_repository(...)`, `locations_bitbucket_server_configs_repos_list(...)`, `locations_builds_approve(...)`, `locations_builds_cancel(...)`, `locations_builds_create(...)`, `locations_builds_get(...)`, `locations_builds_list(...)`, `locations_builds_retry(...)`, `locations_git_lab_configs_connected_repositories_batch_create(...)`, `locations_git_lab_configs_create(...)`, `locations_git_lab_configs_delete(...)`, `locations_git_lab_configs_get(...)`, `locations_git_lab_configs_list(...)`, `locations_git_lab_configs_patch(...)`, `locations_git_lab_configs_remove_git_lab_connected_repository(...)`, `locations_git_lab_configs_repos_list(...)`, `locations_github_enterprise_configs_create(...)`, `locations_github_enterprise_configs_delete(...)`, `locations_github_enterprise_configs_get(...)`, `locations_github_enterprise_configs_list(...)`, `locations_github_enterprise_configs_patch(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_triggers_create(...)`, `locations_triggers_delete(...)`, `locations_triggers_get(...)`, `locations_triggers_list(...)`, `locations_triggers_patch(...)`, `locations_triggers_run(...)`, `locations_triggers_webhook(...)`, `locations_worker_pools_create(...)`, `locations_worker_pools_delete(...)`, `locations_worker_pools_get(...)`, `locations_worker_pools_list(...)`, `locations_worker_pools_patch(...)`, `triggers_create(...)`, `triggers_delete(...)`, `triggers_get(...)`, `triggers_list(...)`, `triggers_patch(...)`, `triggers_run(...)` and `triggers_webhook(...)`
+/// // like `builds_approve(...)`, `builds_cancel(...)`, `builds_create(...)`, `builds_get(...)`, `builds_list(...)`, `builds_retry(...)`, `github_enterprise_configs_create(...)`, `github_enterprise_configs_delete(...)`, `github_enterprise_configs_get(...)`, `github_enterprise_configs_list(...)`, `github_enterprise_configs_patch(...)`, `locations_bitbucket_server_configs_connected_repositories_batch_create(...)`, `locations_bitbucket_server_configs_create(...)`, `locations_bitbucket_server_configs_delete(...)`, `locations_bitbucket_server_configs_get(...)`, `locations_bitbucket_server_configs_list(...)`, `locations_bitbucket_server_configs_patch(...)`, `locations_bitbucket_server_configs_remove_bitbucket_server_connected_repository(...)`, `locations_bitbucket_server_configs_repos_list(...)`, `locations_builds_approve(...)`, `locations_builds_cancel(...)`, `locations_builds_create(...)`, `locations_builds_get(...)`, `locations_builds_list(...)`, `locations_builds_retry(...)`, `locations_get_default_service_account(...)`, `locations_git_lab_configs_connected_repositories_batch_create(...)`, `locations_git_lab_configs_create(...)`, `locations_git_lab_configs_delete(...)`, `locations_git_lab_configs_get(...)`, `locations_git_lab_configs_list(...)`, `locations_git_lab_configs_patch(...)`, `locations_git_lab_configs_remove_git_lab_connected_repository(...)`, `locations_git_lab_configs_repos_list(...)`, `locations_github_enterprise_configs_create(...)`, `locations_github_enterprise_configs_delete(...)`, `locations_github_enterprise_configs_get(...)`, `locations_github_enterprise_configs_list(...)`, `locations_github_enterprise_configs_patch(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_triggers_create(...)`, `locations_triggers_delete(...)`, `locations_triggers_get(...)`, `locations_triggers_list(...)`, `locations_triggers_patch(...)`, `locations_triggers_run(...)`, `locations_triggers_webhook(...)`, `locations_worker_pools_create(...)`, `locations_worker_pools_delete(...)`, `locations_worker_pools_get(...)`, `locations_worker_pools_list(...)`, `locations_worker_pools_patch(...)`, `triggers_create(...)`, `triggers_delete(...)`, `triggers_get(...)`, `triggers_list(...)`, `triggers_patch(...)`, `triggers_run(...)` and `triggers_webhook(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2920,7 +3105,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Google Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
+    /// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
     /// 
     /// # Arguments
     ///
@@ -3286,7 +3471,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Google Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
+    /// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
     /// 
     /// # Arguments
     ///
@@ -3588,7 +3773,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new `BuildTrigger`. This API is experimental.
+    /// Creates a new `BuildTrigger`.
     /// 
     /// # Arguments
     ///
@@ -3608,7 +3793,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+    /// Deletes a `BuildTrigger` by its project ID and trigger ID.
     /// 
     /// # Arguments
     ///
@@ -3627,7 +3812,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about a `BuildTrigger`. This API is experimental.
+    /// Returns information about a `BuildTrigger`.
     /// 
     /// # Arguments
     ///
@@ -3646,7 +3831,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists existing `BuildTrigger`s. This API is experimental.
+    /// Lists existing `BuildTrigger`s.
     /// 
     /// # Arguments
     ///
@@ -3666,7 +3851,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+    /// Updates a `BuildTrigger` by its project ID and trigger ID.
     /// 
     /// # Arguments
     ///
@@ -3677,6 +3862,7 @@ impl<'a, S> ProjectMethods<'a, S> {
             hub: self.hub,
             _request: request,
             _resource_name: resource_name.to_string(),
+            _update_mask: Default::default(),
             _trigger_id: Default::default(),
             _project_id: Default::default(),
             _delegate: Default::default(),
@@ -3825,7 +4011,24 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new `BuildTrigger`. This API is experimental.
+    /// Returns the `DefaultServiceAccount` used by the project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the `DefaultServiceAccount` to retrieve. Format: `projects/{project}/locations/{location}/defaultServiceAccount`
+    pub fn locations_get_default_service_account(&self, name: &str) -> ProjectLocationGetDefaultServiceAccountCall<'a, S> {
+        ProjectLocationGetDefaultServiceAccountCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new `BuildTrigger`.
     /// 
     /// # Arguments
     ///
@@ -3845,7 +4048,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+    /// Deletes a `BuildTrigger` by its project ID and trigger ID.
     /// 
     /// # Arguments
     ///
@@ -3865,7 +4068,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about a `BuildTrigger`. This API is experimental.
+    /// Returns information about a `BuildTrigger`.
     /// 
     /// # Arguments
     ///
@@ -3885,7 +4088,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists existing `BuildTrigger`s. This API is experimental.
+    /// Lists existing `BuildTrigger`s.
     /// 
     /// # Arguments
     ///
@@ -3905,7 +4108,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+    /// Updates a `BuildTrigger` by its project ID and trigger ID.
     /// 
     /// # Arguments
     ///
@@ -3918,6 +4121,7 @@ impl<'a, S> ProjectMethods<'a, S> {
             _request: request,
             _project_id: project_id.to_string(),
             _trigger_id: trigger_id.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6584,7 +6788,7 @@ where
 }
 
 
-/// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Google Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
+/// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
 ///
 /// A builder for the *builds.retry* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -12126,7 +12330,7 @@ where
 }
 
 
-/// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Google Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
+/// Creates a new build based on the specified build. This method creates a new build using the original build request, which may or may not result in an identical build. For triggered builds: * Triggered builds resolve to a precise revision; therefore a retry of a triggered build will result in a build that uses the same revision. For non-triggered builds that specify `RepoSource`: * If the original build built from the tip of a branch, the retried build will build from the tip of that branch, which may not be the same revision as the original build. * If the original build specified a commit sha or revision ID, the retried build will use the identical source. For builds that specify `StorageSource`: * If the original build pulled source from Cloud Storage without specifying the generation of the object, the new build will use the current object, which may be different from the original build source. * If the original build pulled source from Cloud Storage and specified the generation of the object, the new build will attempt to use the same object, which may or may not be available depending on the bucket's lifecycle management settings.
 ///
 /// A builder for the *locations.builds.retry* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -16726,7 +16930,7 @@ where
 }
 
 
-/// Creates a new `BuildTrigger`. This API is experimental.
+/// Creates a new `BuildTrigger`.
 ///
 /// A builder for the *locations.triggers.create* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -17030,7 +17234,7 @@ where
 }
 
 
-/// Deletes a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+/// Deletes a `BuildTrigger` by its project ID and trigger ID.
 ///
 /// A builder for the *locations.triggers.delete* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -17316,7 +17520,7 @@ where
 }
 
 
-/// Returns information about a `BuildTrigger`. This API is experimental.
+/// Returns information about a `BuildTrigger`.
 ///
 /// A builder for the *locations.triggers.get* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -17602,7 +17806,7 @@ where
 }
 
 
-/// Lists existing `BuildTrigger`s. This API is experimental.
+/// Lists existing `BuildTrigger`s.
 ///
 /// A builder for the *locations.triggers.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -17900,7 +18104,7 @@ where
 }
 
 
-/// Updates a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+/// Updates a `BuildTrigger` by its project ID and trigger ID.
 ///
 /// A builder for the *locations.triggers.patch* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -17933,6 +18137,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_triggers_patch(req, "resourceName")
+///              .update_mask(&Default::default())
 ///              .trigger_id("ipsum")
 ///              .project_id("et")
 ///              .doit().await;
@@ -17944,6 +18149,7 @@ pub struct ProjectLocationTriggerPatchCall<'a, S>
     hub: &'a CloudBuild<S>,
     _request: BuildTrigger,
     _resource_name: String,
+    _update_mask: Option<client::FieldMask>,
     _trigger_id: Option<String>,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17974,15 +18180,18 @@ where
         dlg.begin(client::MethodInfo { id: "cloudbuild.projects.locations.triggers.patch",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "resourceName", "triggerId", "projectId"].iter() {
+        for &field in ["alt", "resourceName", "updateMask", "triggerId", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("resourceName", self._resource_name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
         if let Some(value) = self._trigger_id.as_ref() {
             params.push("triggerId", value);
         }
@@ -18124,6 +18333,13 @@ where
     /// we provide this method for API completeness.
     pub fn resource_name(mut self, new_value: &str) -> ProjectLocationTriggerPatchCall<'a, S> {
         self._resource_name = new_value.to_string();
+        self
+    }
+    /// Update mask for the resource. If this is set, the server will only update the fields specified in the field mask. Otherwise, a full update of the mutable resource fields will be performed.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationTriggerPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
         self
     }
     /// Required. ID of the `BuildTrigger` to update.
@@ -20269,7 +20485,269 @@ where
 }
 
 
-/// Creates a new `BuildTrigger`. This API is experimental.
+/// Returns the `DefaultServiceAccount` used by the project.
+///
+/// A builder for the *locations.getDefaultServiceAccount* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudbuild1 as cloudbuild1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use cloudbuild1::{CloudBuild, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = CloudBuild::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_get_default_service_account("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGetDefaultServiceAccountCall<'a, S>
+    where S: 'a {
+
+    hub: &'a CloudBuild<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGetDefaultServiceAccountCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGetDefaultServiceAccountCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DefaultServiceAccount)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "cloudbuild.projects.locations.getDefaultServiceAccount",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the `DefaultServiceAccount` to retrieve. Format: `projects/{project}/locations/{location}/defaultServiceAccount`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetDefaultServiceAccountCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetDefaultServiceAccountCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetDefaultServiceAccountCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGetDefaultServiceAccountCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGetDefaultServiceAccountCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGetDefaultServiceAccountCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Creates a new `BuildTrigger`.
 ///
 /// A builder for the *triggers.create* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -20302,7 +20780,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_create(req, "projectId")
-///              .parent("erat")
+///              .parent("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20573,7 +21051,7 @@ where
 }
 
 
-/// Deletes a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+/// Deletes a `BuildTrigger` by its project ID and trigger ID.
 ///
 /// A builder for the *triggers.delete* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -20600,7 +21078,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_delete("projectId", "triggerId")
-///              .name("est")
+///              .name("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20859,7 +21337,7 @@ where
 }
 
 
-/// Returns information about a `BuildTrigger`. This API is experimental.
+/// Returns information about a `BuildTrigger`.
 ///
 /// A builder for the *triggers.get* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -21145,7 +21623,7 @@ where
 }
 
 
-/// Lists existing `BuildTrigger`s. This API is experimental.
+/// Lists existing `BuildTrigger`s.
 ///
 /// A builder for the *triggers.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -21172,9 +21650,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_list("projectId")
-///              .parent("Stet")
-///              .page_token("est")
-///              .page_size(-82)
+///              .parent("est")
+///              .page_token("aliquyam")
+///              .page_size(-94)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21443,7 +21921,7 @@ where
 }
 
 
-/// Updates a `BuildTrigger` by its project ID and trigger ID. This API is experimental.
+/// Updates a `BuildTrigger` by its project ID and trigger ID.
 ///
 /// A builder for the *triggers.patch* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -21476,6 +21954,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_patch(req, "projectId", "triggerId")
+///              .update_mask(&Default::default())
 ///              .doit().await;
 /// # }
 /// ```
@@ -21486,6 +21965,7 @@ pub struct ProjectTriggerPatchCall<'a, S>
     _request: BuildTrigger,
     _project_id: String,
     _trigger_id: String,
+    _update_mask: Option<client::FieldMask>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -21514,16 +21994,19 @@ where
         dlg.begin(client::MethodInfo { id: "cloudbuild.projects.triggers.patch",
                                http_method: hyper::Method::PATCH });
 
-        for &field in ["alt", "projectId", "triggerId"].iter() {
+        for &field in ["alt", "projectId", "triggerId", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("projectId", self._project_id);
         params.push("triggerId", self._trigger_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -21671,6 +22154,13 @@ where
         self._trigger_id = new_value.to_string();
         self
     }
+    /// Update mask for the resource. If this is set, the server will only update the fields specified in the field mask. Otherwise, a full update of the mutable resource fields will be performed.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectTriggerPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -21780,7 +22270,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_run(req, "projectId", "triggerId")
-///              .name("sit")
+///              .name("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22096,8 +22586,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_webhook(req, "projectId", "trigger")
-///              .secret("Lorem")
-///              .name("ea")
+///              .secret("ea")
+///              .name("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22379,7 +22869,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().webhook(req)
-///              .webhook_key("Stet")
+///              .webhook_key("dolores")
 ///              .doit().await;
 /// # }
 /// ```

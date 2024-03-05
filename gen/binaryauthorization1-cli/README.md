@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Binary Authorization* API at revision *20230113*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Binary Authorization* API at revision *20240223*. The CLI is at version *5.0.3*.
 
 ```bash
 binaryauthorization1 [options]
@@ -40,6 +40,12 @@ binaryauthorization1 [options]
                 attestors-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 attestors-validate-attestation-occurrence <attestor> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-policy <name> [-p <v>]... [-o <out>]
+                platforms-gke-policies-evaluate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                platforms-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                platforms-policies-delete <name> [-p <v>]... [-o <out>]
+                platforms-policies-get <name> [-p <v>]... [-o <out>]
+                platforms-policies-list <parent> [-p <v>]... [-o <out>]
+                platforms-policies-replace-platform-policy <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 policy-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 policy-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 policy-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]

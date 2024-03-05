@@ -4,12 +4,12 @@
 [package]
 
 name = "google-digitalassetlinks1"
-version = "5.0.3+20230117"
+version = "5.0.3+20240224"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with digitalassetlinks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/digitalassetlinks1"
 homepage = "https://developers.google.com/digital-asset-links/"
-documentation = "https://docs.rs/google-digitalassetlinks1/5.0.3+20230117"
+documentation = "https://docs.rs/google-digitalassetlinks1/5.0.3+20240224"
 license = "MIT"
 keywords = ["digitalassetlinks", "google", "protocol", "web", "api"]
 autobins = false

@@ -1,4 +1,4 @@
-site_name: Cloud Profiler v5.0.3+20230123
+site_name: Cloud Profiler v5.0.3+20240219
 site_url: http://byron.github.io/google-apis-rs/google-cloudprofiler2-cli
 site_description: A complete library to interact with Cloud Profiler (protocol v2)
 
@@ -12,6 +12,7 @@ nav:
 - 'Projects':
     - 'Profiles Create': 'projects_profiles-create.md'
     - 'Profiles Create Offline': 'projects_profiles-create-offline.md'
+    - 'Profiles List': 'projects_profiles-list.md'
     - 'Profiles Patch': 'projects_profiles-patch.md'
 
 theme: readthedocs

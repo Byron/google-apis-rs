@@ -25,14 +25,21 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20230124*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Android Publisher* API at revision *20240229*. The CLI is at version *5.0.3*.
 
 ```bash
 androidpublisher3 [options]
         applications
+                data-safety <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 device-tier-configs-create <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 device-tier-configs-get <package-name> <device-tier-config-id> [-p <v>]... [-o <out>]
                 device-tier-configs-list <package-name> [-p <v>]... [-o <out>]
+        apprecovery
+                add-targeting <package-name> <app-recovery-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                app-recoveries <package-name> [-p <v>]... [-o <out>]
+                cancel <package-name> <app-recovery-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                create <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                deploy <package-name> <app-recovery-id> (-r <kv>)... [-p <v>]... [-o <out>]
         edits
                 apks-addexternallyhosted <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 apks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
@@ -65,11 +72,16 @@ androidpublisher3 [options]
                 testers-get <package-name> <edit-id> <track> [-p <v>]... [-o <out>]
                 testers-patch <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 testers-update <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
+                tracks-create <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 tracks-get <package-name> <edit-id> <track> [-p <v>]... [-o <out>]
                 tracks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
                 tracks-patch <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 tracks-update <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 validate <package-name> <edit-id> [-p <v>]... [-o <out>]
+        externaltransactions
+                createexternaltransaction <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                getexternaltransaction <name> [-p <v>]... [-o <out>]
+                refundexternaltransaction <name> (-r <kv>)... [-p <v>]... [-o <out>]
         generatedapks
                 download <package-name> <version-code> <download-id> [-p <v>]... [-o <out>]
                 list <package-name> <version-code> [-p <v>]... [-o <out>]
@@ -78,6 +90,9 @@ androidpublisher3 [options]
                 delete <name> [-p <v>]...
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         inappproducts
+                batch-delete <package-name> (-r <kv>)... [-p <v>]...
+                batch-get <package-name> [-p <v>]... [-o <out>]
+                batch-update <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <package-name> <sku> [-p <v>]...
                 get <package-name> <sku> [-p <v>]... [-o <out>]
                 insert <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -91,16 +106,23 @@ androidpublisher3 [options]
                 convert-region-prices <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-archive <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-activate <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-base-plans-batch-migrate-prices <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-base-plans-batch-update-states <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-deactivate <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-delete <package-name> <product-id> <base-plan-id> [-p <v>]...
                 subscriptions-base-plans-migrate-prices <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-offers-activate <package-name> <product-id> <base-plan-id> <offer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-base-plans-offers-batch-get <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-base-plans-offers-batch-update <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-base-plans-offers-batch-update-states <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-offers-create <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-offers-deactivate <package-name> <product-id> <base-plan-id> <offer-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-offers-delete <package-name> <product-id> <base-plan-id> <offer-id> [-p <v>]...
                 subscriptions-base-plans-offers-get <package-name> <product-id> <base-plan-id> <offer-id> [-p <v>]... [-o <out>]
                 subscriptions-base-plans-offers-list <package-name> <product-id> <base-plan-id> [-p <v>]... [-o <out>]
                 subscriptions-base-plans-offers-patch <package-name> <product-id> <base-plan-id> <offer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-batch-get <package-name> [-p <v>]... [-o <out>]
+                subscriptions-batch-update <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-create <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-delete <package-name> <product-id> [-p <v>]...
                 subscriptions-get <package-name> <product-id> [-p <v>]... [-o <out>]
@@ -110,6 +132,7 @@ androidpublisher3 [options]
                 refund <package-name> <order-id> [-p <v>]...
         purchases
                 products-acknowledge <package-name> <product-id> <token> (-r <kv>)... [-p <v>]...
+                products-consume <package-name> <product-id> <token> [-p <v>]...
                 products-get <package-name> <product-id> <token> [-p <v>]... [-o <out>]
                 subscriptions-acknowledge <package-name> <subscription-id> <token> (-r <kv>)... [-p <v>]...
                 subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>]...
@@ -118,6 +141,7 @@ androidpublisher3 [options]
                 subscriptions-refund <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptionsv2-get <package-name> <token> [-p <v>]... [-o <out>]
+                subscriptionsv2-revoke <package-name> <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 voidedpurchases-list <package-name> [-p <v>]... [-o <out>]
         reviews
                 get <package-name> <review-id> [-p <v>]... [-o <out>]

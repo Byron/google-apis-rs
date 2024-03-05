@@ -4,7 +4,7 @@
 [package]
 
 name = "google-versionhistory1-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Version History (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/versionhistory1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-versionhistory1]
 path = "../versionhistory1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 

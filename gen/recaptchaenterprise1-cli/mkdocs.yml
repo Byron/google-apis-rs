@@ -1,4 +1,4 @@
-site_name: Recaptcha Enterprise v5.0.3+20230115
+site_name: Recaptcha Enterprise v5.0.3+20240303
 site_url: http://byron.github.io/google-apis-rs/google-recaptchaenterprise1-cli
 site_description: A complete library to interact with Recaptcha Enterprise (protocol v1)
 
@@ -12,6 +12,12 @@ nav:
 - 'Projects':
     - 'Assessments Annotate': 'projects_assessments-annotate.md'
     - 'Assessments Create': 'projects_assessments-create.md'
+    - 'Firewallpolicies Create': 'projects_firewallpolicies-create.md'
+    - 'Firewallpolicies Delete': 'projects_firewallpolicies-delete.md'
+    - 'Firewallpolicies Get': 'projects_firewallpolicies-get.md'
+    - 'Firewallpolicies List': 'projects_firewallpolicies-list.md'
+    - 'Firewallpolicies Patch': 'projects_firewallpolicies-patch.md'
+    - 'Firewallpolicies Reorder': 'projects_firewallpolicies-reorder.md'
     - 'Keys Create': 'projects_keys-create.md'
     - 'Keys Delete': 'projects_keys-delete.md'
     - 'Keys Get': 'projects_keys-get.md'

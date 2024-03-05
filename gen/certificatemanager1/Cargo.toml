@@ -4,12 +4,12 @@
 [package]
 
 name = "google-certificatemanager1"
-version = "5.0.3+20230104"
+version = "5.0.3+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Certificate Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/certificatemanager1"
 homepage = "https://cloud.google.com/certificate-manager"
-documentation = "https://docs.rs/google-certificatemanager1/5.0.3+20230104"
+documentation = "https://docs.rs/google-certificatemanager1/5.0.3+20240221"
 license = "MIT"
 keywords = ["certificatemanager", "google", "protocol", "web", "api"]
 autobins = false

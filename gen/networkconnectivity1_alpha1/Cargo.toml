@@ -4,12 +4,12 @@
 [package]
 
 name = "google-networkconnectivity1_alpha1"
-version = "5.0.3+20230105"
+version = "5.0.3+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with networkconnectivity (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/networkconnectivity1_alpha1"
 homepage = "https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest"
-documentation = "https://docs.rs/google-networkconnectivity1_alpha1/5.0.3+20230105"
+documentation = "https://docs.rs/google-networkconnectivity1_alpha1/5.0.3+20240221"
 license = "MIT"
 keywords = ["networkconnectivity", "google", "protocol", "web", "api"]
 autobins = false

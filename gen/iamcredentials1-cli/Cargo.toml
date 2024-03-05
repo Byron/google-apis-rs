@@ -4,7 +4,7 @@
 [package]
 
 name = "google-iamcredentials1-cli"
-version = "5.0.3+20230113"
+version = "5.0.3+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with IAM Credentials (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/iamcredentials1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-iamcredentials1]
 path = "../iamcredentials1"
-version = "5.0.3+20230113"
+version = "5.0.3+20240221"
 

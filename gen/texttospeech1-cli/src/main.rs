@@ -759,7 +759,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_texttospeech1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -786,7 +786,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource states of the request in the form of `projects/*/locations/*/voices/*`."##),
+                     Some(r##"The resource states of the request in the form of `projects/*/locations/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -858,7 +858,7 @@ async fn main() {
     
     let mut app = App::new("texttospeech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230118")
+           .version("5.0.3+20240228")
            .about("Synthesizes natural-sounding speech by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_texttospeech1_cli")
            .arg(Arg::with_name("url")

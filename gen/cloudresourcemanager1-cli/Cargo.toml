@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudresourcemanager1-cli"
-version = "5.0.3+20230115"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Resource Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourcemanager1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudresourcemanager1]
 path = "../cloudresourcemanager1"
-version = "5.0.3+20230115"
+version = "5.0.3+20240303"
 

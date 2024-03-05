@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See your AdMob data
     Readonly,
@@ -204,7 +204,7 @@ impl client::Part for AdUnit {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct App {
-    /// Output only. The approval state for the app.
+    /// Output only. The approval state for the app. The field is read-only.
     #[serde(rename="appApprovalState")]
     
     pub app_approval_state: Option<String>,

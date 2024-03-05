@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting3d5-cli"
-version = "5.0.3+20230118"
+version = "5.0.3+20240201"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dfareporting (protocol v3.5)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d5-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dfareporting3d5]
 path = "../dfareporting3d5"
-version = "5.0.3+20230118"
+version = "5.0.3+20240201"
 

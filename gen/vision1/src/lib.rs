@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Vision* crate version *5.0.3+20230113*, where *20230113* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Vision* crate version *5.0.3+20240223*, where *20240223* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Vision* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/vision/).

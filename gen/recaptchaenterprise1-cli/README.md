@@ -25,13 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Recaptcha Enterprise* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Recaptcha Enterprise* API at revision *20240303*. The CLI is at version *5.0.3*.
 
 ```bash
 recaptchaenterprise1 [options]
         projects
                 assessments-annotate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 assessments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                firewallpolicies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                firewallpolicies-delete <name> [-p <v>]... [-o <out>]
+                firewallpolicies-get <name> [-p <v>]... [-o <out>]
+                firewallpolicies-list <parent> [-p <v>]... [-o <out>]
+                firewallpolicies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                firewallpolicies-reorder <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-delete <name> [-p <v>]... [-o <out>]
                 keys-get <name> [-p <v>]... [-o <out>]

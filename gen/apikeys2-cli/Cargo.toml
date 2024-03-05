@@ -4,7 +4,7 @@
 [package]
 
 name = "google-apikeys2-cli"
-version = "5.0.3+20230118"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Api Keys Service (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/apikeys2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-apikeys2]
 path = "../apikeys2"
-version = "5.0.3+20230118"
+version = "5.0.3+20240303"
 

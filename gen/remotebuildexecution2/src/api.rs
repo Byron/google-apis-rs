@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud Platform data
     CloudPlatform,
@@ -236,7 +236,7 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// The standard error buffer of the action. The server SHOULD NOT inline stderr unless requested by the client in the GetActionResultRequest message. The server MAY omit inlining, even if requested, and MUST do so if inlining would cause the response to exceed message size limits.
     #[serde(rename="stderrRaw")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub stderr_raw: Option<Vec<u8>>,
     /// The digest for a blob containing the standard output of the action, which can be retrieved from the ContentAddressableStorage.
     #[serde(rename="stdoutDigest")]
@@ -245,7 +245,7 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// The standard output buffer of the action. The server SHOULD NOT inline stdout unless requested by the client in the GetActionResultRequest message. The server MAY omit inlining, even if requested, and MUST do so if inlining would cause the response to exceed message size limits.
     #[serde(rename="stdoutRaw")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub stdout_raw: Option<Vec<u8>>,
 }
 
@@ -300,7 +300,7 @@ impl client::ResponseResult for BuildBazelRemoteExecutionV2BatchReadBlobsRespons
 pub struct BuildBazelRemoteExecutionV2BatchReadBlobsResponseResponse {
     /// The raw binary data.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The digest to which this response corresponds.
     
@@ -341,7 +341,7 @@ impl client::RequestValue for BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest
 pub struct BuildBazelRemoteExecutionV2BatchUpdateBlobsRequestRequest {
     /// The raw binary data.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The digest of the blob. This MUST be the digest of `data`.
     
@@ -775,7 +775,7 @@ impl client::Part for BuildBazelRemoteExecutionV2OutputDirectory {}
 pub struct BuildBazelRemoteExecutionV2OutputFile {
     /// The contents of the file if inlining was requested. The server SHOULD NOT inline file contents unless requested by the client in the GetActionResultRequest message. The server MAY omit inlining, even if requested, and MUST do so if inlining would cause the response to exceed message size limits.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub contents: Option<Vec<u8>>,
     /// The digest of the file's content.
     

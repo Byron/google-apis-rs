@@ -4,7 +4,7 @@
 [package]
 
 name = "google-webfonts1-cli"
-version = "5.0.3+20221206"
+version = "5.0.3+20240227"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Webfonts (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/webfonts1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-webfonts1]
 path = "../webfonts1"
-version = "5.0.3+20221206"
+version = "5.0.3+20240227"
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Identity* API at revision *20230117*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Identity* API at revision *20240227*. The CLI is at version *5.0.3*.
 
 ```bash
 cloudidentity1 [options]
@@ -68,6 +68,7 @@ cloudidentity1 [options]
                 memberships-list <parent> [-p <v>]... [-o <out>]
                 memberships-lookup <parent> [-p <v>]... [-o <out>]
                 memberships-modify-membership-roles <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                memberships-search-direct-groups <parent> [-p <v>]... [-o <out>]
                 memberships-search-transitive-groups <parent> [-p <v>]... [-o <out>]
                 memberships-search-transitive-memberships <parent> [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

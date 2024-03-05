@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Associate you with your personal info on Google
     Openid,
@@ -300,6 +300,9 @@ pub struct Environment {
     #[serde(rename="benchmarkIndex")]
     
     pub benchmark_index: Option<f64>,
+    /// The version of libraries with which these results were generated. Ex: axe-core.
+    
+    pub credits: Option<HashMap<String, String>>,
     /// The user agent string of the version of Chrome used.
     #[serde(rename="hostUserAgent")]
     
@@ -327,6 +330,38 @@ pub struct I18n {
 }
 
 impl client::Part for I18n {}
+
+
+/// Message containing an Entity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LhrEntity {
+    /// Optional. An optional category name for the entity.
+    
+    pub category: Option<String>,
+    /// Optional. An optional homepage URL of the entity.
+    
+    pub homepage: Option<String>,
+    /// Optional. An optional flag indicating if the entity is the first party.
+    #[serde(rename="isFirstParty")]
+    
+    pub is_first_party: Option<bool>,
+    /// Optional. An optional flag indicating if the entity is not recognized.
+    #[serde(rename="isUnrecognized")]
+    
+    pub is_unrecognized: Option<bool>,
+    /// Required. Name of the entity.
+    
+    pub name: Option<String>,
+    /// Required. A list of URL origin strings that belong to this entity.
+    
+    pub origins: Option<Vec<String>>,
+}
+
+impl client::Part for LhrEntity {}
 
 
 /// An audit's result object in a Lighthouse result.
@@ -435,6 +470,9 @@ pub struct LighthouseResultV5 {
     #[serde(rename="configSettings")]
     
     pub config_settings: Option<ConfigSettings>,
+    /// Entity classification data.
+    
+    pub entities: Option<Vec<LhrEntity>>,
     /// Environment settings that were used when making this LHR.
     
     pub environment: Option<Environment>,
@@ -442,10 +480,18 @@ pub struct LighthouseResultV5 {
     #[serde(rename="fetchTime")]
     
     pub fetch_time: Option<String>,
+    /// URL displayed on the page after Lighthouse finishes.
+    #[serde(rename="finalDisplayedUrl")]
+    
+    pub final_displayed_url: Option<String>,
     /// The final resolved url that was audited.
     #[serde(rename="finalUrl")]
     
     pub final_url: Option<String>,
+    /// Screenshot data of the full page, along with node rects relevant to the audit results.
+    #[serde(rename="fullPageScreenshot")]
+    
+    pub full_page_screenshot: Option<json::Value>,
     /// The internationalization strings that are required to render the LHR.
     
     pub i18n: Option<I18n>,
@@ -453,6 +499,10 @@ pub struct LighthouseResultV5 {
     #[serde(rename="lighthouseVersion")]
     
     pub lighthouse_version: Option<String>,
+    /// URL of the main document request of the final navigation.
+    #[serde(rename="mainDocumentUrl")]
+    
+    pub main_document_url: Option<String>,
     /// The original requested url.
     #[serde(rename="requestedUrl")]
     

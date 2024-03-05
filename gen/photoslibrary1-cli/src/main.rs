@@ -2151,7 +2151,7 @@ async fn main() {
     
     let mut app = App::new("photoslibrary1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.3+20240223")
            .about("Manage photos, videos, and albums in Google Photos ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli")
            .arg(Arg::with_name("url")

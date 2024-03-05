@@ -255,7 +255,7 @@ async fn main() {
     
     let mut app = App::new("policytroubleshooter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230121")
+           .version("5.0.3+20240303")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_policytroubleshooter1_cli")
            .arg(Arg::with_name("url")

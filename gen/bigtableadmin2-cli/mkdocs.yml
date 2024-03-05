@@ -1,4 +1,4 @@
-site_name: Bigtable Admin v5.0.3+20230110
+site_name: Bigtable Admin v5.0.3+20240221
 site_url: http://byron.github.io/google-apis-rs/google-bigtableadmin2-cli
 site_description: A complete library to interact with Bigtable Admin (protocol v2)
 
@@ -10,8 +10,6 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Operations':
-    - 'Cancel': 'operations_cancel.md'
-    - 'Delete': 'operations_delete.md'
     - 'Get': 'operations_get.md'
     - 'Projects Operations List': 'operations_projects-operations-list.md'
 - 'Projects':
@@ -59,7 +57,6 @@ nav:
     - 'Instances Tables Undelete': 'projects_instances-tables-undelete.md'
     - 'Instances Test Iam Permissions': 'projects_instances-test-iam-permissions.md'
     - 'Instances Update': 'projects_instances-update.md'
-    - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
 
 theme: readthedocs

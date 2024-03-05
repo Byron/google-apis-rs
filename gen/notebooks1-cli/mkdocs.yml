@@ -1,4 +1,4 @@
-site_name: AI Platform Notebooks v5.0.3+20221213
+site_name: AI Platform Notebooks v5.0.3+20231227
 site_url: http://byron.github.io/google-apis-rs/google-notebooks1-cli
 site_description: A complete library to interact with AI Platform Notebooks (protocol v1)
 
@@ -27,8 +27,10 @@ nav:
     - 'Locations Instances Get Instance Health': 'projects_locations-instances-get-instance-health.md'
     - 'Locations Instances Is Upgradeable': 'projects_locations-instances-is-upgradeable.md'
     - 'Locations Instances List': 'projects_locations-instances-list.md'
+    - 'Locations Instances Migrate': 'projects_locations-instances-migrate.md'
     - 'Locations Instances Register': 'projects_locations-instances-register.md'
     - 'Locations Instances Report': 'projects_locations-instances-report.md'
+    - 'Locations Instances Report Event': 'projects_locations-instances-report-event.md'
     - 'Locations Instances Reset': 'projects_locations-instances-reset.md'
     - 'Locations Instances Rollback': 'projects_locations-instances-rollback.md'
     - 'Locations Instances Set Accelerator': 'projects_locations-instances-set-accelerator.md'
@@ -54,6 +56,7 @@ nav:
     - 'Locations Runtimes Get': 'projects_locations-runtimes-get.md'
     - 'Locations Runtimes Get Iam Policy': 'projects_locations-runtimes-get-iam-policy.md'
     - 'Locations Runtimes List': 'projects_locations-runtimes-list.md'
+    - 'Locations Runtimes Migrate': 'projects_locations-runtimes-migrate.md'
     - 'Locations Runtimes Patch': 'projects_locations-runtimes-patch.md'
     - 'Locations Runtimes Refresh Runtime Token Internal': 'projects_locations-runtimes-refresh-runtime-token-internal.md'
     - 'Locations Runtimes Report Event': 'projects_locations-runtimes-report-event.md'

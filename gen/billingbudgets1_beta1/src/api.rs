@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your Google Cloud Platform billing accounts
     CloudBilling,
@@ -179,6 +179,10 @@ pub struct GoogleCloudBillingBudgetsV1beta1AllUpdatesRule {
     #[serde(rename="disableDefaultIamRecipients")]
     
     pub disable_default_iam_recipients: Option<bool>,
+    /// Optional. When set to true, and when the budget has a single project configured, notifications will be sent to project level recipients of that project. This field will be ignored if the budget has multiple or no project configured. Currently, project level recipients are the users with `Owner` role on a cloud project.
+    #[serde(rename="enableProjectLevelRecipients")]
+    
+    pub enable_project_level_recipients: Option<bool>,
     /// Optional. Targets to send notifications to when a threshold is exceeded. This is in addition to default recipients who have billing account IAM roles. The value is the full REST resource name of a monitoring notification channel with the form `projects/{project_id}/notificationChannels/{channel_id}`. A maximum of 5 channels are allowed. See https://cloud.google.com/billing/docs/how-to/budgets-notification-recipients for more details.
     #[serde(rename="monitoringNotificationChannels")]
     
@@ -230,6 +234,10 @@ pub struct GoogleCloudBillingBudgetsV1beta1Budget {
     /// Output only. Resource name of the budget. The resource name implies the scope of a budget. Values are of the form `billingAccounts/{billingAccountId}/budgets/{budgetId}`.
     
     pub name: Option<String>,
+    /// no description provided
+    #[serde(rename="ownershipScope")]
+    
+    pub ownership_scope: Option<String>,
     /// Optional. Rules that trigger alerts (notifications of thresholds being crossed) when spend exceeds the specified percentages of the budget. Optional for `pubsubTopic` notifications. Required if using email notifications.
     #[serde(rename="thresholdRules")]
     
@@ -327,6 +335,10 @@ pub struct GoogleCloudBillingBudgetsV1beta1Filter {
     /// Optional. A set of projects of the form `projects/{project}`, specifying that usage from only this set of projects should be included in the budget. If omitted, the report will include all usage for the billing account, regardless of which project the usage occurred on.
     
     pub projects: Option<Vec<String>>,
+    /// Optional. A set of folder and organization names of the form `folders/{folderId}` or `organizations/{organizationId}`, specifying that usage from only this set of folders and organizations should be included in the budget. If omitted, the budget includes all usage that the billing account pays for. If the folder or organization contains projects that are paid for by a different Cloud Billing account, the budget *doesn't* apply to those projects.
+    #[serde(rename="resourceAncestors")]
+    
+    pub resource_ancestors: Option<Vec<String>>,
     /// Optional. A set of services of the form `services/{service_id}`, specifying that usage from only this set of services should be included in the budget. If omitted, the report will include usage for all the services. The service names are available through the Catalog API: https://cloud.google.com/billing/v1/how-tos/catalog-api.
     
     pub services: Option<Vec<String>>,
@@ -580,6 +592,7 @@ impl<'a, S> BillingAccountMethods<'a, S> {
         BillingAccountBudgetListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _scope: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -1459,8 +1472,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.billing_accounts().budgets_list("parent")
-///              .page_token("sed")
-///              .page_size(-2)
+///              .scope("sed")
+///              .page_token("amet.")
+///              .page_size(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1469,6 +1483,7 @@ pub struct BillingAccountBudgetListCall<'a, S>
 
     hub: &'a CloudBillingBudget<S>,
     _parent: String,
+    _scope: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1499,15 +1514,18 @@ where
         dlg.begin(client::MethodInfo { id: "billingbudgets.billingAccounts.budgets.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "parent", "scope", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._scope.as_ref() {
+            params.push("scope", value);
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -1626,6 +1644,13 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> BillingAccountBudgetListCall<'a, S> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. Set the scope of the budgets to be returned, in the format of the resource name. The scope of a budget is the cost that it tracks, such as costs for a single project, or the costs for all projects in a folder. Only project scope (in the format of "projects/project-id" or "projects/123") is supported in this field. When this field is set to a project's resource name, the budgets returned are tracking the costs for that project.
+    ///
+    /// Sets the *scope* query property to the given value.
+    pub fn scope(mut self, new_value: &str) -> BillingAccountBudgetListCall<'a, S> {
+        self._scope = Some(new_value.to_string());
         self
     }
     /// Optional. The value returned by the last `ListBudgetsResponse` which indicates that this is a continuation of a prior `ListBudgets` call, and that the system should return the next page of data.

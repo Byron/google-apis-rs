@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Hosting* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Firebase Hosting* crate version *5.0.3+20240303*, where *20240303* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Firebase Hosting* *v1_beta1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/hosting/).
@@ -12,9 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](FirebaseHosting) ... 
 //! 
 //! * projects
-//!  * [*operations get*](api::ProjectOperationGetCall), [*sites channels create*](api::ProjectSiteChannelCreateCall), [*sites channels delete*](api::ProjectSiteChannelDeleteCall), [*sites channels get*](api::ProjectSiteChannelGetCall), [*sites channels list*](api::ProjectSiteChannelListCall), [*sites channels patch*](api::ProjectSiteChannelPatchCall), [*sites channels releases create*](api::ProjectSiteChannelReleaseCreateCall), [*sites channels releases list*](api::ProjectSiteChannelReleaseListCall), [*sites create*](api::ProjectSiteCreateCall), [*sites delete*](api::ProjectSiteDeleteCall), [*sites domains create*](api::ProjectSiteDomainCreateCall), [*sites domains delete*](api::ProjectSiteDomainDeleteCall), [*sites domains get*](api::ProjectSiteDomainGetCall), [*sites domains list*](api::ProjectSiteDomainListCall), [*sites domains update*](api::ProjectSiteDomainUpdateCall), [*sites get*](api::ProjectSiteGetCall), [*sites get config*](api::ProjectSiteGetConfigCall), [*sites list*](api::ProjectSiteListCall), [*sites patch*](api::ProjectSitePatchCall), [*sites releases create*](api::ProjectSiteReleaseCreateCall), [*sites releases list*](api::ProjectSiteReleaseListCall), [*sites update config*](api::ProjectSiteUpdateConfigCall), [*sites versions clone*](api::ProjectSiteVersionCloneCall), [*sites versions create*](api::ProjectSiteVersionCreateCall), [*sites versions delete*](api::ProjectSiteVersionDeleteCall), [*sites versions files list*](api::ProjectSiteVersionFileListCall), [*sites versions list*](api::ProjectSiteVersionListCall), [*sites versions patch*](api::ProjectSiteVersionPatchCall) and [*sites versions populate files*](api::ProjectSiteVersionPopulateFileCall)
+//!  * [*operations get*](api::ProjectOperationGetCall), [*sites channels create*](api::ProjectSiteChannelCreateCall), [*sites channels delete*](api::ProjectSiteChannelDeleteCall), [*sites channels get*](api::ProjectSiteChannelGetCall), [*sites channels list*](api::ProjectSiteChannelListCall), [*sites channels patch*](api::ProjectSiteChannelPatchCall), [*sites channels releases create*](api::ProjectSiteChannelReleaseCreateCall), [*sites channels releases get*](api::ProjectSiteChannelReleaseGetCall), [*sites channels releases list*](api::ProjectSiteChannelReleaseListCall), [*sites create*](api::ProjectSiteCreateCall), [*sites custom domains create*](api::ProjectSiteCustomDomainCreateCall), [*sites custom domains delete*](api::ProjectSiteCustomDomainDeleteCall), [*sites custom domains get*](api::ProjectSiteCustomDomainGetCall), [*sites custom domains list*](api::ProjectSiteCustomDomainListCall), [*sites custom domains operations get*](api::ProjectSiteCustomDomainOperationGetCall), [*sites custom domains operations list*](api::ProjectSiteCustomDomainOperationListCall), [*sites custom domains patch*](api::ProjectSiteCustomDomainPatchCall), [*sites custom domains undelete*](api::ProjectSiteCustomDomainUndeleteCall), [*sites delete*](api::ProjectSiteDeleteCall), [*sites domains create*](api::ProjectSiteDomainCreateCall), [*sites domains delete*](api::ProjectSiteDomainDeleteCall), [*sites domains get*](api::ProjectSiteDomainGetCall), [*sites domains list*](api::ProjectSiteDomainListCall), [*sites domains update*](api::ProjectSiteDomainUpdateCall), [*sites get*](api::ProjectSiteGetCall), [*sites get config*](api::ProjectSiteGetConfigCall), [*sites list*](api::ProjectSiteListCall), [*sites patch*](api::ProjectSitePatchCall), [*sites releases create*](api::ProjectSiteReleaseCreateCall), [*sites releases get*](api::ProjectSiteReleaseGetCall), [*sites releases list*](api::ProjectSiteReleaseListCall), [*sites update config*](api::ProjectSiteUpdateConfigCall), [*sites versions clone*](api::ProjectSiteVersionCloneCall), [*sites versions create*](api::ProjectSiteVersionCreateCall), [*sites versions delete*](api::ProjectSiteVersionDeleteCall), [*sites versions files list*](api::ProjectSiteVersionFileListCall), [*sites versions get*](api::ProjectSiteVersionGetCall), [*sites versions list*](api::ProjectSiteVersionListCall), [*sites versions patch*](api::ProjectSiteVersionPatchCall) and [*sites versions populate files*](api::ProjectSiteVersionPopulateFileCall)
 //! * [sites](api::Site)
-//!  * [*channels create*](api::SiteChannelCreateCall), [*channels delete*](api::SiteChannelDeleteCall), [*channels get*](api::SiteChannelGetCall), [*channels list*](api::SiteChannelListCall), [*channels patch*](api::SiteChannelPatchCall), [*channels releases create*](api::SiteChannelReleaseCreateCall), [*channels releases list*](api::SiteChannelReleaseListCall), [*domains create*](api::SiteDomainCreateCall), [*domains delete*](api::SiteDomainDeleteCall), [*domains get*](api::SiteDomainGetCall), [*domains list*](api::SiteDomainListCall), [*domains update*](api::SiteDomainUpdateCall), [*get config*](api::SiteGetConfigCall), [*releases create*](api::SiteReleaseCreateCall), [*releases list*](api::SiteReleaseListCall), [*update config*](api::SiteUpdateConfigCall), [*versions clone*](api::SiteVersionCloneCall), [*versions create*](api::SiteVersionCreateCall), [*versions delete*](api::SiteVersionDeleteCall), [*versions files list*](api::SiteVersionFileListCall), [*versions list*](api::SiteVersionListCall), [*versions patch*](api::SiteVersionPatchCall) and [*versions populate files*](api::SiteVersionPopulateFileCall)
+//!  * [*channels create*](api::SiteChannelCreateCall), [*channels delete*](api::SiteChannelDeleteCall), [*channels get*](api::SiteChannelGetCall), [*channels list*](api::SiteChannelListCall), [*channels patch*](api::SiteChannelPatchCall), [*channels releases create*](api::SiteChannelReleaseCreateCall), [*channels releases get*](api::SiteChannelReleaseGetCall), [*channels releases list*](api::SiteChannelReleaseListCall), [*domains create*](api::SiteDomainCreateCall), [*domains delete*](api::SiteDomainDeleteCall), [*domains get*](api::SiteDomainGetCall), [*domains list*](api::SiteDomainListCall), [*domains update*](api::SiteDomainUpdateCall), [*get config*](api::SiteGetConfigCall), [*releases create*](api::SiteReleaseCreateCall), [*releases get*](api::SiteReleaseGetCall), [*releases list*](api::SiteReleaseListCall), [*update config*](api::SiteUpdateConfigCall), [*versions clone*](api::SiteVersionCloneCall), [*versions create*](api::SiteVersionCreateCall), [*versions delete*](api::SiteVersionDeleteCall), [*versions files list*](api::SiteVersionFileListCall), [*versions get*](api::SiteVersionGetCall), [*versions list*](api::SiteVersionListCall), [*versions patch*](api::SiteVersionPatchCall) and [*versions populate files*](api::SiteVersionPopulateFileCall)
 //! 
 //! 
 //! 
@@ -53,6 +53,7 @@
 //! let r = hub.projects().sites_get(...).doit().await
 //! let r = hub.projects().sites_patch(...).doit().await
 //! let r = hub.sites().channels_releases_create(...).doit().await
+//! let r = hub.sites().channels_releases_get(...).doit().await
 //! let r = hub.sites().channels_releases_list(...).doit().await
 //! let r = hub.sites().channels_create(...).doit().await
 //! let r = hub.sites().channels_delete(...).doit().await
@@ -65,11 +66,13 @@
 //! let r = hub.sites().domains_list(...).doit().await
 //! let r = hub.sites().domains_update(...).doit().await
 //! let r = hub.sites().releases_create(...).doit().await
+//! let r = hub.sites().releases_get(...).doit().await
 //! let r = hub.sites().releases_list(...).doit().await
 //! let r = hub.sites().versions_files_list(...).doit().await
 //! let r = hub.sites().versions_clone(...).doit().await
 //! let r = hub.sites().versions_create(...).doit().await
 //! let r = hub.sites().versions_delete(...).doit().await
+//! let r = hub.sites().versions_get(...).doit().await
 //! let r = hub.sites().versions_list(...).doit().await
 //! let r = hub.sites().versions_patch(...).doit().await
 //! let r = hub.sites().versions_populate_files(...).doit().await
@@ -101,6 +104,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+//! use firebasehosting1_beta1::api::Site;
 //! use firebasehosting1_beta1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -119,13 +123,17 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Site::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.sites().versions_files_list("parent")
-//!              .status("At")
-//!              .page_token("sanctus")
-//!              .page_size(-80)
+//! let result = hub.projects().sites_create(req, "parent")
+//!              .validate_only(false)
+//!              .site_id("amet.")
 //!              .doit().await;
 //! 
 //! match result {

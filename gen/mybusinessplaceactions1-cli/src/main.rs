@@ -711,7 +711,7 @@ async fn main() {
     
     let mut app = App::new("mybusinessplaceactions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.3+20240304")
            .about("The My Business Place Actions API provides an interface for managing place action links of a location on Google. Note - If you have a quota of 0 after enabling the API, please request for GBP API access.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusinessplaceactions1_cli")
            .arg(Arg::with_name("folder")

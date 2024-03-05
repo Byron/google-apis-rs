@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -233,7 +233,7 @@ pub struct CustomVoiceParams {
     /// Required. The name of the AutoML model that synthesizes the custom voice.
     
     pub model: Option<String>,
-    /// Optional. The usage of the synthesized audio to be reported.
+    /// Optional. Deprecated. The usage of the synthesized audio to be reported.
     #[serde(rename="reportedUsage")]
     
     pub reported_usage: Option<String>,
@@ -326,7 +326,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -389,14 +389,14 @@ pub struct SynthesizeLongAudioRequest {
     #[serde(rename="audioConfig")]
     
     pub audio_config: Option<AudioConfig>,
-    /// Required. The Synthesizer requires either plain text or SSML as input.
+    /// Required. The Synthesizer requires either plain text or SSML as input. While Long Audio is in preview, SSML is temporarily unsupported.
     
     pub input: Option<SynthesisInput>,
-    /// Specifies a Cloud Storage URI for the synthesis results. Must be specified in the format: `gs://bucket_name/object_name`, and the bucket must already exist.
+    /// Required. Specifies a Cloud Storage URI for the synthesis results. Must be specified in the format: `gs://bucket_name/object_name`, and the bucket must already exist.
     #[serde(rename="outputGcsUri")]
     
     pub output_gcs_uri: Option<String>,
-    /// The desired voice of the synthesized audio.
+    /// Required. The desired voice of the synthesized audio.
     
     pub voice: Option<VoiceSelectionParams>,
 }
@@ -444,7 +444,7 @@ pub struct SynthesizeSpeechResponse {
     /// The audio data bytes encoded as specified in the request, including the header for encodings that are wrapped in containers (e.g. MP3, OGG_OPUS). For LINEAR16 audio, we include the WAV header. Note: as with all bytes fields, protobuffers use a pure binary representation, whereas JSON representations use base64.
     #[serde(rename="audioContent")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub audio_content: Option<Vec<u8>>,
 }
 
@@ -648,7 +648,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -673,7 +673,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The resource states of the request in the form of `projects/*/locations/*/voices/*`.
+    /// * `parent` - The resource states of the request in the form of `projects/*/locations/*`.
     pub fn locations_synthesize_long_audio(&self, request: SynthesizeLongAudioRequest, parent: &str) -> ProjectLocationSynthesizeLongAudioCall<'a, S> {
         ProjectLocationSynthesizeLongAudioCall {
             hub: self.hub,
@@ -1622,7 +1622,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -2126,7 +2126,7 @@ where
         self._request = new_value;
         self
     }
-    /// The resource states of the request in the form of `projects/*/locations/*/voices/*`.
+    /// The resource states of the request in the form of `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///

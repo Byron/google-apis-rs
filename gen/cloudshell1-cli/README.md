@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Shell* API at revision *20230109*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Shell* API at revision *20240212*. The CLI is at version *5.0.3*.
 
 ```bash
 cloudshell1 [options]

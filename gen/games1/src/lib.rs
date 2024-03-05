@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *5.0.3+20230112*, where *20230112* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Games* crate version *5.0.3+20240228*, where *20240228* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/).
@@ -24,7 +24,9 @@
 //! * metagame
 //!  * [*get metagame config*](api::MetagameGetMetagameConfigCall) and [*list categories by player*](api::MetagameListCategoriesByPlayerCall)
 //! * [players](api::Player)
-//!  * [*get*](api::PlayerGetCall), [*get scoped player ids*](api::PlayerGetScopedPlayerIdCall) and [*list*](api::PlayerListCall)
+//!  * [*get*](api::PlayerGetCall), [*get multiple application player ids*](api::PlayerGetMultipleApplicationPlayerIdCall), [*get scoped player ids*](api::PlayerGetScopedPlayerIdCall) and [*list*](api::PlayerListCall)
+//! * recall
+//!  * [*link persona*](api::RecallLinkPersonaCall), [*reset persona*](api::RecallResetPersonaCall), [*retrieve tokens*](api::RecallRetrieveTokenCall) and [*unlink persona*](api::RecallUnlinkPersonaCall)
 //! * revisions
 //!  * [*check*](api::RevisionCheckCall)
 //! * scores

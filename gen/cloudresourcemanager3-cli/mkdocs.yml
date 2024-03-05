@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v5.0.3+20230115
+site_name: Cloud Resource Manager v5.0.3+20240303
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager3-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v3)
 
@@ -57,6 +57,7 @@ nav:
     - 'Delete': 'tag-keys_delete.md'
     - 'Get': 'tag-keys_get.md'
     - 'Get Iam Policy': 'tag-keys_get-iam-policy.md'
+    - 'Get Namespaced': 'tag-keys_get-namespaced.md'
     - 'List': 'tag-keys_list.md'
     - 'Patch': 'tag-keys_patch.md'
     - 'Set Iam Policy': 'tag-keys_set-iam-policy.md'
@@ -66,6 +67,7 @@ nav:
     - 'Delete': 'tag-values_delete.md'
     - 'Get': 'tag-values_get.md'
     - 'Get Iam Policy': 'tag-values_get-iam-policy.md'
+    - 'Get Namespaced': 'tag-values_get-namespaced.md'
     - 'List': 'tag-values_list.md'
     - 'Patch': 'tag-values_patch.md'
     - 'Set Iam Policy': 'tag-values_set-iam-policy.md'

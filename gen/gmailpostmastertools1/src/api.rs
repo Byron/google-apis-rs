@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See email traffic metrics for the domains you have registered in Gmail Postmaster Tools
     PostmasterReadonly,
@@ -360,10 +360,18 @@ pub struct TrafficStats {
     #[serde(rename="spfSuccessRatio")]
     
     pub spf_success_ratio: Option<f64>,
-    /// The ratio of user-report spam vs. email that was sent to the inbox. This metric only pertains to emails authenticated by [DKIM](http://www.dkim.org/).
+    /// The ratio of user-report spam vs. email that was sent to the inbox. This is potentially inexact -- users may want to refer to the description of the interval fields userReportedSpamRatioLowerBound and userReportedSpamRatioUpperBound for more explicit accuracy guarantees. This metric only pertains to emails authenticated by [DKIM](http://www.dkim.org/).
     #[serde(rename="userReportedSpamRatio")]
     
     pub user_reported_spam_ratio: Option<f64>,
+    /// The lower bound of the confidence interval for the user reported spam ratio. If this field is set, then the value of userReportedSpamRatio is set to the midpoint of this interval and is thus inexact. However, the true ratio is guaranteed to be in between this lower bound and the corresponding upper bound 95% of the time. This metric only pertains to emails authenticated by [DKIM](http://www.dkim.org/).
+    #[serde(rename="userReportedSpamRatioLowerBound")]
+    
+    pub user_reported_spam_ratio_lower_bound: Option<f64>,
+    /// The upper bound of the confidence interval for the user reported spam ratio. If this field is set, then the value of userReportedSpamRatio is set to the midpoint of this interval and is thus inexact. However, the true ratio is guaranteed to be in between this upper bound and the corresponding lower bound 95% of the time. This metric only pertains to emails authenticated by [DKIM](http://www.dkim.org/).
+    #[serde(rename="userReportedSpamRatioUpperBound")]
+    
+    pub user_reported_spam_ratio_upper_bound: Option<f64>,
 }
 
 impl client::ResponseResult for TrafficStats {}

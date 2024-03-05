@@ -1,4 +1,4 @@
-site_name: My Business Business Information v5.0.3+20230124
+site_name: My Business Business Information v5.0.3+20240304
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessbusinessinformation1-cli
 site_description: A complete library to interact with My Business Business Information (protocol v1)
 
@@ -23,9 +23,7 @@ nav:
 - 'Google Locations':
     - 'Search': 'google-locations_search.md'
 - 'Locations':
-    - 'Associate': 'locations_associate.md'
     - 'Attributes Get Google Updated': 'locations_attributes-get-google-updated.md'
-    - 'Clear Location Association': 'locations_clear-location-association.md'
     - 'Delete': 'locations_delete.md'
     - 'Get': 'locations_get.md'
     - 'Get Attributes': 'locations_get-attributes.md'

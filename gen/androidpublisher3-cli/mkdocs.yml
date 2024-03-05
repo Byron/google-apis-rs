@@ -1,4 +1,4 @@
-site_name: Android Publisher v5.0.3+20230124
+site_name: Android Publisher v5.0.3+20240229
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher3-cli
 site_description: A complete library to interact with Android Publisher (protocol v3)
 
@@ -10,9 +10,16 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Applications':
+    - 'Data Safety': 'applications_data-safety.md'
     - 'Device Tier Configs Create': 'applications_device-tier-configs-create.md'
     - 'Device Tier Configs Get': 'applications_device-tier-configs-get.md'
     - 'Device Tier Configs List': 'applications_device-tier-configs-list.md'
+- 'Apprecovery':
+    - 'Add Targeting': 'apprecovery_add-targeting.md'
+    - 'App Recoveries': 'apprecovery_app-recoveries.md'
+    - 'Cancel': 'apprecovery_cancel.md'
+    - 'Create': 'apprecovery_create.md'
+    - 'Deploy': 'apprecovery_deploy.md'
 - 'Edits':
     - 'Apks Addexternallyhosted': 'edits_apks-addexternallyhosted.md'
     - 'Apks List': 'edits_apks-list.md'
@@ -45,11 +52,16 @@ nav:
     - 'Testers Get': 'edits_testers-get.md'
     - 'Testers Patch': 'edits_testers-patch.md'
     - 'Testers Update': 'edits_testers-update.md'
+    - 'Tracks Create': 'edits_tracks-create.md'
     - 'Tracks Get': 'edits_tracks-get.md'
     - 'Tracks List': 'edits_tracks-list.md'
     - 'Tracks Patch': 'edits_tracks-patch.md'
     - 'Tracks Update': 'edits_tracks-update.md'
     - 'Validate': 'edits_validate.md'
+- 'Externaltransactions':
+    - 'Createexternaltransaction': 'externaltransactions_createexternaltransaction.md'
+    - 'Getexternaltransaction': 'externaltransactions_getexternaltransaction.md'
+    - 'Refundexternaltransaction': 'externaltransactions_refundexternaltransaction.md'
 - 'Generatedapks':
     - 'Download': 'generatedapks_download.md'
     - 'List': 'generatedapks_list.md'
@@ -58,6 +70,9 @@ nav:
     - 'Delete': 'grants_delete.md'
     - 'Patch': 'grants_patch.md'
 - 'Inappproducts':
+    - 'Batch Delete': 'inappproducts_batch-delete.md'
+    - 'Batch Get': 'inappproducts_batch-get.md'
+    - 'Batch Update': 'inappproducts_batch-update.md'
     - 'Delete': 'inappproducts_delete.md'
     - 'Get': 'inappproducts_get.md'
     - 'Insert': 'inappproducts_insert.md'
@@ -71,16 +86,23 @@ nav:
     - 'Convert Region Prices': 'monetization_convert-region-prices.md'
     - 'Subscriptions Archive': 'monetization_subscriptions-archive.md'
     - 'Subscriptions Base Plans Activate': 'monetization_subscriptions-base-plans-activate.md'
+    - 'Subscriptions Base Plans Batch Migrate Prices': 'monetization_subscriptions-base-plans-batch-migrate-prices.md'
+    - 'Subscriptions Base Plans Batch Update States': 'monetization_subscriptions-base-plans-batch-update-states.md'
     - 'Subscriptions Base Plans Deactivate': 'monetization_subscriptions-base-plans-deactivate.md'
     - 'Subscriptions Base Plans Delete': 'monetization_subscriptions-base-plans-delete.md'
     - 'Subscriptions Base Plans Migrate Prices': 'monetization_subscriptions-base-plans-migrate-prices.md'
     - 'Subscriptions Base Plans Offers Activate': 'monetization_subscriptions-base-plans-offers-activate.md'
+    - 'Subscriptions Base Plans Offers Batch Get': 'monetization_subscriptions-base-plans-offers-batch-get.md'
+    - 'Subscriptions Base Plans Offers Batch Update': 'monetization_subscriptions-base-plans-offers-batch-update.md'
+    - 'Subscriptions Base Plans Offers Batch Update States': 'monetization_subscriptions-base-plans-offers-batch-update-states.md'
     - 'Subscriptions Base Plans Offers Create': 'monetization_subscriptions-base-plans-offers-create.md'
     - 'Subscriptions Base Plans Offers Deactivate': 'monetization_subscriptions-base-plans-offers-deactivate.md'
     - 'Subscriptions Base Plans Offers Delete': 'monetization_subscriptions-base-plans-offers-delete.md'
     - 'Subscriptions Base Plans Offers Get': 'monetization_subscriptions-base-plans-offers-get.md'
     - 'Subscriptions Base Plans Offers List': 'monetization_subscriptions-base-plans-offers-list.md'
     - 'Subscriptions Base Plans Offers Patch': 'monetization_subscriptions-base-plans-offers-patch.md'
+    - 'Subscriptions Batch Get': 'monetization_subscriptions-batch-get.md'
+    - 'Subscriptions Batch Update': 'monetization_subscriptions-batch-update.md'
     - 'Subscriptions Create': 'monetization_subscriptions-create.md'
     - 'Subscriptions Delete': 'monetization_subscriptions-delete.md'
     - 'Subscriptions Get': 'monetization_subscriptions-get.md'
@@ -90,6 +112,7 @@ nav:
     - 'Refund': 'orders_refund.md'
 - 'Purchases':
     - 'Products Acknowledge': 'purchases_products-acknowledge.md'
+    - 'Products Consume': 'purchases_products-consume.md'
     - 'Products Get': 'purchases_products-get.md'
     - 'Subscriptions Acknowledge': 'purchases_subscriptions-acknowledge.md'
     - 'Subscriptions Cancel': 'purchases_subscriptions-cancel.md'
@@ -98,6 +121,7 @@ nav:
     - 'Subscriptions Refund': 'purchases_subscriptions-refund.md'
     - 'Subscriptions Revoke': 'purchases_subscriptions-revoke.md'
     - 'Subscriptionsv2 Get': 'purchases_subscriptionsv2-get.md'
+    - 'Subscriptionsv2 Revoke': 'purchases_subscriptionsv2-revoke.md'
     - 'Voidedpurchases List': 'purchases_voidedpurchases-list.md'
 - 'Reviews':
     - 'Get': 'reviews_get.md'

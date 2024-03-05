@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games* API at revision *20230112*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Games* API at revision *20240228*. The CLI is at version *5.0.3*.
 
 ```bash
 games1 [options]
@@ -55,8 +55,14 @@ games1 [options]
                 list-categories-by-player <player-id> <collection> [-p <v>]... [-o <out>]
         players
                 get <player-id> [-p <v>]... [-o <out>]
+                get-multiple-application-player-ids [-p <v>]... [-o <out>]
                 get-scoped-player-ids [-p <v>]... [-o <out>]
                 list <collection> [-p <v>]... [-o <out>]
+        recall
+                link-persona (-r <kv>)... [-p <v>]... [-o <out>]
+                reset-persona (-r <kv>)... [-p <v>]... [-o <out>]
+                retrieve-tokens <session-id> [-p <v>]... [-o <out>]
+                unlink-persona (-r <kv>)... [-p <v>]... [-o <out>]
         revisions
                 check <client-revision> [-p <v>]... [-o <out>]
         scores

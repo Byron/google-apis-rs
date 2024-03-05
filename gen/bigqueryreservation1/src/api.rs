@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your data in Google BigQuery and see the email address for your Google Account
     Bigquery,
@@ -202,6 +202,28 @@ impl client::RequestValue for Assignment {}
 impl client::ResponseResult for Assignment {}
 
 
+/// Auto scaling settings.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Autoscale {
+    /// Output only. The slot capacity added to this reservation when autoscale happens. Will be between [0, max_slots].
+    #[serde(rename="currentSlots")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub current_slots: Option<i64>,
+    /// Number of slots to be scaled when needed.
+    #[serde(rename="maxSlots")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub max_slots: Option<i64>,
+}
+
+impl client::Part for Autoscale {}
+
+
 /// Represents a BI Reservation.
 /// 
 /// # Activities
@@ -257,11 +279,18 @@ pub struct CapacityCommitment {
     #[serde(rename="commitmentStartTime")]
     
     pub commitment_start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Edition of the capacity commitment.
+    
+    pub edition: Option<String>,
     /// Output only. For FAILED commitment plan, provides the reason of failure.
     #[serde(rename="failureStatus")]
     
     pub failure_status: Option<Status>,
-    /// Applicable only for commitments located within one of the BigQuery multi-regions (US or EU). If set to true, this commitment is placed in the organization's secondary region which is designated for disaster recovery purposes. If false, this commitment is placed in the organization's default region.
+    /// Output only. If true, the commitment is a flat-rate commitment, otherwise, it's an edition commitment.
+    #[serde(rename="isFlatRate")]
+    
+    pub is_flat_rate: Option<bool>,
+    /// Applicable only for commitments located within one of the BigQuery multi-regions (US or EU). If set to true, this commitment is placed in the organization's secondary region which is designated for disaster recovery purposes. If false, this commitment is placed in the organization's default region. NOTE: this is a preview feature. Project must be allow-listed in order to set this field.
     #[serde(rename="multiRegionAuxiliary")]
     
     pub multi_region_auxiliary: Option<bool>,
@@ -407,6 +436,10 @@ impl client::RequestValue for MergeCapacityCommitmentsRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MoveAssignmentRequest {
+    /// The optional assignment ID. A new assignment name is generated if this field is empty. This field can contain only lowercase alphanumeric characters or dashes. Max length is 64 characters.
+    #[serde(rename="assignmentId")]
+    
+    pub assignment_id: Option<String>,
     /// The new reservation ID, e.g.: `projects/myotherproject/locations/US/reservations/team2-prod`
     #[serde(rename="destinationId")]
     
@@ -429,6 +462,9 @@ impl client::RequestValue for MoveAssignmentRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reservation {
+    /// The configuration parameters for the auto scaling feature.
+    
+    pub autoscale: Option<Autoscale>,
     /// Job concurrency target which sets a soft upper bound on the number of jobs that can run concurrently in this reservation. This is a soft target due to asynchronous nature of the system and various optimizations for small queries. Default value is 0 which means that concurrency target will be automatically computed by the system. NOTE: this field is exposed as `target_job_concurrency` in the Information Schema, DDL and BQ CLI.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
@@ -437,18 +473,21 @@ pub struct Reservation {
     #[serde(rename="creationTime")]
     
     pub creation_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Edition of the reservation.
+    
+    pub edition: Option<String>,
     /// If false, any query or pipeline job using this reservation will use idle slots from other reservations within the same admin project. If true, a query or pipeline job using this reservation will execute with the slot capacity specified in the slot_capacity field at most.
     #[serde(rename="ignoreIdleSlots")]
     
     pub ignore_idle_slots: Option<bool>,
-    /// Applicable only for reservations located within one of the BigQuery multi-regions (US or EU). If set to true, this reservation is placed in the organization's secondary region which is designated for disaster recovery purposes. If false, this reservation is placed in the organization's default region.
+    /// Applicable only for reservations located within one of the BigQuery multi-regions (US or EU). If set to true, this reservation is placed in the organization's secondary region which is designated for disaster recovery purposes. If false, this reservation is placed in the organization's default region. NOTE: this is a preview feature. Project must be allow-listed in order to set this field.
     #[serde(rename="multiRegionAuxiliary")]
     
     pub multi_region_auxiliary: Option<bool>,
     /// The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. The reservation_id must only contain lower case alphanumeric characters or dashes. It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     
     pub name: Option<String>,
-    /// Minimum slots available to this reservation. A slot is a unit of computational power in BigQuery, and serves as the unit of parallelism. Queries using this reservation might use more slots during runtime if ignore_idle_slots is set to false. If total slot_capacity of the reservation and its siblings exceeds the total slot_count of all capacity commitments, the request will fail with `google.rpc.Code.RESOURCE_EXHAUSTED`. NOTE: for reservations in US or EU multi-regions, slot capacity constraints are checked separately for default and auxiliary regions. See multi_region_auxiliary flag for more details.
+    /// Baseline slots available to this reservation. A slot is a unit of computational power in BigQuery, and serves as the unit of parallelism. Queries using this reservation might use more slots during runtime if ignore_idle_slots is set to false, or autoscaling is enabled. If edition is EDITION_UNSPECIFIED and total slot_capacity of the reservation and its siblings exceeds the total slot_count of all capacity commitments, the request will fail with `google.rpc.Code.RESOURCE_EXHAUSTED`. If edition is any value but EDITION_UNSPECIFIED, then the above requirement is not needed. The total slot_capacity of the reservation and its siblings may exceed the total slot_count of capacity commitments. In that case, the exceeding slots will be charged with the autoscale SKU. You can increase the number of baseline slots in a reservation every few minutes. If you want to decrease your baseline slots, you are limited to once an hour if you have recently changed your baseline slot capacity and your baseline slots exceed your committed slots. Otherwise, you can decrease your baseline slots every few minutes.
     #[serde(rename="slotCapacity")]
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]

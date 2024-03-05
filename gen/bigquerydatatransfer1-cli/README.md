@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *BigQuery Data Transfer* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *BigQuery Data Transfer* API at revision *20240227*. The CLI is at version *5.0.3*.
 
 ```bash
 bigquerydatatransfer1 [options]
@@ -51,6 +51,7 @@ bigquerydatatransfer1 [options]
                 locations-transfer-configs-runs-transfer-logs-list <parent> [-p <v>]... [-o <out>]
                 locations-transfer-configs-schedule-runs <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-transfer-configs-start-manual-runs <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-unenroll-data-sources <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 transfer-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 transfer-configs-delete <name> [-p <v>]... [-o <out>]
                 transfer-configs-get <name> [-p <v>]... [-o <out>]

@@ -25,13 +25,24 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Translate* API at revision *20230106*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Translate* API at revision *20240131*. The CLI is at version *5.0.3*.
 
 ```bash
 translate3 [options]
         projects
                 detect-language <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-supported-languages <parent> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-adaptive-mt-files-adaptive-mt-sentences-list <parent> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-adaptive-mt-files-delete <name> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-adaptive-mt-files-get <name> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-adaptive-mt-files-list <parent> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-adaptive-mt-sentences-list <parent> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-delete <name> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-get <name> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-import-adaptive-mt-file <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-adaptive-mt-datasets-list <parent> [-p <v>]... [-o <out>]
+                locations-adaptive-mt-translate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-batch-translate-document <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-batch-translate-text <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -64,8 +75,10 @@ translate3 [options]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-wait <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-romanize-text <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-translate-document <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-translate-text <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                romanize-text <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 translate-text <parent> (-r <kv>)... [-p <v>]... [-o <out>]
   translate3 --help
 

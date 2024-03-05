@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -183,6 +183,10 @@ pub struct GoogleCloudRecommenderV1CostProjection {
     /// An approximate projection on amount saved or amount incurred. Negative cost units indicate cost savings and positive cost units indicate increase. See google.type.Money documentation for positive/negative units. A user's permissions may affect whether the cost is computed using list prices or custom contract prices.
     
     pub cost: Option<GoogleTypeMoney>,
+    /// The approximate cost savings in the billing account's local currency.
+    #[serde(rename="costInLocalCurrency")]
+    
+    pub cost_in_local_currency: Option<GoogleTypeMoney>,
     /// Duration for which this cost applies.
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -206,7 +210,7 @@ pub struct GoogleCloudRecommenderV1Impact {
     #[serde(rename="costProjection")]
     
     pub cost_projection: Option<GoogleCloudRecommenderV1CostProjection>,
-    /// Use with CategoryType.RELAIBILITY
+    /// Use with CategoryType.RELIABILITY
     #[serde(rename="reliabilityProjection")]
     
     pub reliability_projection: Option<GoogleCloudRecommenderV1ReliabilityProjection>,
@@ -695,6 +699,10 @@ pub struct GoogleCloudRecommenderV1Recommendation {
     #[serde(rename="stateInfo")]
     
     pub state_info: Option<GoogleCloudRecommenderV1RecommendationStateInfo>,
+    /// Fully qualified resource names that this recommendation is targeting.
+    #[serde(rename="targetResources")]
+    
+    pub target_resources: Option<Vec<String>>,
     /// Corresponds to a mutually exclusive group ID within a recommender. A non-empty ID indicates that the recommendation belongs to a mutually exclusive group. This means that only one recommendation within the group is suggested to be applied.
     #[serde(rename="xorGroupId")]
     
@@ -1111,7 +1119,7 @@ impl<'a, S> BillingAccountMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Name of the recommendation.
+    /// * `name` - Required. Name of the recommendation.
     pub fn locations_recommenders_recommendations_mark_dismissed(&self, request: GoogleCloudRecommenderV1MarkRecommendationDismissedRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkDismissedCall<'a, S> {
         BillingAccountLocationRecommenderRecommendationMarkDismissedCall {
             hub: self.hub,
@@ -1359,7 +1367,7 @@ impl<'a, S> FolderMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Name of the recommendation.
+    /// * `name` - Required. Name of the recommendation.
     pub fn locations_recommenders_recommendations_mark_dismissed(&self, request: GoogleCloudRecommenderV1MarkRecommendationDismissedRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkDismissedCall<'a, S> {
         FolderLocationRecommenderRecommendationMarkDismissedCall {
             hub: self.hub,
@@ -1607,7 +1615,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Name of the recommendation.
+    /// * `name` - Required. Name of the recommendation.
     pub fn locations_recommenders_recommendations_mark_dismissed(&self, request: GoogleCloudRecommenderV1MarkRecommendationDismissedRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkDismissedCall<'a, S> {
         OrganizationLocationRecommenderRecommendationMarkDismissedCall {
             hub: self.hub,
@@ -1893,7 +1901,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Name of the recommendation.
+    /// * `name` - Required. Name of the recommendation.
     pub fn locations_recommenders_recommendations_mark_dismissed(&self, request: GoogleCloudRecommenderV1MarkRecommendationDismissedRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkDismissedCall<'a, S> {
         ProjectLocationRecommenderRecommendationMarkDismissedCall {
             hub: self.hub,
@@ -2467,7 +2475,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a, S> {
@@ -3897,7 +3905,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a, S> {
@@ -4478,7 +4486,7 @@ where
         self._request = new_value;
         self
     }
-    /// Name of the recommendation.
+    /// Required. Name of the recommendation.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6203,7 +6211,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a, S> {
@@ -7055,7 +7063,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a, S> {
@@ -7636,7 +7644,7 @@ where
         self._request = new_value;
         self
     }
-    /// Name of the recommendation.
+    /// Required. Name of the recommendation.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8783,7 +8791,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a, S> {
@@ -10213,7 +10221,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a, S> {
@@ -10794,7 +10802,7 @@ where
         self._request = new_value;
         self
     }
-    /// Name of the recommendation.
+    /// Required. Name of the recommendation.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12519,7 +12527,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Optional. Filter expression to restrict the insights returned. Supported filter fields: * `stateInfo.state` * `insightSubtype` * `severity` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `insightSubtype = PERMISSIONS_USAGE` * `severity = CRITICAL OR severity = HIGH` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a, S> {
@@ -13949,7 +13957,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` (These expressions are based on the filter language described at https://google.aip.dev/160)
+    /// Filter expression to restrict the recommendations returned. Supported filter fields: * `state_info.state` * `recommenderSubtype` * `priority` * `targetResources` Examples: * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED` * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE` * `priority = P1 OR priority = P2` * `targetResources : //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1` * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)` The max allowed filter length is 500 characters. (These expressions are based on the filter language described at https://google.aip.dev/160)
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a, S> {
@@ -14530,7 +14538,7 @@ where
         self._request = new_value;
         self
     }
-    /// Name of the recommendation.
+    /// Required. Name of the recommendation.
     ///
     /// Sets the *name* path property to the given value.
     ///

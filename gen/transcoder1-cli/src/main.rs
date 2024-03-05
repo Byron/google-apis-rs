@@ -338,6 +338,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "batch-mode-priority" => Some(("batchModePriority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.output.uri" => Some(("config.output.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.pubsub-destination.topic" => Some(("config.pubsubDestination.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -346,14 +347,16 @@ where
                     "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "input-uri" => Some(("inputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mode" => Some(("mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization" => Some(("optimization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-uri" => Some(("outputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl-after-completion-days" => Some(("ttlAfterCompletionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "config", "create-time", "end-time", "error", "input-uri", "labels", "message", "name", "output", "output-uri", "pubsub-destination", "start-time", "state", "template-id", "topic", "ttl-after-completion-days", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["batch-mode-priority", "code", "config", "create-time", "end-time", "error", "input-uri", "labels", "message", "mode", "name", "optimization", "output", "output-uri", "pubsub-destination", "start-time", "state", "template-id", "topic", "ttl-after-completion-days", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -891,7 +894,7 @@ async fn main() {
     
     let mut app = App::new("transcoder1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.3+20240221")
            .about("This API converts video files into formats suitable for consumer distribution. For more information, see the Transcoder API overview. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_transcoder1_cli")
            .arg(Arg::with_name("url")

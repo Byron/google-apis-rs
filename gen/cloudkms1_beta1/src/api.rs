@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
@@ -271,7 +271,7 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub etag: Option<Vec<u8>>,
 }
 
@@ -343,7 +343,7 @@ pub struct EncryptResponse {
     pub name: Option<String>,
     /// The encrypted data.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub ciphertext: Option<Vec<u8>>,
 }
 
@@ -626,11 +626,11 @@ pub struct EncryptRequest {
     /// larger than 64KiB.
     #[serde(rename="additionalAuthenticatedData")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub additional_authenticated_data: Option<Vec<u8>>,
     /// Required. The data to encrypt. Must be no larger than 64KiB.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub plaintext: Option<Vec<u8>>,
 }
 
@@ -879,13 +879,13 @@ pub struct DecryptRequest {
     /// Required. The encrypted data originally returned in
     /// EncryptResponse.ciphertext.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub ciphertext: Option<Vec<u8>>,
     /// Optional data that must match the data originally supplied in
     /// EncryptRequest.additional_authenticated_data.
     #[serde(rename="additionalAuthenticatedData")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub additional_authenticated_data: Option<Vec<u8>>,
 }
 
@@ -1059,7 +1059,7 @@ impl client::Part for AuditLogConfig {}
 pub struct DecryptResponse {
     /// The decrypted data originally supplied in EncryptRequest.plaintext.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub plaintext: Option<Vec<u8>>,
 }
 

@@ -352,7 +352,7 @@ async fn main() {
     
     let mut app = App::new("localservices1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.3+20240303")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_localservices1_cli")
            .arg(Arg::with_name("url")

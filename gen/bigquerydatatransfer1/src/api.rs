@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your data in Google BigQuery and see the email address for your Google Account
     Bigquery,
@@ -67,7 +67,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_bigquerydatatransfer1 as bigquerydatatransfer1;
-/// use bigquerydatatransfer1::api::TransferConfig;
+/// use bigquerydatatransfer1::api::EnrollDataSourcesRequest;
 /// use bigquerydatatransfer1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
@@ -89,16 +89,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = TransferConfig::default();
+/// let mut req = EnrollDataSourcesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_transfer_configs_patch(req, "name")
-///              .version_info("takimata")
-///              .update_mask(&Default::default())
-///              .service_account_name("amet.")
-///              .authorization_code("duo")
+/// let result = hub.projects().locations_enroll_data_sources(req, "name")
 ///              .doit().await;
 /// 
 /// match result {
@@ -394,6 +390,7 @@ impl client::Part for EmailPreferences {}
 /// * [locations transfer configs runs delete projects](ProjectLocationTransferConfigRunDeleteCall) (response)
 /// * [locations transfer configs delete projects](ProjectLocationTransferConfigDeleteCall) (response)
 /// * [locations enroll data sources projects](ProjectLocationEnrollDataSourceCall) (response)
+/// * [locations unenroll data sources projects](ProjectLocationUnenrollDataSourceCall) (response)
 /// * [transfer configs runs delete projects](ProjectTransferConfigRunDeleteCall) (response)
 /// * [transfer configs delete projects](ProjectTransferConfigDeleteCall) (response)
 /// * [enroll data sources projects](ProjectEnrollDataSourceCall) (response)
@@ -402,6 +399,22 @@ impl client::Part for EmailPreferences {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl client::ResponseResult for Empty {}
+
+
+/// Represents the encryption configuration for a transfer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EncryptionConfiguration {
+    /// The name of the KMS key used for encrypting BigQuery data.
+    #[serde(rename="kmsKeyName")]
+    
+    pub kms_key_name: Option<String>,
+}
+
+impl client::Part for EncryptionConfiguration {}
 
 
 /// A request to enroll a set of data sources so they are visible in the BigQuery UI’s `Transfer` tab.
@@ -548,7 +561,7 @@ pub struct ListTransferRunsResponse {
 impl client::ResponseResult for ListTransferRunsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -592,11 +605,11 @@ pub struct ScheduleOptions {
     #[serde(rename="disableAutoScheduling")]
     
     pub disable_auto_scheduling: Option<bool>,
-    /// Defines time to stop scheduling transfer runs. A transfer run cannot be scheduled at or after the end time. The end time can be changed at any moment. The time when a data transfer can be trigerred manually is not limited by this option.
+    /// Defines time to stop scheduling transfer runs. A transfer run cannot be scheduled at or after the end time. The end time can be changed at any moment. The time when a data transfer can be triggered manually is not limited by this option.
     #[serde(rename="endTime")]
     
     pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Specifies time to start scheduling transfer runs. The first run will be scheduled at or after the start time according to a recurrence pattern defined in the schedule string. The start time can be changed at any moment. The time when a data transfer can be trigerred manually is not limited by this option.
+    /// Specifies time to start scheduling transfer runs. The first run will be scheduled at or after the start time according to a recurrence pattern defined in the schedule string. The start time can be changed at any moment. The time when a data transfer can be triggered manually is not limited by this option.
     #[serde(rename="startTime")]
     
     pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -662,11 +675,11 @@ impl client::ResponseResult for ScheduleTransferRunsResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StartManualTransferRunsRequest {
-    /// Specific run_time for a transfer run to be started. The requested_run_time must not be in the future.
+    /// A run_time timestamp for historical data files or reports that are scheduled to be transferred by the scheduled transfer run. requested_run_time must be a past time and cannot include future time values.
     #[serde(rename="requestedRunTime")]
     
     pub requested_run_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Time range for the transfer runs that should be started.
+    /// A time_range start and end timestamp for historical data files or reports that are scheduled to be transferred by the scheduled transfer run. requested_time_range must be a past time and cannot include future time values.
     #[serde(rename="requestedTimeRange")]
     
     pub requested_time_range: Option<TimeRange>,
@@ -768,7 +781,7 @@ pub struct TransferConfig {
     #[serde(rename="destinationDatasetId")]
     
     pub destination_dataset_id: Option<String>,
-    /// Is this config disabled. When set to true, no runs are scheduled for a given transfer.
+    /// Is this config disabled. When set to true, no runs will be scheduled for this transfer config.
     
     pub disabled: Option<bool>,
     /// User specified display name for the data transfer.
@@ -779,14 +792,18 @@ pub struct TransferConfig {
     #[serde(rename="emailPreferences")]
     
     pub email_preferences: Option<EmailPreferences>,
-    /// The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
+    /// The encryption configuration part. Currently, it is only used for the optional KMS key name. The BigQuery service account of your project must be granted permissions to use the key. Read methods will return the key name applied in effect. Write methods will apply the key if it is present, or otherwise try to apply project default keys if it is absent.
+    #[serde(rename="encryptionConfiguration")]
+    
+    pub encryption_configuration: Option<EncryptionConfiguration>,
+    /// The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
     
     pub name: Option<String>,
     /// Output only. Next time when data transfer will run.
     #[serde(rename="nextRunTime")]
     
     pub next_run_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Pub/Sub topic where notifications will be sent after transfer runs associated with this transfer config finish. The format for specifying a pubsub topic is: `projects/{project}/topics/{topic}`
+    /// Pub/Sub topic where notifications will be sent after transfer runs associated with this transfer config finish. The format for specifying a pubsub topic is: `projects/{project_id}/topics/{topic_id}`
     #[serde(rename="notificationPubsubTopic")]
     
     pub notification_pubsub_topic: Option<String>,
@@ -880,7 +897,7 @@ pub struct TransferRun {
     /// The resource name of the transfer run. Transfer run names have the form `projects/{project_id}/locations/{location}/transferConfigs/{config_id}/runs/{run_id}`. The name is ignored when creating a transfer run.
     
     pub name: Option<String>,
-    /// Output only. Pub/Sub topic where a notification will be sent after this transfer run finishes. The format for specifying a pubsub topic is: `projects/{project}/topics/{topic}`
+    /// Output only. Pub/Sub topic where a notification will be sent after this transfer run finishes. The format for specifying a pubsub topic is: `projects/{project_id}/topics/{topic_id}`
     #[serde(rename="notificationPubsubTopic")]
     
     pub notification_pubsub_topic: Option<String>,
@@ -917,6 +934,26 @@ pub struct TransferRun {
 }
 
 impl client::ResponseResult for TransferRun {}
+
+
+/// A request to unenroll a set of data sources so they are no longer visible in the BigQuery UI’s `Transfer` tab.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations unenroll data sources projects](ProjectLocationUnenrollDataSourceCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnenrollDataSourcesRequest {
+    /// Data sources that are unenrolled. It is required to provide at least one data source id.
+    #[serde(rename="dataSourceIds")]
+    
+    pub data_source_ids: Option<Vec<String>>,
+}
+
+impl client::RequestValue for UnenrollDataSourcesRequest {}
 
 
 /// Information about a user.
@@ -962,7 +999,7 @@ impl client::Part for UserInfo {}
 ///     ).build().await.unwrap();
 /// let mut hub = BigQueryDataTransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `data_sources_check_valid_creds(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `enroll_data_sources(...)`, `locations_data_sources_check_valid_creds(...)`, `locations_data_sources_get(...)`, `locations_data_sources_list(...)`, `locations_enroll_data_sources(...)`, `locations_get(...)`, `locations_list(...)`, `locations_transfer_configs_create(...)`, `locations_transfer_configs_delete(...)`, `locations_transfer_configs_get(...)`, `locations_transfer_configs_list(...)`, `locations_transfer_configs_patch(...)`, `locations_transfer_configs_runs_delete(...)`, `locations_transfer_configs_runs_get(...)`, `locations_transfer_configs_runs_list(...)`, `locations_transfer_configs_runs_transfer_logs_list(...)`, `locations_transfer_configs_schedule_runs(...)`, `locations_transfer_configs_start_manual_runs(...)`, `transfer_configs_create(...)`, `transfer_configs_delete(...)`, `transfer_configs_get(...)`, `transfer_configs_list(...)`, `transfer_configs_patch(...)`, `transfer_configs_runs_delete(...)`, `transfer_configs_runs_get(...)`, `transfer_configs_runs_list(...)`, `transfer_configs_runs_transfer_logs_list(...)`, `transfer_configs_schedule_runs(...)` and `transfer_configs_start_manual_runs(...)`
+/// // like `data_sources_check_valid_creds(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `enroll_data_sources(...)`, `locations_data_sources_check_valid_creds(...)`, `locations_data_sources_get(...)`, `locations_data_sources_list(...)`, `locations_enroll_data_sources(...)`, `locations_get(...)`, `locations_list(...)`, `locations_transfer_configs_create(...)`, `locations_transfer_configs_delete(...)`, `locations_transfer_configs_get(...)`, `locations_transfer_configs_list(...)`, `locations_transfer_configs_patch(...)`, `locations_transfer_configs_runs_delete(...)`, `locations_transfer_configs_runs_get(...)`, `locations_transfer_configs_runs_list(...)`, `locations_transfer_configs_runs_transfer_logs_list(...)`, `locations_transfer_configs_schedule_runs(...)`, `locations_transfer_configs_start_manual_runs(...)`, `locations_unenroll_data_sources(...)`, `transfer_configs_create(...)`, `transfer_configs_delete(...)`, `transfer_configs_get(...)`, `transfer_configs_list(...)`, `transfer_configs_patch(...)`, `transfer_configs_runs_delete(...)`, `transfer_configs_runs_get(...)`, `transfer_configs_runs_list(...)`, `transfer_configs_runs_transfer_logs_list(...)`, `transfer_configs_schedule_runs(...)` and `transfer_configs_start_manual_runs(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1245,7 +1282,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
+    /// * `name` - The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
     pub fn locations_transfer_configs_patch(&self, request: TransferConfig, name: &str) -> ProjectLocationTransferConfigPatchCall<'a, S> {
         ProjectLocationTransferConfigPatchCall {
             hub: self.hub,
@@ -1349,6 +1386,25 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Unenroll data sources in a user project. This allows users to remove transfer configurations for these data sources. They will no longer appear in the ListDataSources RPC and will also no longer appear in the [BigQuery UI](https://console.cloud.google.com/bigquery). Data transfers configurations of unenrolled data sources will not be scheduled.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the project resource in the form: `projects/{project_id}`
+    pub fn locations_unenroll_data_sources(&self, request: UnenrollDataSourcesRequest, name: &str) -> ProjectLocationUnenrollDataSourceCall<'a, S> {
+        ProjectLocationUnenrollDataSourceCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1513,7 +1569,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
+    /// * `name` - The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
     pub fn transfer_configs_patch(&self, request: TransferConfig, name: &str) -> ProjectTransferConfigPatchCall<'a, S> {
         ProjectTransferConfigPatchCall {
             hub: self.hub,
@@ -2176,8 +2232,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().data_sources_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-75)
+///              .page_token("sanctus")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3016,8 +3072,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_sources_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-47)
+///              .page_token("duo")
+///              .page_size(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3302,9 +3358,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_runs_transfer_logs_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-93)
-///              .add_message_types("ut")
+///              .page_token("Lorem")
+///              .page_size(-12)
+///              .add_message_types("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4127,10 +4183,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_runs_list("parent")
-///              .add_states("ipsum")
-///              .run_attempt("ipsum")
-///              .page_token("est")
-///              .page_size(-62)
+///              .add_states("invidunt")
+///              .run_attempt("amet")
+///              .page_token("duo")
+///              .page_size(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4446,9 +4502,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_create(req, "parent")
-///              .version_info("dolor")
-///              .service_account_name("Lorem")
-///              .authorization_code("eos")
+///              .version_info("ut")
+///              .service_account_name("gubergren")
+///              .authorization_code("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4651,7 +4707,7 @@ where
         self._version_info = Some(new_value.to_string());
         self
     }
-    /// Optional service account name. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
+    /// Optional service account email. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
     ///
     /// Sets the *service account name* query property to the given value.
     pub fn service_account_name(mut self, new_value: &str) -> ProjectLocationTransferConfigCreateCall<'a, S> {
@@ -5292,9 +5348,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
-///              .add_data_source_ids("Stet")
+///              .page_token("est")
+///              .page_size(-62)
+///              .add_data_source_ids("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5599,10 +5655,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_patch(req, "name")
-///              .version_info("et")
+///              .version_info("Lorem")
 ///              .update_mask(&Default::default())
-///              .service_account_name("sed")
-///              .authorization_code("et")
+///              .service_account_name("eos")
+///              .authorization_code("labore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5792,7 +5848,7 @@ where
         self._request = new_value;
         self
     }
-    /// The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
+    /// The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5816,7 +5872,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// Optional service account name. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
+    /// Optional service account email. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
     ///
     /// Sets the *service account name* query property to the given value.
     pub fn service_account_name(mut self, new_value: &str) -> ProjectLocationTransferConfigPatchCall<'a, S> {
@@ -7071,9 +7127,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("dolore")
-///              .page_size(-22)
-///              .filter("voluptua.")
+///              .page_token("kasd")
+///              .page_size(-24)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7342,6 +7398,298 @@ where
 }
 
 
+/// Unenroll data sources in a user project. This allows users to remove transfer configurations for these data sources. They will no longer appear in the ListDataSources RPC and will also no longer appear in the [BigQuery UI](https://console.cloud.google.com/bigquery). Data transfers configurations of unenrolled data sources will not be scheduled.
+///
+/// A builder for the *locations.unenrollDataSources* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquerydatatransfer1 as bigquerydatatransfer1;
+/// use bigquerydatatransfer1::api::UnenrollDataSourcesRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use bigquerydatatransfer1::{BigQueryDataTransfer, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = BigQueryDataTransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UnenrollDataSourcesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_unenroll_data_sources(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationUnenrollDataSourceCall<'a, S>
+    where S: 'a {
+
+    hub: &'a BigQueryDataTransfer<S>,
+    _request: UnenrollDataSourcesRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationUnenrollDataSourceCall<'a, S> {}
+
+impl<'a, S> ProjectLocationUnenrollDataSourceCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "bigquerydatatransfer.projects.locations.unenrollDataSources",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:unenrollDataSources";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Bigquery.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UnenrollDataSourcesRequest) -> ProjectLocationUnenrollDataSourceCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the project resource in the form: `projects/{project_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationUnenrollDataSourceCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationUnenrollDataSourceCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationUnenrollDataSourceCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Bigquery`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationUnenrollDataSourceCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationUnenrollDataSourceCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationUnenrollDataSourceCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Returns log messages for the transfer run.
 ///
 /// A builder for the *transferConfigs.runs.transferLogs.list* method supported by a *project* resource.
@@ -7369,9 +7717,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_runs_transfer_logs_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-92)
-///              .add_message_types("dolor")
+///              .page_token("vero")
+///              .page_size(-31)
+///              .add_message_types("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8194,10 +8542,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_runs_list("parent")
-///              .add_states("Stet")
-///              .run_attempt("dolor")
-///              .page_token("duo")
-///              .page_size(-76)
+///              .add_states("voluptua.")
+///              .run_attempt("amet.")
+///              .page_token("consetetur")
+///              .page_size(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8513,9 +8861,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_create(req, "parent")
-///              .version_info("invidunt")
-///              .service_account_name("Stet")
-///              .authorization_code("vero")
+///              .version_info("et")
+///              .service_account_name("et")
+///              .authorization_code("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8718,7 +9066,7 @@ where
         self._version_info = Some(new_value.to_string());
         self
     }
-    /// Optional service account name. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
+    /// Optional service account email. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
     ///
     /// Sets the *service account name* query property to the given value.
     pub fn service_account_name(mut self, new_value: &str) -> ProjectTransferConfigCreateCall<'a, S> {
@@ -9359,9 +9707,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_list("parent")
-///              .page_token("no")
-///              .page_size(-100)
-///              .add_data_source_ids("accusam")
+///              .page_token("vero")
+///              .page_size(-76)
+///              .add_data_source_ids("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9666,10 +10014,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_patch(req, "name")
-///              .version_info("consetetur")
+///              .version_info("vero")
 ///              .update_mask(&Default::default())
-///              .service_account_name("voluptua.")
-///              .authorization_code("et")
+///              .service_account_name("elitr")
+///              .authorization_code("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9859,7 +10207,7 @@ where
         self._request = new_value;
         self
     }
-    /// The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
+    /// The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9883,7 +10231,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// Optional service account name. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
+    /// Optional service account email. If this field is set, the transfer config will be created with this service account's credentials. It requires that the requesting user calling this API has permissions to act as this service account. Note that not all data sources support service account credentials when creating a transfer config. For the latest list of data sources, read about [using service accounts](https://cloud.google.com/bigquery-transfer/docs/use-service-accounts).
     ///
     /// Sets the *service account name* query property to the given value.
     pub fn service_account_name(mut self, new_value: &str) -> ProjectTransferConfigPatchCall<'a, S> {

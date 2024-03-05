@@ -1,4 +1,4 @@
-site_name: Android Provisioning Partner v5.0.3+20230115
+site_name: Android Provisioning Partner v5.0.3+20240304
 site_url: http://byron.github.io/google-apis-rs/google-androiddeviceprovisioning1-cli
 site_description: A complete library to interact with Android Provisioning Partner (protocol v1)
 
@@ -32,6 +32,7 @@ nav:
     - 'Devices Find By Identifier': 'partners_devices-find-by-identifier.md'
     - 'Devices Find By Owner': 'partners_devices-find-by-owner.md'
     - 'Devices Get': 'partners_devices-get.md'
+    - 'Devices Get Sim Lock State': 'partners_devices-get-sim-lock-state.md'
     - 'Devices Metadata': 'partners_devices-metadata.md'
     - 'Devices Unclaim': 'partners_devices-unclaim.md'
     - 'Devices Unclaim Async': 'partners_devices-unclaim-async.md'

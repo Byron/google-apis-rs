@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Certificate Authority Service* crate version *5.0.3+20230105*, where *20230105* is the exact revision of the *privateca:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Certificate Authority Service* crate version *5.0.3+20240221*, where *20240221* is the exact revision of the *privateca:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Certificate Authority Service* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CertificateAuthorityService) ... 
 //! 
 //! * projects
-//!  * [*locations certificate authorities activate*](api::ProjectLocationCertificateAuthorityActivateCall), [*locations certificate authorities certificate revocation lists get*](api::ProjectLocationCertificateAuthorityCertificateRevocationListGetCall), [*locations certificate authorities certificate revocation lists get iam policy*](api::ProjectLocationCertificateAuthorityCertificateRevocationListGetIamPolicyCall), [*locations certificate authorities certificate revocation lists list*](api::ProjectLocationCertificateAuthorityCertificateRevocationListListCall), [*locations certificate authorities certificate revocation lists patch*](api::ProjectLocationCertificateAuthorityCertificateRevocationListPatchCall), [*locations certificate authorities certificate revocation lists set iam policy*](api::ProjectLocationCertificateAuthorityCertificateRevocationListSetIamPolicyCall), [*locations certificate authorities certificate revocation lists test iam permissions*](api::ProjectLocationCertificateAuthorityCertificateRevocationListTestIamPermissionCall), [*locations certificate authorities certificates create*](api::ProjectLocationCertificateAuthorityCertificateCreateCall), [*locations certificate authorities certificates get*](api::ProjectLocationCertificateAuthorityCertificateGetCall), [*locations certificate authorities certificates list*](api::ProjectLocationCertificateAuthorityCertificateListCall), [*locations certificate authorities certificates patch*](api::ProjectLocationCertificateAuthorityCertificatePatchCall), [*locations certificate authorities certificates revoke*](api::ProjectLocationCertificateAuthorityCertificateRevokeCall), [*locations certificate authorities create*](api::ProjectLocationCertificateAuthorityCreateCall), [*locations certificate authorities disable*](api::ProjectLocationCertificateAuthorityDisableCall), [*locations certificate authorities enable*](api::ProjectLocationCertificateAuthorityEnableCall), [*locations certificate authorities fetch*](api::ProjectLocationCertificateAuthorityFetchCall), [*locations certificate authorities get*](api::ProjectLocationCertificateAuthorityGetCall), [*locations certificate authorities get iam policy*](api::ProjectLocationCertificateAuthorityGetIamPolicyCall), [*locations certificate authorities list*](api::ProjectLocationCertificateAuthorityListCall), [*locations certificate authorities patch*](api::ProjectLocationCertificateAuthorityPatchCall), [*locations certificate authorities restore*](api::ProjectLocationCertificateAuthorityRestoreCall), [*locations certificate authorities schedule delete*](api::ProjectLocationCertificateAuthorityScheduleDeleteCall), [*locations certificate authorities set iam policy*](api::ProjectLocationCertificateAuthoritySetIamPolicyCall), [*locations certificate authorities test iam permissions*](api::ProjectLocationCertificateAuthorityTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations reusable configs get*](api::ProjectLocationReusableConfigGetCall), [*locations reusable configs get iam policy*](api::ProjectLocationReusableConfigGetIamPolicyCall), [*locations reusable configs list*](api::ProjectLocationReusableConfigListCall), [*locations reusable configs set iam policy*](api::ProjectLocationReusableConfigSetIamPolicyCall) and [*locations reusable configs test iam permissions*](api::ProjectLocationReusableConfigTestIamPermissionCall)
+//!  * [*locations certificate authorities certificate revocation lists get iam policy*](api::ProjectLocationCertificateAuthorityCertificateRevocationListGetIamPolicyCall), [*locations certificate authorities certificate revocation lists set iam policy*](api::ProjectLocationCertificateAuthorityCertificateRevocationListSetIamPolicyCall), [*locations certificate authorities certificate revocation lists test iam permissions*](api::ProjectLocationCertificateAuthorityCertificateRevocationListTestIamPermissionCall), [*locations certificate authorities get iam policy*](api::ProjectLocationCertificateAuthorityGetIamPolicyCall), [*locations certificate authorities set iam policy*](api::ProjectLocationCertificateAuthoritySetIamPolicyCall), [*locations certificate authorities test iam permissions*](api::ProjectLocationCertificateAuthorityTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations reusable configs get iam policy*](api::ProjectLocationReusableConfigGetIamPolicyCall), [*locations reusable configs set iam policy*](api::ProjectLocationReusableConfigSetIamPolicyCall) and [*locations reusable configs test iam permissions*](api::ProjectLocationReusableConfigTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -47,15 +47,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_certificate_authorities_certificate_revocation_lists_patch(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_activate(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_create(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_disable(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_enable(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_patch(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_restore(...).doit().await
-//! let r = hub.projects().locations_certificate_authorities_schedule_delete(...).doit().await
-//! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_certificate_authorities_certificate_revocation_lists_get_iam_policy(...).doit().await
+//! let r = hub.projects().locations_certificate_authorities_certificate_revocation_lists_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_certificate_authorities_get_iam_policy(...).doit().await
+//! let r = hub.projects().locations_certificate_authorities_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_reusable_configs_get_iam_policy(...).doit().await
+//! let r = hub.projects().locations_reusable_configs_set_iam_policy(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -82,7 +79,6 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_privateca1_beta1 as privateca1_beta1;
-//! use privateca1_beta1::api::CertificateRevocationList;
 //! use privateca1_beta1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -101,17 +97,11 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = CertificateAuthorityService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = CertificateRevocationList::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_certificate_authorities_certificate_revocation_lists_patch(req, "name")
-//!              .update_mask(&Default::default())
-//!              .request_id("ipsum")
+//! let result = hub.projects().locations_certificate_authorities_certificate_revocation_lists_get_iam_policy("resource")
+//!              .options_requested_policy_version(-55)
 //!              .doit().await;
 //! 
 //! match result {

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-language1"
-version = "5.0.3+20230121"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Natural Language (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/language1"
 homepage = "https://cloud.google.com/natural-language/"
-documentation = "https://docs.rs/google-language1/5.0.3+20230121"
+documentation = "https://docs.rs/google-language1/5.0.3+20240303"
 license = "MIT"
 keywords = ["language", "google", "protocol", "web", "api"]
 autobins = false

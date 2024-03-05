@@ -1,4 +1,4 @@
-site_name: Cloud Redis v5.0.3+20230111
+site_name: Cloud Redis v5.0.3+20240226
 site_url: http://byron.github.io/google-apis-rs/google-redis1-cli
 site_description: A complete library to interact with Cloud Redis (protocol v1)
 
@@ -10,6 +10,12 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Clusters Create': 'projects_locations-clusters-create.md'
+    - 'Locations Clusters Delete': 'projects_locations-clusters-delete.md'
+    - 'Locations Clusters Get': 'projects_locations-clusters-get.md'
+    - 'Locations Clusters Get Certificate Authority': 'projects_locations-clusters-get-certificate-authority.md'
+    - 'Locations Clusters List': 'projects_locations-clusters-list.md'
+    - 'Locations Clusters Patch': 'projects_locations-clusters-patch.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Instances Create': 'projects_locations-instances-create.md'
     - 'Locations Instances Delete': 'projects_locations-instances-delete.md'

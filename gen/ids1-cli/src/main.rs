@@ -1467,7 +1467,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -1494,7 +1494,7 @@ async fn main() {
     
     let mut app = App::new("ids1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221113")
+           .version("5.0.3+20231203")
            .about("Cloud IDS (Cloud Intrusion Detection System) detects malware, spyware, command-and-control attacks, and other network-based threats. Its security efficacy is industry leading, built with Palo Alto Networks technologies. When you use this product, your organization name and consumption levels will be shared with Palo Alto Networks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ids1_cli")
            .arg(Arg::with_name("url")

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-apigateway1-cli"
-version = "5.0.3+20221213"
+version = "5.0.3+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with apigateway (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/apigateway1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-apigateway1]
 path = "../apigateway1"
-version = "5.0.3+20221213"
+version = "5.0.3+20240221"
 

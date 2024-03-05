@@ -4,7 +4,7 @@
 [package]
 
 name = "google-resourcesettings1-cli"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Resource Settings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/resourcesettings1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-resourcesettings1]
 path = "../resourcesettings1"
-version = "5.0.3+20230123"
+version = "5.0.3+20240303"
 

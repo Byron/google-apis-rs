@@ -1,4 +1,4 @@
-site_name: Cloud Dataplex v5.0.3+20230120
+site_name: Cloud Dataplex v5.0.3+20240224
 site_url: http://byron.github.io/google-apis-rs/google-dataplex1-cli
 site_description: A complete library to interact with Cloud Dataplex (protocol v1)
 
@@ -10,6 +10,9 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Aspect Types Get Iam Policy': 'projects_locations-aspect-types-get-iam-policy.md'
+    - 'Locations Aspect Types Set Iam Policy': 'projects_locations-aspect-types-set-iam-policy.md'
+    - 'Locations Aspect Types Test Iam Permissions': 'projects_locations-aspect-types-test-iam-permissions.md'
     - 'Locations Data Attribute Bindings Create': 'projects_locations-data-attribute-bindings-create.md'
     - 'Locations Data Attribute Bindings Delete': 'projects_locations-data-attribute-bindings-delete.md'
     - 'Locations Data Attribute Bindings Get': 'projects_locations-data-attribute-bindings-get.md'
@@ -45,7 +48,16 @@ nav:
     - 'Locations Data Taxonomies Patch': 'projects_locations-data-taxonomies-patch.md'
     - 'Locations Data Taxonomies Set Iam Policy': 'projects_locations-data-taxonomies-set-iam-policy.md'
     - 'Locations Data Taxonomies Test Iam Permissions': 'projects_locations-data-taxonomies-test-iam-permissions.md'
+    - 'Locations Entry Groups Get Iam Policy': 'projects_locations-entry-groups-get-iam-policy.md'
+    - 'Locations Entry Groups Set Iam Policy': 'projects_locations-entry-groups-set-iam-policy.md'
+    - 'Locations Entry Groups Test Iam Permissions': 'projects_locations-entry-groups-test-iam-permissions.md'
+    - 'Locations Entry Types Get Iam Policy': 'projects_locations-entry-types-get-iam-policy.md'
+    - 'Locations Entry Types Set Iam Policy': 'projects_locations-entry-types-set-iam-policy.md'
+    - 'Locations Entry Types Test Iam Permissions': 'projects_locations-entry-types-test-iam-permissions.md'
     - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Governance Rules Get Iam Policy': 'projects_locations-governance-rules-get-iam-policy.md'
+    - 'Locations Governance Rules Set Iam Policy': 'projects_locations-governance-rules-set-iam-policy.md'
+    - 'Locations Governance Rules Test Iam Permissions': 'projects_locations-governance-rules-test-iam-permissions.md'
     - 'Locations Lakes Actions List': 'projects_locations-lakes-actions-list.md'
     - 'Locations Lakes Content Create': 'projects_locations-lakes-content-create.md'
     - 'Locations Lakes Content Delete': 'projects_locations-lakes-content-delete.md'

@@ -1,4 +1,4 @@
-site_name: AlertCenter v5.0.3+20230123
+site_name: AlertCenter v5.0.3+20240304
 site_url: http://byron.github.io/google-apis-rs/google-alertcenter1_beta1-cli
 site_description: A complete library to interact with AlertCenter (protocol v1beta1)
 

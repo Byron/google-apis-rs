@@ -1,4 +1,4 @@
-site_name: Database Migration Service v5.0.3+20230105
+site_name: Database Migration Service v5.0.3+20240221
 site_url: http://byron.github.io/google-apis-rs/google-datamigration1-cli
 site_description: A complete library to interact with Database Migration Service (protocol v1)
 
@@ -26,17 +26,27 @@ nav:
     - 'Locations Conversion Workspaces Describe Conversion Workspace Revisions': 'projects_locations-conversion-workspaces-describe-conversion-workspace-revisions.md'
     - 'Locations Conversion Workspaces Describe Database Entities': 'projects_locations-conversion-workspaces-describe-database-entities.md'
     - 'Locations Conversion Workspaces Get': 'projects_locations-conversion-workspaces-get.md'
+    - 'Locations Conversion Workspaces Get Iam Policy': 'projects_locations-conversion-workspaces-get-iam-policy.md'
     - 'Locations Conversion Workspaces List': 'projects_locations-conversion-workspaces-list.md'
+    - 'Locations Conversion Workspaces Mapping Rules Create': 'projects_locations-conversion-workspaces-mapping-rules-create.md'
+    - 'Locations Conversion Workspaces Mapping Rules Delete': 'projects_locations-conversion-workspaces-mapping-rules-delete.md'
+    - 'Locations Conversion Workspaces Mapping Rules Get': 'projects_locations-conversion-workspaces-mapping-rules-get.md'
     - 'Locations Conversion Workspaces Mapping Rules Import': 'projects_locations-conversion-workspaces-mapping-rules-import.md'
+    - 'Locations Conversion Workspaces Mapping Rules List': 'projects_locations-conversion-workspaces-mapping-rules-list.md'
     - 'Locations Conversion Workspaces Patch': 'projects_locations-conversion-workspaces-patch.md'
     - 'Locations Conversion Workspaces Rollback': 'projects_locations-conversion-workspaces-rollback.md'
     - 'Locations Conversion Workspaces Search Background Jobs': 'projects_locations-conversion-workspaces-search-background-jobs.md'
     - 'Locations Conversion Workspaces Seed': 'projects_locations-conversion-workspaces-seed.md'
+    - 'Locations Conversion Workspaces Set Iam Policy': 'projects_locations-conversion-workspaces-set-iam-policy.md'
+    - 'Locations Conversion Workspaces Test Iam Permissions': 'projects_locations-conversion-workspaces-test-iam-permissions.md'
+    - 'Locations Fetch Static Ips': 'projects_locations-fetch-static-ips.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Migration Jobs Create': 'projects_locations-migration-jobs-create.md'
     - 'Locations Migration Jobs Delete': 'projects_locations-migration-jobs-delete.md'
+    - 'Locations Migration Jobs Demote Destination': 'projects_locations-migration-jobs-demote-destination.md'
     - 'Locations Migration Jobs Generate Ssh Script': 'projects_locations-migration-jobs-generate-ssh-script.md'
+    - 'Locations Migration Jobs Generate Tcp Proxy Script': 'projects_locations-migration-jobs-generate-tcp-proxy-script.md'
     - 'Locations Migration Jobs Get': 'projects_locations-migration-jobs-get.md'
     - 'Locations Migration Jobs Get Iam Policy': 'projects_locations-migration-jobs-get-iam-policy.md'
     - 'Locations Migration Jobs List': 'projects_locations-migration-jobs-list.md'
@@ -56,7 +66,10 @@ nav:
     - 'Locations Private Connections Create': 'projects_locations-private-connections-create.md'
     - 'Locations Private Connections Delete': 'projects_locations-private-connections-delete.md'
     - 'Locations Private Connections Get': 'projects_locations-private-connections-get.md'
+    - 'Locations Private Connections Get Iam Policy': 'projects_locations-private-connections-get-iam-policy.md'
     - 'Locations Private Connections List': 'projects_locations-private-connections-list.md'
+    - 'Locations Private Connections Set Iam Policy': 'projects_locations-private-connections-set-iam-policy.md'
+    - 'Locations Private Connections Test Iam Permissions': 'projects_locations-private-connections-test-iam-permissions.md'
 
 theme: readthedocs
 

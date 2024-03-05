@@ -1,4 +1,4 @@
-site_name: Assuredworkloads v5.0.3+20230116
+site_name: Assuredworkloads v5.0.3+20240222
 site_url: http://byron.github.io/google-apis-rs/google-assuredworkloads1-cli
 site_description: A complete library to interact with Assuredworkloads (protocol v1)
 
@@ -12,8 +12,10 @@ nav:
 - 'Organizations':
     - 'Locations Operations Get': 'organizations_locations-operations-get.md'
     - 'Locations Operations List': 'organizations_locations-operations-list.md'
+    - 'Locations Workloads Analyze Workload Move': 'organizations_locations-workloads-analyze-workload-move.md'
     - 'Locations Workloads Create': 'organizations_locations-workloads-create.md'
     - 'Locations Workloads Delete': 'organizations_locations-workloads-delete.md'
+    - 'Locations Workloads Enable Resource Monitoring': 'organizations_locations-workloads-enable-resource-monitoring.md'
     - 'Locations Workloads Get': 'organizations_locations-workloads-get.md'
     - 'Locations Workloads List': 'organizations_locations-workloads-list.md'
     - 'Locations Workloads Mutate Partner Permissions': 'organizations_locations-workloads-mutate-partner-permissions.md'

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Web Risk* crate version *5.0.3+20230121*, where *20230121* is the exact revision of the *webrisk:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Web Risk* crate version *5.0.3+20240303*, where *20240303* is the exact revision of the *webrisk:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Web Risk* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/web-risk/).
@@ -14,7 +14,7 @@
 //! * hashes
 //!  * [*search*](api::HashSearchCall)
 //! * projects
-//!  * [*operations cancel*](api::ProjectOperationCancelCall), [*operations delete*](api::ProjectOperationDeleteCall), [*operations get*](api::ProjectOperationGetCall), [*operations list*](api::ProjectOperationListCall), [*submissions create*](api::ProjectSubmissionCreateCall) and [*uris submit*](api::ProjectUriSubmitCall)
+//!  * [*operations cancel*](api::ProjectOperationCancelCall), [*operations delete*](api::ProjectOperationDeleteCall), [*operations get*](api::ProjectOperationGetCall), [*operations list*](api::ProjectOperationListCall) and [*submissions create*](api::ProjectSubmissionCreateCall)
 //! * threat lists
 //!  * [*compute diff*](api::ThreatListComputeDiffCall)
 //! * uris
@@ -53,8 +53,8 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().operations_get(...).doit().await
-//! let r = hub.projects().uris_submit(...).doit().await
+//! let r = hub.projects().operations_cancel(...).doit().await
+//! let r = hub.projects().operations_delete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -81,7 +81,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_webrisk1 as webrisk1;
-//! use webrisk1::api::GoogleCloudWebriskV1SubmitUriRequest;
+//! use webrisk1::api::GoogleLongrunningCancelOperationRequest;
 //! use webrisk1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -103,12 +103,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleCloudWebriskV1SubmitUriRequest::default();
+//! let mut req = GoogleLongrunningCancelOperationRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().uris_submit(req, "parent")
+//! let result = hub.projects().operations_cancel(req, "name")
 //!              .doit().await;
 //! 
 //! match result {

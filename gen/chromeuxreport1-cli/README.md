@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Chrome UX Report* API at revision *20230117*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Chrome UX Report* API at revision *20240228*. The CLI is at version *5.0.3*.
 
 ```bash
 chromeuxreport1 [options]
         records
+                query-history-record (-r <kv>)... [-p <v>]... [-o <out>]
                 query-record (-r <kv>)... [-p <v>]... [-o <out>]
   chromeuxreport1 --help
 

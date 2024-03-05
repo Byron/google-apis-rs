@@ -86,17 +86,20 @@ where
                     "budget-filter.custom-period.start-date.month" => Some(("budgetFilter.customPeriod.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "budget-filter.custom-period.start-date.year" => Some(("budgetFilter.customPeriod.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "budget-filter.projects" => Some(("budgetFilter.projects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "budget-filter.resource-ancestors" => Some(("budgetFilter.resourceAncestors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "budget-filter.services" => Some(("budgetFilter.services", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "budget-filter.subaccounts" => Some(("budgetFilter.subaccounts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications-rule.disable-default-iam-recipients" => Some(("notificationsRule.disableDefaultIamRecipients", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "notifications-rule.enable-project-level-recipients" => Some(("notificationsRule.enableProjectLevelRecipients", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notifications-rule.monitoring-notification-channels" => Some(("notificationsRule.monitoringNotificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "notifications-rule.pubsub-topic" => Some(("notificationsRule.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications-rule.schema-version" => Some(("notificationsRule.schemaVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ownership-scope" => Some(("ownershipScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "budget-filter", "calendar-period", "credit-types", "credit-types-treatment", "currency-code", "custom-period", "day", "disable-default-iam-recipients", "display-name", "end-date", "etag", "monitoring-notification-channels", "month", "name", "nanos", "notifications-rule", "projects", "pubsub-topic", "schema-version", "services", "specified-amount", "start-date", "subaccounts", "units", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "budget-filter", "calendar-period", "credit-types", "credit-types-treatment", "currency-code", "custom-period", "day", "disable-default-iam-recipients", "display-name", "enable-project-level-recipients", "end-date", "etag", "monitoring-notification-channels", "month", "name", "nanos", "notifications-rule", "ownership-scope", "projects", "pubsub-topic", "resource-ancestors", "schema-version", "services", "specified-amount", "start-date", "subaccounts", "units", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -266,6 +269,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "scope" => {
+                    call = call.scope(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -285,7 +291,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "scope"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -355,17 +361,20 @@ where
                     "budget-filter.custom-period.start-date.month" => Some(("budgetFilter.customPeriod.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "budget-filter.custom-period.start-date.year" => Some(("budgetFilter.customPeriod.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "budget-filter.projects" => Some(("budgetFilter.projects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "budget-filter.resource-ancestors" => Some(("budgetFilter.resourceAncestors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "budget-filter.services" => Some(("budgetFilter.services", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "budget-filter.subaccounts" => Some(("budgetFilter.subaccounts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications-rule.disable-default-iam-recipients" => Some(("notificationsRule.disableDefaultIamRecipients", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "notifications-rule.enable-project-level-recipients" => Some(("notificationsRule.enableProjectLevelRecipients", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notifications-rule.monitoring-notification-channels" => Some(("notificationsRule.monitoringNotificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "notifications-rule.pubsub-topic" => Some(("notificationsRule.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications-rule.schema-version" => Some(("notificationsRule.schemaVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ownership-scope" => Some(("ownershipScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "budget-filter", "calendar-period", "credit-types", "credit-types-treatment", "currency-code", "custom-period", "day", "disable-default-iam-recipients", "display-name", "end-date", "etag", "monitoring-notification-channels", "month", "name", "nanos", "notifications-rule", "projects", "pubsub-topic", "schema-version", "services", "specified-amount", "start-date", "subaccounts", "units", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "budget-filter", "calendar-period", "credit-types", "credit-types-treatment", "currency-code", "custom-period", "day", "disable-default-iam-recipients", "display-name", "enable-project-level-recipients", "end-date", "etag", "monitoring-notification-channels", "month", "name", "nanos", "notifications-rule", "ownership-scope", "projects", "pubsub-topic", "resource-ancestors", "schema-version", "services", "specified-amount", "start-date", "subaccounts", "units", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -659,7 +668,7 @@ async fn main() {
     
     let mut app = App::new("billingbudgets1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.3+20240225")
            .about("The Cloud Billing Budget API stores Cloud Billing budgets, which define a budget plan and the rules to execute as spend is tracked against that plan.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_billingbudgets1_cli")
            .arg(Arg::with_name("url")

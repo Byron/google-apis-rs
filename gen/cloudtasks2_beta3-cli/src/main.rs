@@ -102,6 +102,58 @@ where
         }
     }
 
+    async fn _projects_locations_get_cmek_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_get_cmek_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
@@ -192,6 +244,10 @@ where
                     "app-engine-http-queue.app-engine-routing-override.service" => Some(("appEngineHttpQueue.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-queue.app-engine-routing-override.version" => Some(("appEngineHttpQueue.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.http-method" => Some(("httpTarget.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.scope" => Some(("httpTarget.oauthToken.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.service-account-email" => Some(("httpTarget.oauthToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.audience" => Some(("httpTarget.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.service-account-email" => Some(("httpTarget.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.uri-override.host" => Some(("httpTarget.uriOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.uri-override.path-override.path" => Some(("httpTarget.uriOverride.pathOverride.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.uri-override.port" => Some(("httpTarget.uriOverride.port", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -219,7 +275,7 @@ where
                     "tombstone-ttl" => Some(("tombstoneTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "http-method", "http-target", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "oldest-estimated-arrival-time", "path", "path-override", "port", "purge-time", "query-override", "query-params", "rate-limits", "retry-config", "sampling-ratio", "scheme", "service", "stackdriver-logging-config", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "type", "uri-override", "uri-override-enforce-mode", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "audience", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "http-method", "http-target", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "oauth-token", "oidc-token", "oldest-estimated-arrival-time", "path", "path-override", "port", "purge-time", "query-override", "query-params", "rate-limits", "retry-config", "sampling-ratio", "scheme", "scope", "service", "service-account-email", "stackdriver-logging-config", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "type", "uri-override", "uri-override-enforce-mode", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -565,6 +621,10 @@ where
                     "app-engine-http-queue.app-engine-routing-override.service" => Some(("appEngineHttpQueue.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-queue.app-engine-routing-override.version" => Some(("appEngineHttpQueue.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.http-method" => Some(("httpTarget.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.scope" => Some(("httpTarget.oauthToken.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oauth-token.service-account-email" => Some(("httpTarget.oauthToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.audience" => Some(("httpTarget.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-target.oidc-token.service-account-email" => Some(("httpTarget.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.uri-override.host" => Some(("httpTarget.uriOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.uri-override.path-override.path" => Some(("httpTarget.uriOverride.pathOverride.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-target.uri-override.port" => Some(("httpTarget.uriOverride.port", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -592,7 +652,7 @@ where
                     "tombstone-ttl" => Some(("tombstoneTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "http-method", "http-target", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "oldest-estimated-arrival-time", "path", "path-override", "port", "purge-time", "query-override", "query-params", "rate-limits", "retry-config", "sampling-ratio", "scheme", "service", "stackdriver-logging-config", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "type", "uri-override", "uri-override-enforce-mode", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "audience", "concurrent-dispatches-count", "effective-execution-rate", "executed-last-minute-count", "host", "http-method", "http-target", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "oauth-token", "oidc-token", "oldest-estimated-arrival-time", "path", "path-override", "port", "purge-time", "query-override", "query-params", "rate-limits", "retry-config", "sampling-ratio", "scheme", "scope", "service", "service-account-email", "stackdriver-logging-config", "state", "stats", "task-ttl", "tasks-count", "tombstone-ttl", "type", "uri-override", "uri-override-enforce-mode", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1540,6 +1600,96 @@ where
         }
     }
 
+    async fn _projects_locations_update_cmek_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kms-key", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CmekConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_update_cmek_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -1549,6 +1699,9 @@ where
                 match opt.subcommand() {
                     ("locations-get", Some(opt)) => {
                         call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-get-cmek-config", Some(opt)) => {
+                        call_result = self._projects_locations_get_cmek_config(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
@@ -1603,6 +1756,9 @@ where
                     },
                     ("locations-queues-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_locations_queues_test_iam_permissions(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-update-cmek-config", Some(opt)) => {
+                        call_result = self._projects_locations_update_cmek_config(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1683,7 +1839,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-list', 'locations-queues-create', 'locations-queues-delete', 'locations-queues-get', 'locations-queues-get-iam-policy', 'locations-queues-list', 'locations-queues-patch', 'locations-queues-pause', 'locations-queues-purge', 'locations-queues-resume', 'locations-queues-set-iam-policy', 'locations-queues-tasks-buffer', 'locations-queues-tasks-create', 'locations-queues-tasks-delete', 'locations-queues-tasks-get', 'locations-queues-tasks-list', 'locations-queues-tasks-run' and 'locations-queues-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-get', 'locations-get-cmek-config', 'locations-list', 'locations-queues-create', 'locations-queues-delete', 'locations-queues-get', 'locations-queues-get-iam-policy', 'locations-queues-list', 'locations-queues-patch', 'locations-queues-pause', 'locations-queues-purge', 'locations-queues-resume', 'locations-queues-set-iam-policy', 'locations-queues-tasks-buffer', 'locations-queues-tasks-create', 'locations-queues-tasks-delete', 'locations-queues-tasks-get', 'locations-queues-tasks-list', 'locations-queues-tasks-run', 'locations-queues-test-iam-permissions' and 'locations-update-cmek-config'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-get",
@@ -1691,6 +1847,28 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Resource name for the location."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-get-cmek-config",
+                    Some(r##"Gets the CMEK config. Gets the Customer Managed Encryption Key configured with the Cloud Tasks lcoation. By default there is no kms_key configured."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-get-cmek-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The config resource name. For example: projects/PROJECT_ID/locations/LOCATION_ID/cmekConfig`"##),
                      Some(true),
                      Some(false)),
         
@@ -1757,7 +1935,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-queues-delete",
-                    Some(r##"Deletes a queue. This command will delete the queue even if it has tasks in it. Note: If you delete a queue, a queue with the same name can't be created for 7 days. WARNING: Using this method may have unintended side effects if you are using an App Engine `queue.yaml` or `queue.xml` file to manage your queues. Read [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using this method."##),
+                    Some(r##"Deletes a queue. This command will delete the queue even if it has tasks in it. Note : If you delete a queue, you may be prevented from creating a new queue with the same name as the deleted queue for a tombstone window of up to 3 days. During this window, the CreateQueue operation may appear to recreate the queue, but this can be misleading. If you attempt to create a queue with the same name as one that is in the tombstone window, run GetQueue to confirm that the queue creation was successful. If GetQueue returns 200 response code, your queue was successfully created with the name of the previously deleted queue. Otherwise, your queue did not successfully recreate. WARNING: Using this method may have unintended side effects if you are using an App Engine `queue.yaml` or `queue.xml` file to manage your queues. Read [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-delete",
                   vec![
                     (Some(r##"name"##),
@@ -1991,7 +2169,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-queues-tasks-buffer",
-                    Some(r##"Creates and buffers a new task without the need to explicitly define a Task message. The queue must have HTTP target. To create the task with a custom ID, use the following format and set TASK_ID to your desired ID: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID:buffer To create the task with an automatically generated ID, use the following format: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks:buffer. Note: This feature is in its experimental stage. You must request access to the API through the [Cloud Tasks BufferTask Experiment Signup form](https://forms.gle/X8Zr5hiXH5tTGFqh8)."##),
+                    Some(r##"Creates and buffers a new task without the need to explicitly define a Task message. The queue must have HTTP target. To create the task with a custom ID, use the following format and set TASK_ID to your desired ID: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID:buffer To create the task with an automatically generated ID, use the following format: projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks:buffer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-tasks-buffer",
                   vec![
                     (Some(r##"queue"##),
@@ -2174,13 +2352,41 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-update-cmek-config",
+                    Some(r##"Creates or Updates a CMEK config. Updates the Customer Managed Encryption Key assotiated with the Cloud Tasks location (Creates if the key does not already exist). All new tasks created in the location will be encrypted at-rest with the KMS-key provided in the config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-update-cmek-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. The config resource name which includes the project and location and must end in 'cmekConfig', in the format projects/PROJECT_ID/locations/LOCATION_ID/cmekConfig`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("cloudtasks2-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.3+20240223")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli")
            .arg(Arg::with_name("url")

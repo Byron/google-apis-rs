@@ -4,7 +4,7 @@
 [package]
 
 name = "google-analyticsadmin1_alpha-cli"
-version = "5.0.3+20220307"
+version = "5.0.3+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Google Analytics Admin (protocol v1alpha)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsadmin1_alpha-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-analyticsadmin1_alpha]
 path = "../analyticsadmin1_alpha"
-version = "5.0.3+20220307"
+version = "5.0.3+20240303"
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *5.0.3+20230119*, where *20230119* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *storage* crate version *5.0.3+20240229*, where *20240229* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -11,20 +11,26 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Storage) ... 
 //! 
+//! * anywhere caches
+//!  * [*disable*](api::AnywhereCachDisableCall), [*get*](api::AnywhereCachGetCall), [*insert*](api::AnywhereCachInsertCall), [*list*](api::AnywhereCachListCall), [*pause*](api::AnywhereCachPauseCall), [*resume*](api::AnywhereCachResumeCall) and [*update*](api::AnywhereCachUpdateCall)
 //! * [bucket access controls](api::BucketAccessControl)
 //!  * [*delete*](api::BucketAccessControlDeleteCall), [*get*](api::BucketAccessControlGetCall), [*insert*](api::BucketAccessControlInsertCall), [*list*](api::BucketAccessControlListCall), [*patch*](api::BucketAccessControlPatchCall) and [*update*](api::BucketAccessControlUpdateCall)
 //! * [buckets](api::Bucket)
-//!  * [*delete*](api::BucketDeleteCall), [*get*](api::BucketGetCall), [*get iam policy*](api::BucketGetIamPolicyCall), [*insert*](api::BucketInsertCall), [*list*](api::BucketListCall), [*lock retention policy*](api::BucketLockRetentionPolicyCall), [*patch*](api::BucketPatchCall), [*set iam policy*](api::BucketSetIamPolicyCall), [*test iam permissions*](api::BucketTestIamPermissionCall) and [*update*](api::BucketUpdateCall)
+//!  * [*delete*](api::BucketDeleteCall), [*get*](api::BucketGetCall), [*get iam policy*](api::BucketGetIamPolicyCall), [*insert*](api::BucketInsertCall), [*list*](api::BucketListCall), [*lock retention policy*](api::BucketLockRetentionPolicyCall), [*operations cancel*](api::BucketOperationCancelCall), [*operations get*](api::BucketOperationGetCall), [*operations list*](api::BucketOperationListCall), [*patch*](api::BucketPatchCall), [*set iam policy*](api::BucketSetIamPolicyCall), [*test iam permissions*](api::BucketTestIamPermissionCall) and [*update*](api::BucketUpdateCall)
 //! * [channels](api::Channel)
 //!  * [*stop*](api::ChannelStopCall)
 //! * default object access controls
 //!  * [*delete*](api::DefaultObjectAccessControlDeleteCall), [*get*](api::DefaultObjectAccessControlGetCall), [*insert*](api::DefaultObjectAccessControlInsertCall), [*list*](api::DefaultObjectAccessControlListCall), [*patch*](api::DefaultObjectAccessControlPatchCall) and [*update*](api::DefaultObjectAccessControlUpdateCall)
+//! * [folders](api::Folder)
+//!  * [*delete*](api::FolderDeleteCall), [*get*](api::FolderGetCall), [*insert*](api::FolderInsertCall), [*list*](api::FolderListCall) and [*rename*](api::FolderRenameCall)
+//! * [managed folders](api::ManagedFolder)
+//!  * [*delete*](api::ManagedFolderDeleteCall), [*get*](api::ManagedFolderGetCall), [*get iam policy*](api::ManagedFolderGetIamPolicyCall), [*insert*](api::ManagedFolderInsertCall), [*list*](api::ManagedFolderListCall), [*set iam policy*](api::ManagedFolderSetIamPolicyCall) and [*test iam permissions*](api::ManagedFolderTestIamPermissionCall)
 //! * [notifications](api::Notification)
 //!  * [*delete*](api::NotificationDeleteCall), [*get*](api::NotificationGetCall), [*insert*](api::NotificationInsertCall) and [*list*](api::NotificationListCall)
 //! * [object access controls](api::ObjectAccessControl)
 //!  * [*delete*](api::ObjectAccessControlDeleteCall), [*get*](api::ObjectAccessControlGetCall), [*insert*](api::ObjectAccessControlInsertCall), [*list*](api::ObjectAccessControlListCall), [*patch*](api::ObjectAccessControlPatchCall) and [*update*](api::ObjectAccessControlUpdateCall)
 //! * [objects](api::Object)
-//!  * [*compose*](api::ObjectComposeCall), [*copy*](api::ObjectCopyCall), [*delete*](api::ObjectDeleteCall), [*get*](api::ObjectGetCall), [*get iam policy*](api::ObjectGetIamPolicyCall), [*insert*](api::ObjectInsertCall), [*list*](api::ObjectListCall), [*patch*](api::ObjectPatchCall), [*rewrite*](api::ObjectRewriteCall), [*set iam policy*](api::ObjectSetIamPolicyCall), [*test iam permissions*](api::ObjectTestIamPermissionCall), [*update*](api::ObjectUpdateCall) and [*watch all*](api::ObjectWatchAllCall)
+//!  * [*bulk restore*](api::ObjectBulkRestoreCall), [*compose*](api::ObjectComposeCall), [*copy*](api::ObjectCopyCall), [*delete*](api::ObjectDeleteCall), [*get*](api::ObjectGetCall), [*get iam policy*](api::ObjectGetIamPolicyCall), [*insert*](api::ObjectInsertCall), [*list*](api::ObjectListCall), [*patch*](api::ObjectPatchCall), [*restore*](api::ObjectRestoreCall), [*rewrite*](api::ObjectRewriteCall), [*set iam policy*](api::ObjectSetIamPolicyCall), [*test iam permissions*](api::ObjectTestIamPermissionCall), [*update*](api::ObjectUpdateCall) and [*watch all*](api::ObjectWatchAllCall)
 //! * projects
 //!  * [*hmac keys create*](api::ProjectHmacKeyCreateCall), [*hmac keys delete*](api::ProjectHmacKeyDeleteCall), [*hmac keys get*](api::ProjectHmacKeyGetCall), [*hmac keys list*](api::ProjectHmacKeyListCall), [*hmac keys update*](api::ProjectHmacKeyUpdateCall) and [*service account get*](api::ProjectServiceAccountGetCall)
 //! 
@@ -74,6 +80,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.objects().bulk_restore(...).doit().await
 //! let r = hub.objects().compose(...).doit().await
 //! let r = hub.objects().copy(...).doit().await
 //! let r = hub.objects().delete(...).doit().await
@@ -82,6 +89,7 @@
 //! let r = hub.objects().insert(...).doit().await
 //! let r = hub.objects().list(...).doit().await
 //! let r = hub.objects().patch(...).doit().await
+//! let r = hub.objects().restore(...).doit().await
 //! let r = hub.objects().rewrite(...).doit().await
 //! let r = hub.objects().set_iam_policy(...).doit().await
 //! let r = hub.objects().test_iam_permissions(...).doit().await

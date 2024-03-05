@@ -4,12 +4,12 @@
 [package]
 
 name = "google-androiddeviceprovisioning1"
-version = "5.0.3+20230115"
+version = "5.0.3+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Provisioning Partner (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/androiddeviceprovisioning1"
 homepage = "https://developers.google.com/zero-touch/"
-documentation = "https://docs.rs/google-androiddeviceprovisioning1/5.0.3+20230115"
+documentation = "https://docs.rs/google-androiddeviceprovisioning1/5.0.3+20240304"
 license = "MIT"
 keywords = ["androiddeviceprovisi", "google", "protocol", "web", "api"]
 autobins = false

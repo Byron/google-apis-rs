@@ -169,6 +169,7 @@ where
                     "document-style.even-page-header-id" => Some(("documentStyle.evenPageHeaderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.first-page-footer-id" => Some(("documentStyle.firstPageFooterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.first-page-header-id" => Some(("documentStyle.firstPageHeaderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-style.flip-page-orientation" => Some(("documentStyle.flipPageOrientation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "document-style.margin-bottom.magnitude" => Some(("documentStyle.marginBottom.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "document-style.margin-bottom.unit" => Some(("documentStyle.marginBottom.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.margin-footer.magnitude" => Some(("documentStyle.marginFooter.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -193,7 +194,7 @@ where
                     "suggestions-view-mode" => Some(("suggestionsViewMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "blue", "color", "default-footer-id", "default-header-id", "document-id", "document-style", "even-page-footer-id", "even-page-header-id", "first-page-footer-id", "first-page-header-id", "green", "height", "magnitude", "margin-bottom", "margin-footer", "margin-header", "margin-left", "margin-right", "margin-top", "page-number-start", "page-size", "red", "revision-id", "rgb-color", "suggestions-view-mode", "title", "unit", "use-custom-header-footer-margins", "use-even-page-header-footer", "use-first-page-header-footer", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "blue", "color", "default-footer-id", "default-header-id", "document-id", "document-style", "even-page-footer-id", "even-page-header-id", "first-page-footer-id", "first-page-header-id", "flip-page-orientation", "green", "height", "magnitude", "margin-bottom", "margin-footer", "margin-header", "margin-left", "margin-right", "margin-top", "page-number-start", "page-size", "red", "revision-id", "rgb-color", "suggestions-view-mode", "title", "unit", "use-custom-header-footer-margins", "use-even-page-header-footer", "use-first-page-header-footer", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -483,7 +484,7 @@ async fn main() {
     
     let mut app = App::new("docs1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.3+20240229")
            .about("Reads and writes Google Docs documents.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_docs1_cli")
            .arg(Arg::with_name("url")

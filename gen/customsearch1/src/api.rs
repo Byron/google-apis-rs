@@ -361,7 +361,7 @@ impl client::Part for PromotionImage {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultImage {
-    /// The size of the image, in pixels.
+    /// The size of the image, in bytes.
     #[serde(rename="byteSize")]
     
     pub byte_size: Option<i32>,
@@ -1444,7 +1444,7 @@ where
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should be pages that are related to the specified URL.
+    /// Deprecated.
     ///
     /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
@@ -2014,7 +2014,7 @@ where
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should be pages that are related to the specified URL.
+    /// Deprecated.
     ///
     /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, S> {

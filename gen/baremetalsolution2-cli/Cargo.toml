@@ -4,7 +4,7 @@
 [package]
 
 name = "google-baremetalsolution2-cli"
-version = "5.0.3+20230113"
+version = "5.0.3+20240228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with baremetalsolution (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/baremetalsolution2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-baremetalsolution2]
 path = "../baremetalsolution2"
-version = "5.0.3+20230113"
+version = "5.0.3+20240228"
 

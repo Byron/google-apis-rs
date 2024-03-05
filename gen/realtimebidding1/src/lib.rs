@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Real-time Bidding* crate version *5.0.3+20230124*, where *20230124* is the exact revision of the *realtimebidding:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Real-time Bidding* crate version *5.0.3+20240305*, where *20240305* is the exact revision of the *realtimebidding:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Real-time Bidding* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/realtimebidding/reference/rest/).

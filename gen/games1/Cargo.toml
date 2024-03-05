@@ -4,12 +4,12 @@
 [package]
 
 name = "google-games1"
-version = "5.0.3+20230112"
+version = "5.0.3+20240228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/games1"
 homepage = "https://developers.google.com/games/"
-documentation = "https://docs.rs/google-games1/5.0.3+20230112"
+documentation = "https://docs.rs/google-games1/5.0.3+20240228"
 license = "MIT"
 keywords = ["games", "google", "protocol", "web", "api"]
 autobins = false

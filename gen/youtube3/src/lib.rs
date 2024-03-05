@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *YouTube* crate version *5.0.3+20240303*, where *20240303* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/).
@@ -45,6 +45,8 @@
 //!  * [*list*](api::MemberListCall)
 //! * [memberships levels](api::MembershipsLevel)
 //!  * [*list*](api::MembershipsLevelListCall)
+//! * [playlist images](api::PlaylistImage)
+//!  * [*delete*](api::PlaylistImageDeleteCall), [*insert*](api::PlaylistImageInsertCall), [*list*](api::PlaylistImageListCall) and [*update*](api::PlaylistImageUpdateCall)
 //! * [playlist items](api::PlaylistItem)
 //!  * [*delete*](api::PlaylistItemDeleteCall), [*insert*](api::PlaylistItemInsertCall), [*list*](api::PlaylistItemListCall) and [*update*](api::PlaylistItemUpdateCall)
 //! * [playlists](api::Playlist)
@@ -78,6 +80,8 @@
 //! * [*insert captions*](api::CaptionInsertCall)
 //! * [*update captions*](api::CaptionUpdateCall)
 //! * [*insert channel banners*](api::ChannelBannerInsertCall)
+//! * [*insert playlist images*](api::PlaylistImageInsertCall)
+//! * [*update playlist images*](api::PlaylistImageUpdateCall)
 //! * [*set thumbnails*](api::ThumbnailSetCall)
 //! * [*insert videos*](api::VideoInsertCall)
 //! * [*set watermarks*](api::WatermarkSetCall)

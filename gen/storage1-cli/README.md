@@ -25,10 +25,18 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storage* API at revision *20230119*. The CLI is at version *5.0.3*.
+This documentation was generated from the *storage* API at revision *20240229*. The CLI is at version *5.0.3*.
 
 ```bash
 storage1 [options]
+        anywhere-caches
+                disable <bucket> <anywhere-cache-id> [-p <v>]... [-o <out>]
+                get <bucket> <anywhere-cache-id> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
+                pause <bucket> <anywhere-cache-id> [-p <v>]... [-o <out>]
+                resume <bucket> <anywhere-cache-id> [-p <v>]... [-o <out>]
+                update <bucket> <anywhere-cache-id> (-r <kv>)... [-p <v>]... [-o <out>]
         bucket-access-controls
                 delete <bucket> <entity> [-p <v>]...
                 get <bucket> <entity> [-p <v>]... [-o <out>]
@@ -43,6 +51,9 @@ storage1 [options]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 lock-retention-policy <bucket> <if-metageneration-match> [-p <v>]... [-o <out>]
+                operations-cancel <bucket> <operation-id> [-p <v>]...
+                operations-get <bucket> <operation-id> [-p <v>]... [-o <out>]
+                operations-list <bucket> [-p <v>]... [-o <out>]
                 patch <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <bucket> <permissions>... [-p <v>]... [-o <out>]
@@ -56,6 +67,20 @@ storage1 [options]
                 list <bucket> [-p <v>]... [-o <out>]
                 patch <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+        folders
+                delete <bucket> <folder> [-p <v>]...
+                get <bucket> <folder> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
+                rename <bucket> <source-folder> <destination-folder> [-p <v>]... [-o <out>]
+        managed-folders
+                delete <bucket> <managed-folder> [-p <v>]...
+                get <bucket> <managed-folder> [-p <v>]... [-o <out>]
+                get-iam-policy <bucket> <managed-folder> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
+                set-iam-policy <bucket> <managed-folder> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <bucket> <managed-folder> <permissions>... [-p <v>]... [-o <out>]
         notifications
                 delete <bucket> <notification> [-p <v>]...
                 get <bucket> <notification> [-p <v>]... [-o <out>]
@@ -69,6 +94,7 @@ storage1 [options]
                 patch <bucket> <object> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <bucket> <object> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
         objects
+                bulk-restore <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
                 compose <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
                 copy <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <bucket> <object> [-p <v>]...
@@ -77,6 +103,7 @@ storage1 [options]
                 insert <bucket> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 list <bucket> [-p <v>]... [-o <out>]
                 patch <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
+                restore <bucket> <object> <generation> (-r <kv>)... [-p <v>]... [-o <out>]
                 rewrite <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <bucket> <object> <permissions>... [-p <v>]... [-o <out>]

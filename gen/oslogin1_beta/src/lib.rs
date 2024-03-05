@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud OS Login* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *oslogin:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud OS Login* crate version *5.0.3+20240225*, where *20240225* is the exact revision of the *oslogin:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud OS Login* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/oslogin/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudOSLogin) ... 
 //! 
 //! * users
-//!  * [*get login profile*](api::UserGetLoginProfileCall), [*import ssh public key*](api::UserImportSshPublicKeyCall), [*projects delete*](api::UserProjectDeleteCall), [*ssh public keys create*](api::UserSshPublicKeyCreateCall), [*ssh public keys delete*](api::UserSshPublicKeyDeleteCall), [*ssh public keys get*](api::UserSshPublicKeyGetCall) and [*ssh public keys patch*](api::UserSshPublicKeyPatchCall)
+//!  * [*get login profile*](api::UserGetLoginProfileCall), [*import ssh public key*](api::UserImportSshPublicKeyCall), [*projects delete*](api::UserProjectDeleteCall), [*projects locations sign ssh public key*](api::UserProjectLocationSignSshPublicKeyCall), [*projects zones sign ssh public key*](api::UserProjectZoneSignSshPublicKeyCall), [*ssh public keys create*](api::UserSshPublicKeyCreateCall), [*ssh public keys delete*](api::UserSshPublicKeyDeleteCall), [*ssh public keys get*](api::UserSshPublicKeyGetCall) and [*ssh public keys patch*](api::UserSshPublicKeyPatchCall)
 //! 
 //! 
 //! 
@@ -105,8 +105,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().import_ssh_public_key(req, "parent")
-//!              .view("voluptua.")
-//!              .project_id("At")
+//!              .view("At")
+//!              .add_regions("sanctus")
+//!              .project_id("sed")
 //!              .doit().await;
 //! 
 //! match result {

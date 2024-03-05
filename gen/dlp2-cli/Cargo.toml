@@ -4,11 +4,11 @@
 [package]
 
 name = "google-dlp2-cli"
-version = "5.0.3+20230121"
+version = "5.0.3+20240225"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DLP (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dlp2-cli"
-homepage = "https://cloud.google.com/dlp/docs/"
+homepage = "https://cloud.google.com/sensitive-data-protection/docs/"
 documentation = "http://byron.github.io/google-apis-rs/google_dlp2_cli"
 license = "MIT"
 keywords = ["dlp", "google", "cli"]
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dlp2]
 path = "../dlp2"
-version = "5.0.3+20230121"
+version = "5.0.3+20240225"
 

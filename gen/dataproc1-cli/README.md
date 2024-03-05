@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc* API at revision *20230103*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Dataproc* API at revision *20240222*. The CLI is at version *5.0.3*.
 
 ```bash
 dataproc1 [options]
@@ -46,6 +46,16 @@ dataproc1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-session-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-session-templates-delete <name> [-p <v>]... [-o <out>]
+                locations-session-templates-get <name> [-p <v>]... [-o <out>]
+                locations-session-templates-list <parent> [-p <v>]... [-o <out>]
+                locations-session-templates-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-sessions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-sessions-delete <name> [-p <v>]... [-o <out>]
+                locations-sessions-get <name> [-p <v>]... [-o <out>]
+                locations-sessions-list <parent> [-p <v>]... [-o <out>]
+                locations-sessions-terminate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-workflow-templates-get <name> [-p <v>]... [-o <out>]
@@ -73,6 +83,7 @@ dataproc1 [options]
                 regions-clusters-list <project-id> <region> [-p <v>]... [-o <out>]
                 regions-clusters-node-groups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-node-groups-get <name> [-p <v>]... [-o <out>]
+                regions-clusters-node-groups-repair <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-node-groups-resize <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-patch <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-repair <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]

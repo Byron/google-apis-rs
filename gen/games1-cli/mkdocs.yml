@@ -1,4 +1,4 @@
-site_name: Games v5.0.3+20230112
+site_name: Games v5.0.3+20240228
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -35,8 +35,14 @@ nav:
     - 'List Categories By Player': 'metagame_list-categories-by-player.md'
 - 'Players':
     - 'Get': 'players_get.md'
+    - 'Get Multiple Application Player Ids': 'players_get-multiple-application-player-ids.md'
     - 'Get Scoped Player Ids': 'players_get-scoped-player-ids.md'
     - 'List': 'players_list.md'
+- 'Recall':
+    - 'Link Persona': 'recall_link-persona.md'
+    - 'Reset Persona': 'recall_reset-persona.md'
+    - 'Retrieve Tokens': 'recall_retrieve-tokens.md'
+    - 'Unlink Persona': 'recall_unlink-persona.md'
 - 'Revisions':
     - 'Check': 'revisions_check.md'
 - 'Scores':

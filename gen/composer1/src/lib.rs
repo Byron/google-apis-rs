@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Composer* crate version *5.0.3+20230107*, where *20230107* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Composer* crate version *5.0.3+20240227*, where *20240227* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud Composer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/composer/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudComposer) ... 
 //! 
 //! * projects
-//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations environments load snapshot*](api::ProjectLocationEnvironmentLoadSnapshotCall), [*locations environments patch*](api::ProjectLocationEnvironmentPatchCall), [*locations environments save snapshot*](api::ProjectLocationEnvironmentSaveSnapshotCall), [*locations image versions list*](api::ProjectLocationImageVersionListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments database failover*](api::ProjectLocationEnvironmentDatabaseFailoverCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments execute airflow command*](api::ProjectLocationEnvironmentExecuteAirflowCommandCall), [*locations environments fetch database properties*](api::ProjectLocationEnvironmentFetchDatabasePropertyCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations environments load snapshot*](api::ProjectLocationEnvironmentLoadSnapshotCall), [*locations environments patch*](api::ProjectLocationEnvironmentPatchCall), [*locations environments poll airflow command*](api::ProjectLocationEnvironmentPollAirflowCommandCall), [*locations environments save snapshot*](api::ProjectLocationEnvironmentSaveSnapshotCall), [*locations environments stop airflow command*](api::ProjectLocationEnvironmentStopAirflowCommandCall), [*locations environments user workloads config maps create*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapCreateCall), [*locations environments user workloads config maps delete*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapDeleteCall), [*locations environments user workloads config maps get*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapGetCall), [*locations environments user workloads config maps list*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapListCall), [*locations environments user workloads config maps update*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapUpdateCall), [*locations environments user workloads secrets create*](api::ProjectLocationEnvironmentUserWorkloadsSecretCreateCall), [*locations environments user workloads secrets delete*](api::ProjectLocationEnvironmentUserWorkloadsSecretDeleteCall), [*locations environments user workloads secrets get*](api::ProjectLocationEnvironmentUserWorkloadsSecretGetCall), [*locations environments user workloads secrets list*](api::ProjectLocationEnvironmentUserWorkloadsSecretListCall), [*locations environments user workloads secrets update*](api::ProjectLocationEnvironmentUserWorkloadsSecretUpdateCall), [*locations environments workloads list*](api::ProjectLocationEnvironmentWorkloadListCall), [*locations image versions list*](api::ProjectLocationImageVersionListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -48,6 +48,7 @@
 //! 
 //! ```ignore
 //! let r = hub.projects().locations_environments_create(...).doit().await
+//! let r = hub.projects().locations_environments_database_failover(...).doit().await
 //! let r = hub.projects().locations_environments_delete(...).doit().await
 //! let r = hub.projects().locations_environments_load_snapshot(...).doit().await
 //! let r = hub.projects().locations_environments_patch(...).doit().await

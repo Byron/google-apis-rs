@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Context Manager* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *accesscontextmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Access Context Manager* crate version *5.0.3+20240226*, where *20240226* is the exact revision of the *accesscontextmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Access Context Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-context-manager/docs/reference/rest/).
@@ -17,6 +17,8 @@
 //!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * organizations
 //!  * [*gcp user access bindings create*](api::OrganizationGcpUserAccessBindingCreateCall), [*gcp user access bindings delete*](api::OrganizationGcpUserAccessBindingDeleteCall), [*gcp user access bindings get*](api::OrganizationGcpUserAccessBindingGetCall), [*gcp user access bindings list*](api::OrganizationGcpUserAccessBindingListCall) and [*gcp user access bindings patch*](api::OrganizationGcpUserAccessBindingPatchCall)
+//! * services
+//!  * [*get*](api::ServiceGetCall) and [*list*](api::ServiceListCall)
 //! 
 //! 
 //! 

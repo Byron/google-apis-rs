@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, create, and delete your Google Ads accounts and data.
     Adword,
@@ -345,6 +345,11 @@ pub struct GoogleAdsHomeservicesLocalservicesV1DetailedLeadReport {
     /// Location of the associated account's home city.
     
     pub geo: Option<String>,
+    /// Unique identifier of a Detailed Lead Report.
+    #[serde(rename="googleAdsLeadId")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub google_ads_lead_id: Option<i64>,
     /// Lead category (e.g. hvac, plumber)
     #[serde(rename="leadCategory")]
     
@@ -353,7 +358,7 @@ pub struct GoogleAdsHomeservicesLocalservicesV1DetailedLeadReport {
     #[serde(rename="leadCreationTimestamp")]
     
     pub lead_creation_timestamp: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Unique identifier of a Detailed Lead Report.
+    /// Deprecated in favor of google_ads_lead_id. Unique identifier of a Detailed Lead Report.
     #[serde(rename="leadId")]
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]

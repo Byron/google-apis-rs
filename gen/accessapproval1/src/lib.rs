@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Approval* crate version *5.0.3+20230120*, where *20230120* is the exact revision of the *accessapproval:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Access Approval* crate version *5.0.3+20240223*, where *20240223* is the exact revision of the *accessapproval:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Access Approval* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/cloud-provider-access-management/access-approval/docs).
+//! [official documentation site](https://cloud.google.com/assured-workloads/access-approval/docs).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/accessapproval1).
 //! # Features
 //! 

@@ -1,4 +1,4 @@
-site_name: Data Catalog v5.0.3+20230117
+site_name: Data Catalog v5.0.3+20240222
 site_url: http://byron.github.io/google-apis-rs/google-datacatalog1-cli
 site_description: A complete library to interact with Data Catalog (protocol v1)
 
@@ -30,6 +30,7 @@ nav:
     - 'Locations Entry Groups Entries Tags Delete': 'projects_locations-entry-groups-entries-tags-delete.md'
     - 'Locations Entry Groups Entries Tags List': 'projects_locations-entry-groups-entries-tags-list.md'
     - 'Locations Entry Groups Entries Tags Patch': 'projects_locations-entry-groups-entries-tags-patch.md'
+    - 'Locations Entry Groups Entries Tags Reconcile': 'projects_locations-entry-groups-entries-tags-reconcile.md'
     - 'Locations Entry Groups Entries Test Iam Permissions': 'projects_locations-entry-groups-entries-test-iam-permissions.md'
     - 'Locations Entry Groups Entries Unstar': 'projects_locations-entry-groups-entries-unstar.md'
     - 'Locations Entry Groups Get': 'projects_locations-entry-groups-get.md'

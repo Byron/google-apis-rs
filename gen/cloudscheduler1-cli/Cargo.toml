@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudscheduler1-cli"
-version = "5.0.3+20230106"
+version = "5.0.3+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Scheduler (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudscheduler1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudscheduler1]
 path = "../cloudscheduler1"
-version = "5.0.3+20230106"
+version = "5.0.3+20240226"
 

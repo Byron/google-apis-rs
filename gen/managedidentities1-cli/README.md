@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Managed Service for Microsoft Active Directory Consumer API* API at revision *20221227*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Managed Service for Microsoft Active Directory Consumer API* API at revision *20240112*. The CLI is at version *5.0.3*.
 
 ```bash
 managedidentities1 [options]
@@ -40,9 +40,13 @@ managedidentities1 [options]
                 locations-global-domains-backups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-domains-backups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-domains-backups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-global-domains-check-migration-permission <domain> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-domains-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-domains-delete <name> [-p <v>]... [-o <out>]
                 locations-global-domains-detach-trust <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-global-domains-disable-migration <domain> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-global-domains-domain-join-machine <domain> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-global-domains-enable-migration <domain> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-domains-extend-schema <domain> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-domains-get <name> [-p <v>]... [-o <out>]
                 locations-global-domains-get-iam-policy <resource> [-p <v>]... [-o <out>]

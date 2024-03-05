@@ -1,4 +1,4 @@
-site_name: Binary Authorization v5.0.3+20230113
+site_name: Binary Authorization v5.0.3+20240223
 site_url: http://byron.github.io/google-apis-rs/google-binaryauthorization1-cli
 site_description: A complete library to interact with Binary Authorization (protocol v1)
 
@@ -20,6 +20,12 @@ nav:
     - 'Attestors Update': 'projects_attestors-update.md'
     - 'Attestors Validate Attestation Occurrence': 'projects_attestors-validate-attestation-occurrence.md'
     - 'Get Policy': 'projects_get-policy.md'
+    - 'Platforms Gke Policies Evaluate': 'projects_platforms-gke-policies-evaluate.md'
+    - 'Platforms Policies Create': 'projects_platforms-policies-create.md'
+    - 'Platforms Policies Delete': 'projects_platforms-policies-delete.md'
+    - 'Platforms Policies Get': 'projects_platforms-policies-get.md'
+    - 'Platforms Policies List': 'projects_platforms-policies-list.md'
+    - 'Platforms Policies Replace Platform Policy': 'projects_platforms-policies-replace-platform-policy.md'
     - 'Policy Get Iam Policy': 'projects_policy-get-iam-policy.md'
     - 'Policy Set Iam Policy': 'projects_policy-set-iam-policy.md'
     - 'Policy Test Iam Permissions': 'projects_policy-test-iam-permissions.md'

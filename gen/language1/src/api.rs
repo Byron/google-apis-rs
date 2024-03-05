@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Apply machine learning models to reveal the structure and meaning of text
     CloudLanguage,
@@ -375,10 +375,50 @@ pub struct AnnotateTextRequest {
     pub encoding_type: Option<String>,
     /// Required. The enabled features.
     
-    pub features: Option<Features>,
+    pub features: Option<AnnotateTextRequestFeatures>,
 }
 
 impl client::RequestValue for AnnotateTextRequest {}
+
+
+/// All available features for sentiment, syntax, and semantic analysis. Setting each one to true will enable that specific analysis for the input.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AnnotateTextRequestFeatures {
+    /// Optional. The model options to use for classification. Defaults to v1 options if not specified. Only used if `classify_text` is set to true.
+    #[serde(rename="classificationModelOptions")]
+    
+    pub classification_model_options: Option<ClassificationModelOptions>,
+    /// Classify the full document into categories.
+    #[serde(rename="classifyText")]
+    
+    pub classify_text: Option<bool>,
+    /// Extract document-level sentiment.
+    #[serde(rename="extractDocumentSentiment")]
+    
+    pub extract_document_sentiment: Option<bool>,
+    /// Extract entities.
+    #[serde(rename="extractEntities")]
+    
+    pub extract_entities: Option<bool>,
+    /// Extract entities and their associated sentiment.
+    #[serde(rename="extractEntitySentiment")]
+    
+    pub extract_entity_sentiment: Option<bool>,
+    /// Extract syntax information.
+    #[serde(rename="extractSyntax")]
+    
+    pub extract_syntax: Option<bool>,
+    /// Moderate the document for harmful and sensitive categories.
+    #[serde(rename="moderateText")]
+    
+    pub moderate_text: Option<bool>,
+}
+
+impl client::Part for AnnotateTextRequestFeatures {}
 
 
 /// The text annotations response message.
@@ -405,6 +445,10 @@ pub struct AnnotateTextResponse {
     /// The language of the text, which will be the same as the language specified in the request or, if not specified, the automatically-detected language. See Document.language field for more details.
     
     pub language: Option<String>,
+    /// Harmful and sensitive categories identified in the input document.
+    #[serde(rename="moderationCategories")]
+    
+    pub moderation_categories: Option<Vec<ClassificationCategory>>,
     /// Sentences in the input document. Populated if the user enables AnnotateTextRequest.Features.extract_syntax.
     
     pub sentences: Option<Vec<Sentence>>,
@@ -426,7 +470,7 @@ pub struct ClassificationCategory {
     /// The classifier's confidence of the category. Number represents how certain the classifier is that this category represents the given text.
     
     pub confidence: Option<f32>,
-    /// The name of the category representing the document, from the [predefined taxonomy](https://cloud.google.com/natural-language/docs/categories).
+    /// The name of the category representing the document.
     
     pub name: Option<String>,
 }
@@ -444,14 +488,41 @@ pub struct ClassificationModelOptions {
     /// Setting this field will use the V1 model and V1 content categories version. The V1 model is a legacy model; support for this will be discontinued in the future.
     #[serde(rename="v1Model")]
     
-    pub v1_model: Option<V1Model>,
+    pub v1_model: Option<ClassificationModelOptionsV1Model>,
     /// Setting this field will use the V2 model with the appropriate content categories version. The V2 model is a better performing model.
     #[serde(rename="v2Model")]
     
-    pub v2_model: Option<V2Model>,
+    pub v2_model: Option<ClassificationModelOptionsV2Model>,
 }
 
 impl client::Part for ClassificationModelOptions {}
+
+
+/// Options for the V1 model.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClassificationModelOptionsV1Model { _never_set: Option<bool> }
+
+impl client::Part for ClassificationModelOptionsV1Model {}
+
+
+/// Options for the V2 model.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClassificationModelOptionsV2Model {
+    /// The content categories used for classification.
+    #[serde(rename="contentCategoriesVersion")]
+    
+    pub content_categories_version: Option<String>,
+}
+
+impl client::Part for ClassificationModelOptionsV2Model {}
 
 
 /// The document classification request message.
@@ -465,7 +536,7 @@ impl client::Part for ClassificationModelOptions {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClassifyTextRequest {
-    /// Model options to use for classification. Defaults to v1 options if not specified.
+    /// Optional. Model options to use for classification. Defaults to v1 options if not specified.
     #[serde(rename="classificationModelOptions")]
     
     pub classification_model_options: Option<ClassificationModelOptions>,
@@ -528,6 +599,7 @@ impl client::Part for DependencyEdge {}
 /// * [analyze syntax documents](DocumentAnalyzeSyntaxCall) (none)
 /// * [annotate text documents](DocumentAnnotateTextCall) (none)
 /// * [classify text documents](DocumentClassifyTextCall) (none)
+/// * [moderate text documents](DocumentModerateTextCall) (none)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Document {
@@ -603,40 +675,43 @@ pub struct EntityMention {
 impl client::Part for EntityMention {}
 
 
-/// All available features for sentiment, syntax, and semantic analysis. Setting each one to true will enable that specific analysis for the input.
+/// The document moderation request message.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [moderate text documents](DocumentModerateTextCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Features {
-    /// The model options to use for classification. Defaults to v1 options if not specified. Only used if `classify_text` is set to true.
-    #[serde(rename="classificationModelOptions")]
+pub struct ModerateTextRequest {
+    /// Required. Input document.
     
-    pub classification_model_options: Option<ClassificationModelOptions>,
-    /// Classify the full document into categories.
-    #[serde(rename="classifyText")]
-    
-    pub classify_text: Option<bool>,
-    /// Extract document-level sentiment.
-    #[serde(rename="extractDocumentSentiment")]
-    
-    pub extract_document_sentiment: Option<bool>,
-    /// Extract entities.
-    #[serde(rename="extractEntities")]
-    
-    pub extract_entities: Option<bool>,
-    /// Extract entities and their associated sentiment.
-    #[serde(rename="extractEntitySentiment")]
-    
-    pub extract_entity_sentiment: Option<bool>,
-    /// Extract syntax information.
-    #[serde(rename="extractSyntax")]
-    
-    pub extract_syntax: Option<bool>,
+    pub document: Option<Document>,
 }
 
-impl client::Part for Features {}
+impl client::RequestValue for ModerateTextRequest {}
+
+
+/// The document moderation response message.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [moderate text documents](DocumentModerateTextCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModerateTextResponse {
+    /// Harmful and sensitive categories representing the input document.
+    #[serde(rename="moderationCategories")]
+    
+    pub moderation_categories: Option<Vec<ClassificationCategory>>,
+}
+
+impl client::ResponseResult for ModerateTextResponse {}
 
 
 /// Represents part of speech information for a token. Parts of speech are as defined in http://www.lrec-conf.org/proceedings/lrec2012/pdf/274_Paper.pdf
@@ -723,7 +798,7 @@ pub struct Sentiment {
 impl client::Part for Sentiment {}
 
 
-/// Represents an output piece of text.
+/// Represents a text span in the input document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -734,7 +809,7 @@ pub struct TextSpan {
     #[serde(rename="beginOffset")]
     
     pub begin_offset: Option<i32>,
-    /// The content of the output text.
+    /// The content of the text span, which is a substring of the document.
     
     pub content: Option<String>,
 }
@@ -768,33 +843,6 @@ pub struct Token {
 impl client::Part for Token {}
 
 
-/// Options for the V1 model.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct V1Model { _never_set: Option<bool> }
-
-impl client::Part for V1Model {}
-
-
-/// Options for the V2 model.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct V2Model {
-    /// The content categories used for classification.
-    #[serde(rename="contentCategoriesVersion")]
-    
-    pub content_categories_version: Option<String>,
-}
-
-impl client::Part for V2Model {}
-
-
 
 // ###################
 // MethodBuilders ###
@@ -823,7 +871,7 @@ impl client::Part for V2Model {}
 ///     ).build().await.unwrap();
 /// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `analyze_entities(...)`, `analyze_entity_sentiment(...)`, `analyze_sentiment(...)`, `analyze_syntax(...)`, `annotate_text(...)` and `classify_text(...)`
+/// // like `analyze_entities(...)`, `analyze_entity_sentiment(...)`, `analyze_sentiment(...)`, `analyze_syntax(...)`, `annotate_text(...)`, `classify_text(...)` and `moderate_text(...)`
 /// // to build up your call.
 /// let rb = hub.documents();
 /// # }
@@ -932,6 +980,23 @@ impl<'a, S> DocumentMethods<'a, S> {
     /// * `request` - No description provided.
     pub fn classify_text(&self, request: ClassifyTextRequest) -> DocumentClassifyTextCall<'a, S> {
         DocumentClassifyTextCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Moderates a document for harmful and sensitive categories.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn moderate_text(&self, request: ModerateTextRequest) -> DocumentModerateTextCall<'a, S> {
+        DocumentModerateTextCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -2581,6 +2646,279 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> DocumentClassifyTextCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Moderates a document for harmful and sensitive categories.
+///
+/// A builder for the *moderateText* method supported by a *document* resource.
+/// It is not used directly, but through a [`DocumentMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_language1 as language1;
+/// use language1::api::ModerateTextRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use language1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ModerateTextRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.documents().moderate_text(req)
+///              .doit().await;
+/// # }
+/// ```
+pub struct DocumentModerateTextCall<'a, S>
+    where S: 'a {
+
+    hub: &'a CloudNaturalLanguage<S>,
+    _request: ModerateTextRequest,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for DocumentModerateTextCall<'a, S> {}
+
+impl<'a, S> DocumentModerateTextCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ModerateTextResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "language.documents.moderateText",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/documents:moderateText";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudLanguage.as_ref().to_string());
+        }
+
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ModerateTextRequest) -> DocumentModerateTextCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentModerateTextCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentModerateTextCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudLanguage`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> DocumentModerateTextCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentModerateTextCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> DocumentModerateTextCall<'a, S> {
         self._scopes.clear();
         self
     }

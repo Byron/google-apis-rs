@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *BigQuery Data Transfer* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *bigquerydatatransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *BigQuery Data Transfer* crate version *5.0.3+20240227*, where *20240227* is the exact revision of the *bigquerydatatransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *BigQuery Data Transfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery-transfer/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](BigQueryDataTransfer) ... 
 //! 
 //! * projects
-//!  * [*data sources check valid creds*](api::ProjectDataSourceCheckValidCredCall), [*data sources get*](api::ProjectDataSourceGetCall), [*data sources list*](api::ProjectDataSourceListCall), [*enroll data sources*](api::ProjectEnrollDataSourceCall), [*locations data sources check valid creds*](api::ProjectLocationDataSourceCheckValidCredCall), [*locations data sources get*](api::ProjectLocationDataSourceGetCall), [*locations data sources list*](api::ProjectLocationDataSourceListCall), [*locations enroll data sources*](api::ProjectLocationEnrollDataSourceCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations transfer configs create*](api::ProjectLocationTransferConfigCreateCall), [*locations transfer configs delete*](api::ProjectLocationTransferConfigDeleteCall), [*locations transfer configs get*](api::ProjectLocationTransferConfigGetCall), [*locations transfer configs list*](api::ProjectLocationTransferConfigListCall), [*locations transfer configs patch*](api::ProjectLocationTransferConfigPatchCall), [*locations transfer configs runs delete*](api::ProjectLocationTransferConfigRunDeleteCall), [*locations transfer configs runs get*](api::ProjectLocationTransferConfigRunGetCall), [*locations transfer configs runs list*](api::ProjectLocationTransferConfigRunListCall), [*locations transfer configs runs transfer logs list*](api::ProjectLocationTransferConfigRunTransferLogListCall), [*locations transfer configs schedule runs*](api::ProjectLocationTransferConfigScheduleRunCall), [*locations transfer configs start manual runs*](api::ProjectLocationTransferConfigStartManualRunCall), [*transfer configs create*](api::ProjectTransferConfigCreateCall), [*transfer configs delete*](api::ProjectTransferConfigDeleteCall), [*transfer configs get*](api::ProjectTransferConfigGetCall), [*transfer configs list*](api::ProjectTransferConfigListCall), [*transfer configs patch*](api::ProjectTransferConfigPatchCall), [*transfer configs runs delete*](api::ProjectTransferConfigRunDeleteCall), [*transfer configs runs get*](api::ProjectTransferConfigRunGetCall), [*transfer configs runs list*](api::ProjectTransferConfigRunListCall), [*transfer configs runs transfer logs list*](api::ProjectTransferConfigRunTransferLogListCall), [*transfer configs schedule runs*](api::ProjectTransferConfigScheduleRunCall) and [*transfer configs start manual runs*](api::ProjectTransferConfigStartManualRunCall)
+//!  * [*data sources check valid creds*](api::ProjectDataSourceCheckValidCredCall), [*data sources get*](api::ProjectDataSourceGetCall), [*data sources list*](api::ProjectDataSourceListCall), [*enroll data sources*](api::ProjectEnrollDataSourceCall), [*locations data sources check valid creds*](api::ProjectLocationDataSourceCheckValidCredCall), [*locations data sources get*](api::ProjectLocationDataSourceGetCall), [*locations data sources list*](api::ProjectLocationDataSourceListCall), [*locations enroll data sources*](api::ProjectLocationEnrollDataSourceCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations transfer configs create*](api::ProjectLocationTransferConfigCreateCall), [*locations transfer configs delete*](api::ProjectLocationTransferConfigDeleteCall), [*locations transfer configs get*](api::ProjectLocationTransferConfigGetCall), [*locations transfer configs list*](api::ProjectLocationTransferConfigListCall), [*locations transfer configs patch*](api::ProjectLocationTransferConfigPatchCall), [*locations transfer configs runs delete*](api::ProjectLocationTransferConfigRunDeleteCall), [*locations transfer configs runs get*](api::ProjectLocationTransferConfigRunGetCall), [*locations transfer configs runs list*](api::ProjectLocationTransferConfigRunListCall), [*locations transfer configs runs transfer logs list*](api::ProjectLocationTransferConfigRunTransferLogListCall), [*locations transfer configs schedule runs*](api::ProjectLocationTransferConfigScheduleRunCall), [*locations transfer configs start manual runs*](api::ProjectLocationTransferConfigStartManualRunCall), [*locations unenroll data sources*](api::ProjectLocationUnenrollDataSourceCall), [*transfer configs create*](api::ProjectTransferConfigCreateCall), [*transfer configs delete*](api::ProjectTransferConfigDeleteCall), [*transfer configs get*](api::ProjectTransferConfigGetCall), [*transfer configs list*](api::ProjectTransferConfigListCall), [*transfer configs patch*](api::ProjectTransferConfigPatchCall), [*transfer configs runs delete*](api::ProjectTransferConfigRunDeleteCall), [*transfer configs runs get*](api::ProjectTransferConfigRunGetCall), [*transfer configs runs list*](api::ProjectTransferConfigRunListCall), [*transfer configs runs transfer logs list*](api::ProjectTransferConfigRunTransferLogListCall), [*transfer configs schedule runs*](api::ProjectTransferConfigScheduleRunCall) and [*transfer configs start manual runs*](api::ProjectTransferConfigStartManualRunCall)
 //! 
 //! 
 //! 
@@ -47,12 +47,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_transfer_configs_create(...).doit().await
-//! let r = hub.projects().locations_transfer_configs_get(...).doit().await
-//! let r = hub.projects().locations_transfer_configs_patch(...).doit().await
-//! let r = hub.projects().transfer_configs_create(...).doit().await
-//! let r = hub.projects().transfer_configs_get(...).doit().await
-//! let r = hub.projects().transfer_configs_patch(...).doit().await
+//! let r = hub.projects().locations_transfer_configs_runs_delete(...).doit().await
+//! let r = hub.projects().locations_transfer_configs_delete(...).doit().await
+//! let r = hub.projects().locations_enroll_data_sources(...).doit().await
+//! let r = hub.projects().locations_unenroll_data_sources(...).doit().await
+//! let r = hub.projects().transfer_configs_runs_delete(...).doit().await
+//! let r = hub.projects().transfer_configs_delete(...).doit().await
+//! let r = hub.projects().enroll_data_sources(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -79,7 +80,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_bigquerydatatransfer1 as bigquerydatatransfer1;
-//! use bigquerydatatransfer1::api::TransferConfig;
+//! use bigquerydatatransfer1::api::EnrollDataSourcesRequest;
 //! use bigquerydatatransfer1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -101,16 +102,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = TransferConfig::default();
+//! let mut req = EnrollDataSourcesRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_transfer_configs_patch(req, "name")
-//!              .version_info("At")
-//!              .update_mask(&Default::default())
-//!              .service_account_name("sanctus")
-//!              .authorization_code("sed")
+//! let result = hub.projects().locations_enroll_data_sources(req, "name")
 //!              .doit().await;
 //! 
 //! match result {

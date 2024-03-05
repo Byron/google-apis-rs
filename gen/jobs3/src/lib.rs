@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Talent Solution* crate version *5.0.3+20230120*, where *20230120* is the exact revision of the *jobs:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Talent Solution* crate version *5.0.3+20240202*, where *20240202* is the exact revision of the *jobs:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Cloud Talent Solution* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/talent-solution/job-search/docs/).

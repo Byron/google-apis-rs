@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -238,6 +238,18 @@ pub struct AccessApprovalSettings {
     #[serde(rename="notificationEmails")]
     
     pub notification_emails: Option<Vec<String>>,
+    /// Optional. A pubsub topic to which notifications relating to approval requests should be sent.
+    #[serde(rename="notificationPubsubTopic")]
+    
+    pub notification_pubsub_topic: Option<String>,
+    /// This preference is communicated to Google personnel when sending an approval request but can be overridden if necessary.
+    #[serde(rename="preferNoBroadApprovalRequests")]
+    
+    pub prefer_no_broad_approval_requests: Option<bool>,
+    /// This preference is shared with Google personnel, but can be overridden if said personnel deems necessary. The approver ultimately can set the expiration at approval time.
+    #[serde(rename="preferredRequestExpirationDays")]
+    
+    pub preferred_request_expiration_days: Option<i32>,
 }
 
 impl client::RequestValue for AccessApprovalSettings {}
@@ -318,7 +330,12 @@ pub struct ApprovalRequest {
     #[serde(rename="requestTime")]
     
     pub request_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// The requested expiration for the approval. If the request is approved, access will be granted from the time of approval until the expiration time.
+    /// The requested access duration.
+    #[serde(rename="requestedDuration")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub requested_duration: Option<client::chrono::Duration>,
+    /// The original requested expiration for the approval. Calculated by adding the requested_duration to the request_time.
     #[serde(rename="requestedExpiration")]
     
     pub requested_expiration: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -457,7 +474,7 @@ impl client::ResponseResult for Empty {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnrolledService {
-    /// The product for which Access Approval will be enrolled. Allowed values are listed below (case-sensitive): * all * GA * App Engine . * Artifact Registry * BigQuery * Cloud Bigtable * Cloud Key Management Service * Compute Engine * Cloud Dataflow * Cloud Dataproc * Cloud DLP * Cloud EKM * Cloud HSM * Cloud Identity and Access Management * Cloud Logging * Cloud Pub/Sub * Cloud Spanner * Cloud SQL * Cloud Storage * Google Kubernetes Engine * Organization Policy Serivice * Persistent Disk * Resource Manager * Secret Manager * Speaker ID Note: These values are supported as input for legacy purposes, but will not be returned from the API. * all * ga-only * appengine.googleapis.com * artifactregistry.googleapis.com * bigquery.googleapis.com * bigtable.googleapis.com * container.googleapis.com * cloudkms.googleapis.com * cloudresourcemanager.googleapis.com * cloudsql.googleapis.com * compute.googleapis.com * dataflow.googleapis.com * dataproc.googleapis.com * dlp.googleapis.com * iam.googleapis.com * logging.googleapis.com * orgpolicy.googleapis.com * pubsub.googleapis.com * spanner.googleapis.com * secretmanager.googleapis.com * speakerid.googleapis.com * storage.googleapis.com Calls to UpdateAccessApprovalSettings using 'all' or any of the XXX.googleapis.com will be translated to the associated product name ('all', 'App Engine', etc.). Note: 'all' will enroll the resource in all products supported at both 'GA' and 'Preview' levels. More information about levels of support is available at https://cloud.google.com/access-approval/docs/supported-services
+    /// The product for which Access Approval will be enrolled. Allowed values are listed below (case-sensitive): * all * GA * App Engine * Artifact Registry * BigQuery * Certificate Authority Service * Cloud Bigtable * Cloud Key Management Service * Compute Engine * Cloud Composer * Cloud Dataflow * Cloud Dataproc * Cloud DLP * Cloud EKM * Cloud Firestore * Cloud HSM * Cloud Identity and Access Management * Cloud Logging * Cloud NAT * Cloud Pub/Sub * Cloud Spanner * Cloud SQL * Cloud Storage * Eventarc * Google Kubernetes Engine * Organization Policy Serivice * Persistent Disk * Resource Manager * Secret Manager * Speaker ID Note: These values are supported as input for legacy purposes, but will not be returned from the API. * all * ga-only * appengine.googleapis.com * artifactregistry.googleapis.com * bigquery.googleapis.com * bigtable.googleapis.com * container.googleapis.com * cloudkms.googleapis.com * cloudresourcemanager.googleapis.com * cloudsql.googleapis.com * compute.googleapis.com * dataflow.googleapis.com * dataproc.googleapis.com * dlp.googleapis.com * iam.googleapis.com * logging.googleapis.com * orgpolicy.googleapis.com * pubsub.googleapis.com * spanner.googleapis.com * secretmanager.googleapis.com * speakerid.googleapis.com * storage.googleapis.com Calls to UpdateAccessApprovalSettings using 'all' or any of the XXX.googleapis.com will be translated to the associated product name ('all', 'App Engine', etc.). Note: 'all' will enroll the resource in all products supported at both 'GA' and 'Preview' levels. More information about levels of support is available at https://cloud.google.com/access-approval/docs/supported-services
     #[serde(rename="cloudProduct")]
     
     pub cloud_product: Option<String>,
@@ -540,13 +557,22 @@ pub struct SignatureInfo {
     #[serde(rename="customerKmsKeyVersion")]
     
     pub customer_kms_key_version: Option<String>,
+    /// The hashing algorithm used for signature verification. It will only be present in the case of Google managed keys.
+    #[serde(rename="googleKeyAlgorithm")]
+    
+    pub google_key_algorithm: Option<String>,
     /// The public key for the Google default signing, encoded in PEM format. The signature was created using a private key which may be verified using this public key.
     #[serde(rename="googlePublicKeyPem")]
     
     pub google_public_key_pem: Option<String>,
+    /// The ApprovalRequest that is serialized without the SignatureInfo message field. This data is used with the hashing algorithm to generate the digital signature, and it can be used for signature verification.
+    #[serde(rename="serializedApprovalRequest")]
+    
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    pub serialized_approval_request: Option<Vec<u8>>,
     /// The digital signature.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub signature: Option<Vec<u8>>,
 }
 

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See detailed information about apps installed on Chrome browsers and devices managed by your organization
     ChromeManagementAppdetailReadonly,
@@ -289,7 +289,7 @@ pub struct GoogleChromeManagementV1AppDetails {
 impl client::ResponseResult for GoogleChromeManagementV1AppDetails {}
 
 
-/// Status data for storage. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceAudioStatus](https://chromeenterprise.google/policies/#ReportDeviceAudioStatus) * Data Collection Frequency: 10 minutes * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Status data for storage. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceAudioStatus](https://chromeenterprise.google/policies/#ReportDeviceAudioStatus) * Data Collection Frequency: 10 minutes * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_AUDIO_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -329,7 +329,7 @@ pub struct GoogleChromeManagementV1AudioStatusReport {
 impl client::Part for GoogleChromeManagementV1AudioStatusReport {}
 
 
-/// Information about the battery. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDevicePowerStatus](https://chromeenterprise.google/policies/#ReportDevicePowerStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Information about the battery. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDevicePowerStatus](https://chromeenterprise.google/policies/#ReportDevicePowerStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_BATTERY_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -407,7 +407,7 @@ pub struct GoogleChromeManagementV1BatterySampleReport {
 impl client::Part for GoogleChromeManagementV1BatterySampleReport {}
 
 
-/// Status data for battery. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDevicePowerStatus](https://chromeenterprise.google/policies/#ReportDevicePowerStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Status data for battery. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDevicePowerStatus](https://chromeenterprise.google/policies/#ReportDevicePowerStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_BATTERY_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -443,7 +443,7 @@ pub struct GoogleChromeManagementV1BatteryStatusReport {
 impl client::Part for GoogleChromeManagementV1BatteryStatusReport {}
 
 
-/// Boot performance report of a device. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceBootMode](https://chromeenterprise.google/policies/#ReportDeviceBootMode) * Data Collection Frequency: On every boot up event * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A
+/// Boot performance report of a device. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceBootMode](https://chromeenterprise.google/policies/#ReportDeviceBootMode) * Data Collection Frequency: On every boot up event * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_OS_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -674,6 +674,37 @@ pub struct GoogleChromeManagementV1CountChromeAppRequestsResponse {
 impl client::ResponseResult for GoogleChromeManagementV1CountChromeAppRequestsResponse {}
 
 
+/// Response containing counts for browsers that need attention.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reports count chrome browsers needing attention customers](CustomerReportCountChromeBrowsersNeedingAttentionCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1CountChromeBrowsersNeedingAttentionResponse {
+    /// Number of browsers that haven’t had any recent activity
+    #[serde(rename="noRecentActivityCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub no_recent_activity_count: Option<i64>,
+    /// Number of browsers that are pending an OS update
+    #[serde(rename="pendingBrowserUpdateCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub pending_browser_update_count: Option<i64>,
+    /// Number of browsers that have been recently enrolled
+    #[serde(rename="recentlyEnrolledCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub recently_enrolled_count: Option<i64>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1CountChromeBrowsersNeedingAttentionResponse {}
+
+
 /// Response containing a list of devices expiring in each month of a selected time frame. Counts are grouped by model and Auto Update Expiration date.
 /// 
 /// # Activities
@@ -823,7 +854,65 @@ pub struct GoogleChromeManagementV1CountInstalledAppsResponse {
 impl client::ResponseResult for GoogleChromeManagementV1CountInstalledAppsResponse {}
 
 
-/// CPU specifications for the device * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceCpuInfo](https://chromeenterprise.google/policies/#ReportDeviceCpuInfo) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Response containing a summary printing report for each printer from the specified organizational unit for the requested time interval.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reports count print jobs by printer customers](CustomerReportCountPrintJobsByPrinterCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1CountPrintJobsByPrinterResponse {
+    /// Pagination token for requesting the next page.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// List of PrinterReports matching request.
+    #[serde(rename="printerReports")]
+    
+    pub printer_reports: Option<Vec<GoogleChromeManagementV1PrinterReport>>,
+    /// Total number of printers matching request.
+    #[serde(rename="totalSize")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub total_size: Option<i64>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1CountPrintJobsByPrinterResponse {}
+
+
+/// Response containing a summary printing report for each user that has initiated a print job with a printer from the specified organizational unit during the requested time interval.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reports count print jobs by user customers](CustomerReportCountPrintJobsByUserCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1CountPrintJobsByUserResponse {
+    /// Pagination token for requesting the next page.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// Total number of users matching request.
+    #[serde(rename="totalSize")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub total_size: Option<i64>,
+    /// List of UserPrintReports matching request.
+    #[serde(rename="userPrintReports")]
+    
+    pub user_print_reports: Option<Vec<GoogleChromeManagementV1UserPrintReport>>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1CountPrintJobsByUserResponse {}
+
+
+/// CPU specifications for the device * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceCpuInfo](https://chromeenterprise.google/policies/#ReportDeviceCpuInfo) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_CPU_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -853,7 +942,7 @@ pub struct GoogleChromeManagementV1CpuInfo {
 impl client::Part for GoogleChromeManagementV1CpuInfo {}
 
 
-/// Provides information about the status of the CPU. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceCpuInfo](https://chromeenterprise.google/policies/#ReportDeviceCpuInfo) * Data Collection Frequency: Every 10 minutes * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Provides information about the status of the CPU. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceCpuInfo](https://chromeenterprise.google/policies/#ReportDeviceCpuInfo) * Data Collection Frequency: Every 10 minutes * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_CPU_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -918,6 +1007,26 @@ pub struct GoogleChromeManagementV1Device {
 }
 
 impl client::Part for GoogleChromeManagementV1Device {}
+
+
+/// Device activity report. * Granular permission needed: TELEMETRY_API_DEVICE_ACTIVITY_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1DeviceActivityReport {
+    /// Output only. Device activity state.
+    #[serde(rename="deviceActivityState")]
+    
+    pub device_activity_state: Option<String>,
+    /// Output only. Timestamp of when the report was collected.
+    #[serde(rename="reportTime")]
+    
+    pub report_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for GoogleChromeManagementV1DeviceActivityReport {}
 
 
 /// Report for CountChromeDevicesPerAueDateResponse, contains the count of devices of a specific model and auto update expiration range.
@@ -1038,6 +1147,45 @@ pub struct GoogleChromeManagementV1DiskInfo {
 impl client::Part for GoogleChromeManagementV1DiskInfo {}
 
 
+/// Information of a display device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1DisplayDevice {
+    /// Output only. Display height in millimeters.
+    #[serde(rename="displayHeightMm")]
+    
+    pub display_height_mm: Option<i32>,
+    /// Output only. Display device name.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Output only. Display width in millimeters.
+    #[serde(rename="displayWidthMm")]
+    
+    pub display_width_mm: Option<i32>,
+    /// Output only. Is display internal or not.
+    
+    pub internal: Option<bool>,
+    /// Output only. Year of manufacture.
+    #[serde(rename="manufactureYear")]
+    
+    pub manufacture_year: Option<i32>,
+    /// Output only. Three letter manufacturer ID.
+    #[serde(rename="manufacturerId")]
+    
+    pub manufacturer_id: Option<String>,
+    /// Output only. Manufacturer product code.
+    #[serde(rename="modelId")]
+    
+    pub model_id: Option<i32>,
+}
+
+impl client::Part for GoogleChromeManagementV1DisplayDevice {}
+
+
 /// Information for a display.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1050,6 +1198,10 @@ pub struct GoogleChromeManagementV1DisplayInfo {
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub device_id: Option<i64>,
+    /// Output only. Display device name.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
     /// Output only. Indicates if display is internal or not.
     #[serde(rename="isInternal")]
     
@@ -1069,6 +1221,35 @@ pub struct GoogleChromeManagementV1DisplayInfo {
 }
 
 impl client::Part for GoogleChromeManagementV1DisplayInfo {}
+
+
+/// Response containing a list of print jobs.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reports enumerate print jobs customers](CustomerReportEnumeratePrintJobCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1EnumeratePrintJobsResponse {
+    /// A token, which can be used in a subsequent request to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// List of requested print jobs.
+    #[serde(rename="printJobs")]
+    
+    pub print_jobs: Option<Vec<GoogleChromeManagementV1PrintJob>>,
+    /// Total number of print jobs matching request.
+    #[serde(rename="totalSize")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub total_size: Option<i64>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1EnumeratePrintJobsResponse {}
 
 
 /// Response containing a list of devices with queried app installed.
@@ -1122,7 +1303,7 @@ pub struct GoogleChromeManagementV1GraphicsAdapterInfo {
 impl client::Part for GoogleChromeManagementV1GraphicsAdapterInfo {}
 
 
-/// Information of the graphics subsystem. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceGraphicsStatus](https://chromeenterprise.google/policies/#ReportDeviceGraphicsStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Information of the graphics subsystem. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceGraphicsStatus](https://chromeenterprise.google/policies/#ReportDeviceGraphicsStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_GRAPHICS_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1133,12 +1314,24 @@ pub struct GoogleChromeManagementV1GraphicsInfo {
     #[serde(rename="adapterInfo")]
     
     pub adapter_info: Option<GoogleChromeManagementV1GraphicsAdapterInfo>,
+    /// Output only. Information about the display(s) of the device.
+    #[serde(rename="displayDevices")]
+    
+    pub display_devices: Option<Vec<GoogleChromeManagementV1DisplayDevice>>,
+    /// Output only. Is ePrivacy screen supported or not.
+    #[serde(rename="eprivacySupported")]
+    
+    pub eprivacy_supported: Option<bool>,
+    /// Output only. Information about the internal touch screen(s) of the device.
+    #[serde(rename="touchScreenInfo")]
+    
+    pub touch_screen_info: Option<GoogleChromeManagementV1TouchScreenInfo>,
 }
 
 impl client::Part for GoogleChromeManagementV1GraphicsInfo {}
 
 
-/// Information of the graphics subsystem. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceGraphicsInfo](https://chromeenterprise.google/policies/#ReportDeviceGraphicsInfo) * Data Collection Frequency: 3 hours. * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Information of the graphics subsystem. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceGraphicsInfo](https://chromeenterprise.google/policies/#ReportDeviceGraphicsInfo) * Data Collection Frequency: 3 hours. * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_GRAPHICS_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1155,6 +1348,25 @@ pub struct GoogleChromeManagementV1GraphicsStatusReport {
 }
 
 impl client::Part for GoogleChromeManagementV1GraphicsStatusReport {}
+
+
+/// Heartbeat status report of a device. * Available for Kiosks * This field provides online/offline/unknown status of a device and will only be included if the status has changed (e.g. Online -> Offline) * Data for this field is controlled via policy: [HeartbeatEnabled](https://chromeenterprise.google/policies/#HeartbeatEnabled) [More Info](https://support.google.com/chrome/a/answer/6179663#:~:text=On%20the%20Chrome,device%20status%20alerts) * Heartbeat Frequency: 2 mins * Note: If a device goes offline, it can take up to 12 minutes for the online status of the device to be updated * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: N/A * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_DEVICE_ACTIVITY_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1HeartbeatStatusReport {
+    /// Timestamp of when status changed was detected
+    #[serde(rename="reportTime")]
+    
+    pub report_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// State the device changed to
+    
+    pub state: Option<String>,
+}
+
+impl client::Part for GoogleChromeManagementV1HeartbeatStatusReport {}
 
 
 /// Data that describes the result of the HTTPS latency diagnostics routine, with the HTTPS requests issued to Google websites.
@@ -1231,6 +1443,30 @@ pub struct GoogleChromeManagementV1InstalledApp {
 impl client::Part for GoogleChromeManagementV1InstalledApp {}
 
 
+/// Kiosk app status report of a device. * Available for Kiosks * This field provides the app id and version number running on a kiosk device and the timestamp of when the report was last updated * Data for this field is controlled via policy: [ReportDeviceSessionStatus](https://chromeenterprise.google/policies/#ReportDeviceSessionStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_APPS_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1KioskAppStatusReport {
+    /// App id of kiosk app for example "mdmkkicfmmkgmpkmkdikhlbggogpicma"
+    #[serde(rename="appId")]
+    
+    pub app_id: Option<String>,
+    /// App version number of kiosk app for example "1.10.118"
+    #[serde(rename="appVersion")]
+    
+    pub app_version: Option<String>,
+    /// Timestamp of when report was collected
+    #[serde(rename="reportTime")]
+    
+    pub report_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for GoogleChromeManagementV1KioskAppStatusReport {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -1278,7 +1514,55 @@ pub struct GoogleChromeManagementV1ListTelemetryEventsResponse {
 impl client::ResponseResult for GoogleChromeManagementV1ListTelemetryEventsResponse {}
 
 
-/// Memory information of a device. * This field has both telemetry and device information: - `totalRamBytes` - Device information - `availableRamBytes` - Telemetry information - `totalMemoryEncryption` - Device information * Data for this field is controlled via policy: [ReportDeviceMemoryInfo](https://chromeenterprise.google/policies/#ReportDeviceMemoryInfo) * Data Collection Frequency: - `totalRamBytes` - Only at upload - `availableRamBytes` - Every 10 minutes - `totalMemoryEncryption` - at device startup * Default Data Reporting Frequency: - `totalRamBytes` - 3 hours - `availableRamBytes` - 3 hours - `totalMemoryEncryption` - at device startup - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: only for `totalMemoryEncryption` * Reported for affiliated users only: N/A
+/// Response message for listing notification configs for a customer.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [telemetry notification configs list customers](CustomerTelemetryNotificationConfigListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1ListTelemetryNotificationConfigsResponse {
+    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// The telemetry notification configs from the specified customer.
+    #[serde(rename="telemetryNotificationConfigs")]
+    
+    pub telemetry_notification_configs: Option<Vec<GoogleChromeManagementV1TelemetryNotificationConfig>>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1ListTelemetryNotificationConfigsResponse {}
+
+
+/// Response message for listing telemetry users for a customer.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [telemetry users list customers](CustomerTelemetryUserListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1ListTelemetryUsersResponse {
+    /// Token to specify next page in the list.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// Telemetry users returned in the response.
+    #[serde(rename="telemetryUsers")]
+    
+    pub telemetry_users: Option<Vec<GoogleChromeManagementV1TelemetryUser>>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1ListTelemetryUsersResponse {}
+
+
+/// Memory information of a device. * This field has both telemetry and device information: - `totalRamBytes` - Device information - `availableRamBytes` - Telemetry information - `totalMemoryEncryption` - Device information * Data for this field is controlled via policy: [ReportDeviceMemoryInfo](https://chromeenterprise.google/policies/#ReportDeviceMemoryInfo) * Data Collection Frequency: - `totalRamBytes` - Only at upload - `availableRamBytes` - Every 10 minutes - `totalMemoryEncryption` - at device startup * Default Data Reporting Frequency: - `totalRamBytes` - 3 hours - `availableRamBytes` - 3 hours - `totalMemoryEncryption` - at device startup - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: only for `totalMemoryEncryption` * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_MEMORY_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1304,7 +1588,7 @@ pub struct GoogleChromeManagementV1MemoryInfo {
 impl client::Part for GoogleChromeManagementV1MemoryInfo {}
 
 
-/// Contains samples of memory status reports. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceMemoryInfo](https://chromeenterprise.google/policies/#ReportDeviceMemoryInfo) * Data Collection Frequency: Only at upload, SystemRamFreeByes is collected every 10 minutes * Default Data Reporting Frequency: Every 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Contains samples of memory status reports. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceMemoryInfo](https://chromeenterprise.google/policies/#ReportDeviceMemoryInfo) * Data Collection Frequency: Only at upload, SystemRamFreeByes is collected every 10 minutes * Default Data Reporting Frequency: Every 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_MEMORY_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1332,6 +1616,27 @@ pub struct GoogleChromeManagementV1MemoryStatusReport {
 }
 
 impl client::Part for GoogleChromeManagementV1MemoryStatusReport {}
+
+
+/// Network bandwidth report. * Granular permission needed: TELEMETRY_API_NETWORK_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1NetworkBandwidthReport {
+    /// Output only. Download speed in kilobits per second.
+    #[serde(rename="downloadSpeedKbps")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub download_speed_kbps: Option<i64>,
+    /// Output only. Timestamp of when the report was collected.
+    #[serde(rename="reportTime")]
+    
+    pub report_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for GoogleChromeManagementV1NetworkBandwidthReport {}
 
 
 /// Details about the network device. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportNetworkDeviceConfiguration](https://chromeenterprise.google/policies/#ReportNetworkDeviceConfiguration) * Data Collection Frequency: At device startup * Default Data Reporting Frequency: At device startup - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A
@@ -1366,7 +1671,7 @@ pub struct GoogleChromeManagementV1NetworkDevice {
 impl client::Part for GoogleChromeManagementV1NetworkDevice {}
 
 
-/// Network testing results to determine the health of the device's network connection, for example whether the HTTPS latency is high or normal.
+/// Network testing results to determine the health of the device's network connection, for example whether the HTTPS latency is high or normal. * Granular permission needed: TELEMETRY_API_NETWORK_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1386,7 +1691,7 @@ pub struct GoogleChromeManagementV1NetworkDiagnosticsReport {
 impl client::Part for GoogleChromeManagementV1NetworkDiagnosticsReport {}
 
 
-/// Network device information. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportNetworkDeviceConfiguration](https://chromeenterprise.google/policies/#ReportNetworkDeviceConfiguration) * Data Collection Frequency: At device startup * Default Data Reporting Frequency: At device startup - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A
+/// Network device information. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportNetworkDeviceConfiguration](https://chromeenterprise.google/policies/#ReportNetworkDeviceConfiguration) * Data Collection Frequency: At device startup * Default Data Reporting Frequency: At device startup - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_NETWORK_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1402,7 +1707,7 @@ pub struct GoogleChromeManagementV1NetworkInfo {
 impl client::Part for GoogleChromeManagementV1NetworkInfo {}
 
 
-/// State of visible/configured networks. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportNetworkStatus](https://chromeenterprise.google/policies/#ReportNetworkStatus) * Data Collection Frequency: 60 minutes * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: Yes
+/// State of visible/configured networks. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportNetworkStatus](https://chromeenterprise.google/policies/#ReportNetworkStatus) * Data Collection Frequency: 60 minutes * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: Yes * Granular permission needed: TELEMETRY_API_NETWORK_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1473,7 +1778,7 @@ pub struct GoogleChromeManagementV1NetworkStatusReport {
 impl client::Part for GoogleChromeManagementV1NetworkStatusReport {}
 
 
-/// Contains information regarding the current OS update status. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceOsUpdateStatus](https://chromeenterprise.google/policies/#ReportDeviceOsUpdateStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Contains information regarding the current OS update status. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceOsUpdateStatus](https://chromeenterprise.google/policies/#ReportDeviceOsUpdateStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_OS_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1509,7 +1814,161 @@ pub struct GoogleChromeManagementV1OsUpdateStatus {
 impl client::Part for GoogleChromeManagementV1OsUpdateStatus {}
 
 
-/// Status data for storage. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceStorageStatus](https://chromeenterprise.google/policies/#ReportDeviceStorageStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Peripherals report. * Granular permission needed: TELEMETRY_API_PERIPHERALS_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1PeripheralsReport {
+    /// Output only. Timestamp of when the report was collected.
+    #[serde(rename="reportTime")]
+    
+    pub report_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Reports of all usb connected devices.
+    #[serde(rename="usbPeripheralReport")]
+    
+    pub usb_peripheral_report: Option<Vec<GoogleChromeManagementV1UsbPeripheralReport>>,
+}
+
+impl client::Part for GoogleChromeManagementV1PeripheralsReport {}
+
+
+/// Represents a request to print a document that has been submitted to a printer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1PrintJob {
+    /// Color mode.
+    #[serde(rename="colorMode")]
+    
+    pub color_mode: Option<String>,
+    /// Print job completion timestamp.
+    #[serde(rename="completeTime")]
+    
+    pub complete_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Number of copies.
+    #[serde(rename="copyCount")]
+    
+    pub copy_count: Option<i32>,
+    /// Print job creation timestamp.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Number of pages in the document.
+    #[serde(rename="documentPageCount")]
+    
+    pub document_page_count: Option<i32>,
+    /// Duplex mode.
+    #[serde(rename="duplexMode")]
+    
+    pub duplex_mode: Option<String>,
+    /// Unique ID of the print job.
+    
+    pub id: Option<String>,
+    /// Name of the printer used for printing.
+    
+    pub printer: Option<String>,
+    /// API ID of the printer used for printing.
+    #[serde(rename="printerId")]
+    
+    pub printer_id: Option<String>,
+    /// The final state of the job.
+    
+    pub state: Option<String>,
+    /// The title of the document.
+    
+    pub title: Option<String>,
+    /// The primary e-mail address of the user who submitted the print job.
+    #[serde(rename="userEmail")]
+    
+    pub user_email: Option<String>,
+    /// The unique Directory API ID of the user who submitted the print job.
+    #[serde(rename="userId")]
+    
+    pub user_id: Option<String>,
+}
+
+impl client::Part for GoogleChromeManagementV1PrintJob {}
+
+
+/// Report for CountPrintJobsByPrinter, contains statistics on printer usage. Contains the total number of print jobs initiated with this printer, the number of users and the number of devices that have initiated at least one print job with this printer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1PrinterReport {
+    /// Number of chrome devices that have been used to send print jobs to the specified printer.
+    #[serde(rename="deviceCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub device_count: Option<i64>,
+    /// Number of print jobs sent to the printer.
+    #[serde(rename="jobCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub job_count: Option<i64>,
+    /// Printer name.
+    
+    pub printer: Option<String>,
+    /// Printer API ID.
+    #[serde(rename="printerId")]
+    
+    pub printer_id: Option<String>,
+    /// Printer model.
+    #[serde(rename="printerModel")]
+    
+    pub printer_model: Option<String>,
+    /// Number of users that have sent print jobs to the printer.
+    #[serde(rename="userCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub user_count: Option<i64>,
+}
+
+impl client::Part for GoogleChromeManagementV1PrinterReport {}
+
+
+/// Runtime counters retrieved from CPU. Currently the runtime counters telemetry is only supported by Intel vPro PSR on Gen 14+.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1RuntimeCountersReport {
+    /// Number of times that the device has entered into the hibernation state. Currently obtained via the PSR, count from S0->S4.
+    #[serde(rename="enterHibernationCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub enter_hibernation_count: Option<i64>,
+    /// Number of times that the device has entered into the power-off state. Currently obtained via the PSR, count from S0->S5.
+    #[serde(rename="enterPoweroffCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub enter_poweroff_count: Option<i64>,
+    /// Number of times that the device has entered into the sleep state. Currently obtained via the PSR, count from S0->S3.
+    #[serde(rename="enterSleepCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub enter_sleep_count: Option<i64>,
+    /// Timestamp when the report was collected.
+    #[serde(rename="reportTime")]
+    
+    pub report_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Total lifetime runtime. Currently always S0 runtime from Intel vPro PSR.
+    #[serde(rename="uptimeRuntimeDuration")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub uptime_runtime_duration: Option<client::chrono::Duration>,
+}
+
+impl client::Part for GoogleChromeManagementV1RuntimeCountersReport {}
+
+
+/// Status data for storage. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceStorageStatus](https://chromeenterprise.google/policies/#ReportDeviceStorageStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_STORAGE_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1560,7 +2019,7 @@ pub struct GoogleChromeManagementV1StorageInfoDiskVolume {
 impl client::Part for GoogleChromeManagementV1StorageInfoDiskVolume {}
 
 
-/// Status data for storage. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceStorageStatus](https://chromeenterprise.google/policies/#ReportDeviceStorageStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A
+/// Status data for storage. * This field is telemetry information and this will change over time as the device is utilized. * Data for this field is controlled via policy: [ReportDeviceStorageStatus](https://chromeenterprise.google/policies/#ReportDeviceStorageStatus) * Data Collection Frequency: Only at Upload * Default Data Reporting Frequency: 3 hours - Policy Controlled: Yes * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: No * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_STORAGE_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1579,7 +2038,7 @@ pub struct GoogleChromeManagementV1StorageStatusReport {
 impl client::Part for GoogleChromeManagementV1StorageStatusReport {}
 
 
-/// `TelemetryAudioSevereUnderrunEvent` is triggered when a audio devices run out of buffer data for more than 5 seconds.
+/// `TelemetryAudioSevereUnderrunEvent` is triggered when a audio devices run out of buffer data for more than 5 seconds. * Granular permission needed: TELEMETRY_API_AUDIO_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1590,7 +2049,7 @@ pub struct GoogleChromeManagementV1TelemetryAudioSevereUnderrunEvent { _never_se
 impl client::Part for GoogleChromeManagementV1TelemetryAudioSevereUnderrunEvent {}
 
 
-/// Telemetry data collected from a managed device.
+/// Telemetry data collected from a managed device. * Granular permission needed: TELEMETRY_API_DEVICE
 /// 
 /// # Activities
 /// 
@@ -1640,6 +2099,14 @@ pub struct GoogleChromeManagementV1TelemetryDevice {
     #[serde(rename="graphicsStatusReport")]
     
     pub graphics_status_report: Option<Vec<GoogleChromeManagementV1GraphicsStatusReport>>,
+    /// Output only. Heartbeat status report containing timestamps periodically sorted in decreasing order of report_time
+    #[serde(rename="heartbeatStatusReport")]
+    
+    pub heartbeat_status_report: Option<Vec<GoogleChromeManagementV1HeartbeatStatusReport>>,
+    /// Output only. Kiosk app status report for the kiosk device
+    #[serde(rename="kioskAppStatusReport")]
+    
+    pub kiosk_app_status_report: Option<Vec<GoogleChromeManagementV1KioskAppStatusReport>>,
     /// Output only. Information regarding memory specs for the device.
     #[serde(rename="memoryInfo")]
     
@@ -1651,6 +2118,10 @@ pub struct GoogleChromeManagementV1TelemetryDevice {
     /// Output only. Resource name of the device.
     
     pub name: Option<String>,
+    /// Output only. Network bandwidth reports collected periodically sorted in a decreasing order of report_time.
+    #[serde(rename="networkBandwidthReport")]
+    
+    pub network_bandwidth_report: Option<Vec<GoogleChromeManagementV1NetworkBandwidthReport>>,
     /// Output only. Network diagnostics collected periodically.
     #[serde(rename="networkDiagnosticsReport")]
     
@@ -1671,6 +2142,14 @@ pub struct GoogleChromeManagementV1TelemetryDevice {
     #[serde(rename="osUpdateStatus")]
     
     pub os_update_status: Option<Vec<GoogleChromeManagementV1OsUpdateStatus>>,
+    /// Output only. Peripherals reports collected periodically sorted in a decreasing order of report_time.
+    #[serde(rename="peripheralsReport")]
+    
+    pub peripherals_report: Option<Vec<GoogleChromeManagementV1PeripheralsReport>>,
+    /// Output only. Runtime counters reports collected device lifetime runtime, as well as the counts of S0->S3, S0->S4, and S0->S5 transitions, meaning entering into sleep, hibernation, and power-off states
+    #[serde(rename="runtimeCountersReport")]
+    
+    pub runtime_counters_report: Option<Vec<GoogleChromeManagementV1RuntimeCountersReport>>,
     /// Output only. Device serial number. This value is the same as the Admin Console's Serial Number in the ChromeOS Devices tab.
     #[serde(rename="serialNumber")]
     
@@ -1692,7 +2171,7 @@ pub struct GoogleChromeManagementV1TelemetryDevice {
 impl client::ResponseResult for GoogleChromeManagementV1TelemetryDevice {}
 
 
-/// Information about a device associated with telemetry data.
+/// Information about a device associated with telemetry data. * Granular Permission needed: TELEMETRY_API_DEVICE
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1737,6 +2216,10 @@ pub struct GoogleChromeManagementV1TelemetryEvent {
     /// Output only. Resource name of the event.
     
     pub name: Option<String>,
+    /// Output only. Payload for network connection state change event. Present only when `event_type` is `NETWORK_STATE_CHANGE`.
+    #[serde(rename="networkStateChangeEvent")]
+    
+    pub network_state_change_event: Option<GoogleChromeManagementV1TelemetryNetworkConnectionStateChangeEvent>,
     /// Timestamp that represents when the event was reported.
     #[serde(rename="reportTime")]
     
@@ -1748,12 +2231,36 @@ pub struct GoogleChromeManagementV1TelemetryEvent {
     /// Output only. Information about the user associated with the event.
     
     pub user: Option<GoogleChromeManagementV1TelemetryUserInfo>,
+    /// Output only. Payload for VPN connection state change event. Present only when `event_type` is `VPN_CONNECTION_STATE_CHANGE`.
+    #[serde(rename="vpnConnectionStateChangeEvent")]
+    
+    pub vpn_connection_state_change_event: Option<GoogleChromeManagementV1TelemetryNetworkConnectionStateChangeEvent>,
+    /// Output only. Payload for WiFi signal strength events. Present only when `event_type` is `WIFI_SIGNAL_STRENGTH_LOW` or `WIFI_SIGNAL_STRENGTH_RECOVERED`.
+    #[serde(rename="wifiSignalStrengthEvent")]
+    
+    pub wifi_signal_strength_event: Option<GoogleChromeManagementV1TelemetryNetworkSignalStrengthEvent>,
 }
 
 impl client::Part for GoogleChromeManagementV1TelemetryEvent {}
 
 
-/// Https latency routine is run periodically and `TelemetryHttpsLatencyChangeEvent` is triggered if a latency problem was detected or if the device has recovered from a latency problem..
+/// Configures how the telemetry events should be filtered.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryEventNotificationFilter {
+    /// Only sends the notifications for events of these types. Must not be empty.
+    #[serde(rename="eventTypes")]
+    
+    pub event_types: Option<Vec<String>>,
+}
+
+impl client::Part for GoogleChromeManagementV1TelemetryEventNotificationFilter {}
+
+
+/// Https latency routine is run periodically and `TelemetryHttpsLatencyChangeEvent` is triggered if a latency problem was detected or if the device has recovered from a latency problem. * Granular permission needed: TELEMETRY_API_NETWORK_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1773,7 +2280,107 @@ pub struct GoogleChromeManagementV1TelemetryHttpsLatencyChangeEvent {
 impl client::Part for GoogleChromeManagementV1TelemetryHttpsLatencyChangeEvent {}
 
 
-/// `TelemetryUsbPeripheralsEvent` is triggered USB devices are either added or removed.
+/// `TelemetryNetworkConnectionStateChangeEvent` is triggered on network connection state changes. * Granular permission needed: TELEMETRY_API_NETWORK_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryNetworkConnectionStateChangeEvent {
+    /// Current connection state of the network.
+    #[serde(rename="connectionState")]
+    
+    pub connection_state: Option<String>,
+    /// Unique identifier of the network.
+    
+    pub guid: Option<String>,
+}
+
+impl client::Part for GoogleChromeManagementV1TelemetryNetworkConnectionStateChangeEvent {}
+
+
+/// `TelemetryNetworkSignalStrengthEvent` is triggered on WiFi signal strength events. * Granular permission needed: TELEMETRY_API_NETWORK_REPORT
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryNetworkSignalStrengthEvent {
+    /// Unique identifier of the network.
+    
+    pub guid: Option<String>,
+    /// Signal strength RSSI value.
+    #[serde(rename="signalStrengthDbm")]
+    
+    pub signal_strength_dbm: Option<i32>,
+}
+
+impl client::Part for GoogleChromeManagementV1TelemetryNetworkSignalStrengthEvent {}
+
+
+/// Configuration to receive notifications of telemetry data.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [telemetry notification configs create customers](CustomerTelemetryNotificationConfigCreateCall) (request|response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryNotificationConfig {
+    /// Output only. Google Workspace customer that owns the resource.
+    
+    pub customer: Option<String>,
+    /// Only send notifications for telemetry data matching this filter.
+    
+    pub filter: Option<GoogleChromeManagementV1TelemetryNotificationFilter>,
+    /// The pubsub topic to which notifications are published to.
+    #[serde(rename="googleCloudPubsubTopic")]
+    
+    pub google_cloud_pubsub_topic: Option<String>,
+    /// Output only. Resource name of the notification configuration.
+    
+    pub name: Option<String>,
+}
+
+impl client::RequestValue for GoogleChromeManagementV1TelemetryNotificationConfig {}
+impl client::ResponseResult for GoogleChromeManagementV1TelemetryNotificationConfig {}
+
+
+/// Configures how the telemetry data should be filtered.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryNotificationFilter {
+    /// If set, only sends notifications for telemetry data coming from this device.
+    #[serde(rename="deviceId")]
+    
+    pub device_id: Option<String>,
+    /// If set, only sends notifications for telemetry data coming from devices in this org unit.
+    #[serde(rename="deviceOrgUnitId")]
+    
+    pub device_org_unit_id: Option<String>,
+    /// Only sends notifications for the telemetry events matching this filter.
+    #[serde(rename="telemetryEventNotificationFilter")]
+    
+    pub telemetry_event_notification_filter: Option<GoogleChromeManagementV1TelemetryEventNotificationFilter>,
+    /// If set, only sends notifications for telemetry data coming from devices owned by this user.
+    #[serde(rename="userEmail")]
+    
+    pub user_email: Option<String>,
+    /// If set, only sends notifications for telemetry data coming from devices owned by users in this org unit.
+    #[serde(rename="userOrgUnitId")]
+    
+    pub user_org_unit_id: Option<String>,
+}
+
+impl client::Part for GoogleChromeManagementV1TelemetryNotificationFilter {}
+
+
+/// `TelemetryUsbPeripheralsEvent` is triggered USB devices are either added or removed. * Granular permission needed: TELEMETRY_API_PERIPHERALS_REPORT
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1789,7 +2396,77 @@ pub struct GoogleChromeManagementV1TelemetryUsbPeripheralsEvent {
 impl client::Part for GoogleChromeManagementV1TelemetryUsbPeripheralsEvent {}
 
 
-/// Information about a user associated with telemetry data.
+/// Telemetry data collected from a managed user. * Granular permission needed: TELEMETRY_API_USER
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [telemetry users get customers](CustomerTelemetryUserGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryUser {
+    /// G Suite Customer whose enterprise enrolled the device.
+    
+    pub customer: Option<String>,
+    /// Resource name of the user.
+    
+    pub name: Option<String>,
+    /// Organization unit of the user.
+    #[serde(rename="orgUnitId")]
+    
+    pub org_unit_id: Option<String>,
+    /// Telemetry data collected from a managed user and device.
+    #[serde(rename="userDevice")]
+    
+    pub user_device: Option<Vec<GoogleChromeManagementV1TelemetryUserDevice>>,
+    /// Email address of the user.
+    #[serde(rename="userEmail")]
+    
+    pub user_email: Option<String>,
+    /// Directory ID of the user.
+    #[serde(rename="userId")]
+    
+    pub user_id: Option<String>,
+}
+
+impl client::ResponseResult for GoogleChromeManagementV1TelemetryUser {}
+
+
+/// Telemetry data collected for a managed user and device. * Granular permission needed: TELEMETRY_API_DEVICE
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TelemetryUserDevice {
+    /// Output only. Audio reports collected periodically sorted in a decreasing order of report_time.
+    #[serde(rename="audioStatusReport")]
+    
+    pub audio_status_report: Option<Vec<GoogleChromeManagementV1AudioStatusReport>>,
+    /// Output only. Device activity reports collected periodically sorted in a decreasing order of report_time.
+    #[serde(rename="deviceActivityReport")]
+    
+    pub device_activity_report: Option<Vec<GoogleChromeManagementV1DeviceActivityReport>>,
+    /// The unique Directory API ID of the device. This value is the same as the Admin Console's Directory API ID in the ChromeOS Devices tab.
+    #[serde(rename="deviceId")]
+    
+    pub device_id: Option<String>,
+    /// Output only. Network bandwidth reports collected periodically sorted in a decreasing order of report_time.
+    #[serde(rename="networkBandwidthReport")]
+    
+    pub network_bandwidth_report: Option<Vec<GoogleChromeManagementV1NetworkBandwidthReport>>,
+    /// Output only. Peripherals reports collected periodically sorted in a decreasing order of report_time.
+    #[serde(rename="peripheralsReport")]
+    
+    pub peripherals_report: Option<Vec<GoogleChromeManagementV1PeripheralsReport>>,
+}
+
+impl client::Part for GoogleChromeManagementV1TelemetryUserDevice {}
+
+
+/// Information about a user associated with telemetry data. * Granular permission needed: TELEMETRY_API_USER
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1808,7 +2485,7 @@ pub struct GoogleChromeManagementV1TelemetryUserInfo {
 impl client::Part for GoogleChromeManagementV1TelemetryUserInfo {}
 
 
-/// Thunderbolt bus info. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceSecurityStatus](https://chromeenterprise.google/policies/#ReportDeviceSecurityStatus) * Data Collection Frequency: At device startup * Default Data Reporting Frequency: At device startup - Policy Controlled: No * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A
+/// Thunderbolt bus info. * This field provides device information, which is static and will not change over time. * Data for this field is controlled via policy: [ReportDeviceSecurityStatus](https://chromeenterprise.google/policies/#ReportDeviceSecurityStatus) * Data Collection Frequency: At device startup * Default Data Reporting Frequency: At device startup - Policy Controlled: No * Cache: If the device is offline, the collected data is stored locally, and will be reported when the device is next online: Yes * Reported for affiliated users only: N/A * Granular permission needed: TELEMETRY_API_BUS_DEVICE_INFO
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1854,6 +2531,49 @@ pub struct GoogleChromeManagementV1TotalMemoryEncryptionInfo {
 impl client::Part for GoogleChromeManagementV1TotalMemoryEncryptionInfo {}
 
 
+/// Information of an internal touch screen device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TouchScreenDevice {
+    /// Output only. Touch screen device display name.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Output only. Touch screen device is stylus capable or not.
+    #[serde(rename="stylusCapable")]
+    
+    pub stylus_capable: Option<bool>,
+    /// Output only. Number of touch points supported on the device.
+    #[serde(rename="touchPointCount")]
+    
+    pub touch_point_count: Option<i32>,
+}
+
+impl client::Part for GoogleChromeManagementV1TouchScreenDevice {}
+
+
+/// Information on the device touch screen.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1TouchScreenInfo {
+    /// Output only. List of the internal touch screen devices.
+    
+    pub devices: Option<Vec<GoogleChromeManagementV1TouchScreenDevice>>,
+    /// Output only. Touchpad library name used by the input stack.
+    #[serde(rename="touchpadLibrary")]
+    
+    pub touchpad_library: Option<String>,
+}
+
+impl client::Part for GoogleChromeManagementV1TouchScreenInfo {}
+
+
 /// USB connected peripheral report.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1891,6 +2611,56 @@ pub struct GoogleChromeManagementV1UsbPeripheralReport {
 }
 
 impl client::Part for GoogleChromeManagementV1UsbPeripheralReport {}
+
+
+/// Report for CountPrintJobsByUser, contains printing statistics for a user. Contains the number of printers, the number of devices used to initiate print jobs, and the number of print jobs initiated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleChromeManagementV1UserPrintReport {
+    /// Number of chrome devices that have been used to initiate print jobs by the user.
+    #[serde(rename="deviceCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub device_count: Option<i64>,
+    /// Number of print jobs initiated by the user.
+    #[serde(rename="jobCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub job_count: Option<i64>,
+    /// Number of printers used by the user.
+    #[serde(rename="printerCount")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub printer_count: Option<i64>,
+    /// The primary e-mail address of the user.
+    #[serde(rename="userEmail")]
+    
+    pub user_email: Option<String>,
+    /// The unique Directory API ID of the user.
+    #[serde(rename="userId")]
+    
+    pub user_id: Option<String>,
+}
+
+impl client::Part for GoogleChromeManagementV1UserPrintReport {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [telemetry notification configs delete customers](CustomerTelemetryNotificationConfigDeleteCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
+
+impl client::ResponseResult for GoogleProtobufEmpty {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
@@ -1963,7 +2733,7 @@ impl client::Part for GoogleTypeDate {}
 ///     ).build().await.unwrap();
 /// let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `apps_android_get(...)`, `apps_chrome_get(...)`, `apps_count_chrome_app_requests(...)`, `apps_web_get(...)`, `reports_count_chrome_devices_reaching_auto_expiration_date(...)`, `reports_count_chrome_devices_that_need_attention(...)`, `reports_count_chrome_hardware_fleet_devices(...)`, `reports_count_chrome_versions(...)`, `reports_count_installed_apps(...)`, `reports_find_installed_app_devices(...)`, `telemetry_devices_get(...)`, `telemetry_devices_list(...)` and `telemetry_events_list(...)`
+/// // like `apps_android_get(...)`, `apps_chrome_get(...)`, `apps_count_chrome_app_requests(...)`, `apps_web_get(...)`, `reports_count_chrome_browsers_needing_attention(...)`, `reports_count_chrome_devices_reaching_auto_expiration_date(...)`, `reports_count_chrome_devices_that_need_attention(...)`, `reports_count_chrome_hardware_fleet_devices(...)`, `reports_count_chrome_versions(...)`, `reports_count_installed_apps(...)`, `reports_count_print_jobs_by_printer(...)`, `reports_count_print_jobs_by_user(...)`, `reports_enumerate_print_jobs(...)`, `reports_find_installed_app_devices(...)`, `telemetry_devices_get(...)`, `telemetry_devices_list(...)`, `telemetry_events_list(...)`, `telemetry_notification_configs_create(...)`, `telemetry_notification_configs_delete(...)`, `telemetry_notification_configs_list(...)`, `telemetry_users_get(...)` and `telemetry_users_list(...)`
 /// // to build up your call.
 /// let rb = hub.customers();
 /// # }
@@ -2044,6 +2814,24 @@ impl<'a, S> CustomerMethods<'a, S> {
             _page_size: Default::default(),
             _org_unit_id: Default::default(),
             _order_by: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Count of Chrome Browsers that have been recently enrolled, have new policy to be synced, or have no recent activity.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customer` - Required. The customer ID or "my_customer" prefixed with "customers/".
+    pub fn reports_count_chrome_browsers_needing_attention(&self, customer: &str) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S> {
+        CustomerReportCountChromeBrowsersNeedingAttentionCall {
+            hub: self.hub,
+            _customer: customer.to_string(),
+            _org_unit_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2153,7 +2941,73 @@ impl<'a, S> CustomerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generate report of devices that have a specified app installed.
+    /// Get a summary of printing done by each printer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customer` - Required. Customer ID prefixed with "customers/" or "customers/my_customer" to use the customer associated to the account making the request.
+    pub fn reports_count_print_jobs_by_printer(&self, customer: &str) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        CustomerReportCountPrintJobsByPrinterCall {
+            hub: self.hub,
+            _customer: customer.to_string(),
+            _printer_org_unit_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get a summary of printing done by each user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customer` - Required. Customer ID prefixed with "customers/" or "customers/my_customer" to use the customer associated to the account making the request.
+    pub fn reports_count_print_jobs_by_user(&self, customer: &str) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        CustomerReportCountPrintJobsByUserCall {
+            hub: self.hub,
+            _customer: customer.to_string(),
+            _printer_org_unit_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get a list of print jobs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customer` - Required. Customer ID prefixed with "customers/" or "customers/my_customer" to use the customer associated to the account making the request.
+    pub fn reports_enumerate_print_jobs(&self, customer: &str) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        CustomerReportEnumeratePrintJobCall {
+            hub: self.hub,
+            _customer: customer.to_string(),
+            _printer_org_unit_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generate report of managed Chrome browser devices that have a specified app installed.
     /// 
     /// # Arguments
     ///
@@ -2223,6 +3077,100 @@ impl<'a, S> CustomerMethods<'a, S> {
     /// * `parent` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
     pub fn telemetry_events_list(&self, parent: &str) -> CustomerTelemetryEventListCall<'a, S> {
         CustomerTelemetryEventListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _read_mask: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create a telemetry notification config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource where this notification config will be created. Format: `customers/{customer}`
+    pub fn telemetry_notification_configs_create(&self, request: GoogleChromeManagementV1TelemetryNotificationConfig, parent: &str) -> CustomerTelemetryNotificationConfigCreateCall<'a, S> {
+        CustomerTelemetryNotificationConfigCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Delete a telemetry notification config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the notification config to delete. Format: `customers/{customer}/telemetry/notificationConfigs/{notification_config}`
+    pub fn telemetry_notification_configs_delete(&self, name: &str) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S> {
+        CustomerTelemetryNotificationConfigDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all telemetry notification configs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent which owns the notification configs.
+    pub fn telemetry_notification_configs_list(&self, parent: &str) -> CustomerTelemetryNotificationConfigListCall<'a, S> {
+        CustomerTelemetryNotificationConfigListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get telemetry user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the `TelemetryUser` to return.
+    pub fn telemetry_users_get(&self, name: &str) -> CustomerTelemetryUserGetCall<'a, S> {
+        CustomerTelemetryUserGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _read_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all telemetry users.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
+    pub fn telemetry_users_list(&self, parent: &str) -> CustomerTelemetryUserListCall<'a, S> {
+        CustomerTelemetryUserListCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _read_mask: Default::default(),
@@ -3340,6 +4288,280 @@ where
 }
 
 
+/// Count of Chrome Browsers that have been recently enrolled, have new policy to be synced, or have no recent activity.
+///
+/// A builder for the *reports.countChromeBrowsersNeedingAttention* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().reports_count_chrome_browsers_needing_attention("customer")
+///              .org_unit_id("ipsum")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _customer: String,
+    _org_unit_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S> {}
+
+impl<'a, S> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1CountChromeBrowsersNeedingAttentionResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.reports.countChromeBrowsersNeedingAttention",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "customer", "orgUnitId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("customer", self._customer);
+        if let Some(value) = self._org_unit_id.as_ref() {
+            params.push("orgUnitId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+customer}/reports:countChromeBrowsersNeedingAttention";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementReportReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+customer}", "customer")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["customer"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The customer ID or "my_customer" prefixed with "customers/".
+    ///
+    /// Sets the *customer* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer(mut self, new_value: &str) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S> {
+        self._customer = new_value.to_string();
+        self
+    }
+    /// Optional. The ID of the organizational unit. If omitted, all data will be returned.
+    ///
+    /// Sets the *org unit id* query property to the given value.
+    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S> {
+        self._org_unit_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementReportReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerReportCountChromeBrowsersNeedingAttentionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Generate report of the number of devices expiring in each month of the selected time frame. Devices are grouped by auto update expiration date and model. Further information can be found [here](https://support.google.com/chrome/a/answer/10564947).
 ///
 /// A builder for the *reports.countChromeDevicesReachingAutoExpirationDate* method supported by a *customer* resource.
@@ -3367,9 +4589,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().reports_count_chrome_devices_reaching_auto_expiration_date("customer")
-///              .org_unit_id("ipsum")
+///              .org_unit_id("Lorem")
 ///              .min_aue_date("gubergren")
-///              .max_aue_date("Lorem")
+///              .max_aue_date("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3666,7 +4888,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().reports_count_chrome_devices_that_need_attention("customer")
 ///              .read_mask(&Default::default())
-///              .org_unit_id("eos")
+///              .org_unit_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3952,7 +5174,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().reports_count_chrome_hardware_fleet_devices("customer")
 ///              .read_mask(&Default::default())
-///              .org_unit_id("ea")
+///              .org_unit_id("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4237,10 +5459,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().reports_count_chrome_versions("customer")
-///              .page_token("invidunt")
-///              .page_size(-47)
-///              .org_unit_id("duo")
-///              .filter("ipsum")
+///              .page_token("duo")
+///              .page_size(-50)
+///              .org_unit_id("sed")
+///              .filter("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4547,11 +5769,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().reports_count_installed_apps("customer")
-///              .page_token("ut")
-///              .page_size(-12)
-///              .org_unit_id("rebum.")
-///              .order_by("est")
-///              .filter("ipsum")
+///              .page_token("rebum.")
+///              .page_size(-57)
+///              .org_unit_id("ipsum")
+///              .order_by("ipsum")
+///              .filter("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4752,14 +5974,14 @@ where
         self._org_unit_id = Some(new_value.to_string());
         self
     }
-    /// Field used to order results. Supported order by fields: * app_name * app_type * install_type * number_of_permissions * total_install_count
+    /// Field used to order results. Supported order by fields: * app_name * app_type * install_type * number_of_permissions * total_install_count * app_id
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Supported filter fields: * app_name * app_type * install_type * number_of_permissions * total_install_count * latest_profile_active_date * permission_name
+    /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Supported filter fields: * app_name * app_type * install_type * number_of_permissions * total_install_count * latest_profile_active_date * permission_name * app_id
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
@@ -4842,7 +6064,973 @@ where
 }
 
 
-/// Generate report of devices that have a specified app installed.
+/// Get a summary of printing done by each printer.
+///
+/// A builder for the *reports.countPrintJobsByPrinter* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().reports_count_print_jobs_by_printer("customer")
+///              .printer_org_unit_id("ea")
+///              .page_token("dolor")
+///              .page_size(-56)
+///              .order_by("eos")
+///              .filter("labore")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerReportCountPrintJobsByPrinterCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _customer: String,
+    _printer_org_unit_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerReportCountPrintJobsByPrinterCall<'a, S> {}
+
+impl<'a, S> CustomerReportCountPrintJobsByPrinterCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1CountPrintJobsByPrinterResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.reports.countPrintJobsByPrinter",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "customer", "printerOrgUnitId", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("customer", self._customer);
+        if let Some(value) = self._printer_org_unit_id.as_ref() {
+            params.push("printerOrgUnitId", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+customer}/reports:countPrintJobsByPrinter";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementReportReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+customer}", "customer")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["customer"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Customer ID prefixed with "customers/" or "customers/my_customer" to use the customer associated to the account making the request.
+    ///
+    /// Sets the *customer* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer(mut self, new_value: &str) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._customer = new_value.to_string();
+        self
+    }
+    /// The ID of the organizational unit for printers. If specified, only data for printers from the specified organizational unit will be returned. If omitted, data for printers from all organizational units will be returned.
+    ///
+    /// Sets the *printer org unit id* query property to the given value.
+    pub fn printer_org_unit_id(mut self, new_value: &str) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._printer_org_unit_id = Some(new_value.to_string());
+        self
+    }
+    /// Token to specify the page of the response to be returned.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of results to return. Maximum and default are 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Field used to order results. If omitted, results will be ordered in ascending order of the 'printer' field. Supported order_by fields: * printer * job_count * device_count * user_count
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Note: Only >= and <= comparators are supported in this filter. Supported filter fields: * complete_time
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountPrintJobsByPrinterCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementReportReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerReportCountPrintJobsByPrinterCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerReportCountPrintJobsByPrinterCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerReportCountPrintJobsByPrinterCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Get a summary of printing done by each user.
+///
+/// A builder for the *reports.countPrintJobsByUser* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().reports_count_print_jobs_by_user("customer")
+///              .printer_org_unit_id("duo")
+///              .page_token("sed")
+///              .page_size(-61)
+///              .order_by("Stet")
+///              .filter("kasd")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerReportCountPrintJobsByUserCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _customer: String,
+    _printer_org_unit_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerReportCountPrintJobsByUserCall<'a, S> {}
+
+impl<'a, S> CustomerReportCountPrintJobsByUserCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1CountPrintJobsByUserResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.reports.countPrintJobsByUser",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "customer", "printerOrgUnitId", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("customer", self._customer);
+        if let Some(value) = self._printer_org_unit_id.as_ref() {
+            params.push("printerOrgUnitId", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+customer}/reports:countPrintJobsByUser";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementReportReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+customer}", "customer")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["customer"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Customer ID prefixed with "customers/" or "customers/my_customer" to use the customer associated to the account making the request.
+    ///
+    /// Sets the *customer* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer(mut self, new_value: &str) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._customer = new_value.to_string();
+        self
+    }
+    /// The ID of the organizational unit for printers. If specified, only print jobs initiated with printers from the specified organizational unit will be counted. If omitted, all print jobs will be counted.
+    ///
+    /// Sets the *printer org unit id* query property to the given value.
+    pub fn printer_org_unit_id(mut self, new_value: &str) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._printer_org_unit_id = Some(new_value.to_string());
+        self
+    }
+    /// Token to specify the page of the response to be returned.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of results to return. Maximum and default are 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Field used to order results. If omitted, results will be ordered in ascending order of the 'user_email' field. Supported order_by fields: * user_email * job_count * printer_count * device_count
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Note: Only >= and <= comparators are supported in this filter. Supported filter fields: * complete_time
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountPrintJobsByUserCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementReportReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerReportCountPrintJobsByUserCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerReportCountPrintJobsByUserCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerReportCountPrintJobsByUserCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Get a list of print jobs.
+///
+/// A builder for the *reports.enumeratePrintJobs* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().reports_enumerate_print_jobs("customer")
+///              .printer_org_unit_id("sed")
+///              .page_token("et")
+///              .page_size(-68)
+///              .order_by("vero")
+///              .filter("erat")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerReportEnumeratePrintJobCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _customer: String,
+    _printer_org_unit_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerReportEnumeratePrintJobCall<'a, S> {}
+
+impl<'a, S> CustomerReportEnumeratePrintJobCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1EnumeratePrintJobsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.reports.enumeratePrintJobs",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "customer", "printerOrgUnitId", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("customer", self._customer);
+        if let Some(value) = self._printer_org_unit_id.as_ref() {
+            params.push("printerOrgUnitId", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+customer}/reports:enumeratePrintJobs";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementReportReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+customer}", "customer")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["customer"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Customer ID prefixed with "customers/" or "customers/my_customer" to use the customer associated to the account making the request.
+    ///
+    /// Sets the *customer* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer(mut self, new_value: &str) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._customer = new_value.to_string();
+        self
+    }
+    /// The ID of the organizational unit for printers. If specified, only print jobs submitted to printers from the specified organizational unit will be returned.
+    ///
+    /// Sets the *printer org unit id* query property to the given value.
+    pub fn printer_org_unit_id(mut self, new_value: &str) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._printer_org_unit_id = Some(new_value.to_string());
+        self
+    }
+    /// A page token received from a previous `EnumeratePrintJobs` call. Provide this to retrieve the subsequent page. If omitted, the first page of results will be returned. When paginating, all other parameters provided to `EnumeratePrintJobs` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The number of print jobs in the page from 0 to 100 inclusive, if page_size is not specified or zero, the size will be 50.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Field used to order results. If not specified, results will be ordered in descending order of the `complete_time` field. Supported order by fields: * title * state * create_time * complete_time * document_page_count * color_mode * duplex_mode * printer * user_email
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Note: Only >= and <= comparators are supported for `complete_time`. Note: Only = comparator supported for `user_id` and `printer_id`. Supported filter fields: * complete_time * printer_id * user_id
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportEnumeratePrintJobCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementReportReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerReportEnumeratePrintJobCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerReportEnumeratePrintJobCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerReportEnumeratePrintJobCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Generate report of managed Chrome browser devices that have a specified app installed.
 ///
 /// A builder for the *reports.findInstalledAppDevices* method supported by a *customer* resource.
 /// It is not used directly, but through a [`CustomerMethods`] instance.
@@ -4869,13 +7057,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().reports_find_installed_app_devices("customer")
-///              .page_token("est")
-///              .page_size(-62)
-///              .org_unit_id("ea")
-///              .order_by("dolor")
-///              .filter("Lorem")
-///              .app_type("eos")
-///              .app_id("labore")
+///              .page_token("duo")
+///              .page_size(-34)
+///              .org_unit_id("et")
+///              .order_by("voluptua.")
+///              .filter("amet.")
+///              .app_type("consetetur")
+///              .app_id("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5379,7 +7567,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. Read mask to specify which fields to return.
+    /// Required. Read mask to specify which fields to return. Supported read_mask paths are: - name - org_unit_id - device_id - serial_number - cpu_info - cpu_status_report - memory_info - memory_status_report - network_info - network_diagnostics_report - network_status_report - os_update_status - graphics_info - graphics_status_report - battery_info - battery_status_report - storage_info - storage_status_report - thunderbolt_info - audio_status_report - boot_performance_report - heartbeat_status_report - network_bandwidth_report - peripherals_report - kiosk_app_status_report - app_report - runtime_counters_report 
     ///
     /// Sets the *read mask* query property to the given value.
     pub fn read_mask(mut self, new_value: client::FieldMask) -> CustomerTelemetryDeviceGetCall<'a, S> {
@@ -5490,8 +7678,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().telemetry_devices_list("parent")
 ///              .read_mask(&Default::default())
-///              .page_token("sed")
-///              .page_size(-61)
+///              .page_token("et")
+///              .page_size(-95)
 ///              .filter("Stet")
 ///              .doit().await;
 /// # }
@@ -5668,7 +7856,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Required. Read mask to specify which fields to return.
+    /// Required. Read mask to specify which fields to return. Supported read_mask paths are: - name - org_unit_id - device_id - serial_number - cpu_info - cpu_status_report - memory_info - memory_status_report - network_info - network_diagnostics_report - network_status_report - os_update_status - graphics_info - graphics_status_report - battery_info - battery_status_report - storage_info - storage_status_report - thunderbolt_info - audio_status_report - boot_performance_report - heartbeat_status_report - network_bandwidth_report - peripherals_report - kiosk_app_status_report - app_report - runtime_counters_report 
     ///
     /// Sets the *read mask* query property to the given value.
     pub fn read_mask(mut self, new_value: client::FieldMask) -> CustomerTelemetryDeviceListCall<'a, S> {
@@ -5689,7 +7877,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Only include resources that match the filter. Supported filter fields: - org_unit_id - serial_number - device_id 
+    /// Optional. Only include resources that match the filter. Supported filter fields: - org_unit_id - serial_number - device_id - reports_timestamp The "reports_timestamp" filter accepts either the Unix Epoch milliseconds format or the RFC3339 UTC "Zulu" format with nanosecond resolution and up to nine fractional digits. Both formats should be surrounded by simple double quotes. Examples: "2014-10-02T15:01:23Z", "2014-10-02T15:01:23.045123456Z", "1679283943823".
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a, S> {
@@ -5800,9 +7988,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customers().telemetry_events_list("parent")
 ///              .read_mask(&Default::default())
-///              .page_token("et")
-///              .page_size(-43)
-///              .filter("et")
+///              .page_token("duo")
+///              .page_size(-76)
+///              .filter("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5978,7 +8166,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Required. Read mask to specify which fields to return.
+    /// Required. Read mask to specify which fields to return. Although currently required, this field will become optional, while the filter parameter with an event type will be come required. Supported read_mask paths are: - device - user - audio_severe_underrun_event - usb_peripherals_event - https_latency_change_event - network_state_change_event - wifi_signal_strength_event - vpn_connection_state_change_event - app_install_event - app_uninstall_event - app_launch_event 
     ///
     /// Sets the *read mask* query property to the given value.
     pub fn read_mask(mut self, new_value: client::FieldMask) -> CustomerTelemetryEventListCall<'a, S> {
@@ -5999,7 +8187,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Only include resources that match the filter. Supported filter fields: * device_id * user_id * device_org_unit_id * user_org_unit_id * timestamp * event_type
+    /// Optional. Only include resources that match the filter. Although this parameter is currently optional, this parameter will be required- please specify at least 1 event type. Supported filter fields: - device_id - user_id - device_org_unit_id - user_org_unit_id - timestamp - event_type The "timestamp" filter accepts either the Unix Epoch milliseconds format or the RFC3339 UTC "Zulu" format with nanosecond resolution and up to nine fractional digits. Both formats should be surrounded by simple double quotes. Examples: "2014-10-02T15:01:23Z", "2014-10-02T15:01:23.045123456Z", "1679283943823".
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CustomerTelemetryEventListCall<'a, S> {
@@ -6076,6 +8264,1430 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> CustomerTelemetryEventListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Create a telemetry notification config.
+///
+/// A builder for the *telemetry.notificationConfigs.create* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// use chromemanagement1::api::GoogleChromeManagementV1TelemetryNotificationConfig;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleChromeManagementV1TelemetryNotificationConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().telemetry_notification_configs_create(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerTelemetryNotificationConfigCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _request: GoogleChromeManagementV1TelemetryNotificationConfig,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerTelemetryNotificationConfigCreateCall<'a, S> {}
+
+impl<'a, S> CustomerTelemetryNotificationConfigCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1TelemetryNotificationConfig)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.telemetry.notificationConfigs.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/telemetry/notificationConfigs";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementTelemetryReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleChromeManagementV1TelemetryNotificationConfig) -> CustomerTelemetryNotificationConfigCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource where this notification config will be created. Format: `customers/{customer}`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> CustomerTelemetryNotificationConfigCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryNotificationConfigCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryNotificationConfigCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementTelemetryReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerTelemetryNotificationConfigCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerTelemetryNotificationConfigCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerTelemetryNotificationConfigCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Delete a telemetry notification config.
+///
+/// A builder for the *telemetry.notificationConfigs.delete* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().telemetry_notification_configs_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerTelemetryNotificationConfigDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerTelemetryNotificationConfigDeleteCall<'a, S> {}
+
+impl<'a, S> CustomerTelemetryNotificationConfigDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.telemetry.notificationConfigs.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementTelemetryReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the notification config to delete. Format: `customers/{customer}/telemetry/notificationConfigs/{notification_config}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementTelemetryReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerTelemetryNotificationConfigDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// List all telemetry notification configs.
+///
+/// A builder for the *telemetry.notificationConfigs.list* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().telemetry_notification_configs_list("parent")
+///              .page_token("elitr")
+///              .page_size(-6)
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerTelemetryNotificationConfigListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerTelemetryNotificationConfigListCall<'a, S> {}
+
+impl<'a, S> CustomerTelemetryNotificationConfigListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1ListTelemetryNotificationConfigsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.telemetry.notificationConfigs.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/telemetry/notificationConfigs";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementTelemetryReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent which owns the notification configs.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> CustomerTelemetryNotificationConfigListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// A page token, received from a previous `ListTelemetryNotificationConfigs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListTelemetryNotificationConfigs` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CustomerTelemetryNotificationConfigListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of notification configs to return. The service may return fewer than this value. If unspecified, at most 100 notification configs will be returned. The maximum value is 100; values above 100 will be coerced to 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CustomerTelemetryNotificationConfigListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryNotificationConfigListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryNotificationConfigListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementTelemetryReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerTelemetryNotificationConfigListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerTelemetryNotificationConfigListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerTelemetryNotificationConfigListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Get telemetry user.
+///
+/// A builder for the *telemetry.users.get* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().telemetry_users_get("name")
+///              .read_mask(&Default::default())
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerTelemetryUserGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _name: String,
+    _read_mask: Option<client::FieldMask>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerTelemetryUserGetCall<'a, S> {}
+
+impl<'a, S> CustomerTelemetryUserGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1TelemetryUser)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.telemetry.users.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name", "readMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._read_mask.as_ref() {
+            params.push("readMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementTelemetryReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the `TelemetryUser` to return.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> CustomerTelemetryUserGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Read mask to specify which fields to return. Supported read_mask paths are: - name - org_unit_id - user_id - user_email - user_device.device_id - user_device.audio_status_report - user_device.device_activity_report - user_device.network_bandwidth_report - user_device.peripherals_report 
+    ///
+    /// Sets the *read mask* query property to the given value.
+    pub fn read_mask(mut self, new_value: client::FieldMask) -> CustomerTelemetryUserGetCall<'a, S> {
+        self._read_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryUserGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryUserGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementTelemetryReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerTelemetryUserGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerTelemetryUserGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerTelemetryUserGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// List all telemetry users.
+///
+/// A builder for the *telemetry.users.list* method supported by a *customer* resource.
+/// It is not used directly, but through a [`CustomerMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_chromemanagement1 as chromemanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use chromemanagement1::{ChromeManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.customers().telemetry_users_list("parent")
+///              .read_mask(&Default::default())
+///              .page_token("ipsum")
+///              .page_size(-23)
+///              .filter("takimata")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CustomerTelemetryUserListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ChromeManagement<S>,
+    _parent: String,
+    _read_mask: Option<client::FieldMask>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CustomerTelemetryUserListCall<'a, S> {}
+
+impl<'a, S> CustomerTelemetryUserListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleChromeManagementV1ListTelemetryUsersResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "chromemanagement.customers.telemetry.users.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "readMask", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._read_mask.as_ref() {
+            params.push("readMask", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/telemetry/users";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::ChromeManagementTelemetryReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Customer id or "my_customer" to use the customer associated to the account making the request.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> CustomerTelemetryUserListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Read mask to specify which fields to return. Supported read_mask paths are: - name - org_unit_id - user_id - user_email - user_device.device_id - user_device.audio_status_report - user_device.device_activity_report - user_device.network_bandwidth_report - user_device.peripherals_report 
+    ///
+    /// Sets the *read mask* query property to the given value.
+    pub fn read_mask(mut self, new_value: client::FieldMask) -> CustomerTelemetryUserListCall<'a, S> {
+        self._read_mask = Some(new_value);
+        self
+    }
+    /// Token to specify next page in the list.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CustomerTelemetryUserListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of results to return. Default value is 100. Maximum value is 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CustomerTelemetryUserListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Only include resources that match the filter. Supported filter fields: - user_id - user_org_unit_id 
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> CustomerTelemetryUserListCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryUserListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryUserListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::ChromeManagementTelemetryReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CustomerTelemetryUserListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CustomerTelemetryUserListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CustomerTelemetryUserListCall<'a, S> {
         self._scopes.clear();
         self
     }

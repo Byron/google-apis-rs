@@ -180,7 +180,7 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 pub struct GoogleSecuritySafebrowsingV4Checksum {
     /// The SHA256 hash of the client state; that is, of the sorted list of all hashes present in the database.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha256: Option<Vec<u8>>,
 }
 
@@ -246,7 +246,7 @@ pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequestListUpdateRe
     pub platform_type: Option<String>,
     /// The current state of the client for the requested list (the encrypted client state that was received from the last successful list update).
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub state: Option<Vec<u8>>,
     /// The types of entries present in the list.
     #[serde(rename="threatEntryType")]
@@ -337,7 +337,7 @@ pub struct GoogleSecuritySafebrowsingV4FetchThreatListUpdatesResponseListUpdateR
     /// The new client state, in encrypted format. Opaque to clients.
     #[serde(rename="newClientState")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub new_client_state: Option<Vec<u8>>,
     /// The platform type for which data is returned.
     #[serde(rename="platformType")]
@@ -384,7 +384,7 @@ pub struct GoogleSecuritySafebrowsingV4FindFullHashesRequest {
     /// The current client states for each of the client's local threat lists.
     #[serde(rename="clientStates")]
     
-    #[serde_as(as = "Option<Vec<::client::serde::urlsafe_base64::Wrapper>>")]
+    #[serde_as(as = "Option<Vec<::client::serde::standard_base64::Wrapper>>")]
     pub client_states: Option<Vec<Vec<u8>>>,
     /// The lists and hashes to be checked.
     #[serde(rename="threatInfo")]
@@ -501,7 +501,7 @@ pub struct GoogleSecuritySafebrowsingV4RawHashes {
     /// The hashes, in binary format, concatenated into one long string. Hashes are sorted in lexicographic order. For JSON API users, hashes are base64-encoded.
     #[serde(rename="rawHashes")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub raw_hashes: Option<Vec<u8>>,
 }
 
@@ -533,7 +533,7 @@ pub struct GoogleSecuritySafebrowsingV4RiceDeltaEncoding {
     /// The encoded deltas that are encoded using the Golomb-Rice coder.
     #[serde(rename="encodedData")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub encoded_data: Option<Vec<u8>>,
     /// The offset of the first entry in the encoded data, or, if only a single integer was encoded, that single integer's value. If the field is empty or missing, assume zero.
     #[serde(rename="firstValue")]
@@ -562,11 +562,11 @@ impl client::Part for GoogleSecuritySafebrowsingV4RiceDeltaEncoding {}
 pub struct GoogleSecuritySafebrowsingV4ThreatEntry {
     /// The digest of an executable in SHA256 format. The API supports both binary and hex digests. For JSON requests, digests are base64-encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub digest: Option<Vec<u8>>,
     /// A hash prefix, consisting of the most significant 4-32 bytes of a SHA256 hash. This field is in binary format. For JSON requests, hashes are base64-encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub hash: Option<Vec<u8>>,
     /// A URL.
     
@@ -600,11 +600,11 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatEntryMetadata {}
 pub struct GoogleSecuritySafebrowsingV4ThreatEntryMetadataMetadataEntry {
     /// The metadata entry key. For JSON requests, the key is base64-encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub key: Option<Vec<u8>>,
     /// The metadata entry value. For JSON requests, the value is base64-encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub value: Option<Vec<u8>>,
 }
 
@@ -721,7 +721,7 @@ pub struct GoogleSecuritySafebrowsingV4ThreatHitUserInfo {
     /// Unique user identifier defined by the client.
     #[serde(rename="userId")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub user_id: Option<Vec<u8>>,
 }
 
@@ -1299,7 +1299,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("encodedRequest", ::client::serde::urlsafe_base64::to_string(&self._encoded_request));
+        params.push("encodedRequest", ::client::serde::standard_base64::to_string(&self._encoded_request));
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }
@@ -1540,7 +1540,7 @@ where
         }
 
         let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("encodedRequest", ::client::serde::urlsafe_base64::to_string(&self._encoded_request));
+        params.push("encodedRequest", ::client::serde::standard_base64::to_string(&self._encoded_request));
         if let Some(value) = self._client_version.as_ref() {
             params.push("clientVersion", value);
         }

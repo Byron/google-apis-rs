@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Policy Troubleshooter* crate version *5.0.3+20230121*, where *20230121* is the exact revision of the *policytroubleshooter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Policy Troubleshooter* crate version *5.0.3+20240303*, where *20240303* is the exact revision of the *policytroubleshooter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
 //! Everything else about the *Policy Troubleshooter* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
